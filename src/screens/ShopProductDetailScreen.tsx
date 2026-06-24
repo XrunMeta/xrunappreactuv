@@ -104,13 +104,6 @@ export const v_a59951 = () => {
 
     const [v_32eda7, v_047920] = v_5ab095<'desc' | 'guide'>('desc');
 
-    const [v_1de7ee, v_c488ef] = v_5ab095(false);
-    const [v_a27651, v_da5eb5] = v_5ab095<(() => void) | null>(null);
-    const v_e78315 = v_de06a3((v_e2be2d) => {
-        v_da5eb5(() => v_e2be2d);
-        v_c488ef(true);
-    }, []);
-
     v_c4deb2(() => {
         const v_1ae212 = v_1ed974.addEventListener('hardwareBackPress', () => {
             v_9b57fc(v_ce4741.shop);
@@ -800,7 +793,16 @@ export const v_a59951 = () => {
                             <Text style={[v_d81136.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{v_ba7f97}</Text>
                             {}
                             {!v_d0d89e && (
-                                <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', marginTop: 10 }}>
+                                    <Text style={[v_d81136.detailPriceText, { marginTop: 0 }]}>{Number(v_01bee9.price ?? 0).toLocaleString()} XRUN</Text>
+                                    <Text style={v_d81136.detailPriceHolding}>
+                                        {`  ${v_8d41d7('screens.shopProductDetail.myXrunBalance')}: ${
+                                            v_5db874
+                                                ? (v_a1c497 == null ? '-' : v_a1c497.toLocaleString())
+                                                : v_1d54f1.toLocaleString()
+                                        } XRUN`}
+                                    </Text>
+                                </View>
                             )}
                             {}
                             {v_25cfbb > 9999 && null}
@@ -841,17 +843,6 @@ export const v_a59951 = () => {
                             </View>
                         </View>
                     ) : null}
-                    {}
-                    {!v_d0d89e && (
-                        <TouchableOpacity
-                            style={v_d81136.paymentInfoLink}
-                            onPress={() => v_c488ef(true)}
-                            activeOpacity={0.7}
-                        >
-                            <Feather name="info" size={14} color="#1E3A5F" />
-                            <Text style={v_d81136.paymentInfoLinkText}>{v_8d41d7('screens.shopProductDetail.paymentInfo')}</Text>
-                        </TouchableOpacity>
-                    )}
 
                     {
 }
@@ -929,7 +920,7 @@ export const v_a59951 = () => {
 
                     <TouchableOpacity
                         style={[v_d81136.purchaseButton, v_673bf2 && v_d81136.purchaseButtonDisabled]}
-                        onPress={() => v_e78315(() => { v_23d029(''); v_37f2b0(true); })}
+                        onPress={() => { v_23d029(''); v_37f2b0(true); }}
                         disabled={v_673bf2 || v_660822 == null}
                         activeOpacity={0.8}
                     >
@@ -948,7 +939,7 @@ export const v_a59951 = () => {
                 ) : v_5db874 ? (
                     <TouchableOpacity
                         style={[v_d81136.purchaseButton, v_18a900 && v_d81136.purchaseButtonDisabled]}
-                        onPress={() => v_e78315(v_b000c1)}
+                        onPress={v_b000c1}
                         disabled={v_18a900 || v_837630 || v_660822 == null}
                         activeOpacity={0.8}
                     >
@@ -1003,79 +994,6 @@ export const v_a59951 = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </Modal>
-
-            {}
-            <Modal
-                visible={v_1de7ee}
-                transparent
-                animationType="fade"
-                onRequestClose={() => v_c488ef(false)}
-            >
-                <TouchableOpacity activeOpacity={1} style={v_d81136.modalOverlay} onPress={() => v_c488ef(false)}>
-                    <TouchableOpacity activeOpacity={1} style={[v_d81136.paymentSuccessModal, { paddingTop: 24 }]} onPress={(v_9e86fd) => v_9e86fd.stopPropagation()}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                            <Feather name="credit-card" size={18} color="#1E3A5F" />
-                            <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827' }}>{v_8d41d7('screens.shopProductDetail.paymentInfo')}</Text>
-                        </View>
-                        <View style={v_d81136.paymentInfoModalRow}>
-                            <Text style={v_d81136.paymentInfoModalLabel}>{v_8d41d7('screens.shopProductDetail.paymentAmount')}</Text>
-                            <Text style={v_d81136.paymentInfoModalValue}>{(v_5db874 ? v_e72b09 : v_01bee9.price).toLocaleString()} XRUN</Text>
-                        </View>
-                        <View style={v_d81136.paymentInfoModalRow}>
-                            <Text style={v_d81136.paymentInfoModalLabel}>{v_8d41d7('screens.shopProductDetail.myXrunBalance')}</Text>
-                            {v_19340b ? (
-                                <ActivityIndicator size="small" color="#1E3A5F" />
-                            ) : (
-                                <Text style={v_d81136.paymentInfoModalValue}>
-                                    {v_5db874
-                                        ? (v_a1c497 == null ? '-' : `${v_a1c497.toLocaleString()} XRUN`)
-                                        : `${v_1d54f1.toLocaleString()} XRUN`}
-                                </Text>
-                            )}
-                        </View>
-                        <View style={[v_d81136.paymentInfoModalRow, { borderBottomWidth: 0 }]}>
-                            <Text style={v_d81136.paymentInfoModalLabel}>{v_8d41d7('screens.shopProductDetail.remainingXrun')}</Text>
-                            <Text style={v_d81136.paymentInfoModalRemaining}>
-                                {v_5db874
-                                    ? (v_a1c497 == null ? '-' : `${(v_a1c497 - v_e72b09).toLocaleString()} XRUN`)
-                                    : `${v_512b94.toLocaleString()} XRUN`}
-                            </Text>
-                        </View>
-                        {}
-                        {v_a27651 ? (
-                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
-                                <TouchableOpacity
-                                    onPress={() => { v_da5eb5(null); v_c488ef(false); }}
-                                    style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#e5e7eb', alignItems: 'center' }}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={{ color: '#374151', fontWeight: '600' }}>{v_8d41d7('screens.shop.iak.cancel')}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        const v_16dbdb = v_a27651;
-                                        v_da5eb5(null);
-                                        v_c488ef(false);
-                                        v_16dbdb();
-                                    }}
-                                    style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={{ color: '#fff', fontWeight: '700' }}>{v_8d41d7('screens.shopProductDetail.purchaseButton')}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ) : (
-                            <TouchableOpacity
-                                onPress={() => v_c488ef(false)}
-                                style={{ marginTop: 16, padding: 12, borderRadius: 8, backgroundColor: '#1E3A5F', alignItems: 'center' }}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={{ color: '#fff', fontWeight: '700' }}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
-                            </TouchableOpacity>
-                        )}
-                    </TouchableOpacity>
-                </TouchableOpacity>
             </Modal>
 
             {}
@@ -1579,44 +1497,10 @@ const v_d81136 = v_472849.create({
         letterSpacing: -0.3,
     },
 
-    paymentInfoLink: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        marginTop: -8,
-        marginBottom: 4,
-        paddingHorizontal: 4,
-        paddingVertical: 8,
-        alignSelf: 'flex-start',
-    },
-    paymentInfoLinkText: {
-        fontSize: 13,
-        color: '#1E3A5F',
-        fontWeight: '600',
-        textDecorationLine: 'underline',
-    },
-
-    paymentInfoModalRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
-    },
-    paymentInfoModalLabel: {
-        fontSize: 14,
+    detailPriceHolding: {
+        fontSize: 12,
         color: '#6B7280',
-    },
-    paymentInfoModalValue: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#111827',
-    },
-    paymentInfoModalRemaining: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#16a34a',
+        marginLeft: 6,
     },
 
     tabRow: {
