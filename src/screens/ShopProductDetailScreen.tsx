@@ -793,7 +793,7 @@ export const v_a59951 = () => {
                             {!v_a12826 && (
                                 <Image
                                     source={v_6ef3ee}
-                                    style={{ width: '100%', height: 200, borderRadius: 16 }}
+                                    style={{ width: '100%', aspectRatio: 1, borderRadius: 16 }}
                                     resizeMode="cover"
                                     onError={() => v_aad6d1(true)}
                                 />
