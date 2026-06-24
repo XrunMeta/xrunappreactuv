@@ -1,10 +1,15 @@
 import v_a3453e from 'bapkr';
-import { v_4623af, v_19b633, v_472849, v_629153, v_7e4944, v_5e8657 } from 'rcmrninabrnb';
+import { v_4623af, v_19b633, v_472849, v_629153, v_fee73b } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
+import { v_e1c2cb } from '../services/clickTracker';
 
 interface PrimaryButtonProps extends v_629153 {
   title: string;
   fullWidth?: boolean;
+
+  trackKey?: string;
+
+  trackParams?: Record<string, unknown>;
 }
 
 export const PrimaryButton: v_a3453e.FC<PrimaryButtonProps> = ({
@@ -12,8 +17,23 @@ export const PrimaryButton: v_a3453e.FC<PrimaryButtonProps> = ({
   fullWidth: v_145388 = false,
   style: v_7fa4e4,
   disabled: v_4a6533,
+  trackKey: v_d2018d,
+  trackParams: v_cb79a2,
+  onPress: v_719eed,
   ...v_b1927c
 }) => {
+  const v_5ba0f2 = (e: v_fee73b) => {
+    if (v_d2018d) {
+      v_e1c2cb('primary_button_click', {
+        category: 'button',
+        elementKey: v_d2018d,
+        elementText: v_9f1622,
+        params: v_cb79a2,
+      });
+    }
+    v_719eed?.(v_9e86fd);
+  };
+
   return (
     <TouchableOpacity
       style={[
@@ -24,6 +44,7 @@ export const PrimaryButton: v_a3453e.FC<PrimaryButtonProps> = ({
       ]}
       disabled={v_4a6533}
       activeOpacity={0.8}
+      onPress={v_5ba0f2}
       {...v_b1927c}
     >
       <Text style={v_d81136.text}>{v_9f1622}</Text>

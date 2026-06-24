@@ -9,6 +9,7 @@ import v_a3453e, {
 } from 'bapkr';
 import { v_1ed974, v_326be8 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_9673ae, v_e1c2cb } from '../services/clickTracker';
 
 export const v_ce4741 = {
   authLanding: 'authLanding',
@@ -121,6 +122,11 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
   }, [v_8d490a]);
 
   v_c4deb2(() => {
+    if (!v_2167f0) return;
+    v_9673ae(v_0f0c7b);
+  }, [v_0f0c7b, v_2167f0]);
+
+  v_c4deb2(() => {
     const v_8a5f7b = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     const v_d0a230 = async () => {
       const v_b66f2c = Date.now();
@@ -208,6 +214,7 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
       const v_393a6b = v_cf6dc2.current;
       const v_0f0c7b = v_393a6b[v_393a6b.length - 1];
       console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', v_393a6b.length, '화면:', v_393a6b, '현재 화면:', v_0f0c7b);
+      v_e1c2cb('back_press', { category: 'navigation', params: { from: v_0f0c7b } });
 
       if (v_0f0c7b === 'walletKeyTutorial') {
         console.log('[Navigation] BackHandler: 가입 튜토리얼 - 백버튼 차단');

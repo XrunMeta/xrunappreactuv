@@ -92,6 +92,7 @@ import { v_e8d7c0 } from './src/services/ayet';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
+import { v_122a16 } from './src/services/clickTracker';
 
 let v_09243c = null;
 try {
@@ -989,6 +990,10 @@ export default function v_6540c3() {
     };
 
     v_6c5111();
+  }, []);
+
+  v_c4deb2(() => {
+    void v_122a16({ enabled: false });
   }, []);
 
   v_c4deb2(() => {
