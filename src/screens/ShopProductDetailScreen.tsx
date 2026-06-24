@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996, v_e767d1, v_1ed974 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_7618c3, v_07a341, v_122070, v_326be8, v_79c4f2, v_aa7413, v_39a996, v_e767d1, v_1ed974 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_556baf, v_570c34 } from '../components';
@@ -789,19 +789,18 @@ export const v_a59951 = () => {
                             </View>
                         )}
                         <View style={v_d81136.productImageContainer}>
-                            <View style={v_d81136.productImageWrapper}>
-                                {v_a12826 ? (
-
-                                    <View style={v_d81136.productImage} />
-                                ) : (
-                                    <Image
-                                        source={v_6ef3ee}
-                                        style={v_d81136.productImage}
-                                        resizeMode="contain"
-                                        onError={() => v_aad6d1(true)}
-                                    />
-                                )}
-                            </View>
+                            {}
+                            {v_a12826 ? (
+                                <View style={v_d81136.productImageWrapper} />
+                            ) : (
+                                <ImageBackground
+                                    source={v_6ef3ee}
+                                    style={v_d81136.productImageWrapper}
+                                    imageStyle={{ borderRadius: 16 }}
+                                    resizeMode="contain"
+                                    onError={() => v_aad6d1(true)}
+                                />
+                            )}
                         </View>
                         {}
                         <View style={[v_d81136.productInfoContainer, { alignItems: 'flex-start' }]}>
