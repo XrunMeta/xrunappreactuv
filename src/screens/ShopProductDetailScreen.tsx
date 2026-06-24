@@ -1516,17 +1516,12 @@ const styles = StyleSheet.create({
         height: 200,
 
         borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#ffffff',
+        backgroundColor: '#F3F4F6',
     },
     productImage: {
         width: '100%',
         height: '100%',
-
-        borderRadius: 16,
     },
     productInfoContainer: {
         alignItems: 'center',
