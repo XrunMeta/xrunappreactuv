@@ -916,19 +916,15 @@ export const ShopProductDetailScreen = () => {
                         </View>
 
                         {}
-                        {detailTab === 'desc' && (
+                        {detailTab === 'desc' && (hasDetailDescription || product.description) && (
                             <View style={{ paddingTop: 16 }}>
                                 {hasDetailDescription ? (
                                     <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
                                         {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
                                     </Text>
-                                ) : product.description ? (
+                                ) : (
                                     <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
                                         {String(product.description).trim()}
-                                    </Text>
-                                ) : (
-                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, color: '#9CA3AF' }]}>
-                                        {t('screens.shopProductDetail.noDescription')}
                                     </Text>
                                 )}
                             </View>
