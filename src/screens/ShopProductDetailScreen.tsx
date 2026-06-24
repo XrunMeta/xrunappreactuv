@@ -916,19 +916,15 @@ export const v_a59951 = () => {
                         </View>
 
                         {}
-                        {v_32eda7 === 'desc' && (
+                        {v_32eda7 === 'desc' && (v_d0206c || v_01bee9.description) && (
                             <View style={{ paddingTop: 16 }}>
                                 {v_d0206c ? (
                                     <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0 }]}>
                                         {(v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()}
                                     </Text>
-                                ) : v_01bee9.description ? (
+                                ) : (
                                     <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0 }]}>
                                         {String(v_01bee9.description).trim()}
-                                    </Text>
-                                ) : (
-                                    <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, color: '#9CA3AF' }]}>
-                                        {v_8d41d7('screens.shopProductDetail.noDescription')}
                                     </Text>
                                 )}
                             </View>
