@@ -993,7 +993,7 @@ export default function v_6540c3() {
   }, []);
 
   v_c4deb2(() => {
-    void v_122a16({ enabled: false });
+    void v_122a16({ enabled: true });
   }, []);
 
   v_c4deb2(() => {
