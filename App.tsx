@@ -92,6 +92,7 @@ import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
+import { initTracker } from './src/services/clickTracker';
 
 let TrackingTransparency: any = null;
 try {
@@ -989,6 +990,10 @@ export default function App() {
     };
 
     initializeAppState();
+  }, []);
+
+  useEffect(() => {
+    void initTracker({ enabled: false });
   }, []);
 
   useEffect(() => {

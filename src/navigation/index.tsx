@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { BackHandler, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { trackScreen, trackEvent } from '../services/clickTracker';
 
 export const ROUTES = {
   authLanding: 'authLanding',
@@ -121,6 +122,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [stack]);
 
   useEffect(() => {
+    if (!isInitialized) return;
+    trackScreen(currentScreen);
+  }, [currentScreen, isInitialized]);
+
+  useEffect(() => {
     const BOOT_SLOW_LOG = '[!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!부팅 느림]';
     const checkLoginStatus = async () => {
       const t0 = Date.now();
@@ -208,6 +214,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
       const currentStack = stackRef.current;
       const currentScreen = currentStack[currentStack.length - 1];
       console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', currentStack.length, '화면:', currentStack, '현재 화면:', currentScreen);
+      trackEvent('back_press', { category: 'navigation', params: { from: currentScreen } });
 
       if (currentScreen === 'walletKeyTutorial') {
         console.log('[Navigation] BackHandler: 가입 튜토리얼 - 백버튼 차단');

@@ -1,10 +1,15 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, GestureResponderEvent } from 'react-native';
 import { COLORS, FONTS } from '../constants';
+import { trackEvent } from '../services/clickTracker';
 
 interface PrimaryButtonProps extends TouchableOpacityProps {
   title: string;
   fullWidth?: boolean;
+
+  trackKey?: string;
+
+  trackParams?: Record<string, unknown>;
 }
 
 export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
@@ -12,8 +17,23 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   fullWidth = false,
   style,
   disabled,
+  trackKey,
+  trackParams,
+  onPress,
   ...props
 }) => {
+  const handlePress = (e: GestureResponderEvent) => {
+    if (trackKey) {
+      trackEvent('primary_button_click', {
+        category: 'button',
+        elementKey: trackKey,
+        elementText: title,
+        params: trackParams,
+      });
+    }
+    onPress?.(e);
+  };
+
   return (
     <TouchableOpacity
       style={[
@@ -24,6 +44,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       ]}
       disabled={disabled}
       activeOpacity={0.8}
+      onPress={handlePress}
       {...props}
     >
       <Text style={styles.text}>{title}</Text>
