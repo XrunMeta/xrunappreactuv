@@ -598,17 +598,9 @@ export const v_10886b = () => {
                     <Text style={v_d81136.productTitle} numberOfLines={2}>
                         {v_01bee9.title}
                     </Text>
+                    {}
                     <View style={v_d81136.productFooter}>
-                        <View style={v_d81136.priceContainer}>
-                            <View style={v_d81136.xplayIconContainer}>
-                                <Image
-                                    source={v_33c40c}
-                                    style={v_d81136.xrunIcon}
-                                    resizeMode="contain"
-                                />
-                            </View>
-                            <Text style={v_d81136.priceText}>{v_01bee9.price.toLocaleString()}</Text>
-                        </View>
+                        <Text style={v_d81136.priceText}>{v_01bee9.price.toLocaleString()} XRUN</Text>
                         {v_80e8c0 && (
                             <TouchableOpacity
                                 style={v_d81136.purchaseButton}
@@ -1035,20 +1027,19 @@ const v_d81136 = v_472849.create({
         marginBottom: 2,
     },
     productTitle: {
-        fontSize: 14,
-        fontFamily: 'Roboto-SemiBold',
+        fontSize: 15,
+        fontFamily: 'Roboto-Bold',
         color: '#101828',
-        marginBottom: 2,
-        lineHeight: 18,
-        height: 40, 
+        marginBottom: 8,
+        lineHeight: 20,
+        height: 60, 
     },
     productFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 9,
-        borderTopWidth: 1.108,
-        borderTopColor: '#f3f4f6',
+        paddingTop: 4,
+
     },
     priceContainer: {
         flexDirection: 'row',
@@ -1079,9 +1070,10 @@ const v_d81136 = v_472849.create({
         height: 24,
     },
     priceText: {
-        fontSize: 16,
+
+        fontSize: 18,
         fontFamily: 'Roboto-Bold',
-        color: '#343a5a',
+        color: '#111827',
         letterSpacing: -0.4,
     },
     purchaseButton: {
