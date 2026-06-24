@@ -598,17 +598,9 @@ export const ShopScreen = () => {
                     <Text style={styles.productTitle} numberOfLines={2}>
                         {product.title}
                     </Text>
+                    {}
                     <View style={styles.productFooter}>
-                        <View style={styles.priceContainer}>
-                            <View style={styles.xplayIconContainer}>
-                                <Image
-                                    source={xrunRoundLogo}
-                                    style={styles.xrunIcon}
-                                    resizeMode="contain"
-                                />
-                            </View>
-                            <Text style={styles.priceText}>{product.price.toLocaleString()}</Text>
-                        </View>
+                        <Text style={styles.priceText}>{product.price.toLocaleString()} XRUN</Text>
                         {showPurchaseButton && (
                             <TouchableOpacity
                                 style={styles.purchaseButton}
@@ -1035,20 +1027,19 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     productTitle: {
-        fontSize: 14,
-        fontFamily: 'Roboto-SemiBold',
+        fontSize: 15,
+        fontFamily: 'Roboto-Bold',
         color: '#101828',
-        marginBottom: 2,
-        lineHeight: 18,
-        height: 40, 
+        marginBottom: 8,
+        lineHeight: 20,
+        height: 60, 
     },
     productFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 9,
-        borderTopWidth: 1.108,
-        borderTopColor: '#f3f4f6',
+        paddingTop: 4,
+
     },
     priceContainer: {
         flexDirection: 'row',
@@ -1079,9 +1070,10 @@ const styles = StyleSheet.create({
         height: 24,
     },
     priceText: {
-        fontSize: 16,
+
+        fontSize: 18,
         fontFamily: 'Roboto-Bold',
-        color: '#343a5a',
+        color: '#111827',
         letterSpacing: -0.4,
     },
     purchaseButton: {
