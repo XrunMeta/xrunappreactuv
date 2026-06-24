@@ -894,31 +894,48 @@ export const v_a59951 = () => {
                                         ? (v_90e57e?.content || v_90e57e?.contentAddDesc || '').trim()
                                         : String(v_01bee9.description).trim();
 
-                                    if (v_453c44.includes('▶')) {
-                                        const v_946c09 = v_453c44.split('▶').map((v_fd5f43) => v_fd5f43.trim()).filter(Boolean);
-                                        return v_946c09.map((v_b6a7e0, v_e86ad8) => {
-                                            const v_a52412 = v_b6a7e0.split('\n').map((v_1614db) => v_1614db.trim()).filter(Boolean);
-                                            const v_66b19f = v_a52412[0] || '';
-                                            const v_4d33b2 = v_a52412.slice(1);
-                                            return (
-                                                <View key={v_e86ad8} style={{ marginBottom: v_e86ad8 < v_946c09.length - 1 ? 16 : 0 }}>
-                                                    <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
-                                                        {v_66b19f}
-                                                    </Text>
-                                                    {v_4d33b2.map((v_e6293e, v_ebec57) => (
-                                                        <Text key={v_ebec57} style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>
-                                                            {v_e6293e}
-                                                        </Text>
-                                                    ))}
-                                                </View>
-                                            );
-                                        });
+                                    const v_a52412 = v_453c44.split('\n').map((v_1614db) => v_1614db.trim()).filter(Boolean);
+                                    const v_946c09 = [];
+                                    let v_c3bc75 = null;
+                                    const v_fea108 = /^(?:▶\s*(.+)|\[([^\]]+)\]\s*(.*))$/;
+                                    for (const v_e6293e of v_a52412) {
+                                        const v_35f85c = v_e6293e.match(v_fea108);
+                                        if (v_35f85c) {
+                                            if (v_c3bc75) v_946c09.push(v_c3bc75);
+                                            const v_66b19f = (v_35f85c[1] ?? v_35f85c[2] ?? '').trim();
+                                            v_c3bc75 = { heading: v_66b19f, body: [] };
+                                            const v_25c4f7 = (v_35f85c[3] ?? '').trim();
+                                            if (v_25c4f7) v_c3bc75.body.push(v_25c4f7);
+                                        } else if (v_c3bc75) {
+                                            v_c3bc75.body.push(v_e6293e);
+                                        } else {
+
+                                            v_c3bc75 = { heading: '', body: [v_e6293e] };
+                                        }
                                     }
-                                    return (
-                                        <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0 }]}>
-                                            {v_453c44}
-                                        </Text>
-                                    );
+                                    if (v_c3bc75) v_946c09.push(v_c3bc75);
+
+                                    if (v_946c09.length === 1 && !v_946c09[0].heading) {
+                                        return (
+                                            <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                                {v_946c09[0].body.join('\n')}
+                                            </Text>
+                                        );
+                                    }
+                                    return v_946c09.map((v_b6a7e0, v_e86ad8) => (
+                                        <View key={v_e86ad8} style={{ marginBottom: v_e86ad8 < v_946c09.length - 1 ? 16 : 0 }}>
+                                            {v_b6a7e0.heading ? (
+                                                <Text style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                                    {v_b6a7e0.heading}
+                                                </Text>
+                                            ) : null}
+                                            {v_b6a7e0.body.map((v_e6293e, v_ebec57) => (
+                                                <Text key={v_ebec57} style={[v_d81136.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>
+                                                    {v_e6293e}
+                                                </Text>
+                                            ))}
+                                        </View>
+                                    ));
                                 })()}
                             </View>
                         )}
