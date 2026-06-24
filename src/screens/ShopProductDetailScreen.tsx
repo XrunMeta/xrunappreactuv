@@ -871,15 +871,37 @@ export const ShopProductDetailScreen = () => {
                         {}
                         {effectiveTab === 'desc' && hasDesc && (
                             <View style={{ paddingTop: 16 }}>
-                                {hasDetailDescription ? (
-                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
-                                        {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
-                                    </Text>
-                                ) : (
-                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
-                                        {String(product.description).trim()}
-                                    </Text>
-                                )}
+                                {(() => {
+                                    const rawContent = hasDetailDescription
+                                        ? (productDetail?.content || productDetail?.contentAddDesc || '').trim()
+                                        : String(product.description).trim();
+
+                                    if (rawContent.includes('▶')) {
+                                        const sections = rawContent.split('▶').map((s) => s.trim()).filter(Boolean);
+                                        return sections.map((sec, idx) => {
+                                            const lines = sec.split('\n').map((l) => l.trim()).filter(Boolean);
+                                            const heading = lines[0] || '';
+                                            const body = lines.slice(1);
+                                            return (
+                                                <View key={idx} style={{ marginBottom: idx < sections.length - 1 ? 16 : 0 }}>
+                                                    <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                                        {heading}
+                                                    </Text>
+                                                    {body.map((line, i) => (
+                                                        <Text key={i} style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>
+                                                            {line}
+                                                        </Text>
+                                                    ))}
+                                                </View>
+                                            );
+                                        });
+                                    }
+                                    return (
+                                        <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                            {rawContent}
+                                        </Text>
+                                    );
+                                })()}
                             </View>
                         )}
 
@@ -909,14 +931,6 @@ export const ShopProductDetailScreen = () => {
             {}
             {!isPurchasedView && (
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
-                {}
-                <Text style={styles.bottomBalanceText}>
-                    {`${t('screens.shopProductDetail.balanceShort')}: ${
-                        isXplayShop
-                            ? (xrunBalanceState == null ? '-' : xrunBalanceState.toLocaleString())
-                            : xrunBalance.toLocaleString()
-                    } XRUN`}
-                </Text>
                 {product.isIak ? (
 
                     <TouchableOpacity
