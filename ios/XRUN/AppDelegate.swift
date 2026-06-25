@@ -6,6 +6,8 @@ import AyetSDK
 import AppTrackingTransparency
 import AdSupport
 
+import AdMixerMediation
+
 #if canImport(GoogleMaps)
 import GoogleMaps
 #endif
@@ -65,6 +67,9 @@ public class AppDelegate: ExpoAppDelegate {
     AyetSDK.shared.setDebug(true)
     #endif
     AyetSDK.shared.initialize(placementId: 22062, externalIdentifier: "guest")
+
+    AMMediation.shared.initialize(mediaKey: "10407", adunitID: ["105809"])
+    NSLog("[NasmediaAd] iOS SDK initialized")
 
     let delegate = ReactNativeDelegate()
     let factory = ExpoReactNativeFactory(delegate: delegate)

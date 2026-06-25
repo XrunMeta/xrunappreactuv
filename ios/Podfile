@@ -51,6 +51,8 @@ $AppsFlyerPurchaseConnector=true
   pod 'Ads-Global', '7.9.1.1'
   # Adison Offerwall SDK (파트너센터 연동) — Android와 동일 버전으로 pin
   pod 'AdisonOfferwallSDK', '5.2.0'
+  # 🔥 [2026-06-26] 나스미디어 nap ssp Mediation (AR Reward AdUnit 105809)
+  pod 'AdMixerMediation'
   config = use_native_modules!(config_command)
 
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
