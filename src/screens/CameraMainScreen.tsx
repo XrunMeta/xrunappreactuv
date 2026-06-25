@@ -24,6 +24,8 @@ import { v_f4e704, v_66b9cc, v_c2fdd1, v_89c10a } from '../components';
 import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
+
+import { v_ab2b01, v_17d0bf, v_d46e1b } from '../services/nasmediaAd';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -911,6 +913,29 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     const v_368ba7 = v_2e375c.map((v_9390e8, v_a56041) => {
       return { ...v_4ac6a7[v_a56041 % v_4ac6a7.length], ...v_9390e8 };
     });
+
+    const v_950238 = v_326be8.OS === 'ios' ? '105809' : '105817';
+    const v_f7d096 = 3;
+    if (v_368ba7.length >= v_f7d096) {
+
+      const v_0f4768 = Array.from({ length: v_368ba7.length }, (v_37eab7, v_ebec57) => v_ebec57);
+      for (let v_ebec57 = v_0f4768.length - 1; v_ebec57 > 0; v_ebec57--) {
+        const v_b75e36 = Math.floor(Math.random() * (v_ebec57 + 1));
+        ;[v_0f4768[v_ebec57], v_0f4768[v_b75e36]] = [v_0f4768[v_b75e36], v_0f4768[v_ebec57]];
+      }
+      const v_24327f = new Set(v_0f4768.slice(0, v_f7d096));
+      v_368ba7.forEach((v_21cc31, v_ebec57) => {
+        if (v_24327f.has(v_ebec57)) {
+          v_21cc31.isVideoToken = true;
+          v_21cc31.videoAdUnitId = v_950238;
+          v_21cc31.ad_company = 'nasmedia_video';
+
+          if (!v_21cc31.name || v_21cc31.name === 'undefined') {
+            v_21cc31.name = '🎬 동영상 보고 적립';
+          }
+        }
+      });
+    }
 
     console.log('==========토큰 렌더링==========');
     console.log('');
@@ -2575,6 +2600,25 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }, [v_572bd3, v_04cb77, v_917f22]);
 
   const v_eed806 = v_de06a3((token: v_60c7c3) => {
+
+    if (v_21cc31.isVideoToken && v_d46e1b()) {
+      (async () => {
+        try {
+          const v_f24fd5 = await v_e84827.getItem('userData');
+          const v_ef7306 = v_f24fd5 ? JSON.parse(v_f24fd5) : null;
+          const v_717992 = Number(v_ef7306?.member ?? 0);
+          if (!v_717992) {
+            console.warn('[nasmedia-video] member id 없음 — 광고 호출 skip');
+            return;
+          }
+          await v_ab2b01();
+          await v_17d0bf(v_717992);
+        } catch (v_49263d) {
+          console.error('[nasmedia-video] 광고 호출 실패:', v_49263d);
+        }
+      })();
+      return; 
+    }
 
     if (v_181e3e.current) {
       clearTimeout(v_181e3e.current);
