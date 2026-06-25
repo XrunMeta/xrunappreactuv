@@ -24,6 +24,8 @@ import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '..
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
+
+import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable } from '../services/nasmediaAd';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -911,6 +913,29 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     const newOrganizedData = nextData.map((data, index) => {
       return { ...spots[index % spots.length], ...data };
     });
+
+    const VIDEO_AD_UNIT = Platform.OS === 'ios' ? '105809' : '105817';
+    const VIDEO_TOKEN_COUNT = 3;
+    if (newOrganizedData.length >= VIDEO_TOKEN_COUNT) {
+
+      const indices = Array.from({ length: newOrganizedData.length }, (_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        ;[indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      const videoSlots = new Set(indices.slice(0, VIDEO_TOKEN_COUNT));
+      newOrganizedData.forEach((token: any, i: number) => {
+        if (videoSlots.has(i)) {
+          token.isVideoToken = true;
+          token.videoAdUnitId = VIDEO_AD_UNIT;
+          token.ad_company = 'nasmedia_video';
+
+          if (!token.name || token.name === 'undefined') {
+            token.name = '🎬 동영상 보고 적립';
+          }
+        }
+      });
+    }
 
     console.log('==========토큰 렌더링==========');
     console.log('');
@@ -2575,6 +2600,25 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, [showBottomPanel, selectedToken, navigateToAd]);
 
   const handleTokenClick = useCallback((token: TokenData) => {
+
+    if (token.isVideoToken && isNasmediaAdAvailable()) {
+      (async () => {
+        try {
+          const userDataStr = await AsyncStorage.getItem('userData');
+          const userData = userDataStr ? JSON.parse(userDataStr) : null;
+          const memberId = Number(userData?.member ?? 0);
+          if (!memberId) {
+            console.warn('[nasmedia-video] member id 없음 — 광고 호출 skip');
+            return;
+          }
+          await initNasmediaAd();
+          await showNasmediaRewardedAd(memberId);
+        } catch (err) {
+          console.error('[nasmedia-video] 광고 호출 실패:', err);
+        }
+      })();
+      return; 
+    }
 
     if (autoAdTimeoutRef.current) {
       clearTimeout(autoAdTimeoutRef.current);

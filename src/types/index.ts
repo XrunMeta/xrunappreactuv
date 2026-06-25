@@ -49,6 +49,9 @@ export interface TokenData {
   campid?: string;
   ad_company?: string; 
   urlAD?: string; 
+
+  isVideoToken?: boolean;
+  videoAdUnitId?: string;  
 }
 
 export interface SpotData {
