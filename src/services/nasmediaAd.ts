@@ -29,6 +29,34 @@ export function v_d46e1b(): boolean {
   return !!v_6a3da4
 }
 
+let v_6da25d = null;
+const v_c03020 = 5 * 60 * 1000;
+
+export async function v_3b9e74(): Promise<{ amount: number; active: boolean }> {
+  const v_5c2f9f = Date.now();
+  if (v_6da25d && v_5c2f9f - v_6da25d.fetchedAt < v_c03020) {
+    return { amount: v_6da25d.value, active: v_6da25d.active };
+  }
+  try {
+    const v_c01615 = process.env.EXPO_PUBLIC_API_ENV === 'preview'
+      ? 'https://oth-path-bab568.example.invalid'
+      : 'https://oth-path-f0013c.example.invalid';
+    const v_8f00b9 = await fetch(`${v_c01615}/nasmedia/video/reward-amount`, {
+      headers: { 'Cache-Control': 'no-cache' },
+    });
+    if (v_8f00b9.ok) {
+      const v_9390e8 = await v_8f00b9.json() as { reward_xrun: number; active: boolean };
+      const v_f63e09 = Number(v_9390e8.reward_xrun) || 0;
+      const v_f8b770 = !!v_9390e8.active;
+      v_6da25d = { value: v_f63e09, active: v_f8b770, fetchedAt: v_5c2f9f };
+      return { amount: v_f63e09, active: v_f8b770 };
+    }
+  } catch (v_49263d) {
+    console.warn('[nasmediaAd] reward-amount fetch failed:', v_49263d);
+  }
+  return { amount: v_6da25d?.value ?? 0, active: v_6da25d?.active ?? false };
+}
+
 export async function v_ab2b01(): Promise<boolean> {
   if (!v_6a3da4) {
     console.warn('[nasmediaAd] native module not linked (구 빌드)')

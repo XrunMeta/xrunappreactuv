@@ -26,7 +26,7 @@ import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
 
-import { v_ab2b01, v_17d0bf, v_d46e1b } from '../services/nasmediaAd';
+import { v_ab2b01, v_17d0bf, v_d46e1b, v_3b9e74 } from '../services/nasmediaAd';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -719,6 +719,14 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const v_181e3e = v_e662ae<NodeJS.Timeout | null>(null);
   const v_a27ed2 = v_e662ae<NodeJS.Timeout | null>(null); 
 
+  const v_f28ed2 = v_e662ae<number>(0);
+
+  v_c4deb2(() => {
+    v_3b9e74().then(({ amount: v_f63e09 }) => {
+      v_f28ed2.current = v_f63e09;
+    }).catch(() => {  });
+  }, []);
+
   type RecentAd = Partial<v_60c7c3> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
   const [v_f87d4d, v_32744e] = v_5ab095<RecentAd[]>([]);
   const [v_558a7d, v_8b4a6c] = v_5ab095(false);
@@ -925,6 +933,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
         ;[v_0f4768[v_ebec57], v_0f4768[v_b75e36]] = [v_0f4768[v_b75e36], v_0f4768[v_ebec57]];
       }
       const v_24327f = new Set(v_0f4768.slice(0, v_f7d096));
+
+      const v_769b05 = v_f28ed2.current;
       v_368ba7.forEach((v_21cc31, v_ebec57) => {
         if (v_24327f.has(v_ebec57)) {
           v_21cc31.isVideoToken = true;
@@ -933,7 +943,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
           v_21cc31.name = '🎬 동영상 보고 적립';
           v_21cc31.brand = '나스미디어';
-          v_21cc31.iconurl = '';  
+          v_21cc31.iconurl = '';
+
+          if (v_769b05 > 0) {
+            v_21cc31.xrunPrice = v_769b05;
+            v_21cc31.coin = String(v_769b05);
+          }
         }
       });
     }
