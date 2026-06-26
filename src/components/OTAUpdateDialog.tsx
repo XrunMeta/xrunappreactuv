@@ -1,5 +1,5 @@
 import v_a3453e, { v_c4deb2, v_e662ae, v_5ab095 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v_6b5698, v_1ed974, v_39a996 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v_6b5698, v_1ed974, v_39a996, v_80fa10 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_94035f from 'ryynyumnbcgyvtiickefs';
 import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
@@ -74,9 +74,14 @@ const OTAUpdateDialog: v_a3453e.FC<OTAUpdateDialogProps> = ({ isAdFinished: v_65
                     v_8d41d7('common.versionUpdate.restartMessage'),
                     [
                         {
-                            text: v_8d41d7('common.versionUpdate.confirm'), 
+                            text: v_8d41d7('common.versionUpdate.confirm'),
                             onPress: () => {
-                                v_1ed974.exitApp(); 
+
+                                try {
+                                    v_80fa10.ForceKill?.killProcess();
+                                } catch {
+                                    v_1ed974.exitApp(); 
+                                }
                             },
                         },
                     ],
