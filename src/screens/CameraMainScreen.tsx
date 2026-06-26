@@ -14,6 +14,7 @@ import {
   Platform,
   Linking,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -930,9 +931,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           token.videoAdUnitId = VIDEO_AD_UNIT;
           token.ad_company = 'nasmedia_video';
 
-          if (!token.name || token.name === 'undefined') {
-            token.name = '🎬 동영상 보고 적립';
-          }
+          token.name = '🎬 동영상 보고 적립';
+          token.brand = '나스미디어';
+          token.iconurl = '';  
         }
       });
     }
@@ -2601,20 +2602,29 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const handleTokenClick = useCallback((token: TokenData) => {
 
-    if (token.isVideoToken && isNasmediaAdAvailable()) {
+    if (token.isVideoToken) {
       (async () => {
         try {
+          if (!isNasmediaAdAvailable()) {
+            Alert.alert('Native module 미연결', '새 APK 를 다시 설치해주세요\n(빌드 1b3d2a3d 이상)');
+            return;
+          }
           const userDataStr = await AsyncStorage.getItem('userData');
           const userData = userDataStr ? JSON.parse(userDataStr) : null;
           const memberId = Number(userData?.member ?? 0);
           if (!memberId) {
-            console.warn('[nasmedia-video] member id 없음 — 광고 호출 skip');
+            Alert.alert('회원 ID 없음', '다시 로그인 후 시도해주세요');
             return;
           }
+          console.log('[nasmedia-video] showRewardedAd 호출 memberId=', memberId);
           await initNasmediaAd();
-          await showNasmediaRewardedAd(memberId);
+          const result = await showNasmediaRewardedAd(memberId);
+          if (!result) {
+            Alert.alert('광고 호출 실패', '잠시 후 다시 시도해주세요\n(광고 인벤토리가 없거나 네트워크 문제)');
+          }
         } catch (err) {
           console.error('[nasmedia-video] 광고 호출 실패:', err);
+          Alert.alert('광고 오류', String(err));
         }
       })();
       return; 
