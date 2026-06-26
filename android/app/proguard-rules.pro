@@ -49,3 +49,15 @@
 # ayeT-Studios Offerwall SDK (Android SDK v2)
 -keep class com.ayet.sdk.** { *; }
 -keep public class com.ayet.sdk.AyetSdk { public *; }
+
+# 🔥 [2026-06-26] 나스미디어 nap ssp SDK v2 (Rewarded video) — R8 stripping 방지
+#   guide: Android SDK 시작하기 - Native > Step 3. Proguard 설정
+-keep class com.nasmedia.admixerssp.** { *; }
+-keep interface com.nasmedia.admixerssp.** { *; }
+-dontwarn com.nasmedia.admixerssp.**
+
+# 나스미디어 네이티브 모듈 (R8 stripping 방지)
+-keep class run.xrun.xrunapp.NasmediaAdModule { *; }
+-keep class run.xrun.xrunapp.NasmediaAdPackage { *; }
+-keepclassmembers class run.xrun.xrunapp.NasmediaAdModule { *; }
+-keepclassmembers class run.xrun.xrunapp.NasmediaAdPackage { *; }
