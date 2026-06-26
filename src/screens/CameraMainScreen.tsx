@@ -26,7 +26,7 @@ import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
 
-import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable } from '../services/nasmediaAd';
+import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable, getNasmediaRewardAmount } from '../services/nasmediaAd';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -719,6 +719,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const autoAdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const tokenClickTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
 
+  const videoRewardAmountRef = useRef<number>(0);
+
+  useEffect(() => {
+    getNasmediaRewardAmount().then(({ amount }) => {
+      videoRewardAmountRef.current = amount;
+    }).catch(() => {  });
+  }, []);
+
   type RecentAd = Partial<TokenData> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
   const [recentAds, setRecentAds] = useState<RecentAd[]>([]);
   const [showRecentModal, setShowRecentModal] = useState(false);
@@ -925,6 +933,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
         ;[indices[i], indices[j]] = [indices[j], indices[i]];
       }
       const videoSlots = new Set(indices.slice(0, VIDEO_TOKEN_COUNT));
+
+      const rewardAmount = videoRewardAmountRef.current;
       newOrganizedData.forEach((token: any, i: number) => {
         if (videoSlots.has(i)) {
           token.isVideoToken = true;
@@ -933,7 +943,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
           token.name = '🎬 동영상 보고 적립';
           token.brand = '나스미디어';
-          token.iconurl = '';  
+          token.iconurl = '';
+
+          if (rewardAmount > 0) {
+            token.xrunPrice = rewardAmount;
+            token.coin = String(rewardAmount);
+          }
         }
       });
     }
