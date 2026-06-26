@@ -52,7 +52,7 @@ class NasmediaAdModule(reactContext: ReactApplicationContext) : ReactContextBase
 
     @ReactMethod
     fun loadAndShowRewardedAd(adUnitId: String, memberId: Int, promise: Promise) {
-        val activity = currentActivity
+        val activity = reactApplicationContext.currentActivity
         if (activity == null) {
             promise.reject("NO_ACTIVITY", "Current activity is null")
             return
