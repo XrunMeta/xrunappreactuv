@@ -14,6 +14,7 @@ import {
   v_326be8,
   v_f2c756,
   v_122070,
+  v_03e392,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
@@ -930,9 +931,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           v_21cc31.videoAdUnitId = v_950238;
           v_21cc31.ad_company = 'nasmedia_video';
 
-          if (!v_21cc31.name || v_21cc31.name === 'undefined') {
-            v_21cc31.name = '🎬 동영상 보고 적립';
-          }
+          v_21cc31.name = '🎬 동영상 보고 적립';
+          v_21cc31.brand = '나스미디어';
+          v_21cc31.iconurl = '';  
         }
       });
     }
@@ -2601,20 +2602,29 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_eed806 = v_de06a3((token: v_60c7c3) => {
 
-    if (v_21cc31.isVideoToken && v_d46e1b()) {
+    if (v_21cc31.isVideoToken) {
       (async () => {
         try {
+          if (!v_d46e1b()) {
+            v_03e392.alert('Native module 미연결', '새 APK 를 다시 설치해주세요\n(빌드 1b3d2a3d 이상)');
+            return;
+          }
           const v_f24fd5 = await v_e84827.getItem('userData');
           const v_ef7306 = v_f24fd5 ? JSON.parse(v_f24fd5) : null;
           const v_717992 = Number(v_ef7306?.member ?? 0);
           if (!v_717992) {
-            console.warn('[nasmedia-video] member id 없음 — 광고 호출 skip');
+            v_03e392.alert('회원 ID 없음', '다시 로그인 후 시도해주세요');
             return;
           }
+          console.log('[nasmedia-video] showRewardedAd 호출 memberId=', v_717992);
           await v_ab2b01();
-          await v_17d0bf(v_717992);
+          const v_43c42e = await v_17d0bf(v_717992);
+          if (!v_43c42e) {
+            v_03e392.alert('광고 호출 실패', '잠시 후 다시 시도해주세요\n(광고 인벤토리가 없거나 네트워크 문제)');
+          }
         } catch (v_49263d) {
           console.error('[nasmedia-video] 광고 호출 실패:', v_49263d);
+          v_03e392.alert('광고 오류', String(v_49263d));
         }
       })();
       return; 
