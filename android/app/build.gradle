@@ -111,7 +111,7 @@ dependencies {
         transitive = true
     }
 
-    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.25'
+    implementation 'io.github.nasmedia-tech:admixer-ssp:2.0.0'
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

@@ -3,18 +3,20 @@ package run.xrun.xrunapp
 import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.nasmedia.admixerssp.AdMixer
-import com.nasmedia.admixerssp.common.AdEvent
-import com.nasmedia.admixerssp.common.AdInfo
-import com.nasmedia.admixerssp.common.AdListener
-import com.nasmedia.admixerssp.reward.RewardInterstitialVideoAd
+import com.nasmedia.admixerssp.common.AdMixer
+import com.nasmedia.admixerssp.ads.AMMRewardVideo
+import com.nasmedia.admixerssp.ads.AMMRewardVideoLoadCallback
+import com.nasmedia.admixerssp.ads.AdError
+import com.nasmedia.admixerssp.ads.AdInfo
+import com.nasmedia.admixerssp.ads.FullScreenContentCallback
+import com.nasmedia.admixerssp.ads.OnUserEarnedRewardListener
 import android.os.Handler
 import android.os.Looper
 
 class NasmediaAdModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
     private val mainHandler = Handler(Looper.getMainLooper())
-    private var rewardAd: RewardInterstitialVideoAd? = null
+    private var loadedAd: AMMRewardVideo? = null
     private var isInitialized = false
 
     override fun getName(): String = "NasmediaAdModule"
@@ -63,66 +65,73 @@ class NasmediaAdModule(reactContext: ReactApplicationContext) : ReactContextBase
         mainHandler.post {
             try {
 
-                rewardAd?.stopRewardVideoAd()
-                rewardAd?.setListener(null)
-
-                val customParams = HashMap<String, String>().apply {
-                    put("xrun_member_id", memberId.toString())
-                }
+                loadedAd?.stop()
+                loadedAd = null
 
                 val adInfo = AdInfo.Builder(adUnitId)
-                    .setCustomParams(customParams)
-                    .setMute(false)
                     .build()
 
-                val ad = RewardInterstitialVideoAd(activity)
-                ad.setAdInfo(adInfo, activity)
-                ad.setListener(object : AdListener {
-                    override fun onReceivedAd(adapterName: String?, adView: Any?) {
-                        Log.d("NasmediaAd", "onReceivedAd adapter=$adapterName")
+                AMMRewardVideo.loadAd(activity, adInfo, object : AMMRewardVideoLoadCallback() {
+                    override fun onSuccessLoadReward(adapterName: String, ad: AMMRewardVideo) {
+                        Log.d("NasmediaAd", "onSuccessLoadReward adapter=$adapterName")
+                        loadedAd = ad
                         sendEvent("NasmediaAd_onLoaded", Arguments.createMap().apply {
                             putString("adapter", adapterName)
                             putString("adUnitId", adUnitId)
                         })
 
-                        mainHandler.post {
-                            ad.showRewardVideoAd()
+                        ad.setFullScreenContentCallback(object : FullScreenContentCallback() {
+                            override fun onAdShowedFullScreenContent() {
+                                Log.d("NasmediaAd", "onAdShowedFullScreenContent")
+                            }
+                            override fun onAdClicked() {
+                                Log.d("NasmediaAd", "onAdClicked")
+                            }
+                            override fun onAdCompleted() {
+                                Log.d("NasmediaAd", "onAdCompleted")
+                            }
+                            override fun onAdDismissedFullScreenContent() {
+                                Log.d("NasmediaAd", "onAdDismissedFullScreenContent")
+                                sendEvent("NasmediaAd_onClosed", Arguments.createMap().apply {
+                                    putString("adUnitId", adUnitId)
+                                })
+                                loadedAd = null
+                            }
+                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                Log.e("NasmediaAd", "onAdFailedToShowFullScreenContent code=${adError.code} msg=${adError.message}")
+                                sendEvent("NasmediaAd_onLoadFailed", Arguments.createMap().apply {
+                                    putInt("errorCode", adError.code)
+                                    putString("errorMsg", adError.message ?: "")
+                                    putString("adUnitId", adUnitId)
+                                })
+                                loadedAd = null
+                            }
+                        })
+
+                        if (ad.hasInterstitial) {
+                            ad.show(activity, object : OnUserEarnedRewardListener {
+                                override fun onUserEarnedReward() {
+                                    Log.d("NasmediaAd", "onUserEarnedReward memberId=$memberId")
+                                    sendEvent("NasmediaAd_onEarnedReward", Arguments.createMap().apply {
+                                        putInt("memberId", memberId)
+                                        putString("adUnitId", adUnitId)
+                                    })
+                                }
+                            })
                         }
                     }
 
-                    override fun onFailedToReceiveAd(adView: Any?, adapterName: String?, errorCode: Int, errorMsg: String?) {
-                        Log.e("NasmediaAd", "onFailedToReceiveAd code=$errorCode msg=$errorMsg")
+                    override fun onFailLoadReward(errorCode: Int, errorMsg: String?) {
+                        Log.e("NasmediaAd", "onFailLoadReward code=$errorCode msg=$errorMsg")
                         sendEvent("NasmediaAd_onLoadFailed", Arguments.createMap().apply {
-                            putString("adapter", adapterName)
                             putInt("errorCode", errorCode)
                             putString("errorMsg", errorMsg ?: "")
                             putString("adUnitId", adUnitId)
                         })
-                    }
-
-                    override fun onEventAd(adView: Any?, adEvent: AdEvent?) {
-                        when (adEvent) {
-                            AdEvent.EARNEDREWARD -> {
-                                Log.d("NasmediaAd", "EARNEDREWARD memberId=$memberId")
-                                sendEvent("NasmediaAd_onEarnedReward", Arguments.createMap().apply {
-                                    putInt("memberId", memberId)
-                                    putString("adUnitId", adUnitId)
-                                })
-                            }
-                            AdEvent.CLOSE, AdEvent.SKIPPED -> {
-                                Log.d("NasmediaAd", "CLOSE/SKIPPED event=$adEvent")
-                                sendEvent("NasmediaAd_onClosed", Arguments.createMap().apply {
-                                    putString("adUnitId", adUnitId)
-                                    putString("event", adEvent.name)
-                                })
-                            }
-                            else -> {  }
-                        }
+                        loadedAd = null
                     }
                 })
 
-                rewardAd = ad
-                ad.loadRewardVideoAd()
                 promise.resolve(true)
             } catch (e: Exception) {
                 Log.e("NasmediaAd", "loadAndShowRewardedAd failed", e)
@@ -134,9 +143,8 @@ class NasmediaAdModule(reactContext: ReactApplicationContext) : ReactContextBase
     @ReactMethod
     fun stopAd(promise: Promise) {
         mainHandler.post {
-            rewardAd?.stopRewardVideoAd()
-            rewardAd?.setListener(null)
-            rewardAd = null
+            loadedAd?.stop()
+            loadedAd = null
             promise.resolve(true)
         }
     }
