@@ -79,7 +79,8 @@ class NasmediaAdModule(reactContext: ReactApplicationContext) : ReactContextBase
                 val adInfo = builder.build()
 
                 val ad = RewardInterstitialVideoAd(activity)
-                ad.setAdInfo(adInfo, activity)
+
+                ad.setAdInfo(adInfo)
                 ad.setListener(object : AdListener {
                     override fun onReceivedAd(adapterName: String?, adView: Any?) {
                         Log.d("NasmediaAd", "onReceivedAd adapter=$adapterName")
@@ -106,8 +107,9 @@ class NasmediaAdModule(reactContext: ReactApplicationContext) : ReactContextBase
                     override fun onEventAd(adView: Any?, adEvent: AdEvent?) {
                         Log.d("NasmediaAd", "onEventAd event=$adEvent")
                         when (adEvent) {
-                            AdEvent.EARNEDREWARD -> {
-                                Log.d("NasmediaAd", "EARNEDREWARD memberId=$memberId")
+
+                            AdEvent.COMPLETION -> {
+                                Log.d("NasmediaAd", "COMPLETION (reward) memberId=$memberId")
                                 sendEvent("NasmediaAd_onEarnedReward", Arguments.createMap().apply {
                                     putInt("memberId", memberId)
                                     putString("adUnitId", adUnitId)
