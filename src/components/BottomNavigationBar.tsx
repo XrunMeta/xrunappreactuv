@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { getIosWalletShowStatus, getAndroidWalletShowStatus } from '../services';
@@ -64,18 +65,25 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
   const [showWallet, setShowWallet] = useState(false);
 
   useEffect(() => {
+    const cacheKey = Platform.OS === 'ios' ? 'cachedShowWallet_ios' : 'cachedShowWallet_android';
+
+    (async () => {
+      try {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached === '1') setShowWallet(true);
+        else if (cached === '0') setShowWallet(false);
+      } catch {  }
+    })();
+
     const fetchStatus = async () => {
       try {
-        if (Platform.OS === 'ios') {
-          const iosOnWallet = await getIosWalletShowStatus(navigate);
-          setShowWallet(iosOnWallet);
-        } else {
-          const androidOnWallet = await getAndroidWalletShowStatus(navigate);
-          setShowWallet(androidOnWallet);
-        }
+        const next = Platform.OS === 'ios'
+          ? await getIosWalletShowStatus(navigate)
+          : await getAndroidWalletShowStatus(navigate);
+        setShowWallet(next);
+        AsyncStorage.setItem(cacheKey, next ? '1' : '0').catch(() => {});
       } catch (error) {
         console.error('[BottomNavigationBar] 지갑 표시 상태 오류:', error);
-        setShowWallet(false);
       }
     };
     fetchStatus();

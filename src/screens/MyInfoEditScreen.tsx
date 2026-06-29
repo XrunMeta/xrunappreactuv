@@ -87,7 +87,13 @@ export const MyInfoEditScreen = () => {
   const { t, i18n } = useTranslation();
   const { reset, canGoBack, goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
-  const { selectedCountryDialCode, setSelectedCountryDialCode, setSelectMode } = useAppContext();
+  const {
+    selectedCountryDialCode,
+    setSelectedCountryDialCode,
+    setSelectMode,
+    setVerificationEmail,
+    setVerificationSuccessRoute,
+  } = useAppContext();
 
   const hasLoadedUserInfoRef = React.useRef(false);
   const isMountedRef = React.useRef(false);

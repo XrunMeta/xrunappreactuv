@@ -6,9 +6,6 @@
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
   <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-  <!-- READ_MEDIA_* 권한 제거 (Google Play 정책: 일회성 사진 접근은 Photo Picker 사용)
-       - 이미지 선택: expo-image-picker 가 Android 13+ 에서 Photo Picker 자동 사용 (권한 불필요)
-       - 사진 저장 (바코드): expo-media-library writeOnly 모드 → MediaStore API 직접 호출 -->
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
   <uses-permission android:name="android.permission.RECORD_AUDIO"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -28,9 +25,11 @@
     <meta-data android:name="com.bytedance.sdk.openadsdk.APP_ID" android:value="8747763"/>
     <meta-data android:name="com.bytedance.sdk.openadsdk.DEBUG" android:value="false"/>
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="oth-google-api-key"/>
-    <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
+    <meta-data android:name="expo.modules.updates.ENABLED" android:value="true"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://u.expo.dev/98780521-4749-4507-8e3a-62a2b3a80783"/>
+    <meta-data android:name="expo.modules.updates.EXPO_RUNTIME_VERSION" android:value="@string/expo_runtime_version"/>
     <activity android:name=".MainActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:theme="@style/Theme.App.SplashScreen" android:exported="true" android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>

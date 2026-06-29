@@ -26,6 +26,11 @@ export default {
     linkErrorMessage: 'Unable to open the current page.',
     loadFailed: 'Failed to load notification list.',
   },
+  toast: {
+    inquiryReplyArrived: '💬 1:1 Inquiry Reply Arrived',
+    newNotification: '🔔 New Notification',
+    moreCount: ' and {{count}} more',
+  },
 };
 
 

@@ -49,6 +49,9 @@ export interface TokenData {
   campid?: string;
   ad_company?: string; 
   urlAD?: string; 
+
+  isVideoToken?: boolean;
+  videoAdUnitId?: string;  
 }
 
 export interface SpotData {
@@ -282,6 +285,12 @@ export interface SignupRequest {
   age: number; 
   recommand: number; 
   os: number; 
+
+  agree_service?: boolean;
+  agree_location?: boolean;
+  agree_privacy?: boolean;
+  social_code?: number;
+  app_source?: string;
 }
 
 export interface SignupResponse {

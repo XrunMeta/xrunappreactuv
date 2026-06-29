@@ -10,9 +10,9 @@
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "splash": {
-      "image": "./assets/icon_xrun_round_logo.png",
+      "image": "./assets/splash_transparent.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": false,
@@ -35,9 +35,28 @@
           "instagram",
           "twitter",
           "whatsapp",
+          "telegram",
+          "whale",
+          "kakaotalk",
+          "kakaolink",
+          "line",
+          "fb",
+          "instagram",
+          "twitter",
+          "whatsapp",
           "telegram"
         ],
         "CFBundleURLTypes": [
+          {
+            "CFBundleTypeRole": "Editor",
+            "CFBundleURLSchemes": [
+              "xrungoApp",
+              "run.xrun.xrunapps",
+              "com.googleusercontent.apps.1003094533748-ht43iomt62g0h1dmiii3huav334pqiie",
+              "com.googleusercontent.apps.1003094533748-2g87114p66dfq8v0f7imi67r9h5on6g4"
+            ],
+            "CFBundleURLName": "run.xrun.xrunapps"
+          },
           {
             "CFBundleTypeRole": "Editor",
             "CFBundleURLSchemes": [
@@ -56,16 +75,16 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "49"
+      "buildNumber": "52"
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 288,
+      "versionCode": 289,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -82,7 +101,27 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
-        "com.google.android.gms.permission.AD_ID"
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO"
       ]
     },
     "web": {
@@ -129,6 +168,10 @@
       "eas": {
         "projectId": "98780521-4749-4507-8e3a-62a2b3a80783"
       }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/98780521-4749-4507-8e3a-62a2b3a80783"
     }
   }
 }

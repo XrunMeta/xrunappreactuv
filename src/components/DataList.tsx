@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   ViewStyle,
   Text,
+  RefreshControl,
 } from 'react-native';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types';
 import { COLORS, SIZES, FONTS } from '../constants';
@@ -27,6 +28,9 @@ export interface DataListProps<T> {
   emptyMessage?: string;
 
   itemProps?: Record<string, any>;
+
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }
 
 const DataListComponent = <T extends Record<string, any>>(
@@ -39,6 +43,8 @@ const DataListComponent = <T extends Record<string, any>>(
     onItemPress,
     emptyMessage,
     itemProps,
+    refreshing,
+    onRefresh,
   }: DataListProps<T>,
   ref: React.Ref<DataListRef>
 ) => {
@@ -176,6 +182,11 @@ const DataListComponent = <T extends Record<string, any>>(
         contentContainerStyle,
       ]}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} />
+        ) : undefined
+      }
       onScroll={({ nativeEvent }) => {
         const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
 

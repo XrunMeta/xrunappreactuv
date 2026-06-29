@@ -11,7 +11,9 @@ import {
   Image,
   Linking,
   Modal,
+  AppState,
 } from 'react-native';
+import type { AppStateStatus } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -115,11 +117,8 @@ function resolveWalletListIconSource(asset: CombinedAsset): any | null {
   const sym = (asset.symbol || '').toUpperCase();
   const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
 
-  if (asset.currency === 1900) {
+  if (asset.currency === 1900 || asset.currency === 19) {
     return null;
-  }
-  if (asset.currency === 19 || sub.includes('ad xrun')) {
-    return require('../../assets/ad-round-logo.png');
   }
   if (sym === 'ETH' || asset.currency === 2) {
     if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
@@ -405,6 +404,30 @@ export const WalletScreen = () => {
     }
   }, [cardsData, customTokens, adXrunAmount, referralAmount, combineTokenData]);
 
+  const pushAutoNavConsumed = useRef(false);
+  useEffect(() => {
+    if (pushAutoNavConsumed.current) return;
+    if (combinedAssets.length === 0) return;
+    (async () => {
+      try {
+        const flag = await AsyncStorage.getItem('pendingPushWalletNav');
+        if (flag !== 'xrun_pol') return;
+        pushAutoNavConsumed.current = true;
+        await AsyncStorage.removeItem('pendingPushWalletNav');
+        const target = combinedAssets.find((a) => Number(a.currency) === 18);
+        if (target) {
+          setSelectedWalletAsset(target);
+          navigate(ROUTES.walletDetail);
+        }
+      } catch (e) {
+        if (__DEV__) console.warn('[WalletScreen] push auto nav fail:', e);
+      }
+    })();
+  }, [combinedAssets, navigate, setSelectedWalletAsset]);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshAllRef = useRef<(() => void) | null>(null);
+
   useEffect(() => {
     if (!member) return;
 
@@ -472,44 +495,42 @@ export const WalletScreen = () => {
             return 0;
           });
 
-          try {
-            console.log('[WalletScreen] RPC 잔액 조회 시도 — member:', member);
-            const baseUrl = getApiBaseUrl();
-            const headers: Record<string, string> = {
-              'Content-Type': 'application/json',
-              Authorization: await getAuthHeader(),
-            };
-            const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ member }),
-            });
-            console.log('[WalletScreen] RPC HTTP 상태:', rpcRes.status);
-            if (rpcRes.ok) {
+          setCardsData(sortedData);
+          setIsLoading(false);
+
+          (async () => {
+            try {
+              const baseUrl = getApiBaseUrl();
+              const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+                Authorization: await getAuthHeader(),
+              };
+              const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ member }),
+              });
+              if (!rpcRes.ok) return;
               const rpcJson: any = await rpcRes.json().catch(() => null);
-              const balances: Array<{ currency: number; address: string; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
-              console.log('[WalletScreen] RPC 잔액 응답:', balances.length, '건');
+              const balances: Array<{ currency: number; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
               const rpcByCurrency = new Map<number, string>();
               for (const b of balances) {
                 if (b.status === 'ok' && b.rpcAmount != null) {
                   rpcByCurrency.set(Number(b.currency), b.rpcAmount);
                 }
               }
-              for (const item of sortedData as any[]) {
+              if (rpcByCurrency.size === 0) return;
+              setCardsData((prev) => prev.map((item: any) => {
                 const cur = Number(item.currency);
-                if (rpcByCurrency.has(cur)) {
-                  const rpcAmt = rpcByCurrency.get(cur)!;
-                  item.Wamount = rpcAmt;
-                  item.amount = rpcAmt;
-                  console.log(`[WalletScreen] currency=${cur} RPC 적용:`, rpcAmt);
-                }
-              }
+                if (!rpcByCurrency.has(cur)) return item;
+                const rpcAmt = rpcByCurrency.get(cur)!;
+                if (String(item.amount) === rpcAmt) return item;
+                return { ...item, Wamount: rpcAmt, amount: rpcAmt };
+              }));
+            } catch (e: any) {
+              console.warn('[WalletScreen] RPC 잔액 백그라운드 갱신 실패:', e?.message);
             }
-          } catch (e: any) {
-            console.warn('[WalletScreen] RPC 잔액 조회 실패 (DB 잔액 그대로 사용):', e?.message);
-          }
-
-          setCardsData(sortedData);
+          })();
 
           const xrunWallet = sortedData.find((item) => Number(item.currency) === 1);
           console.log('[WalletScreen] xrunWallet 찾기:', xrunWallet ? {
@@ -524,8 +545,6 @@ export const WalletScreen = () => {
           } else {
             console.warn('[WalletScreen] ⚠️ currency=1 지갑을 찾을 수 없음! sortedData currencies:', sortedData.map((d: any) => d.currency));
           }
-
-          setIsLoading(false);
         } else {
           console.warn('[WalletScreen] ⚠️ walletResponse에 data 없음:', walletResponse);
           setIsLoading(false);
@@ -589,15 +608,54 @@ export const WalletScreen = () => {
       }
     };
 
+    const refreshAll = () => {
+      if (!member) return;
+      console.log('[WalletScreen] refreshAll — 4종 데이터 fetch');
+      getUsersBalanceUpdateV2(String(member), navigate).catch(() => {});
+      fetchWalletDataAsync();
+      fetchOtherChainsStatusAsync();
+      fetchADXRUNTopBannersAsync();
+      fetchReferralIncomeAsync();
+    };
+    refreshAllRef.current = refreshAll;
+
     fetchWalletDataAsync();
     fetchOtherChainsStatusAsync();
     fetchADXRUNTopBannersAsync();
     fetchReferralIncomeAsync();
 
+    let prevAppState: AppStateStatus = AppState.currentState;
+    const sub = AppState.addEventListener('change', (nextAppState) => {
+      const wasBackground = !!prevAppState.match(/inactive|background/);
+      const isNowActive = nextAppState === 'active';
+      prevAppState = nextAppState;
+      if (wasBackground && isNowActive) refreshAll();
+    });
+
+    let unsub: (() => void) | null = null;
+    import('../utils/walletEvents').then(({ subscribeWalletRefresh }) => {
+      unsub = subscribeWalletRefresh(() => {
+        if (refreshAllRef.current) refreshAllRef.current();
+      });
+    }).catch(() => {});
+
     return () => {
       abortController.abort();
+      sub.remove();
+      if (unsub) unsub();
     };
   }, [member, statusOtherChain, navigate]);
+
+  const onPullRefresh = useCallback(async () => {
+    if (!member || refreshing) return;
+    setRefreshing(true);
+    try {
+      if (refreshAllRef.current) refreshAllRef.current();
+    } finally {
+
+      setTimeout(() => setRefreshing(false), 1200);
+    }
+  }, [member, refreshing]);
 
   const handleCopyAddress = () => {
     if (publicAddress) {
@@ -784,7 +842,10 @@ export const WalletScreen = () => {
         suffix: asset.symbol,
         iconSource,
 
-        fallbackLabel: asset.currency === 1900 ? 'RF' : asset.symbol.slice(0, 2).toUpperCase(),
+        fallbackLabel:
+          asset.currency === 1900 ? 'RF'
+          : asset.currency === 19 ? 'AD'
+          : asset.symbol.slice(0, 2).toUpperCase(),
         fallbackColors: {
           background: diskBg,
           text: textOnDisk,
@@ -838,7 +899,7 @@ export const WalletScreen = () => {
         navigate(ROUTES.adHistory);
       } else if (currency === 1900) {
 
-        navigate(ROUTES.referralSettlement);
+        navigate(ROUTES.referralMyGroup);
       } else {
 
         setSelectedWalletAsset(item);
@@ -862,7 +923,12 @@ export const WalletScreen = () => {
       onPress,
     } = props;
 
-    const iconSize = listIndex === 1 || listIndex === 2 ? Math.round(48 * 0.5) : listIndex === 4 ? Math.round(48 * 0.8) : Math.round(48 * 0.9);
+    const isTextBadge = currency === 19 || currency === 1900;
+    const iconSize = isTextBadge
+      ? Math.round(48 * 0.9)
+      : listIndex === 1 || listIndex === 2 ? Math.round(48 * 0.5)
+      : listIndex === 4 ? Math.round(48 * 0.8)
+      : Math.round(48 * 0.9);
     const [imgError, setImgError] = useState(false);
 
     useEffect(() => {
@@ -894,10 +960,12 @@ export const WalletScreen = () => {
                 <Text
                   style={[
                     styles.tokenIconText,
-                    typeof listIndex === 'number' &&
+
+                    !isTextBadge && typeof listIndex === 'number' &&
                       listIndex > 0 &&
                       listIndex < 3 &&
                       styles.tokenIconTextCompact,
+                    isTextBadge && { fontSize: 20, lineHeight: 24 },
                     { color: fallbackColors?.text || '#343434' },
                   ]}
                   numberOfLines={1}
@@ -1000,6 +1068,8 @@ export const WalletScreen = () => {
               contentContainerStyle={styles.dataListContent}
               keyExtractor={(item, index) => `token-${item.id}-${index}`}
               onItemPress={handleTokenPress}
+              refreshing={refreshing}
+              onRefresh={onPullRefresh}
             />
           )}
         </View>
@@ -1057,6 +1127,20 @@ export const WalletScreen = () => {
               <Text style={styles.walletInfoTitle}>{t('screens.wallet.walletInfo')}</Text>
               <Text style={styles.walletInfoSubtitle}>{t('screens.wallet.walletInfoSubtitle')}</Text>
             </View>
+            {}
+            <TouchableOpacity
+              style={styles.walletInfoRow}
+              onPress={() => {
+                setWalletInfoVisible(false);
+                setTimeout(() => navigate(ROUTES.walletKeyGuide), 250);
+              }}
+            >
+              <View style={styles.walletInfoIconWrap}>
+                <Ionicons name="help-circle-outline" size={22} color="#343a5a" />
+              </View>
+              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.walletInfoRow}
               onPress={() => {
@@ -1071,7 +1155,7 @@ export const WalletScreen = () => {
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.walletInfoRow}
+              style={[styles.walletInfoRow, { borderBottomWidth: 0 }]}
               onPress={() => {
                 setWalletInfoVisible(false);
                 setTimeout(() => navigate(ROUTES.walletRestore), 250);
@@ -1081,19 +1165,6 @@ export const WalletScreen = () => {
                 <Ionicons name="cloud-download-outline" size={22} color="#343a5a" />
               </View>
               <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletRestore')}</Text>
-              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.walletInfoRow, { borderBottomWidth: 0 }]}
-              onPress={() => {
-                setWalletInfoVisible(false);
-                setTimeout(() => navigate(ROUTES.walletKeyGuide), 250);
-              }}
-            >
-              <View style={styles.walletInfoIconWrap}>
-                <Ionicons name="help-circle-outline" size={22} color="#343a5a" />
-              </View>
-              <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
           </View>

@@ -14,6 +14,8 @@ import {
   Platform,
   Linking,
   ScrollView,
+  Alert,
+  NativeModules,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -24,6 +26,8 @@ import { BottomNavigationBar, LevelNotification, Dialog, OptionButton } from '..
 import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
+
+import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable, getNasmediaRewardAmount } from '../services/nasmediaAd';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -716,6 +720,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const autoAdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const tokenClickTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
 
+  const videoRewardAmountRef = useRef<number>(0);
+
+  useEffect(() => {
+    getNasmediaRewardAmount().then(({ amount }) => {
+      videoRewardAmountRef.current = amount;
+    }).catch(() => {  });
+  }, []);
+
   type RecentAd = Partial<TokenData> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
   const [recentAds, setRecentAds] = useState<RecentAd[]>([]);
   const [showRecentModal, setShowRecentModal] = useState(false);
@@ -911,6 +923,36 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     const newOrganizedData = nextData.map((data, index) => {
       return { ...spots[index % spots.length], ...data };
     });
+
+    const VIDEO_AD_UNIT = Platform.OS === 'ios' ? '105809' : '105817';
+    const VIDEO_TOKEN_COUNT = 3;
+    if (newOrganizedData.length >= VIDEO_TOKEN_COUNT) {
+
+      const indices = Array.from({ length: newOrganizedData.length }, (_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        ;[indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      const videoSlots = new Set(indices.slice(0, VIDEO_TOKEN_COUNT));
+
+      const rewardAmount = videoRewardAmountRef.current;
+      newOrganizedData.forEach((token: any, i: number) => {
+        if (videoSlots.has(i)) {
+          token.isVideoToken = true;
+          token.videoAdUnitId = VIDEO_AD_UNIT;
+          token.ad_company = 'nasmedia_video';
+
+          token.name = '🎬 동영상 보고 적립';
+          token.brand = '나스미디어';
+          token.iconurl = '';
+
+          if (rewardAmount > 0) {
+            token.xrunPrice = rewardAmount;
+            token.coin = String(rewardAmount);
+          }
+        }
+      });
+    }
 
     console.log('==========토큰 렌더링==========');
     console.log('');
@@ -2126,7 +2168,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       setAdvertisementParams(adParams);
 
-      const needsExternalBrowser = /gpakorea\.com/i.test(urlAD);
+      const tokenName = String(token?.name ?? '');
+      const needsExternalBrowser = /구독/.test(tokenName) && /gpakorea\.com/i.test(urlAD);
       if (needsExternalBrowser) {
         console.log('[showAdInModal] GPA Korea 광고 — 외부 브라우저로 오픈 (Google OAuth 호환)');
 
@@ -2575,6 +2618,50 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const handleTokenClick = useCallback((token: TokenData) => {
 
+    console.log('[nasmedia-video] handleTokenClick 진입', {
+      isVideoToken: token.isVideoToken,
+      videoAdUnitId: (token as any).videoAdUnitId,
+      ad_company: token.ad_company,
+      name: token.name,
+      nasmediaAvailable: isNasmediaAdAvailable(),
+      hasNativeModule: !!(NativeModules as any).NasmediaAdModule,
+    });
+
+    console.log('[nasmedia-video] 모든 NativeModules keys:', Object.keys(NativeModules).filter(k =>
+      /Nas|Pang|Adis|Ayet|Force|Tap/i.test(k)
+    ).sort());
+
+    if (token.isVideoToken) {
+
+      setShowBottomPanel(false);
+      setSelectedToken(null);
+      (async () => {
+        try {
+          if (!isNasmediaAdAvailable()) {
+            Alert.alert('Native module 미연결', '새 APK 를 다시 설치해주세요\n(빌드 1b3d2a3d 이상)');
+            return;
+          }
+          const userDataStr = await AsyncStorage.getItem('userData');
+          const userData = userDataStr ? JSON.parse(userDataStr) : null;
+          const memberId = Number(userData?.member ?? 0);
+          if (!memberId) {
+            Alert.alert('회원 ID 없음', '다시 로그인 후 시도해주세요');
+            return;
+          }
+          console.log('[nasmedia-video] showRewardedAd 호출 memberId=', memberId);
+          await initNasmediaAd();
+          const result = await showNasmediaRewardedAd(memberId);
+          if (!result) {
+            Alert.alert('광고 호출 실패', '잠시 후 다시 시도해주세요\n(광고 인벤토리가 없거나 네트워크 문제)');
+          }
+        } catch (err) {
+          console.error('[nasmedia-video] 광고 호출 실패:', err);
+          Alert.alert('광고 오류', String(err));
+        }
+      })();
+      return; 
+    }
+
     if (autoAdTimeoutRef.current) {
       clearTimeout(autoAdTimeoutRef.current);
       autoAdTimeoutRef.current = null;
@@ -2725,6 +2812,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       name: token.name,
                       isCompleted: isCompleted,
                     });
+
+                    if (token.spotID === 5) {
+                      navigate(ROUTES.showNapMxReward);
+                      return;
+                    }
 
                     handleTokenClick(token);
                   };

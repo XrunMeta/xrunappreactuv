@@ -21,7 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, SafeScrollView, SafeView } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { COLORS, SIZES, FONTS } from '../constants';
-import { useAppNavigation } from '../navigation';
+import { useAppNavigation, ROUTES } from '../navigation';
 import {
   getNotificationList,
   sendNotificationMessage,
@@ -35,6 +35,10 @@ import { getEnv } from '../utils/env';
 const eventImage = require('../../assets/thumb_event.png');
 const chatXrun = require('../../assets/chat-xrun.png');
 const chatUser = require('../../assets/chat-user.png');
+
+const HOMEPAGE_BASE = 'https://xrun.run';
+const buildBoardUrl = (kind: string, id: number | string): string =>
+  `${HOMEPAGE_BASE}/?board=${kind}&id=${id}`;
 
 const formatDate = (dateString: string): string => {
   try {
@@ -200,8 +204,8 @@ export const MyInfoNotifyScreen = () => {
   const handleContentSizeChange = useCallback(() => {
     if (scrollViewRef.current && notifications.length > 0 && shouldAutoScroll.current) {
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+        scrollViewRef.current?.scrollToEnd({ animated: false });
+      }, 0);
     }
   }, [notifications.length]);
 
@@ -380,7 +384,18 @@ export const MyInfoNotifyScreen = () => {
                 <TouchableOpacity
                   style={[styles.ctaButton, styles.ctaButtonWithMargin]}
                   onPress={async () => {
-                    const url = `https://oth-path-app.example.invalid/oth-path?id=${notification.board}`;
+
+                    const title = String(notification.title ?? '');
+                    if (title.includes('출석체크')) {
+                      try {
+                        await AsyncStorage.setItem('pendingPushWalletNav', 'xrun_pol');
+                        navigate(ROUTES.wallet);
+                      } catch (e) {
+                        console.warn('[Notify] 출석체크 navigate 실패:', e);
+                      }
+                      return;
+                    }
+                    const url = buildBoardUrl('notice', notification.board);
                     Linking.openURL(url).catch(async () => {
                       await showAlert(t('screens.myInfoNotify.alerts.linkError'), t('screens.myInfoNotify.alerts.linkErrorMessage'));
                     });
@@ -391,10 +406,10 @@ export const MyInfoNotifyScreen = () => {
                 </TouchableOpacity>
               )}
               {}
-              {isEvent && notification.guid !== '' && notification.guid !== null && (
+              {isEvent && (
                 <TouchableOpacity
-                  style={styles.ctaButton}
-                  onPress={() => openLink(notification.guid)}
+                  style={[styles.ctaButton, styles.ctaButtonWithMargin]}
+                  onPress={() => openLink(buildBoardUrl('event', notification.board))}
                   activeOpacity={0.85}
                 >
                   <Text style={styles.ctaText}>{t('screens.myInfoNotify.goToEvent')}</Text>

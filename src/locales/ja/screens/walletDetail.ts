@@ -13,6 +13,19 @@ export default {
   withdrawal: '引き出し',
   shop: 'ショップ',
   other: 'その他',
+  priceUpdating: '価格情報を更新中',
+  cat_gift_purchase: 'ギフティコン購入',
+  cat_refund: '返金',
+  cat_attendance: '出席チェック',
+  cat_xplay_zone1: 'Xplay Zone1',
+  cat_xplay_zone2: 'Xplay Zone2',
+  cat_ar_settle: 'AR広告精算',
+  cat_ar_settle_pocr: 'AR広告精算1',
+  cat_ar_settle_nas: 'AR広告精算2',
+  cat_referral_settle: 'リファラル精算',
+  cat_recommender_reward: '推薦者報酬',
+  cat_signup_reward: '新規登録報酬',
+  cat_afterlife: 'アフターライフ',
 };
 
 

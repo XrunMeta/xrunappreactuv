@@ -32,7 +32,7 @@ export const getCurrentOTAVersion = async (): Promise<number> => {
     }
 };
 
-const OTA_ENABLED = false;
+const OTA_ENABLED = true;
 
 export const checkOTAVersion = async (): Promise<OTAVersionInfo | null> => {
     if (!OTA_ENABLED) return null;

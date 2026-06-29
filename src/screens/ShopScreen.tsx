@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl, TextInput, Linking } from 'react-native';
+import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeScrollView, SafeView } from '../components';
@@ -30,9 +31,13 @@ interface ProductData {
     title: string;
     description?: string;
     price: number;
-    image: ImageSourcePropType;
+    image?: ImageSourcePropType | null;
 
     isXplayShop?: boolean;
+
+    isIak?: boolean;
+
+    iakCategory?: string;
 }
 
 const sampleProducts: ProductData[] = [
@@ -83,7 +88,20 @@ function shopItemToProductData(item: ShopItemData): ProductData {
 
 const FALLBACK_KRW_PER_XRUN = 70;
 
-function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number): ProductData {
+function resolveAssetUri(uri: string | null | undefined): string | null {
+    if (!uri) return null;
+    const s = String(uri).trim();
+    if (!s) return null;
+    if (/^https?:\/\//i.test(s)) return s;
+    if (s.startsWith('/files/')) {
+
+        const id = s.slice('/files/'.length);
+        return `https://oth-path-gw.example.invalid/oth-path${id}`;
+    }
+    return s;
+}
+
+function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, defaultImageUri?: string | null): ProductData {
     const rawPrice = typeof item.price === 'number' ? item.price : 0;
 
     const hasBackendXrun = typeof (item as any).priceKRW === 'number';
@@ -94,13 +112,21 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number):
         const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
         xrunPrice = Math.ceil(rawPrice / divisor);
     }
+
+    const resolvedDefault = resolveAssetUri(defaultImageUri);
+    const fallbackImage = resolvedDefault ? { uri: resolvedDefault } : null;
     return {
         id: item.id ?? `g-${item.name ?? ''}`,
-        brand: (item as any).brandName ?? '기프티콘',
+
+        brand: (item as any).brandName ?? (item as any).brand ?? '',
         title: item.name ?? '-',
+
+        description: (item as any).description ?? undefined,
         price: xrunPrice,
-        image: item.imageUrl ? { uri: item.imageUrl } : sampleCU,
+        image: item.imageUrl ? { uri: resolveAssetUri(item.imageUrl) ?? item.imageUrl } : (fallbackImage as any),
         isXplayShop: true,
+        isIak: (item as any).source === 'iak',
+        iakCategory: (item as any).iakCategory ?? (item as any).category ?? undefined,
     };
 }
 
@@ -112,6 +138,8 @@ export const ShopScreen = () => {
     const [tab, setTab] = useState<'xrunStore' | 'myItems'>('xrunStore');
 
     const [xplayProductList, setXplayProductList] = useState<GiftishowProductItem[]>([]);
+
+    const [serverDefaultImage, setServerDefaultImage] = useState<string | null>(null);
     const [xplayLoading, setXplayLoading] = useState(false);
     const [xplayRefreshing, setXplayRefreshing] = useState(false);
     const [xplayError, setXplayError] = useState<string | null>(null);
@@ -123,6 +151,13 @@ export const ShopScreen = () => {
     const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
 
     const [gopaxKrwPerXrun, setGopaxKrwPerXrun] = useState<number>(FALLBACK_KRW_PER_XRUN);
+
+    const [shopCountry, setShopCountry] = useState<'KR' | 'ID' | null>(null);  
+    const [gpsDenied, setGpsDenied] = useState<boolean>(false);
+
+    const SHOP_DEV_EMAILS = ['oth-test@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+    const [isDevAccount, setIsDevAccount] = useState<boolean>(false);
+    const [forceCountry, setForceCountry] = useState<'AUTO' | 'KR' | 'ID'>('AUTO');
     const { navigate } = useAppNavigation();
 
     const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
@@ -245,13 +280,88 @@ export const ShopScreen = () => {
         return () => { cancelled = true; };
     }, []);
 
+    useEffect(() => {
+        (async () => {
+            try {
+                const ud = await AsyncStorage.getItem('userData');
+                const email = ud ? (JSON.parse(ud)?.email ?? '').toLowerCase().trim() : '';
+                if (email && SHOP_DEV_EMAILS.includes(email)) {
+                    setIsDevAccount(true);
+                    const saved = await AsyncStorage.getItem('devShopForceCountry');
+                    if (saved === 'KR' || saved === 'ID') {
+                        setForceCountry(saved);
+
+                        setShopCountry(saved);
+                    }
+                }
+            } catch {  }
+        })();
+
+    }, []);
+
+    const GPS_CACHE_KEY = 'shopGpsCountry';
+    const GPS_CACHE_TTL = 30 * 60 * 1000; 
+    const detectCountry = useCallback(async () => {
+        if (forceCountry !== 'AUTO') {
+            setShopCountry(forceCountry);
+            setGpsDenied(false);
+            return;
+        }
+
+        try {
+            const cached = await AsyncStorage.getItem(GPS_CACHE_KEY);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed?.country && parsed?.ts && (Date.now() - parsed.ts) < GPS_CACHE_TTL) {
+                    setShopCountry(parsed.country === 'ID' ? 'ID' : 'KR');
+                    setGpsDenied(false);
+                    console.log('[ShopScreen] GPS country cache hit:', parsed.country, '(age', Math.round((Date.now() - parsed.ts)/1000), 's)');
+                    return;
+                }
+            }
+        } catch {  }
+        try {
+            const perm = await Location.getForegroundPermissionsAsync();
+            let granted = perm.granted;
+            if (!granted) {
+                const req = await Location.requestForegroundPermissionsAsync();
+                granted = req.granted;
+            }
+            if (!granted) {
+                setGpsDenied(true);
+                setShopCountry('KR');
+                return;
+            }
+            setGpsDenied(false);
+            const pos = await Location.getLastKnownPositionAsync({ maxAge: 60_000, requiredAccuracy: 1000 })
+                ?? await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+            if (!pos?.coords) { setShopCountry('KR'); return; }
+            const geo = await Location.reverseGeocodeAsync({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }).catch(() => []);
+            const isoCountry = (geo?.[0]?.isoCountryCode ?? '').toUpperCase();
+            const finalCountry = isoCountry === 'ID' ? 'ID' : 'KR';
+            setShopCountry(finalCountry);
+            console.log('[ShopScreen] GPS country detected:', isoCountry, '→', finalCountry);
+
+            try {
+                await AsyncStorage.setItem(GPS_CACHE_KEY, JSON.stringify({ country: finalCountry, ts: Date.now() }));
+            } catch {  }
+        } catch (e) {
+            console.warn('[ShopScreen] GPS detect failed, fallback KR:', e);
+            setGpsDenied(true);
+            setShopCountry('KR');
+        }
+    }, [forceCountry]);
+
     const loadXplayProducts = useCallback(async () => {
         setXplayError(null);
-        try {
 
+        const endpoint = shopCountry === 'ID' ? '/getIakActiveGoods' : '/getGiftishowActiveGoods';
+        try {
             const axiosInstance = (await import('../services')).createAxiosInstance();
-            const res = await axiosInstance.post('/getGiftishowActiveGoods', {});
+            const res = await axiosInstance.post(endpoint, {});
             const raw = Array.isArray(res.data?.data?.list) ? res.data.data.list as any[] : [];
+
+            setServerDefaultImage(typeof res.data?.data?.default_image === 'string' ? res.data.data.default_image : null);
 
             const list = raw.map((g: any) => ({
                 id: g.goods_code,
@@ -260,6 +370,12 @@ export const ShopScreen = () => {
                 price: Number(g.xplay_points ?? 0),    
                 priceKRW: Number(g.real_price ?? 0),
                 imageUrl: g.goods_image,
+
+                source: shopCountry === 'ID' ? 'iak' : 'kr_giftishow',
+
+                iakCategory: shopCountry === 'ID' ? (g.category ?? null) : null,
+
+                description: typeof g.description === 'string' ? g.description : undefined,
             }));
             setXplayProductList(list as any);
             console.log('[Xplay Shop] DB 활성 상품:', list.length, '건');
@@ -277,7 +393,7 @@ export const ShopScreen = () => {
                 setXplayProductList([]);
             }
         }
-    }, []);
+    }, [shopCountry]);
 
     const loadGopaxKrwPerXrun = useCallback(async () => {
         try {
@@ -318,11 +434,17 @@ export const ShopScreen = () => {
 
     useEffect(() => {
         if (tab === 'xrunStore') {
+            void detectCountry();
+        }
+    }, [tab, detectCountry]);
+
+    useEffect(() => {
+        if (tab === 'xrunStore' && shopCountry !== null) {
             setXplayLoading(true);
             void loadGopaxKrwPerXrun();
             loadXplayProducts().finally(() => setXplayLoading(false));
         }
-    }, [tab, loadXplayProducts, loadGopaxKrwPerXrun]);
+    }, [tab, shopCountry, loadXplayProducts, loadGopaxKrwPerXrun]);
 
     const onXplayRefresh = useCallback(() => {
         setXplayRefreshing(true);
@@ -370,8 +492,8 @@ export const ShopScreen = () => {
     }, [screenWidth]);
 
     const xplayProductsAsCards = useMemo(
-        () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun)),
-        [xplayProductList, gopaxKrwPerXrun],
+        () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun, serverDefaultImage)),
+        [xplayProductList, gopaxKrwPerXrun, serverDefaultImage],
     );
 
     const filterByQuery = useCallback((list: ProductData[]): ProductData[] => {
@@ -415,6 +537,9 @@ export const ShopScreen = () => {
             description: product.description,
             isXrun: product.brand === 'XRUN',
             shopTab: product.isXplayShop ? ('xplayShop' as const) : undefined,
+
+            isIak: product.isIak ?? false,
+            iakCategory: product.iakCategory ?? null,
         };
         setSelectedShopItem(shopItem as any);
         navigate(ROUTES.shopProductDetail);
@@ -436,7 +561,8 @@ export const ShopScreen = () => {
 
         const isRemote = product.image && typeof product.image === 'object' && 'uri' in product.image;
         const imgFailed = isRemote && failedImages.has(product.id);
-        const displayImage = imgFailed ? xrunHorizontalLogo : product.image;
+        const displayImage = imgFailed ? null : product.image;
+        const hasImage = !!displayImage;
 
         return (
             <TouchableOpacity
@@ -449,16 +575,19 @@ export const ShopScreen = () => {
                     styles.productImageContainer,
                     isEthereum && styles.productImageContainerEthereum
                 ]}>
-                    <Image
-                        source={displayImage}
-                        style={styles.productImage}
-                        resizeMode="contain"
-                        onError={() => {
-                            if (isRemote) {
-                                setFailedImages(prev => new Set(prev).add(product.id));
-                            }
-                        }}
-                    />
+                    {hasImage ? (
+                        <Image
+                            source={displayImage as ImageSourcePropType}
+
+                            style={{ width: '80%', height: '80%', borderRadius: 8, alignSelf: 'center', marginTop: '10%' }}
+                            resizeMode="cover"
+                            onError={() => {
+                                if (isRemote) {
+                                    setFailedImages(prev => new Set(prev).add(product.id));
+                                }
+                            }}
+                        />
+                    ) : null}
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
                             <Text style={styles.imageDescriptionText}>{product.description}</Text>
@@ -466,21 +595,13 @@ export const ShopScreen = () => {
                     )}
                 </View>
                 <View style={styles.productInfo}>
-                    <Text style={styles.productBrand}>{product.brand}</Text>
+                    <Text style={styles.productBrand}>{product.brand || (product.isIak ? t('screens.shop.iakBrand') : t('screens.shop.giftBrand'))}</Text>
                     <Text style={styles.productTitle} numberOfLines={2}>
                         {product.title}
                     </Text>
+                    {}
                     <View style={styles.productFooter}>
-                        <View style={styles.priceContainer}>
-                            <View style={styles.xplayIconContainer}>
-                                <Image
-                                    source={xrunRoundLogo}
-                                    style={styles.xrunIcon}
-                                    resizeMode="contain"
-                                />
-                            </View>
-                            <Text style={styles.priceText}>{product.price.toLocaleString()}</Text>
-                        </View>
+                        <Text style={styles.priceText}>{product.price.toLocaleString()} XRUN</Text>
                         {showPurchaseButton && (
                             <TouchableOpacity
                                 style={styles.purchaseButton}
@@ -588,6 +709,58 @@ export const ShopScreen = () => {
                 >
                     {tab === 'xrunStore' ? (
                         <>
+                            {}
+                            {isDevAccount && (
+                                <View style={styles.devCountryRow}>
+                                    <Text style={styles.devCountryLabel}>DEV 국가:</Text>
+                                    {(['AUTO', 'KR', 'ID'] as const).map((c) => (
+                                        <TouchableOpacity
+                                            key={c}
+                                            onPress={async () => {
+                                                setForceCountry(c);
+                                                if (c === 'AUTO') {
+                                                    await AsyncStorage.removeItem('devShopForceCountry');
+
+                                                    await AsyncStorage.removeItem('shopGpsCountry');
+                                                    setShopCountry(null); 
+                                                } else {
+                                                    await AsyncStorage.setItem('devShopForceCountry', c);
+
+                                                    setShopCountry(c);
+                                                }
+                                            }}
+                                            style={[styles.devCountryChip, forceCountry === c && styles.devCountryChipActive]}
+                                        >
+                                            <Text style={[styles.devCountryChipText, forceCountry === c && styles.devCountryChipTextActive]}>
+                                                {c === 'AUTO' ? '🌐 GPS' : c === 'KR' ? '🇰🇷 KR' : '🇮🇩 ID'}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                    <Text style={styles.devCountryCurrent}>현재: {shopCountry ?? '...'}</Text>
+                                </View>
+                            )}
+
+                            {}
+                            {gpsDenied && (
+                                <TouchableOpacity
+                                    onPress={async () => {
+                                        const req = await Location.requestForegroundPermissionsAsync();
+                                        if (req.granted) {
+                                            setShopCountry(null); 
+                                        } else {
+
+                                            Linking.openSettings();
+                                        }
+                                    }}
+                                    activeOpacity={0.8}
+                                    style={styles.gpsBanner}
+                                >
+                                    <Feather name="map-pin" size={16} color="#92400e" />
+                                    <Text style={styles.gpsBannerText}>
+                                        {t('screens.shop.iak.gpsBanner')}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
                             {xplayLoading && !xplayRefreshing ? (
                                 <View style={styles.loadingContainer}>
                                     <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
@@ -811,17 +984,21 @@ const styles = StyleSheet.create({
     },
     productImageContainer: {
         width: '100%',
-        height: 128,
+
+        aspectRatio: 1,
         borderBottomWidth: 1.108,
         borderBottomColor: '#e2e2e2',
         backgroundColor: '#ffffff',
         overflow: 'hidden',
         position: 'relative',
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
     },
     productImageContainerEthereum: {
         backgroundColor: '#f2f2f2',
     },
     productImage: {
+
         width: '100%',
         height: '100%',
     },
@@ -851,20 +1028,19 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     productTitle: {
-        fontSize: 14,
-        fontFamily: 'Roboto-SemiBold',
+
+        fontSize: 13,
+        fontFamily: 'Roboto-Medium',
         color: '#101828',
-        marginBottom: 2,
+        marginBottom: 6,
         lineHeight: 18,
-        height: 40, 
     },
     productFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 9,
-        borderTopWidth: 1.108,
-        borderTopColor: '#f3f4f6',
+        paddingTop: 4,
+
     },
     priceContainer: {
         flexDirection: 'row',
@@ -895,9 +1071,10 @@ const styles = StyleSheet.create({
         height: 24,
     },
     priceText: {
-        fontSize: 16,
+
+        fontSize: 18,
         fontFamily: 'Roboto-Bold',
-        color: '#343a5a',
+        color: '#111827',
         letterSpacing: -0.4,
     },
     purchaseButton: {
@@ -912,6 +1089,67 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto-Bold',
         color: '#343a5a',
         textAlign: 'center',
+    },
+    devCountryRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginHorizontal: 16,
+        marginTop: 8,
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        backgroundColor: '#1f2937',
+        borderRadius: 6,
+        flexWrap: 'wrap',
+    },
+    devCountryLabel: {
+        fontSize: 11,
+        color: '#9ca3af',
+        fontFamily: 'Roboto-Bold',
+    },
+    devCountryChip: {
+        paddingVertical: 3,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+        backgroundColor: '#374151',
+    },
+    devCountryChipActive: {
+        backgroundColor: '#3b82f6',
+    },
+    devCountryChipText: {
+        fontSize: 11,
+        color: '#d1d5db',
+        fontFamily: 'Roboto-Medium',
+    },
+    devCountryChipTextActive: {
+        color: '#fff',
+        fontFamily: 'Roboto-Bold',
+    },
+    devCountryCurrent: {
+        marginLeft: 'auto',
+        fontSize: 10,
+        color: '#fbbf24',
+        fontFamily: 'Roboto-Regular',
+    },
+    gpsBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginHorizontal: 16,
+        marginTop: 8,
+        marginBottom: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        backgroundColor: '#fef3c7',
+        borderWidth: 1,
+        borderColor: '#fbbf24',
+    },
+    gpsBannerText: {
+        flex: 1,
+        fontSize: FONTS.size.msmall,
+        fontFamily: 'Roboto-Regular',
+        color: '#92400e',
     },
     loadingContainer: {
         paddingVertical: 40,

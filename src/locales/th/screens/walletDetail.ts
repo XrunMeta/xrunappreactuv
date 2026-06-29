@@ -13,6 +13,19 @@ export default {
   withdrawal: 'Withdrawal',
   shop: 'Shop',
   other: 'Other',
+  priceUpdating: 'กำลังอัปเดตข้อมูลราคา',
+  cat_gift_purchase: 'ซื้อบัตรของขวัญ',
+  cat_refund: 'คืนเงิน',
+  cat_attendance: 'เช็คอิน',
+  cat_xplay_zone1: 'Xplay Zone1',
+  cat_xplay_zone2: 'Xplay Zone2',
+  cat_ar_settle: 'การชำระเงิน AR',
+  cat_ar_settle_pocr: 'การชำระเงิน AR 1',
+  cat_ar_settle_nas: 'การชำระเงิน AR 2',
+  cat_referral_settle: 'การชำระเงินแนะนำ',
+  cat_recommender_reward: 'รางวัลผู้แนะนำ',
+  cat_signup_reward: 'รางวัลสมัครสมาชิก',
+  cat_afterlife: 'Afterlife',
 };
 
 

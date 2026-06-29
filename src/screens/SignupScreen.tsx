@@ -48,6 +48,7 @@ import {
 } from '../services';
 import { signInWithApple } from '../services/appleAuth';
 import { AxiosError } from 'axios';
+import { TUTORIAL_PENDING_KEY, TUTORIAL_COMPLETED_KEY } from './walletKeyTutorialHelpers';
 
 const AGE_OPTIONS = ['0', '10', '20', '30', '40', '50+'] as const;
 
@@ -745,16 +746,18 @@ export const SignupScreen = () => {
         await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.phoneRequired'));
         return;
       }
-      if (hasRegions && isKoreaSelected && (!selectedRegion || selectedRegion.dialCode === '0')) {
+
+      if (hasRegions && (!selectedRegion || selectedRegion.dialCode === '0')) {
         await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.regionRequired'));
         return;
       }
       if (!gender || gender === '0') {
-        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.genderRequired') || '성별을 선택해주세요.');
+
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.genderRequired', { defaultValue: '성별을 선택해주세요.' }));
         return;
       }
       if (!ageRange || ageRange === '0') {
-        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.ageRequired') || '연령대를 선택해주세요.');
+        await showAlert(t('screens.signup.alerts.inputError'), t('screens.signup.errors.ageRequired', { defaultValue: '연령대를 선택해주세요.' }));
         return;
       }
     }
@@ -888,6 +891,10 @@ export const SignupScreen = () => {
             recommand: referralMemberId || 0,
             os: SignupHelpers.getOSCode(),
             social_code: 2052, 
+
+            agree_service: serviceTermsAccepted,
+            agree_location: locationTermsAccepted,
+            agree_privacy: privacyTermsAccepted,
           };
 
           console.log('[회원가입] 애플 회원가입 API 호출 시작');
@@ -929,6 +936,13 @@ export const SignupScreen = () => {
 
           await AsyncStorage.setItem('appleSignupCompleted', 'true');
           await AsyncStorage.setItem('appleSignupCompletedEmail', email.trim());
+
+          try {
+            await AsyncStorage.removeItem(TUTORIAL_COMPLETED_KEY);
+            await AsyncStorage.setItem(TUTORIAL_PENDING_KEY, 'true');
+          } catch (e) {
+            console.warn('[애플 회원가입] 튜토리얼 pending 플래그 저장 실패:', e);
+          }
           console.log('[회원가입] 애플 회원가입 완료 플래그 저장:', email.trim());
 
           await AsyncStorage.removeItem('appleSignupRequired');
@@ -1034,6 +1048,10 @@ export const SignupScreen = () => {
           gender: gender,
           ageRange: ageRange,
           isAppleSignupMode: false,
+
+          agree_service: serviceTermsAccepted,
+          agree_location: locationTermsAccepted,
+          agree_privacy: privacyTermsAccepted,
         };
 
         await AsyncStorage.setItem('pendingSignupData', JSON.stringify(pendingSignupData));

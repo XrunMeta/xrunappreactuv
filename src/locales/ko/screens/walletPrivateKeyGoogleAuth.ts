@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: '복사 완료되었습니다.\n사용하고자 하는 곳에 붙여넣으시면 됩니다.',
   alertVeryDangerTitle: '⚠️ 매우 위험합니다',
   alertVeryDangerMessage: '평문 (암호화 없이) 으로 개인 키를 Google Drive 에 저장합니다.\n\n이 파일을 누군가 받으면 비밀번호 없이 지갑의 모든 자산을 옮길 수 있습니다.\n\n정말 진행하시겠습니까?',
-  alertUnderstoodContinue: '이해했습니다, 계속',
+  alertUnderstoodContinue: '계속하기',
   alertFinalConfirmTitle: '⚠️ 마지막 확인',
   alertFinalConfirmMessage: '평문 PK 가 그대로 Drive 에 저장됩니다.\n파일을 받은 사람은 즉시 자산을 옮길 수 있습니다.\n\n계속하시겠습니까?',
   alertYesPlainSave: '예, 평문 저장합니다',

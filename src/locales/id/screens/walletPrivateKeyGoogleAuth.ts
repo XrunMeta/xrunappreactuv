@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: 'Salinan selesai.\nTempelkan di mana Anda membutuhkannya.',
   alertVeryDangerTitle: '⚠️ Sangat Berbahaya',
   alertVeryDangerMessage: 'Ini menyimpan kunci pribadi Anda sebagai teks biasa (tanpa enkripsi) ke Google Drive.\n\nJika ada yang mendapatkan file ini, mereka dapat memindahkan semua aset dompet Anda tanpa kata sandi.\n\nApakah Anda benar-benar ingin melanjutkan?',
-  alertUnderstoodContinue: 'Saya mengerti, lanjutkan',
+  alertUnderstoodContinue: 'Lanjutkan',
   alertFinalConfirmTitle: '⚠️ Konfirmasi Akhir',
   alertFinalConfirmMessage: 'PK teks biasa akan disimpan apa adanya di Drive.\nSiapa pun yang menerima file dapat memindahkan aset segera.\n\nLanjutkan?',
   alertYesPlainSave: 'Ya, simpan sebagai teks biasa',

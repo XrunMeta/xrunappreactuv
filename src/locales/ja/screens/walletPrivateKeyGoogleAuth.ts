@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: 'コピーが完了しました。\n使用したい場所に貼り付けてください。',
   alertVeryDangerTitle: '⚠️ 非常に危険です',
   alertVeryDangerMessage: '平文 (暗号化なし) で秘密鍵を Google Drive に保存します。\n\nこのファイルを誰かが取得すると、パスワードなしでウォレットのすべての資産を移動できます。\n\n本当に続行しますか?',
-  alertUnderstoodContinue: '理解しました、続行',
+  alertUnderstoodContinue: '続行',
   alertFinalConfirmTitle: '⚠️ 最終確認',
   alertFinalConfirmMessage: '平文 PK がそのまま Drive に保存されます。\nファイルを受け取った人は即座に資産を移動できます。\n\n続行しますか?',
   alertYesPlainSave: 'はい、平文で保存します',

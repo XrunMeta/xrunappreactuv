@@ -7,8 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header, ReferralStatsCard, SegmentedControl, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COLORS, COMMON_STYLES, LANG, SIZES, FONTS } from '../constants';
-import { getReferralIncome } from '../services';
-import type { ReferralIncomeItem } from '../services';
+import { getReferralIncome, getXRUNGopaxPrice } from '../services';
+import type { ReferralIncomeItem, GetReferralIncomeResponse } from '../services';
+import { getCachedReferralSettlement, getInflightReferralSettlement } from '../services/referralSettlementCache';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -24,16 +25,16 @@ interface TransformedSettlementData {
   fromName?: string | null; 
 }
 
-const SOURCE_LABEL: Record<string, string> = {
-  nas: 'AR 광고 (나스미디어)',
-  nasmedia: 'AR 광고 (나스미디어)',
-  pocr: 'AR 광고 (포인트클릭)',
-  pointclick: 'AR 광고 (포인트클릭)',
-  ayet: 'Xplay Zone 1',
-  maf: 'Xplay Zone 2',
-  mychips: 'Xplay Zone 2',
-  recommand: '추천 가입',
-  attendance: '출석체크',
+const SOURCE_KEY: Record<string, string> = {
+  nas: 'source_nas',
+  nasmedia: 'source_nas',
+  pocr: 'source_pocr',
+  pointclick: 'source_pocr',
+  ayet: 'source_xplay_zone1',
+  maf: 'source_xplay_zone2',
+  mychips: 'source_xplay_zone2',
+  recommand: 'source_recommend',
+  attendance: 'source_attendance',
 };
 
 const formatDateTime = (dateString: string): string => {
@@ -99,13 +100,38 @@ export const ReferralSettlementScreen = () => {
   const [memberId, setMemberId] = useState<number | null>(null);
   const [settlementData, setSettlementData] = useState<TransformedSettlementData[]>([]);
   const [currentData, setCurrentData] = useState<TransformedSettlementData[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [totalRevenue, setTotalRevenue] = useState<string>('0 XRUN');
   const [totalRevenueWon, setTotalRevenueWon] = useState<string>('₩0');
   const [gopaxPrice, setGopaxPrice] = useState<number>(0); 
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const result = await getXRUNGopaxPrice();
+        const price = Number(result?.data?.gopaxPrice ?? 0);
+        if (price > 0) {
+          setGopaxPrice(price);
+          await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
+          return;
+        }
+      } catch (e) {
+        console.warn('[정산] 고팍스 가격 API 실패, AsyncStorage fallback:', e);
+      }
+      try {
+        const cached = await AsyncStorage.getItem('xrungopaxprice');
+        if (cached) {
+          const data = JSON.parse(cached);
+          const p = Number(data?.data?.gopaxPrice ?? 0);
+          if (p > 0) setGopaxPrice(p);
+        }
+      } catch {  }
+    })();
+  }, []);
   const [userEmail, setUserEmail] = useState<string>('');
 
   const { t } = useTranslation();
@@ -151,15 +177,16 @@ export const ReferralSettlementScreen = () => {
     loadUserData();
   }, []);
 
-  const fetchSettlementData = useCallback(async (member: number) => {
+  const fetchSettlementData = useCallback(async (member: number, prefetchedResponse?: GetReferralIncomeResponse, silent?: boolean) => {
     try {
-      setLoading(true);
+
+      if (!prefetchedResponse && !silent) setLoading(true);
 
       console.log('═══════════════════════════════════════════');
-      console.log('[정산 디버그] fetchSettlementData 시작, member:', member);
+      console.log('[정산 디버그] fetchSettlementData 시작, member:', member, prefetchedResponse ? '(캐시 사용)' : '(API 호출)');
       console.log('═══════════════════════════════════════════');
 
-      const resultRef = await getReferralIncome(member, navigate);
+      const resultRef = prefetchedResponse ?? await getReferralIncome(member, navigate);
 
       console.log('[정산 디버그] 백엔드 응답 status:', resultRef.status);
       console.log('[정산 디버그] 백엔드 응답 message:', resultRef.message);
@@ -185,7 +212,11 @@ export const ReferralSettlementScreen = () => {
       if (resultRef.status === 'success') {
 
         const rows: TransformedSettlementData[] = (resultRef.data || []).map((item: ReferralIncomeItem, idx: number) => {
-          const label = SOURCE_LABEL[item.source_type] || item.source_type || '레퍼럴 분배';
+
+          const sourceKey = SOURCE_KEY[item.source_type];
+          const label = sourceKey
+            ? t(`screens.referralSettlement.${sourceKey}`)
+            : (item.source_type || t('screens.referralSettlement.source_referral_share'));
           return {
             id: `ref_${item.id}_${idx}`,
             type: label,
@@ -208,14 +239,12 @@ export const ReferralSettlementScreen = () => {
         const formattedAmount = totalAmountNum.toFixed(2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
-        const price = gopaxPrice > 0 ? gopaxPrice : 176; 
-        console.log('[정산] 원화 계산:', { totalAmountNum, price });
-
-        const wonEquivalent = calculateWonEquivalent(totalAmountNum, price);
-        console.log('[정산] 원화 환산 결과:', wonEquivalent);
-
-        const formattedWon = formatWonAmount(wonEquivalent);
-        console.log('[정산] 원화 포맷팅 결과:', formattedWon);
+        let formattedWon = '';
+        if (gopaxPrice && gopaxPrice > 0) {
+          const wonEquivalent = calculateWonEquivalent(totalAmountNum, gopaxPrice);
+          formattedWon = formatWonAmount(wonEquivalent);
+          console.log('[정산] 원화 환산:', { totalAmountNum, price: gopaxPrice, formattedWon });
+        }
         setTotalRevenueWon(formattedWon);
 
         const initialItems = rows.slice(0, ITEMS_PER_PAGE);
@@ -250,9 +279,24 @@ export const ReferralSettlementScreen = () => {
   }, [navigate, gopaxPrice]);
 
   useEffect(() => {
-    if (memberId) {
-      fetchSettlementData(memberId);
+    if (!memberId) return;
+    const cached = getCachedReferralSettlement(memberId);
+    if (cached) {
+      fetchSettlementData(memberId, cached);
+      setTimeout(() => { fetchSettlementData(memberId, undefined, true); }, 0);
+      return;
     }
+    const inflight = getInflightReferralSettlement(memberId);
+    if (inflight) {
+
+      setLoading(true);
+      inflight.then((data) => {
+        if (data) fetchSettlementData(memberId, data);
+        else fetchSettlementData(memberId); 
+      });
+      return;
+    }
+    fetchSettlementData(memberId);
   }, [memberId, fetchSettlementData]);
 
   const loadMoreData = useCallback(() => {
@@ -289,7 +333,7 @@ export const ReferralSettlementScreen = () => {
     const badgeLabel = isPaid
       ? (t('screens.referralSettlement.paid') || '지급 완료')
       : (t('screens.referralSettlement.pending') || '지급 대기');
-    const fromLine = item.fromName ? `${item.fromName} 님이 발생시킨 수익이에요.` : null;
+    const fromLine = item.fromName ? t('screens.referralSettlement.fromUserRevenue', { name: item.fromName }) : null;
     return (
       <View style={[styles.questCard, isPaid && styles.questCardPaid]}>
         <View style={[styles.questBadge, isPaid ? styles.statusPaid : styles.statusPending]}>
@@ -309,7 +353,7 @@ export const ReferralSettlementScreen = () => {
         ) : null}
         <View style={styles.questDivider} />
         <View style={styles.questFooter}>
-          <Text style={[styles.questFooterLabel, isPaid && styles.textPaidSub]}>보상금액</Text>
+          <Text style={[styles.questFooterLabel, isPaid && styles.textPaidSub]}>{t('screens.referralSettlement.rewardAmount')}</Text>
           <Text style={[styles.questAmount, isPaid && styles.textPaid]}>{item.amount}</Text>
         </View>
       </View>

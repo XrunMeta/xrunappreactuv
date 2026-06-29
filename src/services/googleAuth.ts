@@ -59,8 +59,7 @@ const handleTimeoutError = async (navigation: any) => {
 
 const getApiBaseUrl = (): string => {
   const env = getEnv();
-  const baseUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
-
+  const baseUrl = env.GATEWAY_WORKERS;
   if (baseUrl.endsWith('/oth-path')) {
     return baseUrl.replace('/oth-path', '');
   }
@@ -257,7 +256,7 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
 
       return {
         success: true,
-        data: data.data,
+        data: { ...(data.data ?? {}), ...(typeof data.jwt === 'string' ? { jwt: data.jwt } : {}) },
       };
     } catch (fetchError: any) {
       clearTimeout(timeoutId);

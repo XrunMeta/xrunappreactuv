@@ -11,9 +11,11 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import { SafeView, FormCheckbox, PrimaryButton } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { recordWalletTutorialComplete } from '../services';
 import {
   TOTAL_PAGES,
   isLastPage,
@@ -24,28 +26,48 @@ import {
 
 type Mode = 'signup' | 'readonly';
 
+const PAGE_ICONS: ReadonlyArray<keyof typeof Ionicons.glyphMap> = [
+  'key-outline',
+  'shield-checkmark-outline',
+  'eye-outline',
+];
+
 const TutorialPage: React.FC<{
   width: number;
   title: string;
   body: string[];
-  pageIndex: number;
-  totalPages: number;
-}> = ({ width, title, body, pageIndex, totalPages }) => (
-
-  <View style={[styles.page, { width }]}>
-    <View style={styles.pageInner}>
-      <Text style={styles.stepLabel}>
-        {`STEP ${pageIndex + 1} / ${totalPages}`}
-      </Text>
+  iconName: keyof typeof Ionicons.glyphMap;
+  rememberHeading: string;
+}> = ({ width, title, body, iconName, rememberHeading }) => (
+  <ScrollView
+    style={[styles.page, { width }]}
+    contentContainerStyle={styles.pageContent}
+    showsVerticalScrollIndicator={false}
+  >
+    {}
+    <View style={styles.header}>
       <Text style={styles.title}>{title}</Text>
-      <View style={styles.divider} />
+      <View style={styles.iconBox}>
+        <Ionicons name={iconName} size={28} color={COLORS.buttonPrimary} />
+      </View>
+    </View>
+
+    {}
+    <View style={styles.card}>
+      <Text style={styles.cardHeading}>{rememberHeading}</Text>
       {body.map((line, i) => (
-        <Text key={i} style={styles.bodyLine}>
-          {`• ${line}`}
-        </Text>
+        <View key={i} style={styles.checkRow}>
+          <Ionicons
+            name="checkmark-circle-outline"
+            size={20}
+            color={COLORS.buttonPrimary}
+            style={styles.checkIcon}
+          />
+          <Text style={styles.checkText}>{line}</Text>
+        </View>
       ))}
     </View>
-  </View>
+  </ScrollView>
 );
 
 export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
@@ -80,6 +102,9 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
     } catch (e) {
       console.warn('[WalletKeyTutorial] 완료 플래그 저장 실패:', e);
     }
+    recordWalletTutorialComplete().catch((e) =>
+      console.warn('[WalletKeyTutorial] DB 기록 실패 (로컬만 저장됨):', e),
+    );
     reset(ROUTES.map);
   }, [reset]);
 
@@ -88,12 +113,25 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
     body: t(`screens.walletKeyTutorial.page${i + 1}.body`, {
       returnObjects: true,
     }) as string[],
+    iconName: PAGE_ICONS[i] ?? PAGE_ICONS[0],
   }));
 
   const onLast = isLastPage(currentPage);
+  const progressPct = ((currentPage + 1) / TOTAL_PAGES) * 100;
 
   return (
     <SafeView style={styles.container}>
+      {}
+      <View style={styles.progressHeader}>
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
+        </View>
+        <Text style={styles.progressLabel}>
+          {currentPage + 1} / {TOTAL_PAGES}
+        </Text>
+      </View>
+
+      {}
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -104,19 +142,11 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
         style={{ flex: 1 }}
       >
         {pages.map((p, i) => (
-          <TutorialPage key={i} width={width} pageIndex={i} totalPages={TOTAL_PAGES} {...p} />
+          <TutorialPage key={i} width={width} {...p} rememberHeading={t('screens.walletKeyTutorial.rememberHeading')} />
         ))}
       </ScrollView>
 
-      <View style={styles.dots}>
-        {pages.map((_, i) => (
-          <View
-            key={i}
-            style={[styles.dot, i === currentPage && styles.dotActive]}
-          />
-        ))}
-      </View>
-
+      {}
       <View style={styles.footer}>
         {mode === 'signup' && onLast && (
           <View testID="tutorial-agree-wrap" style={styles.agreeWrap}>
@@ -172,65 +202,124 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
 
-  page: {
-    paddingHorizontal: 24,
-    justifyContent: 'center',
+  progressHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-
-  pageInner: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     paddingHorizontal: 24,
-    paddingVertical: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 2,
+    paddingTop: 40,
+    paddingBottom: 36,
+    gap: 12,
   },
-  stepLabel: {
+  progressTrack: {
+    flex: 1,
+    height: 4,
+    backgroundColor: '#EEEEEE',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.buttonPrimary,
+    borderRadius: 2,
+  },
+  progressLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.buttonPrimary,
-    letterSpacing: 1,
-    textAlign: 'center',
-    marginBottom: 12,
+    color: '#9CA3AF',
+    minWidth: 32,
+    textAlign: 'right',
+  },
+
+  page: {
+    flex: 1,
+  },
+  pageContent: {
+    paddingHorizontal: 24,
+    paddingTop: 56,
+    paddingBottom: 24,
+  },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 28,
+    gap: 12,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '700',
+    flex: 1,
+    fontSize: 26,
+    fontWeight: '800',
     color: COLORS.text,
-    textAlign: 'center',
+    lineHeight: 34,
+    letterSpacing: -0.3,
+  },
+  iconBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  card: {
+    backgroundColor: '#F5F5F7',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  cardHeading: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 16,
+    lineHeight: 22,
+  },
+  checkRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  checkIcon: {
+    marginTop: 2,
+    marginRight: 10,
+  },
+  checkText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#374151',
+  },
+
+  footer: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 32,
+  },
+  agreeWrap: {
     marginBottom: 16,
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#EAEAEA',
-    marginBottom: 20,
+  buttonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
-  bodyLine: {
+  prevBtn: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+  prevText: {
     fontSize: 15,
-    lineHeight: 24,
-    color: COLORS.text,
-    marginBottom: 10,
+    color: '#6B7280',
+    fontWeight: '500',
   },
-  dots: { flexDirection: 'row', justifyContent: 'center', marginVertical: 16 },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-    backgroundColor: '#D0D0D0',
+  mainBtn: {
+    flex: 1,
   },
-  dotActive: { backgroundColor: COLORS.buttonPrimary, width: 20 },
-  footer: { paddingHorizontal: 24, paddingBottom: 32 },
-  agreeWrap: { marginBottom: 16 },
-  buttonRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  prevBtn: { paddingVertical: 14, paddingHorizontal: 20 },
-  prevText: { fontSize: 16, color: COLORS.text },
-  mainBtn: { flex: 1 },
 });

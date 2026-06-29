@@ -8,6 +8,7 @@ import { Header, PrimaryButton } from '../components';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { postTransferNew } from '../services';
 import { consumePendingWallets, sendPolygonLocal, isLocalSendEnabledForUser, clearPendingWallets, recordOnchainTransfer } from '../services/walletSendLocal';
 
@@ -20,6 +21,7 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
 
 export const WalletTransactionProgressScreen = () => {
   const { t } = useTranslation();
+  const { showAlert } = useAlertDialog();
   const { goBack, navigate } = useAppNavigation();
   const {
     walletSendAddress,
@@ -128,6 +130,19 @@ export const WalletTransactionProgressScreen = () => {
 
           if (!local.ok) {
             console.error('[WalletTransactionProgress] 로컬 송금 실패:', local);
+
+            const failDetail = String((local as any).detail ?? '');
+            const isGasShort = (local as any).reason === 'broadcast-failed'
+              && /수수료|가스|insufficient funds/i.test(failDetail);
+            if (isGasShort) {
+              setIsProcessing(false);
+              setIsSuccess(false);
+              await showAlert(
+                t('common.gasInsufficient.title'),
+                t('common.gasInsufficient.messageTransfer'),
+              );
+              return;
+            }
             throw new Error(`송금 실패: ${(local as any).reason} ${(local as any).detail ?? ''}`);
           }
 

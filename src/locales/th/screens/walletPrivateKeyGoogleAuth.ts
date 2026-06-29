@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: 'คัดลอกเสร็จสมบูรณ์\nวางในที่ที่คุณต้องการ',
   alertVeryDangerTitle: '⚠️ อันตรายมาก',
   alertVeryDangerMessage: 'นี่จะบันทึกคีย์ส่วนตัวของคุณเป็นข้อความธรรมดา (ไม่เข้ารหัส) ไปยัง Google Drive\n\nหากใครได้รับไฟล์นี้ พวกเขาสามารถโอนสินทรัพย์กระเป๋าเงินทั้งหมดของคุณโดยไม่มีรหัสผ่าน\n\nคุณต้องการดำเนินการต่อจริงๆ หรือ?',
-  alertUnderstoodContinue: 'ฉันเข้าใจ ดำเนินการต่อ',
+  alertUnderstoodContinue: 'ดำเนินการต่อ',
   alertFinalConfirmTitle: '⚠️ การยืนยันสุดท้าย',
   alertFinalConfirmMessage: 'PK ข้อความธรรมดาจะถูกบันทึกตามที่เป็นใน Drive\nใครก็ตามที่ได้รับไฟล์สามารถโอนสินทรัพย์ได้ทันที\n\nดำเนินการต่อ?',
   alertYesPlainSave: 'ใช่ บันทึกเป็นข้อความธรรมดา',

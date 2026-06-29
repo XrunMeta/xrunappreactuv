@@ -11,9 +11,9 @@ export default {
     title: 'Cadangkan Kunci Anda dengan Aman',
     body: [
       'Anda dapat mencadangkan kunci dompet di aplikasi. Bahkan jika perangkat hilang atau aplikasi dihapus, cadangan memungkinkan Anda memulihkan dompet.',
-      'Cadangan terenkripsi: dikunci dengan kata sandi untuk keamanan — direkomendasikan',
+      'Cadangan terenkripsi: dikunci dengan PIN untuk keamanan — direkomendasikan',
       'Cadangan polos: siapa pun dapat membukanya, jangan pernah dibagikan',
-      'Jika Anda kehilangan file cadangan dan kata sandi, tidak ada yang dapat memulihkannya. Simpan di tempat yang aman dan terpisah.',
+      'Jika Anda kehilangan file cadangan dan PIN, tidak ada yang dapat memulihkannya. Simpan di tempat yang aman dan terpisah.',
     ],
   },
   page3: {
@@ -24,6 +24,7 @@ export default {
       'Jika Anda kehilangan kunci, perusahaan pun tidak dapat memulihkannya. Tanggung jawab akhir pengelolaan kunci ada pada Anda.',
     ],
   },
+  rememberHeading: 'Harap diingat',
   agree: { label: 'Saya telah membaca dan memahami semua hal di atas.' },
   button: { prev: 'Kembali', next: 'Berikutnya', start: 'Mulai' },
   readonly: { close: 'Tutup' },

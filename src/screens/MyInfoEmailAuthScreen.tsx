@@ -90,6 +90,8 @@ export const MyInfoEmailAuthScreen = () => {
           keyboardType="email-address"
           placeholder={t('screens.myInfoEmailAuth.emailPlaceholder')}
           containerStyle={styles.fieldContainer}
+
+          editable={false}
           rightAccessory={
             <TouchableOpacity
               style={styles.inlineButton}

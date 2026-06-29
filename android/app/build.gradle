@@ -32,8 +32,8 @@ android {
         applicationId 'run.xrun.xrunapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 288
-        versionName "4.10.7"
+        versionCode 289
+        versionName "4.10.14"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
@@ -110,6 +110,8 @@ dependencies {
     implementation('co.adison:adison-offerwall-sdk:5.2.0') {
         transitive = true
     }
+
+    implementation 'io.github.nasmedia-tech:admixer-ssp:2.0.0'
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

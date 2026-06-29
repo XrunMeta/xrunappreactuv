@@ -135,8 +135,27 @@ export const setStoredLanguage = async (language: LanguageCode): Promise<void> =
     await loadLanguage(language);
     await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     await i18n.changeLanguage(language);
+
+    syncLanguageToServer(language).catch(e => console.warn('[i18n] server sync failed:', e?.message));
   } catch (error) {
     console.error('언어 설정 저장 실패:', error);
+  }
+};
+
+const syncLanguageToServer = async (language: LanguageCode): Promise<void> => {
+  try {
+    const { getApiBaseUrl, getAuthHeader } = await import('../services');
+    const baseUrl = getApiBaseUrl();
+    const authHeader = await getAuthHeader();
+    if (!authHeader) return; 
+
+    await fetch(`${baseUrl}/me/language`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: authHeader },
+      body: JSON.stringify({ language }),
+    });
+  } catch (e) {
+
   }
 };
 

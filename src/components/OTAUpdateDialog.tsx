@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, AppState, BackHandler, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, AppState, BackHandler, ActivityIndicator, NativeModules } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
@@ -74,9 +74,14 @@ const OTAUpdateDialog: React.FC<OTAUpdateDialogProps> = ({ isAdFinished = true }
                     t('common.versionUpdate.restartMessage'),
                     [
                         {
-                            text: t('common.versionUpdate.confirm'), 
+                            text: t('common.versionUpdate.confirm'),
                             onPress: () => {
-                                BackHandler.exitApp(); 
+
+                                try {
+                                    NativeModules.ForceKill?.killProcess();
+                                } catch {
+                                    BackHandler.exitApp(); 
+                                }
                             },
                         },
                     ],

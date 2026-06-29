@@ -60,6 +60,7 @@ import {
   ShopTicketDetailScreen,
   ShopItemRegisterScreen,
   ShowNapAdScreen,
+  ShowNapMxRewardScreen,
   ShowPockAdScreen,
   ShowWebViewScreen,
   XRUNinfoScreen,
@@ -79,10 +80,10 @@ import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
 import { AdisonTestScreen } from './src/screens/AdisonTestScreen';
 
-import { NavigationProvider, useAppNavigation } from './src/navigation';
+import { NavigationProvider, useAppNavigation, ROUTES } from './src/navigation';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
-import { AddTokenDialog, AliveService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
+import { AddTokenDialog, AliveService, NotificationToastService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
 import { loadEnvSync, getEnv } from './src/utils/env';
 import { showToast } from './src/utils';
 import appsFlyer from 'react-native-appsflyer';
@@ -92,6 +93,7 @@ import { setAyetUserId } from './src/services/ayet';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
+import { initTracker } from './src/services/clickTracker';
 
 let TrackingTransparency: any = null;
 try {
@@ -119,6 +121,8 @@ import * as Notifications from 'expo-notifications';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -147,6 +151,48 @@ const ScreenHost = () => {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    const handleTap = (response: Notifications.NotificationResponse) => {
+      try {
+        const data = (response?.notification?.request?.content?.data ?? {}) as Record<string, unknown>;
+        const type = String(data.type ?? '');
+        if (type === 'inquiry_reply') {
+          navigate(ROUTES.myInfoNotify);
+          return;
+        }
+
+        AsyncStorage.setItem('pendingPushWalletNav', 'xrun_pol').catch(() => {});
+        navigate(ROUTES.wallet);
+      } catch (e) {
+        console.warn('[push tap] navigate fail:', e);
+      }
+    };
+
+    const sub = Notifications.addNotificationResponseReceivedListener(handleTap);
+
+    Notifications.getLastNotificationResponseAsync()
+      .then((resp) => { if (resp) handleTap(resp); })
+      .catch(() => {});
+
+    const recvSub = Notifications.addNotificationReceivedListener((notif) => {
+      try {
+        const data = (notif?.request?.content?.data ?? {}) as Record<string, unknown>;
+        const category = String(data.category ?? '');
+
+        if (['deposit', 'withdrawal', 'ar_nas', 'ar_pointclick', 'xplay_ayet', 'xplay_maf', 'referral_reward'].includes(category)) {
+
+          import('./src/utils/walletEvents').then(({ emitWalletRefresh }) => {
+            emitWalletRefresh(`push:${category}`);
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('[push received] handler error:', e);
+      }
+    });
+
+    return () => { sub.remove(); recvSub.remove(); };
+  }, [navigate]);
 
   useEffect(() => {
 
@@ -611,6 +657,10 @@ const ScreenHost = () => {
     return <ShowNapAdScreen />;
   }
 
+  if (currentScreen === 'showNapMxReward') {
+    return <ShowNapMxRewardScreen />;
+  }
+
   if (currentScreen === 'showPockAd') {
     return <ShowPockAdScreen />;
   }
@@ -948,6 +998,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    void initTracker({ enabled: true });
+  }, []);
+
+  useEffect(() => {
     const handleAppStateChange = async (nextAppState: AppStateStatus) => {
       const previousState = appStateRef.current;
       console.log('[App] AppState 변경 감지:', {
@@ -1186,6 +1240,7 @@ export default function App() {
             <OTAUpdateProvider>
               <PermissionRequester isAdFinished={isAdFinished} />
               <AliveService />
+              <NotificationToastService />
               <ScreenHost />
               <GlobalDialogs />
               {__DEV__ && <DevDebugPanel />}

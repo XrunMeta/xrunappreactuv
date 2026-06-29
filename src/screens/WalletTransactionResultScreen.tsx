@@ -101,7 +101,15 @@ export const WalletTransactionResultScreen = () => {
   };
 
   const formattedAmount = amount ? new BigNumber(amount).toFixed() : '0';
-  const formattedGasPrice = gasPrice ? parseFloat(gasPrice).toFixed(6) : '0.000000';
+
+  const formattedGasFee = gasPrice
+    ? (() => {
+        const gwei = parseFloat(gasPrice) * 1e9;
+        const fixed = gwei.toFixed(2);
+        const trimmed = fixed.replace(/\.?0+$/, '');
+        return `${trimmed} GWEI`;
+      })()
+    : '0 GWEI';
 
   if (!txHash && !transactionResult) {
     return null;
@@ -121,7 +129,7 @@ export const WalletTransactionResultScreen = () => {
         />
         <InfoCard
           label={t('screens.walletTransactionResult.networkFee')}
-          value={`${formattedGasPrice} ${network}`}
+          value={formattedGasFee}
         />
         <InfoCard
           label={t('screens.walletTransactionResult.to')}

@@ -144,7 +144,7 @@ export const WalletReceiveScreen = () => {
       />
 
       <SafeScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, styles.scrollContentEvenly]}
         backgroundColor="transparent"
         showsVerticalScrollIndicator={false}
         showBottomBackground={false}
@@ -160,12 +160,7 @@ export const WalletReceiveScreen = () => {
         </View>
         {}
         <View style={styles.topSection}>
-          <View style={styles.tokenInfo}>
-            <Text style={styles.tokenName}>
-              {currencyInfo.symbol}
-            </Text>
-            <Text style={styles.walletName}>{currencyInfo.name}</Text>
-          </View>
+          <Text style={styles.tokenName}>{currencyInfo.symbol}</Text>
 
           <View style={styles.qrContainer}>
             <View style={styles.qrBorder}>
@@ -173,13 +168,13 @@ export const WalletReceiveScreen = () => {
                 {walletAddress ? (
                   <QRCode
                     value={walletAddress}
-                    size={180}
+                    size={160}
                     color="#000000"
                     backgroundColor="#FFFFFF"
                     getRef={(c) => (qrCodeRef.current = c)}
                   />
                 ) : (
-                  <Ionicons name="qr-code" size={180} color="#121212" />
+                  <Ionicons name="qr-code" size={160} color="#121212" />
                 )}
                 <View style={styles.qrLogoBadge}>
                   <Ionicons name="logo-electron" size={24} color="white" />
@@ -278,29 +273,21 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     ...COMMON_STYLES.scrollContent,
   },
+  scrollContentEvenly: {
+
+    justifyContent: 'space-evenly',
+  },
   topSection: {
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  tokenInfo: {
-    alignItems: 'center',
-    marginBottom: 30,
   },
   tokenName: {
     fontSize: 24,
     fontFamily: FONTS.family.bold,
     color: COLORS.text,
-    marginBottom: 4,
-  },
-  walletName: {
-    fontSize: 14,
-    fontFamily: FONTS.family.regular,
-    color: COLORS.headerText,
-    opacity: 0.6,
+    marginBottom: 18,
   },
   qrContainer: {
-    marginBottom: 30,
+    marginBottom: 26,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -313,8 +300,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   qrBase: {
-    width: 220,
-    height: 220,
+    width: 200,
+    height: 200,
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',

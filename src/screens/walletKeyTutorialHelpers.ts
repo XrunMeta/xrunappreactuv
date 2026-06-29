@@ -8,8 +8,8 @@ export const canFinish = (currentPage: number, agreed: boolean): boolean =>
 
 export const shouldShowTutorial = (
   pendingFlag: string | null,
-  completedFlag: string | null,
-): boolean => pendingFlag === 'true' && completedFlag !== 'true';
+  _completedFlag: string | null,
+): boolean => pendingFlag === 'true';
 
 export const TUTORIAL_PENDING_KEY = 'tutorialPending';
 export const TUTORIAL_COMPLETED_KEY = 'walletKeyTutorialCompleted';

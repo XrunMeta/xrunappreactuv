@@ -13,6 +13,19 @@ export default {
   withdrawal: '提现',
   shop: '商店',
   other: '其他',
+  priceUpdating: '正在更新价格信息',
+  cat_gift_purchase: '礼品券购买',
+  cat_refund: '退款',
+  cat_attendance: '签到',
+  cat_xplay_zone1: 'Xplay Zone1',
+  cat_xplay_zone2: 'Xplay Zone2',
+  cat_ar_settle: 'AR广告结算',
+  cat_ar_settle_pocr: 'AR广告结算1',
+  cat_ar_settle_nas: 'AR广告结算2',
+  cat_referral_settle: '推荐结算',
+  cat_recommender_reward: '推荐人奖励',
+  cat_signup_reward: '注册奖励',
+  cat_afterlife: 'Afterlife',
 };
 
 

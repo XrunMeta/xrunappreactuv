@@ -36,11 +36,8 @@ const handleTimeoutError = async (navigation: any) => {
 
 const getApiBaseUrl = (): string => {
   const env = getEnv();
-  const baseUrl = env.USE_WORKERS_API === 'true' ? env.GATEWAY_WORKERS : env.GATEWAY_NODEJS;
 
-  if (baseUrl.endsWith('/oth-path')) {
-    return baseUrl;
-  }
+  const baseUrl = env.GATEWAY_WORKERS;
   return baseUrl;
 };
 
@@ -263,7 +260,7 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
 
       return {
         success: true,
-        data: data.data,
+        data: { ...(data.data ?? {}), ...(typeof data.jwt === 'string' ? { jwt: data.jwt } : {}) },
       };
     } catch (fetchError: any) {
 

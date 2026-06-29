@@ -8,9 +8,11 @@ import { useTranslation } from 'react-i18next';
 import { Header, SegmentedControl, TaboolaBanner } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { useAlertDialog } from '../context/AlertDialogContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
-import { getMyGiftishowCoupons, getXrunPurchasedItems } from '../services';
+import { getMyGiftishowCoupons, getXrunPurchasedItems, getMyIakTxns } from '../services';
+import type { MyIakTxnItem } from '../services';
 import type { MyGiftishowCouponItem } from '../types';
 import type { PurchasedItemData } from '../types';
 
@@ -25,7 +27,11 @@ interface MyItemData {
     purchaseDate: string;
     tr_id?: string;
 
-    type: 'xrun' | 'giftishow';
+    type: 'xrun' | 'giftishow' | 'iak';  
+
+    iakSn?: string;
+
+    iakCustomerId?: string;
     storage?: string;
     txID?: string;
     item?: number;
@@ -131,6 +137,7 @@ export const ShopMyItemsScreen = () => {
     const { navigate, currentScreen } = useAppNavigation();
     const { t } = useTranslation();
     const { setSelectedShopItem } = useAppContext();
+    const { showAlert } = useAlertDialog();
     const [items, setItems] = useState<MyItemData[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -154,9 +161,10 @@ export const ShopMyItemsScreen = () => {
             }
             const memberStr = String(member);
             setCurrentMember(memberStr);
-            const [giftishowRes, xrunRes] = await Promise.all([
+            const [giftishowRes, xrunRes, iakRes] = await Promise.all([
                 getMyGiftishowCoupons(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
                 getXrunPurchasedItems(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] })),
+                getMyIakTxns(memberStr, navigate).catch(() => ({ status: 'error' as const, data: [] as MyIakTxnItem[] })),
             ]);
             const giftishowList: MyItemData[] =
                 giftishowRes?.status === 'success' && Array.isArray(giftishowRes.data)
@@ -168,7 +176,29 @@ export const ShopMyItemsScreen = () => {
                 xrunRes?.status === 'success' && Array.isArray(xrunRes.data)
                     ? xrunRes.data.map((p, i) => xrunPurchasedToMyItemData(p, i))
                     : [];
-            const merged = [...xrunList, ...giftishowList].sort((a, b) => b.sortKey - a.sortKey);
+
+            const iakList: MyItemData[] =
+                iakRes?.status === 'success' && Array.isArray(iakRes.data)
+                    ? iakRes.data.map((t) => {
+                        const hasIcon = t.icon_url && t.icon_url !== '-' && /^https?:\/\//.test(t.icon_url);
+                        return {
+                            id: `iak-${t.ref_id}`,
+                            brand: 'IAK',
+                            title: t.product_name || t.product_code,
+                            image: hasIcon ? { uri: t.icon_url! } : defaultCouponImage,
+
+                            status: t.status === 'pending' ? 'pending' : 'available',
+                            purchaseDate: String(t.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
+                            tr_id: t.ref_id,
+                            type: 'iak' as const,
+                            iakSn: t.iak_sn ?? undefined,
+                            iakCustomerId: t.customer_id,
+
+                            sortKey: Number(String(t.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
+                        } as MyItemData;
+                    })
+                    : [];
+            const merged = [...xrunList, ...giftishowList, ...iakList].sort((a, b) => b.sortKey - a.sortKey);
             setItems(merged);
         } catch {
             setItems([]);
@@ -216,6 +246,18 @@ export const ShopMyItemsScreen = () => {
     };
 
     const handleUseItem = (item: MyItemData) => {
+
+        if (item.type === 'iak') {
+            const lines: string[] = [];
+            if (item.iakCustomerId) lines.push(t('screens.shop.iak.phoneLabelLine', { phone: item.iakCustomerId }));
+            if (item.iakSn) lines.push(t('screens.shop.iak.snInfoLine', { sn: item.iakSn }));
+            if (item.status === 'pending') lines.push('\n' + t('screens.shop.iak.pendingNote'));
+            else if (item.status === 'used') lines.push('\n' + t('screens.shop.iak.failedNote'));
+            else lines.push('\n' + t('screens.shop.iak.successNote'));
+            const msg = lines.join('\n');
+            showAlert(item.title, msg, [{ text: t('screens.shop.iak.ok') }]);
+            return;
+        }
         if (item.type === 'xrun') {
             const shopItem = {
                 id: item.id,
@@ -268,6 +310,8 @@ export const ShopMyItemsScreen = () => {
     const renderItemCard = (item: MyItemData) => {
         const isAvailable = item.status === 'available';
         const isPending = item.status === 'pending';
+
+        const isIakCompleted = item.type === 'iak' && isAvailable;
         const isRemoteImage = item.image && typeof item.image === 'object' && 'uri' in (item.image as any);
         const displayImage = isRemoteImage && failedImageIds.has(item.id) ? defaultCouponImage : item.image;
 
@@ -293,7 +337,13 @@ export const ShopMyItemsScreen = () => {
                                 <Text style={styles.itemBrand}>{item.brand === 'SHOP' ? t('screens.shop.shopBrand') : item.brand}</Text>
                                 <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : isPending ? styles.statusTagPending : styles.statusTagUsed]}>
                                     <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : isPending ? styles.statusTagTextPending : styles.statusTagTextUsed]}>
-                                        {isAvailable ? t('screens.shop.availableShort') : isPending ? t('screens.shop.pendingShort') : t('screens.shop.usedShort')}
+                                        {isIakCompleted
+                                            ? t('screens.shop.completedShort')
+                                            : isAvailable
+                                                ? t('screens.shop.availableShort')
+                                                : isPending
+                                                    ? t('screens.shop.pendingShort')
+                                                    : t('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>

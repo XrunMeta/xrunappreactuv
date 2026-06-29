@@ -45,7 +45,7 @@ export default {
   alertCopyCompleteMessage: 'Copy complete.\nPaste it where you need it.',
   alertVeryDangerTitle: '⚠️ Very Dangerous',
   alertVeryDangerMessage: 'This saves your private key as plaintext (no encryption) to Google Drive.\n\nIf anyone gets this file, they can move all your wallet assets without any password.\n\nDo you really want to proceed?',
-  alertUnderstoodContinue: 'I understand, continue',
+  alertUnderstoodContinue: 'Continue',
   alertFinalConfirmTitle: '⚠️ Final Confirmation',
   alertFinalConfirmMessage: 'Plaintext PK will be saved on Drive as-is.\nAnyone who receives the file can move assets immediately.\n\nContinue?',
   alertYesPlainSave: 'Yes, save as plaintext',

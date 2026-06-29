@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ImageBackground, ImageSourcePropType, ScrollView, Platform, TextInput, Modal, ActivityIndicator, KeyboardAvoidingView, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeView, SafeScrollView } from '../components';
@@ -13,7 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord, purchaseIakWithXrun, purchaseIakPrepare, purchaseIakRecord } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
@@ -37,6 +37,18 @@ interface ProductDetailData {
     price: number;
     image: ImageSourcePropType;
     isXrun?: boolean;
+    isIak?: boolean;  
+    iakCategory?: string | null;  
+}
+
+type IakInputKind = 'phone' | 'game_id' | 'meter' | 'generic';
+function getIakInputKind(category?: string | null): IakInputKind {
+    if (!category) return 'phone';
+    const c = String(category).toLowerCase();
+    if (c === 'game') return 'game_id';
+    if (c === 'pln') return 'meter';
+
+    return 'phone';
 }
 
 const defaultProductFallback: ProductDetailData = {
@@ -68,7 +80,10 @@ export const ShopProductDetailScreen = () => {
         price: parseFloat(selectedShopItem.priceLabel?.replace(/,/g, '') || '0'),
         image: selectedShopItem.image || defaultProductFallback.image,
         isXrun: (selectedShopItem as any).isXrun || false,
+        isIak: (selectedShopItem as any).isIak || false,
+        iakCategory: (selectedShopItem as any).iakCategory ?? null,
     } : defaultProductFallback;
+    const iakInputKind: IakInputKind = product.isIak ? getIakInputKind(product.iakCategory) : 'phone';
 
     const isExchangeProduct = false;
 
@@ -85,14 +100,33 @@ export const ShopProductDetailScreen = () => {
 
     const [member, setMember] = useState<string | null>(null);
 
+    const [descLines, setDescLines] = useState(1);
+
+    const [detailTab, setDetailTab] = useState<'desc' | 'guide'>('desc');
+
+    useEffect(() => {
+        const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+            navigate(ROUTES.shop);
+            return true;
+        });
+        return () => sub.remove();
+    }, [navigate]);
+
     const [purchasePinVisible, setPurchasePinVisible] = useState(false);
-    const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' } | null>(null);
+    const [purchaseCtx, setPurchaseCtx] = useState<{ memberId: number; email: string; kind: 'item' | 'gift' | 'iak'; iakCustomerId?: string } | null>(null);
     const [purchaseLocalLoading, setPurchaseLocalLoading] = useState(false);
 
     const [xplayBalanceState, setXplayBalanceState] = useState<number | null>(null);
     const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
     const [xplayPurchaseLoading, setXplayPurchaseLoading] = useState(false);
     const [xplayPaymentSuccessVisible, setXplayPaymentSuccessVisible] = useState(false);
+
+    const [iakPhone, setIakPhone] = useState<string>('');
+    const [iakPurchaseLoading, setIakPurchaseLoading] = useState(false);
+    const [iakPurchaseResult, setIakPurchaseResult] = useState<any>(null);
+    const [iakSuccessVisible, setIakSuccessVisible] = useState(false);
+
+    const [iakPhoneModalVisible, setIakPhoneModalVisible] = useState(false);
 
     const [xplayPurchaseResult, setXplayPurchaseResult] = useState<{
         tr_id?: string;
@@ -244,7 +278,16 @@ export const ShopProductDetailScreen = () => {
         const balance = xrunBalanceState;
         console.log('[Xplay 구매] 잔액 비교', { balance, needPrice, ok: balance >= needPrice });
         if (balance < needPrice) {
-            showAlert(t('screens.shopProductDetail.alerts.notification'), t('screens.shopProductDetail.alerts.insufficientXplay'), [{ text: t('screens.shopProductDetail.confirm') }]);
+
+            const shortage = (needPrice - balance).toFixed(4).replace(/\.?0+$/, '');
+            showAlert(
+                t('screens.shopProductDetail.alerts.notification'),
+                t('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage }),
+                [
+                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.xplayInfo) },
+                    { text: t('screens.shopProductDetail.confirm') },
+                ],
+            );
             return;
         }
         showAlert(t('screens.shopProductDetail.alerts.purchaseConfirmTitle'), t('screens.shopProductDetail.alerts.purchaseConfirmMessageXplay', { title: product.title }), [
@@ -603,6 +646,111 @@ export const ShopProductDetailScreen = () => {
         navigate(ROUTES.shopMyItems);
     };
 
+    const inputPrefix = iakInputKind === 'game_id' ? 'gameId' : iakInputKind === 'meter' ? 'meter' : 'phone';
+    const tkInput = useCallback((suffix: string) => `screens.shop.iak.${inputPrefix}${suffix}`, [inputPrefix]);
+    const customerLabel = t(tkInput('Label'));
+    const handleIakPurchase = useCallback(async () => {
+        if (!member || iakPurchaseLoading) return;
+        const phone = iakPhone.trim();
+        if (!phone) {
+            showAlert(t('screens.shop.iak.notice'), t(tkInput('Required')), [{ text: t('screens.shop.iak.ok') }]);
+            return;
+        }
+        if (xrunBalanceState === null || xrunBalanceLoading) {
+            showAlert(t('screens.shop.iak.notice'), t('screens.shop.iak.balanceLoading'), [{ text: t('screens.shop.iak.ok') }]);
+            return;
+        }
+        if (xrunBalanceState < product.price) {
+
+            const shortage = (product.price - xrunBalanceState).toFixed(4).replace(/\.?0+$/, '');
+            showAlert(
+                t('screens.shop.iak.notice'),
+                t('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage }),
+                [
+                    { text: t('screens.shopProductDetail.alerts.collectXrun'), onPress: () => navigate(ROUTES.xplayInfo) },
+                    { text: t('screens.shop.iak.ok') },
+                ],
+            );
+            return;
+        }
+        showAlert(
+            t('screens.shop.iak.purchaseConfirmTitle'),
+            t('screens.shop.iak.purchaseConfirmMessage', { title: product.title, price: product.price, label: customerLabel, customer: phone, phone }),
+            [
+                { text: t('screens.shop.iak.cancel') },
+                {
+                    text: t('screens.shop.iak.buyConfirm'),
+                    onPress: async () => {
+                        setIakPurchaseLoading(true);
+                        try {
+                            const res = await purchaseIakWithXrun({
+                                member: Number(member),
+                                product_code: String(product.id),
+                                customer_id: phone,
+                                env: 'prod',
+                            }, navigate);
+
+                            const innerData: any = res?.data ?? null;
+                            const innerStatus = innerData?.txn_status;
+                            const userMessage = innerData?.user_message ?? null;
+                            const wasRefunded = !!innerData?.refunded || innerStatus === 'refunded';
+                            if (res?.status === 'success' && innerStatus === 'success') {
+                                setIakPurchaseResult(innerData);
+                                setIakSuccessVisible(true);
+                                loadXrunBalance();
+                            } else if (res?.status === 'success' && (innerStatus === 'failed' || innerStatus === 'refunded')) {
+                                const failTitle = t('screens.shop.iak.purchaseFailed');
+                                const reason = userMessage || res?.message || t('screens.shop.iak.unknownError');
+                                const refundLine = wasRefunded ? `\n\n${t('screens.shop.iak.autoRefunded')}` : '';
+                                showAlert(failTitle, `${reason}${refundLine}`, [{ text: t('screens.shop.iak.ok') }]);
+                                loadXrunBalance();
+                            } else if (res?.code === 410) {
+
+                                try {
+                                    const userDataStr = await AsyncStorage.getItem('userData');
+                                    const ud = userDataStr ? JSON.parse(userDataStr) : null;
+                                    const memberId = ud?.member != null ? Number(ud.member) : null;
+                                    const email = (ud?.email ?? '').toLowerCase().trim();
+                                    if (memberId && email && isLocalSendEnabledForUser(email)) {
+                                        const entries = await findEntriesForUser(email, memberId);
+                                        const hasKey = (entries.pol?.s === 's1');
+                                        if (hasKey) {
+                                            setPurchaseCtx({ memberId, email, kind: 'iak', iakCustomerId: phone });
+                                            setPurchasePinVisible(true);
+                                            setIakPurchaseLoading(false);
+                                            return;
+                                        }
+                                    }
+                                } catch {  }
+                                showAlert(t('screens.shop.iak.purchaseFailed'), t('screens.walletRestore.restoreNeededShort'), [
+                                    { text: t('screens.shop.iak.ok') },
+                                    { text: t('screens.walletRestore.restoreNow'), onPress: () => navigate(ROUTES.walletRestore) },
+                                ]);
+                            } else {
+
+                                const innerData2: any = (res as any)?.data ?? null;
+                                const userMsg2 = innerData2?.user_message ?? null;
+                                const wasRefunded2 = !!innerData2?.refunded || innerData2?.txn_status === 'refunded';
+                                const reason2 = userMsg2 || res?.message || t('screens.shop.iak.unknownError');
+                                const refundLine2 = wasRefunded2 ? `\n\n${t('screens.shop.iak.autoRefunded')}` : '';
+                                showAlert(t('screens.shop.iak.purchaseFailed'), `${reason2}${refundLine2}`, [{ text: t('screens.shop.iak.ok') }]);
+                                loadXrunBalance();
+                            }
+                        } finally {
+                            setIakPurchaseLoading(false);
+                        }
+                    },
+                },
+            ]);
+    }, [t, member, iakPhone, iakPurchaseLoading, product.id, product.title, product.price, xrunBalanceState, xrunBalanceLoading, showAlert, navigate, loadXrunBalance, tkInput, customerLabel]);
+
+    const handleIakSuccessClose = () => {
+        setIakSuccessVisible(false);
+        setIakPhone('');
+        setIakPurchaseResult(null);
+        navigate(ROUTES.shopMyItems);
+    };
+
     const handleXplayPaymentSuccessClose = () => {
         setXplayPaymentSuccessVisible(false);
         setXplayPurchaseResult(null);
@@ -641,30 +789,28 @@ export const ShopProductDetailScreen = () => {
                             </View>
                         )}
                         <View style={styles.productImageContainer}>
-                            <View style={styles.productImageWrapper}>
-                                {showPlaceholder ? (
-
-                                    <View style={styles.productImage} />
-                                ) : (
-                                    <Image
-                                        source={primarySource}
-                                        style={styles.productImage}
-                                        resizeMode="contain"
-                                        onError={() => setImageLoadFailed(true)}
-                                    />
-                                )}
-                            </View>
+                            {}
+                            {!showPlaceholder && (
+                                <Image
+                                    source={primarySource}
+                                    style={{ width: '100%', aspectRatio: 1, borderRadius: 16 }}
+                                    resizeMode="cover"
+                                    onError={() => setImageLoadFailed(true)}
+                                />
+                            )}
                         </View>
-                        <View style={styles.productInfoContainer}>
+                        {}
+                        <View style={[styles.productInfoContainer, { alignItems: 'flex-start' }]}>
                             <View style={styles.brandContainer}>
-                                <Text style={styles.brand}>{displayBrand}</Text>
+                                <Text style={[styles.brand, { textAlign: 'left' }]}>{displayBrand}</Text>
                             </View>
-                            <Text style={styles.title}>{displayTitle}</Text>
-                            {hasDetailDescription ? (
-                                <Text style={styles.productDescription}>
-                                    {(productDetail?.content || productDetail?.contentAddDesc || '').trim()}
-                                </Text>
-                            ) : null}
+                            <Text style={[styles.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{displayTitle}</Text>
+                            {}
+                            {!isPurchasedView && (
+                                <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
+                            )}
+                            {}
+                            {descLines > 9999 && null}
                         </View>
                     </View>
 
@@ -673,11 +819,11 @@ export const ShopProductDetailScreen = () => {
                         <View style={styles.paymentCard}>
                             <View style={styles.sectionHeader}>
                                 <Feather name="check-circle" size={18} color="#22c55e" />
-                                <Text style={styles.sectionTitle}>구매 완료 정보</Text>
+                                <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.purchaseCompleteInfo')}</Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.paymentRow}>
-                                <Text style={styles.paymentLabel}>결제 금액</Text>
+                                <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
                                 <View style={styles.priceContainer}>
                                     <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
                                     <Text style={styles.paymentValue}>
@@ -697,111 +843,146 @@ export const ShopProductDetailScreen = () => {
                                 </View>
                             </View>
                             <View style={styles.paymentRowLast}>
-                                <Text style={styles.paymentLabel}>구매일</Text>
+                                <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.purchaseDateLabel')}</Text>
                                 <Text style={styles.paymentBalance}>{purchasedDate || '-'}</Text>
                             </View>
                         </View>
-                    ) : (
-                    <View style={styles.paymentCard}>
-                        <View style={styles.sectionHeader}>
-                            <Feather name="credit-card" size={18} color="#1E3A5F" />
-                            <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.paymentInfo')}</Text>
-                        </View>
-                        <View style={styles.divider} />
-                        {isXplayShop ? (
-                            <>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
-                                    <View style={styles.priceContainer}>
-                                        <Image source={xrunRoundLogo} style={styles.coinIcon} resizeMode="contain" />
-                                        <Text style={styles.paymentValue}>{displayPrice.toLocaleString()} XRUN</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXRUNBalance')}</Text>
-                                    {xrunBalanceLoading ? (
-                                        <ActivityIndicator size="small" color="#1E3A5F" />
-                                    ) : (
-                                        <Text style={styles.paymentBalance}>
-                                            {xrunBalanceState == null ? '-' : `${xrunBalanceState.toLocaleString()} XRUN`}
-                                        </Text>
-                                    )}
-                                </View>
-                                <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXRUN')}</Text>
-                                    <Text style={styles.paymentRemaining}>
-                                        {xrunBalanceState == null ? '-' : `${(xrunBalanceState - displayPrice).toLocaleString()} XRUN`}
+                    ) : null}
+
+                    {
+}
+                    {(() => {
+                        const descStr = String(product.description ?? '').trim();
+                        const isPlaceholder = descStr === '' || descStr === '-';
+                        const hasDesc = !!(hasDetailDescription || (product.description && !isPlaceholder));
+
+                        const effectiveTab: 'desc' | 'guide' = hasDesc ? detailTab : 'guide';
+                        return (
+                    <View style={styles.guideCard}>
+                        <View style={styles.tabRow}>
+                            {hasDesc && (
+                                <TouchableOpacity
+                                    onPress={() => setDetailTab('desc')}
+                                    style={[styles.tabButton, effectiveTab === 'desc' && styles.tabButtonActive]}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={[styles.tabButtonText, effectiveTab === 'desc' && styles.tabButtonTextActive]}>
+                                        {t('screens.shopProductDetail.tabDescription')}
                                     </Text>
-                                </View>
-                            </>
-                        ) : (
-                            <>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.paymentAmount')}</Text>
-                                    <View style={styles.priceContainer}>
-                                        <Image source={coinIcon} style={styles.coinIcon} resizeMode="contain" />
-                                        <Text style={styles.paymentValue}>{product.price.toLocaleString()} XRUN</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.paymentRow}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.myXrunBalance')}</Text>
-                                    {xrunBalanceLoading ? (
-                                        <ActivityIndicator size="small" color="#1E3A5F" />
-                                    ) : (
-                                        <Text style={styles.paymentBalance}>{xrunBalance.toLocaleString()} XRUN</Text>
-                                    )}
-                                </View>
-                                <View style={styles.paymentRowLast}>
-                                    <Text style={styles.paymentLabel}>{t('screens.shopProductDetail.remainingXrun')}</Text>
-                                    <Text style={styles.paymentRemaining}>{remainingBalance.toLocaleString()} XRUN</Text>
-                                </View>
-                            </>
+                                </TouchableOpacity>
+                            )}
+                            <TouchableOpacity
+                                onPress={() => setDetailTab('guide')}
+                                style={[styles.tabButton, effectiveTab === 'guide' && styles.tabButtonActive]}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={[styles.tabButtonText, effectiveTab === 'guide' && styles.tabButtonTextActive]}>
+                                    {t('screens.shopProductDetail.tabGuide')}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {}
+                        {effectiveTab === 'desc' && hasDesc && (
+                            <View style={{ paddingTop: 16 }}>
+                                {(() => {
+                                    const rawContent = hasDetailDescription
+                                        ? (productDetail?.content || productDetail?.contentAddDesc || '').trim()
+                                        : String(product.description).trim();
+
+                                    const lines = rawContent.split('\n').map((l) => l.trim()).filter(Boolean);
+                                    const sections: { heading: string; body: string[] }[] = [];
+                                    let cur: { heading: string; body: string[] } | null = null;
+                                    const headingRe = /^(?:▶\s*(.+)|\[([^\]]+)\]\s*(.*))$/;
+                                    for (const line of lines) {
+                                        const m = line.match(headingRe);
+                                        if (m) {
+                                            if (cur) sections.push(cur);
+                                            const heading = (m[1] ?? m[2] ?? '').trim();
+                                            cur = { heading, body: [] };
+                                            const tail = (m[3] ?? '').trim();
+                                            if (tail) cur.body.push(tail);
+                                        } else if (cur) {
+                                            cur.body.push(line);
+                                        } else {
+
+                                            cur = { heading: '', body: [line] };
+                                        }
+                                    }
+                                    if (cur) sections.push(cur);
+
+                                    if (sections.length === 1 && !sections[0].heading) {
+                                        return (
+                                            <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0 }]}>
+                                                {sections[0].body.join('\n')}
+                                            </Text>
+                                        );
+                                    }
+                                    return sections.map((sec, idx) => (
+                                        <View key={idx} style={{ marginBottom: idx < sections.length - 1 ? 16 : 0 }}>
+                                            {sec.heading ? (
+                                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                                    {sec.heading}
+                                                </Text>
+                                            ) : null}
+                                            {sec.body.map((line, i) => (
+                                                <Text key={i} style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>
+                                                    {line}
+                                                </Text>
+                                            ))}
+                                        </View>
+                                    ));
+                                })()}
+                            </View>
+                        )}
+
+                        {}
+                        {effectiveTab === 'guide' && (
+                            <View style={{ paddingTop: 16 }}>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                    {t('screens.shopProductDetail.cancelRefund')}
+                                </Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.cancelRefundLine1')}</Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.cancelRefundLine2')}</Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 16 }]}>• {t('screens.shopProductDetail.cancelRefundLine3')}</Text>
+
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, fontWeight: '700', color: '#111827', marginBottom: 6 }]}>
+                                    {t('screens.shopProductDetail.guideSubtitle')}
+                                </Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.guideLine1')}</Text>
+                                <Text style={[styles.productDescription, { textAlign: 'left', marginTop: 0, marginBottom: 4 }]}>• {t('screens.shopProductDetail.guideLine2')}</Text>
+                            </View>
                         )}
                     </View>
-                    )}
-
-                    {}
-                    <View style={styles.guideCard}>
-                        <View style={styles.sectionHeader}>
-                            <Feather name="info" size={18} color="#1E3A5F" />
-                            <Text style={styles.sectionTitle}>{t('screens.shopProductDetail.guide')}</Text>
-                        </View>
-                        <View style={styles.divider} />
-
-                        <View style={styles.guideItem}>
-                            <View style={styles.guideItemHeader}>
-                                <View style={styles.guideNumber}>
-                                    <Text style={styles.guideNumberText}>1</Text>
-                                </View>
-                                <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.cancelRefund')}</Text>
-                            </View>
-                            <View style={styles.guideTextContainer}>
-                                <Text style={styles.guideText}>• 본 상품은 구매 즉시 발송되는 디지털 쿠폰(모바일 쿠폰/바코드)입니다.</Text>
-                                <Text style={styles.guideText}>• 쿠폰번호(PIN) 발행 후 사용 여부 확인이 불가능하므로 단순 변심에 의한 취소 및 환불은 불가능합니다.</Text>
-                                <Text style={styles.guideText}>• 상품 품절 등 교환 불가 사유 발생 시에만 100% 환불 처리됩니다.</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.guideItem}>
-                            <View style={styles.guideItemHeader}>
-                                <View style={styles.guideNumber}>
-                                    <Text style={styles.guideNumberText}>2</Text>
-                                </View>
-                                <Text style={styles.guideSubtitle}>{t('screens.shopProductDetail.guideSubtitle')}</Text>
-                            </View>
-                            <View style={styles.guideTextContainer}>
-                                <Text style={styles.guideText}>• 전국 교환처(해당 브랜드 매장)에서 결제 시 모바일 쿠폰을 제시해 주세요.</Text>
-                                <Text style={styles.guideText}>• 매장 재고에 따라 상품이 제공되지 않을 수 있으며, 이 경우 동일 가격 이상의 다른 상품으로 교환 가능합니다(차액 지불).</Text>
-                            </View>
-                        </View>
-                    </View>
+                        );
+                    })()}
                 </View>
             </SafeScrollView>
 
             {}
             {!isPurchasedView && (
             <View style={[styles.buttonContainer, { paddingBottom: bottomSafeArea + 20 }]}>
-                {isXplayShop ? (
+                {product.isIak ? (
+
+                    <TouchableOpacity
+                        style={[styles.purchaseButton, iakPurchaseLoading && styles.purchaseButtonDisabled]}
+                        onPress={() => { setIakPhone(''); setIakPhoneModalVisible(true); }}
+                        disabled={iakPurchaseLoading || member == null}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient
+                            colors={['#1E3A5F', '#2D4A6F']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.purchaseButtonGradient}
+                        >
+                            {iakPurchaseLoading ? <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} /> : null}
+                            <Text style={styles.purchaseButtonText}>
+                                {iakPurchaseLoading ? t('screens.shop.iak.processing') : t('screens.shop.iak.buyButton')}
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                ) : isXplayShop ? (
                     <TouchableOpacity
                         style={[styles.purchaseButton, xplayPurchaseLoading && styles.purchaseButtonDisabled]}
                         onPress={handleXplayPurchase}
@@ -863,6 +1044,89 @@ export const ShopProductDetailScreen = () => {
 
             {}
             <Modal
+                visible={iakPhoneModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setIakPhoneModalVisible(false)}
+            >
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={styles.modalOverlay}
+                >
+                    <View style={[styles.paymentSuccessModal, { paddingTop: 24 }]}>
+                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#111827', marginBottom: 8, textAlign: 'center' }}>
+                            {t(tkInput('ModalTitle'))}
+                        </Text>
+                        <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
+                            {t(tkInput('ModalDesc'))}
+                        </Text>
+                        <TextInput
+                            value={iakPhone}
+                            onChangeText={setIakPhone}
+                            placeholder={t(tkInput('Placeholder'))}
+                            keyboardType={iakInputKind === 'game_id' ? 'numeric' : 'phone-pad'}
+                            autoFocus
+                            style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, marginBottom: 16, backgroundColor: '#fff', width: '100%' }}
+                        />
+                        <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
+                            <TouchableOpacity
+                                style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: '#e5e7eb', alignItems: 'center' }}
+                                onPress={() => setIakPhoneModalVisible(false)}
+                                disabled={iakPurchaseLoading}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#374151', fontWeight: '600' }}>{t('screens.shop.iak.cancel')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ flex: 1, padding: 12, borderRadius: 8, backgroundColor: iakPhone.trim() ? '#1E3A5F' : '#9ca3af', alignItems: 'center' }}
+                                onPress={() => { setIakPhoneModalVisible(false); handleIakPurchase(); }}
+                                disabled={iakPurchaseLoading || !iakPhone.trim()}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#fff', fontWeight: '700' }}>{t('screens.shop.iak.buyConfirm')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
+
+            {}
+            <Modal
+                visible={iakSuccessVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={handleIakSuccessClose}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.paymentSuccessModal}>
+                        <View style={styles.modalLogoContainer}>
+                            <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
+                        </View>
+                        <Text style={[styles.paymentSuccessMessage, { marginBottom: 12 }]}>
+                            {t('screens.shop.iak.successTitle')}
+                        </Text>
+                        {iakPurchaseResult?.iak?.sn ? (
+                            <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('screens.shop.iak.snLabel')}</Text>
+                                <Text style={{ fontSize: 16, fontWeight: '700', fontFamily: 'Roboto-Medium', color: '#111827', letterSpacing: 1 }}>
+                                    {iakPurchaseResult.iak.sn}
+                                </Text>
+                            </View>
+                        ) : null}
+                        <View style={{ backgroundColor: '#eff6ff', borderRadius: 8, padding: 12, marginBottom: 16, width: '100%' }}>
+                            <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, textAlign: 'center' }}>
+                                {t('screens.shop.iak.smsNotice')}
+                            </Text>
+                        </View>
+                        <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleIakSuccessClose} activeOpacity={0.8}>
+                            <Text style={styles.paymentSuccessButtonText}>{t('screens.shop.iak.ok')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {}
+            <Modal
                 visible={xplayPaymentSuccessVisible}
                 transparent={true}
                 animationType="fade"
@@ -904,7 +1168,7 @@ export const ShopProductDetailScreen = () => {
                     visible={purchasePinVisible}
                     memberId={purchaseCtx.memberId}
                     email={purchaseCtx.email}
-                    processingLabel="결제 처리 중..."
+                    processingLabel={t('screens.shop.iak.processingPayment')}
                     onSuccess={async (wallets: WalletKey[]) => {
 
                         if (purchaseLocalLoading) return;
@@ -912,9 +1176,70 @@ export const ShopProductDetailScreen = () => {
                         const kind = purchaseCtx.kind;
                         try {
 
-                            const target = wallets.find((w) => w.wallet_code === 'c18');
+                            const target = wallets.find((w) => w.wallet_code === 'c18')
+                                ?? wallets.find((w) => w.wallet_code === 'c16');
                             if (!target?.private_key) {
                                 throw new Error('지갑 키를 찾을 수 없어요. 복원을 먼저 해주세요.');
+                            }
+                            if (kind === 'iak') {
+
+                                const customerId = purchaseCtx.iakCustomerId ?? '';
+                                if (!customerId) throw new Error(t(tkInput('Required')));
+                                const prep = await purchaseIakPrepare(member!, String(product.id), navigate);
+                                if (prep?.status !== 'success' || !prep.data?.[0]) {
+                                    throw new Error(prep?.message || 'IAK prepare 실패');
+                                }
+                                const meta = prep.data[0];
+                                const send = await sendOnchainLocal({
+                                    privateKey: target.private_key,
+                                    fromAddress: meta.userAddress,
+                                    toAddress: meta.casherAddress,
+                                    amount: String(meta.actualPurchaseAmount),
+                                    currency: 18,
+                                });
+                                if (!send.ok) {
+                                    const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
+                                    const detailStr = typeof detail === 'string' ? detail : '';
+                                    const isGasShort = (send as any).reason === 'broadcast-failed'
+                                        && /수수료|가스|insufficient funds/i.test(detailStr);
+                                    if (isGasShort) {
+                                        setPurchasePinVisible(false);
+                                        setPurchaseLocalLoading(false);
+                                        await showAlert(t('common.gasInsufficient.title'), t('common.gasInsufficient.messagePurchase'));
+                                        return;
+                                    }
+                                    throw new Error(detailStr || '송금 실패');
+                                }
+                                const rec = await purchaseIakRecord(
+                                    member!, meta.ref_id, customerId, send.txHash, String(product.id), navigate
+                                );
+
+                                const recData: any = Array.isArray(rec?.data) ? rec.data[0] : rec?.data;
+                                const recInnerStatus = recData?.txn_status;
+                                if (rec?.status === 'success' && recInnerStatus === 'success') {
+                                    console.log('[T-031 IAK 구매] 성공:', { txHash: send.txHash, ref_id: meta.ref_id });
+                                    setIakPurchaseResult(recData);
+                                    setPurchasePinVisible(false);
+                                    setIakSuccessVisible(true);
+                                    loadXrunBalance();
+                                    return;
+                                }
+                                if (recInnerStatus === 'failed' || recInnerStatus === 'refunded' || rec?.status !== 'success') {
+                                    setPurchasePinVisible(false);
+                                    setPurchaseLocalLoading(false);
+                                    const reason = recData?.user_message || rec?.message || t('screens.shop.iak.unknownError');
+                                    const wasRefunded = !!recData?.refunded || recInnerStatus === 'refunded';
+                                    const refundLine = wasRefunded ? `\n\n${t('screens.shop.iak.autoRefunded')}` : '';
+                                    showAlert(t('screens.shop.iak.purchaseFailed'), `${reason}${refundLine}`, [{ text: t('screens.shop.iak.ok') }]);
+                                    loadXrunBalance();
+                                    return;
+                                }
+
+                                setIakPurchaseResult(recData);
+                                setPurchasePinVisible(false);
+                                setIakSuccessVisible(true);
+                                loadXrunBalance();
+                                return;
                             }
                             if (kind === 'gift') {
 
@@ -932,7 +1257,20 @@ export const ShopProductDetailScreen = () => {
                                 });
                                 if (!send.ok) {
                                     const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
-                                    throw new Error(typeof detail === 'string' ? detail : '송금 실패');
+
+                                    const detailStr = typeof detail === 'string' ? detail : '';
+                                    const isGasShort = (send as any).reason === 'broadcast-failed'
+                                        && /수수료|가스|insufficient funds/i.test(detailStr);
+                                    if (isGasShort) {
+                                        setPurchasePinVisible(false);
+                                        setPurchaseLocalLoading(false);
+                                        await showAlert(
+                                            t('common.gasInsufficient.title'),
+                                            t('common.gasInsufficient.messagePurchase'),
+                                        );
+                                        return;
+                                    }
+                                    throw new Error(detailStr || '송금 실패');
                                 }
                                 const rec = await purchaseGiftRecord(member!, String(product.id), userPhone ?? '', send.txHash, meta.actualPurchaseAmount, navigate);
                                 if (rec?.status !== 'success') {
@@ -974,7 +1312,20 @@ export const ShopProductDetailScreen = () => {
                             });
                             if (!send.ok) {
                                 const detail = (send as any).detail ?? (send as any).reason ?? '송금 실패';
-                                throw new Error(typeof detail === 'string' ? detail : '송금 실패');
+
+                                const detailStr = typeof detail === 'string' ? detail : '';
+                                const isGasShort = (send as any).reason === 'broadcast-failed'
+                                    && /수수료|가스|insufficient funds/i.test(detailStr);
+                                if (isGasShort) {
+                                    setPurchasePinVisible(false);
+                                    setPurchaseLocalLoading(false);
+                                    await showAlert(
+                                        t('common.gasInsufficient.title'),
+                                        t('common.gasInsufficient.messagePurchase'),
+                                    );
+                                    return;
+                                }
+                                throw new Error(detailStr || '송금 실패');
                             }
                             const rec = await purchaseXrunItemRecord(member!, parseInt(String(product.id), 10), send.txHash, meta.actualPurchaseAmount, navigate);
                             if (rec?.status !== 'success') {
@@ -1159,12 +1510,10 @@ const styles = StyleSheet.create({
     productImageWrapper: {
         width: '100%',
         height: 200,
+
         borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: '#ffffff',
+        backgroundColor: '#F3F4F6',
     },
     productImage: {
         width: '100%',
@@ -1190,13 +1539,59 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         letterSpacing: -0.3,
     },
+
+    bottomBalanceText: {
+        fontSize: 13,
+        color: '#6B7280',
+        marginBottom: 10,
+        textAlign: 'right',
+    },
+
+    tabRow: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E5E7EB',
+        marginBottom: 4,
+    },
+    tabButton: {
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderBottomWidth: 2,
+        borderBottomColor: 'transparent',
+        marginBottom: -1,
+    },
+    tabButtonActive: {
+        borderBottomColor: '#1E3A5F',
+    },
+    tabButtonText: {
+        fontSize: 14,
+        color: '#9CA3AF',
+        fontWeight: '500',
+    },
+    tabButtonTextActive: {
+        color: '#1E3A5F',
+        fontWeight: '700',
+    },
+
+    detailPriceText: {
+        marginTop: 10,
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#111827',
+        fontFamily: 'Roboto-Bold',
+        alignSelf: 'flex-start',
+    },
     productDescription: {
         marginTop: 12,
         fontSize: 14,
         fontFamily: 'Roboto-Regular',
         color: '#6B7280',
         lineHeight: 20,
+
         textAlign: 'center',
+        alignSelf: 'stretch',
+        width: '100%',
     },
     detailLoadingWrap: {
         position: 'absolute',
@@ -1279,17 +1674,10 @@ const styles = StyleSheet.create({
         letterSpacing: -0.3,
     },
     guideCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 20,
-        padding: 20,
+
+        paddingHorizontal: 4,
+        paddingBottom: 32,
         marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-        elevation: 5,
-        borderWidth: 1,
-        borderColor: '#F0F0F0',
     },
     guideItem: {
         marginBottom: 20,

@@ -26,6 +26,11 @@ export default {
     linkErrorMessage: 'ไม่สามารถเปิดหน้าปัจจุบันได้',
     loadFailed: 'ไม่สามารถโหลดรายการแจ้งเตือนได้',
   },
+  toast: {
+    inquiryReplyArrived: '💬 ได้รับการตอบกลับสอบถาม 1:1 แล้ว',
+    newNotification: '🔔 แจ้งเตือนใหม่',
+    moreCount: ' และอีก {{count}} รายการ',
+  },
 };
 
 

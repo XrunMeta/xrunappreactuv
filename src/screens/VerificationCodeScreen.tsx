@@ -30,7 +30,7 @@ import {
 } from '../services';
 import { signInWithApple } from '../services/appleAuth';
 import { AxiosError } from 'axios';
-import { TUTORIAL_PENDING_KEY } from './walletKeyTutorialHelpers';
+import { TUTORIAL_PENDING_KEY, TUTORIAL_COMPLETED_KEY } from './walletKeyTutorialHelpers';
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 300;
@@ -138,6 +138,10 @@ export const VerificationCodeScreen = () => {
             recommand: pendingData.referralMemberId || 0,
             os: SignupHelpers.getOSCode(),
             social_code: isAppleSignupMode ? 2052 : (isGoogleSignupMode ? 2051 : undefined), 
+
+            agree_service: !!pendingData.agree_service,
+            agree_location: !!pendingData.agree_location,
+            agree_privacy: !!pendingData.agree_privacy,
           };
 
           console.log('[회원가입] 회원가입 API 호출 시작', {
@@ -264,6 +268,7 @@ export const VerificationCodeScreen = () => {
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
 
           try {
+            await AsyncStorage.removeItem(TUTORIAL_COMPLETED_KEY);
             await AsyncStorage.setItem(TUTORIAL_PENDING_KEY, 'true');
           } catch (e) {
             console.warn('[회원가입] 튜토리얼 pending 플래그 저장 실패:', e);

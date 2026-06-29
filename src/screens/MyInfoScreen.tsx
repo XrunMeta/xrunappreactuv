@@ -169,12 +169,23 @@ export const MyInfoScreen = () => {
               const lastCheckedTime = await AsyncStorage.getItem('lastNotificationCheckTime');
               const lastChecked = lastCheckedTime ? new Date(lastCheckedTime).getTime() : 0;
 
-              const hasNewNotifications = response.data.some((notification) => {
-                const notificationTime = new Date(notification.datetime).getTime();
+              const toUtcMs = (raw: unknown): number => {
+                const s = String(raw ?? '').trim();
+                if (!s) return 0;
+
+                const iso = s.includes('T') ? s : s.replace(' ', 'T') + (s.endsWith('Z') ? '' : 'Z');
+                return new Date(iso).getTime();
+              };
+              const newOnes = response.data.filter((notification) => {
+
+                if (Number(notification.type) === 9303) return false;
+                const notificationTime = toUtcMs(notification.datetime);
                 return notificationTime > lastChecked;
               });
+              const hasNewNotifications = newOnes.length > 0;
 
               setHasUnreadNotifications(hasNewNotifications);
+
             } else {
               setHasUnreadNotifications(false);
             }
@@ -214,10 +225,6 @@ export const MyInfoScreen = () => {
         }
       } else if (menu.id === 'notify') {
 
-        console.log('[내 정보] 알림 메뉴 — 빨간 점 즉시 숨김 (옵티미스틱)');
-        setHasUnreadNotifications(false);
-
-        AsyncStorage.setItem('lastNotificationCheckTime', new Date().toISOString()).catch(() => {});
         navigate(ROUTES[menu.route]);
       } else {
         navigate(ROUTES[menu.route]);

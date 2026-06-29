@@ -40,9 +40,6 @@ export const getApiBaseUrl = (): string => {
   const env = getEnv();
   if (env.USE_WORKERS_API !== 'true') return env.GATEWAY_NODEJS;
 
-  if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    return PREVIEW_GATEWAY_URL;
-  }
   if (process.env.EXPO_PUBLIC_API_ENV === 'preview') {
     return PREVIEW_GATEWAY_URL;
   }
@@ -628,6 +625,17 @@ export const sendAliveSignal = async (
     }
     throw error;
   }
+};
+
+export const getIosGuideShowStatus = async (navigation?: any): Promise<boolean> => {
+  try {
+    const server = await checkServerVersion();
+    if (server?.data && (server.data as any).iosOnGuide !== undefined) {
+      const v = (server.data as any).iosOnGuide;
+      return v === 1 || v === true;
+    }
+  } catch (_) {}
+  return true; 
 };
 
 export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean> => {
@@ -5074,6 +5082,93 @@ export const purchaseGiftWithXplayPoints = async (
   }
 };
 
+export interface MyIakTxnItem {
+  ref_id: string;
+  product_code: string;
+  product_name: string | null;
+  customer_id: string;
+  product_price: number;  
+  xrun_amount: number;
+  status: 'pending' | 'success' | 'failed' | 'refunded';
+  iak_sn: string | null;
+  iak_message: string | null;
+  created_at: string;
+  callback_at: string | null;
+  icon_url?: string | null;  
+}
+export const getMyIakTxns = async (
+  member: number | string,
+  navigation?: any,
+): Promise<{ status: string; data: MyIakTxnItem[] }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const res = await axiosInstance.post('/getMyIakTxns', { member: Number(member) });
+    const data = res.data;
+    if (data?.status === 'success' && Array.isArray(data.data)) {
+      return { status: 'success', data: data.data as MyIakTxnItem[] };
+    }
+    return { status: 'error', data: [] };
+  } catch (e) {
+    console.warn('[IAK] My txn fetch err:', (e as Error).message);
+    return { status: 'error', data: [] };
+  }
+};
+
+export const purchaseIakPrepare = async (
+  member: number,
+  product_code: string,
+  navigation?: any,
+): Promise<any> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const r = await axiosInstance.post('/purchaseIakPrepare', { member, product_code });
+  return r.data;
+};
+
+export const purchaseIakRecord = async (
+  member: number,
+  ref_id: string,
+  customer_id: string,
+  txHash: string,
+  product_code: string,
+  navigation?: any,
+): Promise<any> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const r = await axiosInstance.post('/purchaseIakRecord', { member, ref_id, customer_id, txHash, product_code });
+  return r.data;
+};
+
+export const purchaseIakWithXrun = async (
+  params: { member: number; product_code: string; customer_id: string; env?: 'dev' | 'prod' },
+  navigation?: any,
+): Promise<{ status: string; code?: number; message?: string; data?: any }> => {
+  try {
+    const axiosInstance = createAxiosInstance(navigation);
+    const response = await axiosInstance.post('/purchaseIakWithXrun', {
+      member: params.member,
+      product_code: params.product_code,
+      customer_id: params.customer_id,
+      env: params.env ?? 'prod',
+    });
+    const data = response.data;
+    if (data?.status === 'success') {
+      console.log('[IAK] 구매 성공:', { member: params.member, product_code: params.product_code, data: data?.data });
+    } else {
+      console.warn('[IAK] 구매 실패:', data?.message ?? data);
+    }
+    return data;
+  } catch (error) {
+    const msg = error instanceof AxiosError
+      ? (error.response?.data as any)?.message || error.message
+      : (error as Error).message;
+    console.error('[IAK] 구매 오류:', msg);
+    if (error instanceof AxiosError) {
+      const d = error.response?.data as any;
+      return { status: 'error', code: error.response?.status, message: d?.message || error.message };
+    }
+    return { status: 'error', message: (error as Error).message };
+  }
+};
+
 export const cancelGiftishowCoupon = async (
   member: string,
   tr_id: string,
@@ -7089,5 +7184,49 @@ export const resetPasswordWithCode = async (
   } catch (error: any) {
     const data = error?.response?.data;
     return { status: 'error', code: error?.response?.status, message: data?.message || error?.message || 'failed' };
+  }
+};
+
+export const getNotificationSettings = async (
+  member: number,
+): Promise<{ all: boolean; notice: boolean; event: boolean } | null> => {
+  try {
+    const axiosInstance = createAxiosInstance();
+    const res = await axiosInstance.get(`/notification-settings?member=${member}`);
+    const row = res.data?.data?.[0];
+    if (!row) return null;
+    return { all: !!row.all, notice: !!row.notice, event: !!row.event };
+  } catch (e) {
+    console.warn('[getNotificationSettings] failed:', e);
+    return null;
+  }
+};
+
+export const updateNotificationSettings = async (
+  member: number,
+  patch: { all?: boolean; notice?: boolean; event?: boolean },
+): Promise<boolean> => {
+  try {
+    const axiosInstance = createAxiosInstance();
+    await axiosInstance.post('/notification-settings', { member, ...patch });
+    return true;
+  } catch (e) {
+    console.warn('[updateNotificationSettings] failed:', e);
+    throw e;
+  }
+};
+
+export const recordWalletTutorialComplete = async (): Promise<boolean> => {
+  try {
+    const jwt = await AsyncStorage.getItem('jwt');
+    if (!jwt) return false;
+    const member = jwtPayloadSub(jwt);
+    if (!member) return false;
+    const axiosInstance = createAxiosInstance();
+    await axiosInstance.post('/wallet-tutorial/complete', { member });
+    return true;
+  } catch (e) {
+    console.warn('[recordWalletTutorialComplete] failed:', e);
+    return false;
   }
 };

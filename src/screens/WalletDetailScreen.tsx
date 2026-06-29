@@ -440,7 +440,13 @@ export const WalletDetailScreen = () => {
 
           const onchainCategory = (item as any).category as string | undefined;
           if (onchainCategory && onchainCategory.trim()) {
-            actionType = onchainCategory.trim();
+            const trimmed = onchainCategory.trim();
+            if (trimmed.startsWith('cat:')) {
+              const key = trimmed.slice(4);
+              actionType = t(`screens.walletDetail.cat_${key}`);
+            } else {
+              actionType = trimmed;
+            }
           }
 
           const amountInEth = weiToEth(item.value, item.tokenDecimal);
@@ -709,8 +715,12 @@ export const WalletDetailScreen = () => {
 
   const krwValue = useMemo(() => {
 
-    if (!selectedWalletAsset || (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19) || !gopaxPrice) {
+    if (!selectedWalletAsset || (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19)) {
       return null;
+    }
+
+    if (!gopaxPrice) {
+      return t('screens.walletDetail.priceUpdating');
     }
 
     try {
@@ -726,9 +736,9 @@ export const WalletDetailScreen = () => {
       return `KRW ${formattedInteger}`;
     } catch (error) {
       console.error('[WalletDetail] KRW 금액 계산 오류:', error);
-      return null;
+      return t('screens.walletDetail.priceUpdating');
     }
-  }, [selectedWalletAsset, gopaxPrice]);
+  }, [selectedWalletAsset, gopaxPrice, t]);
 
   const shortenedAddress = useMemo(() => {
     return publicAddress || '';
@@ -764,7 +774,8 @@ export const WalletDetailScreen = () => {
           subValue={krwValue || ''}
           address={shortenedAddress}
           onCopy={handleCopyAddress}
-          onDownload={selectedWalletAsset?.currency === 19 ? undefined : handleDownload}
+
+          onDownload={undefined}
           actions={[
             {
               label: explorerLabel,

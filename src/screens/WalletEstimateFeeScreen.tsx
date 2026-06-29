@@ -160,13 +160,12 @@ export const WalletEstimateFeeScreen = () => {
     }
 
     try {
-      const currency = selectedWalletAsset?.currency || 0;
-      const isPolygon = currency === 16 || currency === 18;
-      const network = isPolygon ? 'POL' : 'ETH';
 
-      const fixed = parseFloat(gasPrice.toString()).toFixed(6);
+      const polValue = parseFloat(gasPrice.toString());
+      const gweiValue = polValue * 1e9;
+      const fixed = gweiValue.toFixed(2);
       const trimmed = fixed.replace(/\.?0+$/, '');
-      return `${trimmed} ${network}`;
+      return `${trimmed} GWEI`;
     } catch (error) {
       console.error('[WalletEstimateFee] 가스 수수료 포맷팅 오류:', error);
       return t('screens.walletEstimateFee.error');
