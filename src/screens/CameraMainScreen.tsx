@@ -28,6 +28,8 @@ import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
 
 import { v_ab2b01, v_17d0bf, v_d46e1b, v_3b9e74 } from '../services/nasmediaAd';
+
+import { v_18f201 as v_8c1aee, v_3dc1fd, v_ad3a98, v_8c8ab6, v_f095b0 } from '../services/pangle';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -2815,6 +2817,44 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                     if (v_21cc31.spotID === 5) {
                       v_9b57fc(v_ce4741.showNapMxReward);
+                      return;
+                    }
+                    if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4) {
+                      (async () => {
+                        try {
+                          let v_b1717e = v_8c8ab6();
+                          if (!v_b1717e) {
+                            console.log('[AR-Pangle] 초기화 후 재확인');
+                            await v_f095b0();
+                            v_b1717e = await v_ad3a98();
+                          }
+                          if (!v_b1717e) {
+                            await v_889fad('광고 준비 중', '잠시 후 다시 시도해주세요.');
+                            return;
+                          }
+                          const v_61418d = v_3dc1fd();
+                          const v_e7f87b = await v_f3de6d();
+                          await v_8c1aee(
+                            v_61418d,
+                            v_717992 ? String(v_717992) : '',
+                            v_e7f87b,
+                            (v_36c043) => {
+                              console.log('[AR-Pangle] 보상 수령:', v_36c043, 'spotID:', v_21cc31.spotID);
+
+                              v_cba33f('광고 시청 완료 — 보상이 지급될 예정이에요');
+                            },
+                            () => {
+                              console.log('[AR-Pangle] 광고 닫힘 (미완료)');
+                            },
+                            (v_49263d) => {
+                              console.warn('[AR-Pangle] 로드 실패:', v_49263d?.message);
+                              v_889fad('광고 로드 실패', '잠시 후 다시 시도해주세요.');
+                            },
+                          );
+                        } catch (v_9e86fd) {
+                          console.error('[AR-Pangle] 예외:', v_9e86fd?.message);
+                        }
+                      })();
                       return;
                     }
 
