@@ -65,7 +65,7 @@
       "ios": {
         "distribution": "store",
         "image": "latest"
-      },
+      }
     },
     "production-apk": {
       "extends": "production",

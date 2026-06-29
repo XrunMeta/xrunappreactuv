@@ -15,6 +15,7 @@ import {
   Linking,
   ScrollView,
   Alert,
+  NativeModules,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -2616,6 +2617,19 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   }, [showBottomPanel, selectedToken, navigateToAd]);
 
   const handleTokenClick = useCallback((token: TokenData) => {
+
+    console.log('[nasmedia-video] handleTokenClick 진입', {
+      isVideoToken: token.isVideoToken,
+      videoAdUnitId: (token as any).videoAdUnitId,
+      ad_company: token.ad_company,
+      name: token.name,
+      nasmediaAvailable: isNasmediaAdAvailable(),
+      hasNativeModule: !!(NativeModules as any).NasmediaAdModule,
+    });
+
+    console.log('[nasmedia-video] 모든 NativeModules keys:', Object.keys(NativeModules).filter(k =>
+      /Nas|Pang|Adis|Ayet|Force|Tap/i.test(k)
+    ).sort());
 
     if (token.isVideoToken) {
       (async () => {
