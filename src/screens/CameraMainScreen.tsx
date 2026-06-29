@@ -2632,6 +2632,9 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     ).sort());
 
     if (v_21cc31.isVideoToken) {
+
+      v_6a4dcd(false);
+      v_96a9ed(null);
       (async () => {
         try {
           if (!v_d46e1b()) {

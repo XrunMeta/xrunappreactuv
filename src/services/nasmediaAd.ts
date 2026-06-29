@@ -25,6 +25,27 @@ const v_357489 = v_6a3da4
   ? new v_0cafec(v_80fa10.NasmediaAdModule)
   : null
 
+if (v_357489) {
+  const { Alert: v_03e392 } = require('rcmrninabrnb')
+  v_357489.addListener('NasmediaAd_onLoaded', (v_e2a85c) =>
+    console.log('[nasmedia-video] ✅ onLoaded', v_e2a85c),
+  )
+  v_357489.addListener('NasmediaAd_onLoadFailed', (v_e2a85c) => {
+    console.log('[nasmedia-video] ❌ onLoadFailed', v_e2a85c)
+    v_03e392.alert(
+      '나스미디어 광고 로드 실패',
+      `code=${v_e2a85c?.errorCode}\nmsg=${v_e2a85c?.errorMsg}\nadUnitId=${v_e2a85c?.adUnitId}`,
+    )
+  })
+  v_357489.addListener('NasmediaAd_onEarnedReward', (v_e2a85c) =>
+    console.log('[nasmedia-video] 🎉 onEarnedReward', v_e2a85c),
+  )
+  v_357489.addListener('NasmediaAd_onClosed', (v_e2a85c) =>
+    console.log('[nasmedia-video] 🚪 onClosed', v_e2a85c),
+  )
+  console.log('[nasmedia-video] module-level listener 등록 완료')
+}
+
 export function v_d46e1b(): boolean {
   return !!v_6a3da4
 }
