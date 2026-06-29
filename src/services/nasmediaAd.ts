@@ -25,6 +25,27 @@ const emitter = NasmediaAdModule
   ? new NativeEventEmitter(NativeModules.NasmediaAdModule)
   : null
 
+if (emitter) {
+  const { Alert } = require('react-native')
+  emitter.addListener('NasmediaAd_onLoaded', (p: any) =>
+    console.log('[nasmedia-video] ✅ onLoaded', p),
+  )
+  emitter.addListener('NasmediaAd_onLoadFailed', (p: any) => {
+    console.log('[nasmedia-video] ❌ onLoadFailed', p)
+    Alert.alert(
+      '나스미디어 광고 로드 실패',
+      `code=${p?.errorCode}\nmsg=${p?.errorMsg}\nadUnitId=${p?.adUnitId}`,
+    )
+  })
+  emitter.addListener('NasmediaAd_onEarnedReward', (p: any) =>
+    console.log('[nasmedia-video] 🎉 onEarnedReward', p),
+  )
+  emitter.addListener('NasmediaAd_onClosed', (p: any) =>
+    console.log('[nasmedia-video] 🚪 onClosed', p),
+  )
+  console.log('[nasmedia-video] module-level listener 등록 완료')
+}
+
 export function isNasmediaAdAvailable(): boolean {
   return !!NasmediaAdModule
 }

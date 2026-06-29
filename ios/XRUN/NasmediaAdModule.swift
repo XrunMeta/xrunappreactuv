@@ -74,13 +74,14 @@ class NasmediaAdModule: RCTEventEmitter, AMMRewardVideoDelegate {
         "xrun_member_id": "\(memberId.intValue)"
       ]
 
-      AMMRewardVideo.load(adUnitID: adUnitId, customParam: customParam) { [weak self] reward, error in
+      AMMRewardVideo.load(adUnitID: adUnitId, customParam: customParam) { [weak self] reward, adapterName, error in
         guard let self = self else { return }
         if let error = error {
           NSLog("[NasmediaAd] load error: \(error)")
           self.sendIfListening("NasmediaAd_onLoadFailed", body: [
             "adUnitId": adUnitId,
             "errorMsg": String(describing: error),
+            "adapter": adapterName ?? "",
           ])
           reject("AD_LOAD_ERROR", String(describing: error), error)
           return
@@ -89,6 +90,7 @@ class NasmediaAdModule: RCTEventEmitter, AMMRewardVideoDelegate {
           self.sendIfListening("NasmediaAd_onLoadFailed", body: [
             "adUnitId": adUnitId,
             "errorMsg": "reward is nil",
+            "adapter": adapterName ?? "",
           ])
           reject("AD_NIL", "Rewarded ad is nil", nil)
           return
@@ -96,9 +98,11 @@ class NasmediaAdModule: RCTEventEmitter, AMMRewardVideoDelegate {
 
         self.rewardVideo = reward
         self.rewardVideo?.delegate = self
-        self.rewardVideo?.customParam = customParam  
 
-        self.sendIfListening("NasmediaAd_onLoaded", body: ["adUnitId": adUnitId])
+        self.sendIfListening("NasmediaAd_onLoaded", body: [
+          "adUnitId": adUnitId,
+          "adapter": adapterName ?? "",
+        ])
 
         guard let rootVC = UIApplication.shared.connectedScenes
                 .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })

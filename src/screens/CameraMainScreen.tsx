@@ -2632,6 +2632,9 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     ).sort());
 
     if (token.isVideoToken) {
+
+      setShowBottomPanel(false);
+      setSelectedToken(null);
       (async () => {
         try {
           if (!isNasmediaAdAvailable()) {
