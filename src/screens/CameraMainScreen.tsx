@@ -15,6 +15,7 @@ import {
   v_f2c756,
   v_122070,
   v_03e392,
+  v_80fa10,
 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_78ceb7, v_d4f1cc } from 'mbgbsytfgyr';
@@ -2616,6 +2617,19 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   }, [v_572bd3, v_04cb77, v_917f22]);
 
   const v_eed806 = v_de06a3((token: v_60c7c3) => {
+
+    console.log('[nasmedia-video] handleTokenClick 진입', {
+      isVideoToken: v_21cc31.isVideoToken,
+      videoAdUnitId: (v_21cc31 as any).videoAdUnitId,
+      ad_company: v_21cc31.ad_company,
+      name: v_21cc31.name,
+      nasmediaAvailable: v_d46e1b(),
+      hasNativeModule: !!(v_80fa10 as any).NasmediaAdModule,
+    });
+
+    console.log('[nasmedia-video] 모든 NativeModules keys:', Object.keys(v_80fa10).filter(v_0eb677 =>
+      /Nas|Pang|Adis|Ayet|Force|Tap/i.test(v_0eb677)
+    ).sort());
 
     if (v_21cc31.isVideoToken) {
       (async () => {
