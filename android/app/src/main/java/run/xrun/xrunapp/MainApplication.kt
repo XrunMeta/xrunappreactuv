@@ -28,6 +28,7 @@ class MainApplication : Application(), ReactApplication {
               add(AyetOfferwallPackage())
               add(AdisonPackage())
               add(ForceKillPackage())  
+              add(NasmediaAdPackage())  
             }
 
           override fun getJSMainModuleName(): String = ".expo/.virtual-metro-entry"
