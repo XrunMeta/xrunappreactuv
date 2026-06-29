@@ -2813,6 +2813,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       isCompleted: isCompleted,
                     });
 
+                    if (token.spotID === 5) {
+                      navigate(ROUTES.showNapMxReward);
+                      return;
+                    }
+
                     handleTokenClick(token);
                   };
 

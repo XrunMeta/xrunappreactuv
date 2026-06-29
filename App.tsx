@@ -60,6 +60,7 @@ import {
   ShopTicketDetailScreen,
   ShopItemRegisterScreen,
   ShowNapAdScreen,
+  ShowNapMxRewardScreen,
   ShowPockAdScreen,
   ShowWebViewScreen,
   XRUNinfoScreen,
@@ -654,6 +655,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'showNapAd') {
     return <ShowNapAdScreen />;
+  }
+
+  if (currentScreen === 'showNapMxReward') {
+    return <ShowNapMxRewardScreen />;
   }
 
   if (currentScreen === 'showPockAd') {
