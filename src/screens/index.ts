@@ -56,6 +56,7 @@ export { ShopSuccessScreen } from './ShopSuccessScreen';
 export { ShopTicketDetailScreen } from './ShopTicketDetailScreen';
 export { ShopItemRegisterScreen } from './ShopItemRegisterScreen';
 export { ShowNapAdScreen } from './ShowNapAdScreen';
+export { ShowNapMxRewardScreen } from './ShowNapMxRewardScreen';
 export { ShowPockAdScreen } from './ShowPockAdScreen';
 export { ShowWebViewScreen } from './ShowWebViewScreen';
 export { XRUNinfoScreen } from './XRUNinfo';

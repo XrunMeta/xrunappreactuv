@@ -67,6 +67,7 @@ export const v_ce4741 = {
   shopTicketDetail: 'shopTicketDetail',
   shopItemRegister: 'shopItemRegister',
   showNapAd: 'showNapAd',
+  showNapMxReward: 'showNapMxReward',
   showPockAd: 'showPockAd',
   showWebView: 'showWebView',
   xrunInfo: 'xrunInfo',

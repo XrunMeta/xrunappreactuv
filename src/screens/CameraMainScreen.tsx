@@ -2813,6 +2813,11 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       isCompleted: v_2be890,
                     });
 
+                    if (v_21cc31.spotID === 5) {
+                      v_9b57fc(v_ce4741.showNapMxReward);
+                      return;
+                    }
+
                     v_eed806(v_21cc31);
                   };
 

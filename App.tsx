@@ -60,6 +60,7 @@ import {
   v_a1c4a5,
   v_680bee,
   v_287831,
+  v_76ecb6,
   v_540580,
   v_858c71,
   v_f7bdb9,
@@ -654,6 +655,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'showNapAd') {
     return <ShowNapAdScreen />;
+  }
+
+  if (v_0f0c7b === 'showNapMxReward') {
+    return <ShowNapMxRewardScreen />;
   }
 
   if (v_0f0c7b === 'showPockAd') {
