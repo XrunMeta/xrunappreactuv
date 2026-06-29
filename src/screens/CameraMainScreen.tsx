@@ -28,6 +28,8 @@ import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
 
 import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable, getNasmediaRewardAmount } from '../services/nasmediaAd';
+
+import { loadAndShowRewardedAd as pangleLoadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReady, isPangleReadySync, initializePangle } from '../services/pangle';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -2815,6 +2817,44 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                     if (token.spotID === 5) {
                       navigate(ROUTES.showNapMxReward);
+                      return;
+                    }
+                    if (token.spotID === 3 || token.spotID === 4) {
+                      (async () => {
+                        try {
+                          let ready = isPangleReadySync();
+                          if (!ready) {
+                            console.log('[AR-Pangle] 초기화 후 재확인');
+                            await initializePangle();
+                            ready = await isPangleReady();
+                          }
+                          if (!ready) {
+                            await showAlert('광고 준비 중', '잠시 후 다시 시도해주세요.');
+                            return;
+                          }
+                          const adUnitId = getPangleRewardedAdUnitId();
+                          const deviceInfo = await collectDeviceInfo();
+                          await pangleLoadAndShowRewardedAd(
+                            adUnitId,
+                            memberId ? String(memberId) : '',
+                            deviceInfo,
+                            (reward) => {
+                              console.log('[AR-Pangle] 보상 수령:', reward, 'spotID:', token.spotID);
+
+                              showToast('광고 시청 완료 — 보상이 지급될 예정이에요');
+                            },
+                            () => {
+                              console.log('[AR-Pangle] 광고 닫힘 (미완료)');
+                            },
+                            (err) => {
+                              console.warn('[AR-Pangle] 로드 실패:', err?.message);
+                              showAlert('광고 로드 실패', '잠시 후 다시 시도해주세요.');
+                            },
+                          );
+                        } catch (e: any) {
+                          console.error('[AR-Pangle] 예외:', e?.message);
+                        }
+                      })();
                       return;
                     }
 
