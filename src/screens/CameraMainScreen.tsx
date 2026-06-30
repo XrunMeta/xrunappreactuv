@@ -725,6 +725,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const videoRewardAmountRef = useRef<number>(0);
   const pangleRewardAmountRef = useRef<number>(0);
 
+  const pangleAdInFlightRef = useRef<boolean>(false);
+
   useEffect(() => {
     getNasmediaRewardAmount().then(({ amount, pangleAmount }) => {
       videoRewardAmountRef.current = amount;
@@ -2813,6 +2815,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                     });
 
                     if (token.spotID === 3 || token.spotID === 4 || token.spotID === 5) {
+
+                      if (pangleAdInFlightRef.current) {
+                        console.log('[AR-Pangle] 이미 광고 로드/표시 중 — 클릭 무시');
+                        return;
+                      }
+                      pangleAdInFlightRef.current = true;
                       (async () => {
                         try {
                           let ready = isPangleReadySync();
@@ -2822,6 +2830,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                             ready = await isPangleReady();
                           }
                           if (!ready) {
+                            pangleAdInFlightRef.current = false;
                             await showAlert('광고 준비 중', '잠시 후 다시 시도해주세요.');
                             return;
                           }
@@ -2865,20 +2874,25 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                             },
                             async () => {
                               console.log('[AR-Pangle] 광고 닫힘 — rewardEarned:', rewardEarned);
-                              if (rewardEarned) {
-                                await doGrant();
-                              } else {
-
-                                console.log('[AR-Pangle] 시청 미완료 — 보상 지급 안 함');
+                              try {
+                                if (rewardEarned) {
+                                  await doGrant();
+                                } else {
+                                  console.log('[AR-Pangle] 시청 미완료 — 보상 지급 안 함');
+                                }
+                              } finally {
+                                pangleAdInFlightRef.current = false;
                               }
                             },
                             (err) => {
                               console.warn('[AR-Pangle] 로드 실패:', err?.message);
+                              pangleAdInFlightRef.current = false;
                               showAlert('광고 로드 실패', '잠시 후 다시 시도해주세요.');
                             },
                           );
                         } catch (e: any) {
                           console.error('[AR-Pangle] 예외:', e?.message);
+                          pangleAdInFlightRef.current = false;
                         }
                       })();
                       return;
