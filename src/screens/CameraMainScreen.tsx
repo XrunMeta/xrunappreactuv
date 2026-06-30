@@ -930,19 +930,15 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       return { ...v_4ac6a7[v_a56041 % v_4ac6a7.length], ...v_9390e8 };
     });
 
+    v_3b9e74().then(({ amount: v_f63e09, pangleAmount: v_21ba9c }) => {
+      v_f28ed2.current = v_f63e09;
+      v_006d12.current = v_21ba9c;
+    }).catch(() => {  });
     const v_ab8428 = v_f28ed2.current;
     const v_076342 = v_006d12.current;
     v_368ba7.forEach((v_21cc31) => {
-      if (v_21cc31.spotID === 5) {
 
-        v_21cc31.isVideoToken = true;
-        v_21cc31.ad_company = 'nasmedia_video';
-        v_21cc31.name = '🎬 동영상 보고 적립';
-        v_21cc31.brand = '나스미디어';
-        v_21cc31.iconurl = '';
-        v_21cc31.xrunPrice = v_ab8428;
-        v_21cc31.coin = String(v_ab8428);
-      } else if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4) {
+      if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4 || v_21cc31.spotID === 5) {
 
         v_21cc31.isPangleToken = true;
         v_21cc31.ad_company = 'pangle_video';
@@ -2816,11 +2812,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                       isCompleted: v_2be890,
                     });
 
-                    if (v_21cc31.spotID === 5) {
-                      v_9b57fc(v_ce4741.showNapMxReward);
-                      return;
-                    }
-                    if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4) {
+                    if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4 || v_21cc31.spotID === 5) {
                       (async () => {
                         try {
                           let v_b1717e = v_8c8ab6();
