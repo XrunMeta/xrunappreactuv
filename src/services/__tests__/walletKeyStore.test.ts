@@ -206,6 +206,44 @@ it('new device: export → deleteKek (KEK 소실) → restore → unlockUserWall
   }
 });
 
+it('m-1: bv2 토큰 부족(salt만 있고 iv·cipher 없음) → empty string', async () => {
+  expect(await decryptBackupJsonAny('bv2:aabbccdd', 'anypin')).toBe('');
+});
+
+it('m-1: bv2 salt 길이 != 64 → empty string', async () => {
+  const badSalt = 'a'.repeat(32); 
+  const validIv = 'b'.repeat(32);
+  expect(await decryptBackupJsonAny(`bv2:${badSalt}:${validIv}:someCipher`, 'anypin')).toBe('');
+});
+
+it('m-1: bv2 iv 길이 != 32 → empty string', async () => {
+  const validSalt = 'a'.repeat(64);
+  const badIv = 'b'.repeat(16); 
+  expect(await decryptBackupJsonAny(`bv2:${validSalt}:${badIv}:someCipher`, 'anypin')).toBe('');
+});
+
+it('m-1: bv2 cipher 빈 문자열 → empty string', async () => {
+  const validSalt = 'a'.repeat(64);
+  const validIv = 'b'.repeat(32);
+  expect(await decryptBackupJsonAny(`bv2:${validSalt}:${validIv}:`, 'anypin')).toBe('');
+});
+
+it('C-1: encryptBackupJsonV2 with 6-digit PIN → decryptBackupJsonAny round-trip', async () => {
+  const plaintext = JSON.stringify({ v: 2, wallets: [{ pk: '0x' + '11'.repeat(32) }] });
+  const enc = await encryptBackupJsonV2(plaintext, '123456');
+  expect(enc.startsWith('bv2:')).toBe(true);
+
+  const parts = enc.slice(4).split(':');
+  expect(parts.length).toBeGreaterThanOrEqual(3);
+  expect(parts[0].length).toBe(64); 
+  expect(parts[1].length).toBe(32); 
+  expect(parts[2].length).toBeGreaterThan(0); 
+
+  expect(await decryptBackupJsonAny(enc, '123456')).toBe(plaintext);
+
+  expect(await decryptBackupJsonAny(enc, '000000')).toBe('');
+});
+
 it('v1 backup entry restore → re-encrypted as v2 in vault', async () => {
 
   const addr = await deriveAddr();

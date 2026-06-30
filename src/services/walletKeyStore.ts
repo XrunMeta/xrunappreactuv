@@ -644,7 +644,18 @@ export async function encryptBackupJsonV2(json: string, secret: string): Promise
 
 export async function decryptBackupJsonAny(encrypted: string, secret: string): Promise<string> {
   if (encrypted.startsWith('bv2:')) {
-    const [, saltHex, ivHex, cipher] = encrypted.split(':');
+
+    const rest = encrypted.slice(4); 
+    const sep1 = rest.indexOf(':');
+    if (sep1 < 0) return ''; 
+    const saltHex = rest.slice(0, sep1);
+    const afterSalt = rest.slice(sep1 + 1);
+    const sep2 = afterSalt.indexOf(':');
+    if (sep2 < 0) return ''; 
+    const ivHex = afterSalt.slice(0, sep2);
+    const cipher = afterSalt.slice(sep2 + 1);
+
+    if (saltHex.length !== 64 || ivHex.length !== 32 || !cipher) return '';
     const key = await deriveScryptKey(secret, saltHex);
     return CryptoJS.AES.decrypt(cipher, key, {
       iv: hexToWordArray(ivHex),

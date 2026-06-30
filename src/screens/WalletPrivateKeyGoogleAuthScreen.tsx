@@ -27,7 +27,7 @@ import {
   jwtPayloadSub,
   findEntriesForUser,
   exportBackup,
-  encryptBackupJson,
+  encryptBackupJsonV2,
   buildPlainBackup,
   NETWORK_MAP,
   type BackupPayload,
@@ -220,7 +220,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
 
       const json = JSON.stringify(payload);
-      const encrypted = encryptBackupJson(json, pin);
+      const encrypted = await encryptBackupJsonV2(json, pin);
       const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
 
       if (Platform.OS === 'android') {
@@ -284,7 +284,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
       if (!pin) throw new Error('PIN 정보 누락 — 화면을 다시 열어주세요');
       const jsonRaw = JSON.stringify(payload);
-      const json = encryptBackupJson(jsonRaw, pin);
+      const json = await encryptBackupJsonV2(jsonRaw, pin);
       const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
