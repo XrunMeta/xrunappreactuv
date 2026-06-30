@@ -50,13 +50,25 @@ export function isNasmediaAdAvailable(): boolean {
   return !!NasmediaAdModule
 }
 
-let cachedRewardAmount: { value: number; active: boolean; fetchedAt: number } | null = null;
+let cachedRewardAmount: {
+  value: number
+  active: boolean
+  pangleValue: number
+  pangleActive: boolean
+  fetchedAt: number
+} | null = null;
 const REWARD_AMOUNT_CACHE_MS = 5 * 60 * 1000;
 
-export async function getNasmediaRewardAmount(): Promise<{ amount: number; active: boolean }> {
+export async function getNasmediaRewardAmount(): Promise<{
+  amount: number; active: boolean;
+  pangleAmount: number; pangleActive: boolean;
+}> {
   const now = Date.now();
   if (cachedRewardAmount && now - cachedRewardAmount.fetchedAt < REWARD_AMOUNT_CACHE_MS) {
-    return { amount: cachedRewardAmount.value, active: cachedRewardAmount.active };
+    return {
+      amount: cachedRewardAmount.value, active: cachedRewardAmount.active,
+      pangleAmount: cachedRewardAmount.pangleValue, pangleActive: cachedRewardAmount.pangleActive,
+    };
   }
   try {
     const baseUrl = process.env.EXPO_PUBLIC_API_ENV === 'preview'
@@ -66,16 +78,26 @@ export async function getNasmediaRewardAmount(): Promise<{ amount: number; activ
       headers: { 'Cache-Control': 'no-cache' },
     });
     if (res.ok) {
-      const data = await res.json() as { reward_xrun: number; active: boolean };
+      const data = await res.json() as {
+        reward_xrun: number; active: boolean;
+        pangle_reward_xrun?: number; pangle_active?: boolean;
+      };
       const amount = Number(data.reward_xrun) || 0;
       const active = !!data.active;
-      cachedRewardAmount = { value: amount, active, fetchedAt: now };
-      return { amount, active };
+      const pangleAmount = Number(data.pangle_reward_xrun ?? 0);
+      const pangleActive = !!data.pangle_active;
+      cachedRewardAmount = { value: amount, active, pangleValue: pangleAmount, pangleActive, fetchedAt: now };
+      return { amount, active, pangleAmount, pangleActive };
     }
   } catch (err) {
     console.warn('[nasmediaAd] reward-amount fetch failed:', err);
   }
-  return { amount: cachedRewardAmount?.value ?? 0, active: cachedRewardAmount?.active ?? false };
+  return {
+    amount: cachedRewardAmount?.value ?? 0,
+    active: cachedRewardAmount?.active ?? false,
+    pangleAmount: cachedRewardAmount?.pangleValue ?? 0,
+    pangleActive: cachedRewardAmount?.pangleActive ?? false,
+  };
 }
 
 export async function initNasmediaAd(): Promise<boolean> {

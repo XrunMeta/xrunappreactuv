@@ -723,10 +723,12 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const tokenClickTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
 
   const videoRewardAmountRef = useRef<number>(0);
+  const pangleRewardAmountRef = useRef<number>(0);
 
   useEffect(() => {
-    getNasmediaRewardAmount().then(({ amount }) => {
+    getNasmediaRewardAmount().then(({ amount, pangleAmount }) => {
       videoRewardAmountRef.current = amount;
+      pangleRewardAmountRef.current = pangleAmount;
     }).catch(() => {  });
   }, []);
 
@@ -926,35 +928,30 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       return { ...spots[index % spots.length], ...data };
     });
 
-    const VIDEO_AD_UNIT = Platform.OS === 'ios' ? '105809' : '105817';
-    const VIDEO_TOKEN_COUNT = 3;
-    if (newOrganizedData.length >= VIDEO_TOKEN_COUNT) {
+    const nasmediaAmount = videoRewardAmountRef.current;
+    const pangleAmount = pangleRewardAmountRef.current;
+    newOrganizedData.forEach((token: any) => {
+      if (token.spotID === 5) {
 
-      const indices = Array.from({ length: newOrganizedData.length }, (_, i) => i);
-      for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        ;[indices[i], indices[j]] = [indices[j], indices[i]];
+        token.isVideoToken = true;
+        token.ad_company = 'nasmedia_video';
+        token.name = '🎬 동영상 보고 적립';
+        token.brand = '나스미디어';
+        token.iconurl = '';
+        token.xrunPrice = nasmediaAmount;
+        token.coin = String(nasmediaAmount);
+      } else if (token.spotID === 3 || token.spotID === 4) {
+
+        token.isPangleToken = true;
+        token.ad_company = 'pangle_video';
+        token.name = '🎬 동영상 보고 적립';
+        token.brand = 'Pangle';
+        token.iconurl = '';
+        token.xrunPrice = pangleAmount;
+        token.coin = String(pangleAmount);
       }
-      const videoSlots = new Set(indices.slice(0, VIDEO_TOKEN_COUNT));
 
-      const rewardAmount = videoRewardAmountRef.current;
-      newOrganizedData.forEach((token: any, i: number) => {
-        if (videoSlots.has(i)) {
-          token.isVideoToken = true;
-          token.videoAdUnitId = VIDEO_AD_UNIT;
-          token.ad_company = 'nasmedia_video';
-
-          token.name = '🎬 동영상 보고 적립';
-          token.brand = '나스미디어';
-          token.iconurl = '';
-
-          if (rewardAmount > 0) {
-            token.xrunPrice = rewardAmount;
-            token.coin = String(rewardAmount);
-          }
-        }
-      });
-    }
+    });
 
     console.log('==========토큰 렌더링==========');
     console.log('');
