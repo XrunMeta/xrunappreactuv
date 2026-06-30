@@ -18,6 +18,7 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_843035 } from '../constants';
 import { v_cba33f } from '../utils';
+import { v_566465 } from '../services/nasmediaAd';
 import { v_287831 } from './ShowNapAdScreen';
 import { v_540580 } from './ShowPockAdScreen';
 
@@ -396,7 +397,7 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
             if (v_f71b56.includes('myappfree.com') || v_f71b56.includes('go.myappfree')) {
               console.warn('[WebView] MAF 도메인 리다이렉트 감지 - 차단 후 뒤로가기:', v_f71b56);
 
-              try { v_cba33f('이 광고는 현재 참여할 수 없습니다.'); } catch {}
+              try { v_cba33f(v_566465('toast_ad_unavailable', '이 광고는 현재 참여할 수 없습니다.')); } catch {}
               v_7f2e65();
               return false;
             }

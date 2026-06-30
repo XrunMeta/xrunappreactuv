@@ -7,6 +7,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_82ad38, v_981fdd } from '../services/tapjoy';
 import { v_fda57c } from '../services/appsflyer';
 import { v_cba33f } from '../utils';
+import { v_566465 } from '../services/nasmediaAd';
 
 export const v_f2ecfa = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
@@ -23,13 +24,13 @@ export const v_f2ecfa = () => {
           v_afd01c?.();
         });
         if (v_43c42e.success) {
-          if (!v_7ed973.current) v_cba33f('탭조이 광고를 불러왔습니다.');
+          if (!v_7ed973.current) v_cba33f(v_566465('toast_tapjoy_loaded', '탭조이 광고를 불러왔습니다.'));
         } else {
           v_cba33f(v_43c42e.message || '광고를 불러올 수 없습니다.');
           if (v_7ed973.current) v_c7ac57();
         }
       } catch (v_9e86fd) {
-        v_cba33f('오류가 발생했습니다.');
+        v_cba33f(v_566465('toast_general_error', '오류가 발생했습니다.'));
         if (v_7ed973.current) v_c7ac57();
       } finally {
         v_34a50a(false);

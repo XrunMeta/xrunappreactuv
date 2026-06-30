@@ -4,6 +4,7 @@ import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import * as v_a928e1 from 'yvptvjtrs';
 import { v_843337 } from './playStoreUrl';
+import { v_566465 } from '../services/nasmediaAd';
 
 export const v_cba33f = (v_a8cd21) => {
   if (v_326be8.OS === 'android') {
@@ -25,7 +26,7 @@ export const v_db97fb = async (
     v_cba33f(v_e5db92);
   } catch (v_5e9bfe) {
 
-    v_cba33f('주소를 복사하지 못했습니다. 다시 시도해주세요.');
+    v_cba33f(v_566465('toast_copy_fail', '주소를 복사하지 못했습니다. 다시 시도해주세요.'));
   }
 };
 

@@ -12,6 +12,7 @@ import {
   v_5dbd47,
 } from '../services/adison';
 import { v_cba33f } from '../utils';
+import { v_566465 } from '../services/nasmediaAd';
 
 export const AdisonOfferwallScreen: v_a3453e.FC = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
@@ -24,14 +25,14 @@ export const AdisonOfferwallScreen: v_a3453e.FC = () => {
       v_124e9d.current = true;
       try {
         if (!v_120d5c()) {
-          v_cba33f('Adison SDK가 이 빌드에 포함되어 있지 않습니다.');
+          v_cba33f(v_566465('toast_adison_not_in_build', 'Adison SDK가 이 빌드에 포함되어 있지 않습니다.'));
           v_c7ac57();
           return;
         }
 
         const v_3ed4c3 = await v_14739d();
         if (!v_3ed4c3) {
-          v_cba33f('Adison 초기화에 실패했습니다.');
+          v_cba33f(v_566465('toast_adison_init_fail', 'Adison 초기화에 실패했습니다.'));
           v_c7ac57();
           return;
         }
@@ -53,7 +54,7 @@ export const AdisonOfferwallScreen: v_a3453e.FC = () => {
 
         const v_d1b432 = await v_5dbd47();
         if (!v_d1b432) {
-          v_cba33f('Adison 오퍼월을 열 수 없습니다.');
+          v_cba33f(v_566465('toast_adison_open_fail', 'Adison 오퍼월을 열 수 없습니다.'));
         }
       } catch (v_9e86fd) {
         v_cba33f(v_9e86fd?.message ?? 'Adison 오퍼월 오류');

@@ -2148,7 +2148,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       if (!v_7ec08d || v_7ec08d === '') {
         console.error('❌ urlAD가 없습니다. WebView 모달을 표시할 수 없습니다.');
-        v_cba33f('광고 URL을 찾을 수 없습니다.');
+        v_cba33f(v_566465('toast_ad_url_not_found', '광고 URL을 찾을 수 없습니다.'));
         return;
       }
 
@@ -2188,7 +2188,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           await v_f2c756.openURL(v_7ec08d);
         } catch (v_49263d) {
           console.error('[showAdInModal] 외부 브라우저 오픈 실패:', v_49263d);
-          v_cba33f('브라우저를 열 수 없습니다.');
+          v_cba33f(v_566465('toast_browser_open_fail', '브라우저를 열 수 없습니다.'));
         }
         return;
       }
@@ -2293,7 +2293,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
       if (!v_b2dceb) {
         console.error('❌ webViewUrl도 없습니다.');
-        v_cba33f('광고 정보를 찾을 수 없습니다.');
+        v_cba33f(v_566465('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
         return;
       }
 
@@ -2380,18 +2380,18 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             }
           } else {
             console.error('❌ WebView URL로 광고 정보를 찾을 수 없습니다.');
-            v_cba33f('광고 정보를 찾을 수 없습니다.');
+            v_cba33f(v_566465('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
             return;
           }
         }
       } catch (v_5e9bfe) {
         console.error('❌ 광고 정보 재구성 실패:', v_5e9bfe);
-        v_cba33f('광고 정보를 찾을 수 없습니다.');
+        v_cba33f(v_566465('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
         return;
       }
     } else if (!v_d0b6d4 && !v_04cb77) {
       console.error('❌ i 아이콘 클릭 - advertisementParams와 selectedToken이 모두 없습니다.');
-      v_cba33f('광고 정보를 찾을 수 없습니다.');
+      v_cba33f(v_566465('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
       return;
     }
 
@@ -2512,7 +2512,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           await v_f2c756.openURL(v_7ec08d);
         } catch (v_49263d) {
           console.error('[다른 경로] 외부 브라우저 오픈 실패:', v_49263d);
-          v_cba33f('브라우저를 열 수 없습니다.');
+          v_cba33f(v_566465('toast_browser_open_fail', '브라우저를 열 수 없습니다.'));
         }
         return;
       }

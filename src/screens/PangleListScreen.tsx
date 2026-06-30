@@ -10,6 +10,7 @@ import { v_f3de6d } from '../utils/napApiUtils';
 import { v_573fcf } from '../utils/env';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_cba33f } from '../utils';
+import { v_566465 } from '../services/nasmediaAd';
 
 interface PangleAd {
   campid: string | number;
@@ -77,7 +78,7 @@ export const v_4a5627 = () => {
 
       const v_ef7306 = await v_e84827.getItem('userData');
       if (!v_ef7306) {
-        v_cba33f('로그인이 필요합니다.');
+        v_cba33f(v_566465('toast_login_required', '로그인이 필요합니다.'));
         return;
       }
 
@@ -85,7 +86,7 @@ export const v_4a5627 = () => {
       const v_660822 = v_ff39bc?.member?.toString() || '';
 
       if (!v_660822) {
-        v_cba33f('로그인이 필요합니다.');
+        v_cba33f(v_566465('toast_login_required', '로그인이 필요합니다.'));
         return;
       }
 
@@ -124,16 +125,16 @@ export const v_4a5627 = () => {
             },
             (v_5e9bfe) => {
               console.error('[PangleListScreen] 광고 로드 실패:', v_5e9bfe);
-              v_cba33f('광고를 불러올 수 없습니다.');
+              v_cba33f(v_566465('toast_ad_load_fail', '광고를 불러올 수 없습니다.'));
             }
           );
         } catch (v_5e9bfe) {
           console.error('[PangleListScreen] 광고 표시 오류:', v_5e9bfe);
-          v_cba33f('광고를 표시할 수 없습니다.');
+          v_cba33f(v_566465('toast_ad_show_fail', '광고를 표시할 수 없습니다.'));
         }
       } else {
         console.warn('[PangleListScreen] Pangle이 준비되지 않았습니다.');
-        v_cba33f('광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.');
+        v_cba33f(v_566465('toast_ad_loading', '광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.'));
       }
     } catch (v_5e9bfe) {
       console.error('[PangleListScreen] 광고 클릭 처리 오류:', v_5e9bfe);
