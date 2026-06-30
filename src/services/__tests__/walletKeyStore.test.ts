@@ -10,6 +10,7 @@ import {
   pinVerifyHash,
   readVault,
   deriveEvmAddress,
+  setupPinForUser,
 
   encryptBackupJsonV2,
   decryptBackupJsonAny,
@@ -242,6 +243,42 @@ it('C-1: encryptBackupJsonV2 with 6-digit PIN → decryptBackupJsonAny round-tri
   expect(await decryptBackupJsonAny(enc, '123456')).toBe(plaintext);
 
   expect(await decryptBackupJsonAny(enc, '000000')).toBe('');
+});
+
+it('newly set-up wallet is stored as ver:2 without h', async () => {
+  const addr = await deriveAddr();
+  await setupPinForUser(
+    [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }],
+    '123456',
+    EMAIL,
+    MEMBER,
+  );
+  const vault = await readVault();
+  const e = vault.find((x) => x.u === userHash(EMAIL, MEMBER, 'eth'));
+  expect(e?.ver).toBe(2);
+  expect(e?.h).toBeUndefined();
+  const res = await unlockUserWallets('123456', EMAIL, MEMBER);
+  expect(res.ok).toBe(true);
+});
+
+it('restorePlainBackup stores ver:2 without h', async () => {
+  const { restorePlainBackup } = require('../walletKeyStore');
+  const addr = await deriveAddr();
+  const payload = {
+    v: 1 as const,
+    warning: 'PLAIN_TEXT_DO_NOT_SHARE' as const,
+    email: EMAIL,
+    wallets: [{ network: 'eth' as const, wallet_code: 'c1', address: addr, private_key: PK }],
+    exported_at: Date.now(),
+  };
+  const result = await restorePlainBackup(payload, EMAIL, MEMBER, '123456');
+  expect(result.ok).toBe(true);
+  const vault = await readVault();
+  const e = vault.find((x) => x.u === userHash(EMAIL, MEMBER, 'eth'));
+  expect(e?.ver).toBe(2);
+  expect(e?.h).toBeUndefined();
+  const res = await unlockUserWallets('123456', EMAIL, MEMBER);
+  expect(res.ok).toBe(true);
 });
 
 it('v1 backup entry restore → re-encrypted as v2 in vault', async () => {

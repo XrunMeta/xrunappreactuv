@@ -657,11 +657,16 @@ export async function decryptBackupJsonAny(encrypted: string, secret: string): P
 
     if (saltHex.length !== 64 || ivHex.length !== 32 || !cipher) return '';
     const key = await deriveScryptKey(secret, saltHex);
-    return CryptoJS.AES.decrypt(cipher, key, {
-      iv: hexToWordArray(ivHex),
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-    }).toString(CryptoJS.enc.Utf8);
+    try {
+      return CryptoJS.AES.decrypt(cipher, key, {
+        iv: hexToWordArray(ivHex),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }).toString(CryptoJS.enc.Utf8);
+    } catch {
+
+      return '';
+    }
   }
   return decryptBackupJson(encrypted, secret); 
 }
@@ -824,6 +829,24 @@ export interface PlainBackupPayload {
   exported_at: number;
 }
 
+export async function setupPinForUser(
+  wallets: WalletKey[],
+  pin: string,
+  email: string,
+  member: number,
+): Promise<void> {
+  const grouped: Partial<Record<WalletNetwork, WalletKey[]>> = {};
+  for (const w of wallets) {
+    const net = NETWORK_MAP[w.wallet_code];
+    if (!net) continue;
+    (grouped[net] ??= []).push(w);
+  }
+  for (const [network, group] of Object.entries(grouped) as [WalletNetwork, WalletKey[]][]) {
+    const { c, iv } = await encryptWithPinV2(JSON.stringify(group), pin, email, member);
+    await upsertEntry({ u: userHash(email, member, network), c, iv, ver: 2, s: 's1' });
+  }
+}
+
 export interface RestorePlainResult {
   ok: boolean;
   imported: WalletNetwork[];
@@ -885,12 +908,12 @@ export async function restorePlainBackup(
       continue;
     }
     const plaintext = JSON.stringify(wallets);
-    const cipher = encryptWithPin(plaintext, pin, email, member);
-    const h = pinVerifyHash(pin, email, member);
+    const { c, iv } = await encryptWithPinV2(plaintext, pin, email, member);
     await upsertEntry({
       u: userHash(email, member, network),
-      c: cipher,
-      h,
+      c,
+      iv,
+      ver: 2,
       s: 's1',
     });
     imported.push(network);

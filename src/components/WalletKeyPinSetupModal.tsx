@@ -19,8 +19,7 @@ import {
   findEntriesForUser,
   upsertEntry,
   deobfuscateWithMember,
-  encryptWithPin,
-  pinVerifyHash,
+  encryptWithPinV2,
   verifyAllWallets,
   type WalletKey,
   type VaultEntry,
@@ -117,12 +116,13 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
         const v = await verifyAllWallets(wallets);
         if (!v.ok) throw new Error(`verify-fail:${network}:${v.failed.join(',')}`);
 
-        const cipher2 = encryptWithPin(plaintextJson, pin, email, memberId);
+        const { c: cipher2, iv: iv2 } = await encryptWithPinV2(plaintextJson, pin, email, memberId);
 
         await upsertEntry({
           u: userHash(email, memberId, network),
           c: cipher2,
-          h: pinVerifyHash(pin, email, memberId),
+          iv: iv2,
+          ver: 2,
           s: 's1',
         });
         committedNetworks.push(network);
