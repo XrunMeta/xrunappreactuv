@@ -102,8 +102,10 @@ export const WalletEstimateFeeScreen = () => {
       console.log('[WalletEstimateFee] 가스 수수료 예상 응답:', result);
 
       if (result?.data && Array.isArray(result.data) && result.data.length > 0) {
-        const estimatedCost = result.data[0].estimatedCost;
-        if (estimatedCost) {
+
+        const estimatedCost =
+          result.data[0].estimatedFee ?? result.data[0].estimatedCost;
+        if (estimatedCost != null) {
           setGasPrice(estimatedCost);
         } else {
           setGasPrice(result.data[0].gasPrice || 0);
@@ -161,11 +163,12 @@ export const WalletEstimateFeeScreen = () => {
 
     try {
 
-      const polValue = parseFloat(gasPrice.toString());
-      const gweiValue = polValue * 1e9;
-      const fixed = gweiValue.toFixed(2);
-      const trimmed = fixed.replace(/\.?0+$/, '');
-      return `${trimmed} GWEI`;
+      const currency = selectedWalletAsset?.currency || 0;
+      const unit = currency === 16 || currency === 18 ? 'POL' : 'ETH';
+
+      const fixed = new BigNumber(gasPrice.toString()).toFixed(10);
+      const trimmed = fixed.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+      return `${trimmed} ${unit}`;
     } catch (error) {
       console.error('[WalletEstimateFee] 가스 수수료 포맷팅 오류:', error);
       return t('screens.walletEstimateFee.error');
