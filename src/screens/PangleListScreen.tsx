@@ -10,6 +10,7 @@ import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getEnvValue } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showToast } from '../utils';
+import { getToastBody } from '../services/nasmediaAd';
 
 interface PangleAd {
   campid: string | number;
@@ -77,7 +78,7 @@ export const PangleListScreen = () => {
 
       const userData = await AsyncStorage.getItem('userData');
       if (!userData) {
-        showToast('로그인이 필요합니다.');
+        showToast(getToastBody('toast_login_required', '로그인이 필요합니다.'));
         return;
       }
 
@@ -85,7 +86,7 @@ export const PangleListScreen = () => {
       const member = parsedUserData?.member?.toString() || '';
 
       if (!member) {
-        showToast('로그인이 필요합니다.');
+        showToast(getToastBody('toast_login_required', '로그인이 필요합니다.'));
         return;
       }
 
@@ -124,16 +125,16 @@ export const PangleListScreen = () => {
             },
             (error) => {
               console.error('[PangleListScreen] 광고 로드 실패:', error);
-              showToast('광고를 불러올 수 없습니다.');
+              showToast(getToastBody('toast_ad_load_fail', '광고를 불러올 수 없습니다.'));
             }
           );
         } catch (error) {
           console.error('[PangleListScreen] 광고 표시 오류:', error);
-          showToast('광고를 표시할 수 없습니다.');
+          showToast(getToastBody('toast_ad_show_fail', '광고를 표시할 수 없습니다.'));
         }
       } else {
         console.warn('[PangleListScreen] Pangle이 준비되지 않았습니다.');
-        showToast('광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.');
+        showToast(getToastBody('toast_ad_loading', '광고를 준비하는 중입니다. 잠시 후 다시 시도해주세요.'));
       }
     } catch (error) {
       console.error('[PangleListScreen] 광고 클릭 처리 오류:', error);

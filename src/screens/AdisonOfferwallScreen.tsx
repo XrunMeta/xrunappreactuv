@@ -12,6 +12,7 @@ import {
   showAdisonOfferwall,
 } from '../services/adison';
 import { showToast } from '../utils';
+import { getToastBody } from '../services/nasmediaAd';
 
 export const AdisonOfferwallScreen: React.FC = () => {
   const { goBack } = useAppNavigation();
@@ -24,14 +25,14 @@ export const AdisonOfferwallScreen: React.FC = () => {
       openedRef.current = true;
       try {
         if (!isAdisonAvailable()) {
-          showToast('Adison SDK가 이 빌드에 포함되어 있지 않습니다.');
+          showToast(getToastBody('toast_adison_not_in_build', 'Adison SDK가 이 빌드에 포함되어 있지 않습니다.'));
           goBack();
           return;
         }
 
         const ok = await initAdison();
         if (!ok) {
-          showToast('Adison 초기화에 실패했습니다.');
+          showToast(getToastBody('toast_adison_init_fail', 'Adison 초기화에 실패했습니다.'));
           goBack();
           return;
         }
@@ -53,7 +54,7 @@ export const AdisonOfferwallScreen: React.FC = () => {
 
         const shown = await showAdisonOfferwall();
         if (!shown) {
-          showToast('Adison 오퍼월을 열 수 없습니다.');
+          showToast(getToastBody('toast_adison_open_fail', 'Adison 오퍼월을 열 수 없습니다.'));
         }
       } catch (e: any) {
         showToast(e?.message ?? 'Adison 오퍼월 오류');

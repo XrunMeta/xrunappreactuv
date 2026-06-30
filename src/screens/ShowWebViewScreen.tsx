@@ -18,6 +18,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS } from '../constants';
 import { showToast } from '../utils';
+import { getToastBody } from '../services/nasmediaAd';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
 
@@ -396,7 +397,7 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
             if (url.includes('myappfree.com') || url.includes('go.myappfree')) {
               console.warn('[WebView] MAF 도메인 리다이렉트 감지 - 차단 후 뒤로가기:', url);
 
-              try { showToast('이 광고는 현재 참여할 수 없습니다.'); } catch {}
+              try { showToast(getToastBody('toast_ad_unavailable', '이 광고는 현재 참여할 수 없습니다.')); } catch {}
               handleClose();
               return false;
             }

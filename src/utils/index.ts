@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as CryptoJS from 'crypto-js';
 import { getPlayStoreUrl } from './playStoreUrl';
+import { getToastBody } from '../services/nasmediaAd';
 
 export const showToast = (message: string) => {
   if (Platform.OS === 'android') {
@@ -25,7 +26,7 @@ export const copyToClipboard = async (
     showToast(successMessage);
   } catch (error) {
 
-    showToast('주소를 복사하지 못했습니다. 다시 시도해주세요.');
+    showToast(getToastBody('toast_copy_fail', '주소를 복사하지 못했습니다. 다시 시도해주세요.'));
   }
 };
 

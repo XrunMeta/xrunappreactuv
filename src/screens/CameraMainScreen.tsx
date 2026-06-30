@@ -2148,7 +2148,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       if (!urlAD || urlAD === '') {
         console.error('❌ urlAD가 없습니다. WebView 모달을 표시할 수 없습니다.');
-        showToast('광고 URL을 찾을 수 없습니다.');
+        showToast(getToastBody('toast_ad_url_not_found', '광고 URL을 찾을 수 없습니다.'));
         return;
       }
 
@@ -2188,7 +2188,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           await Linking.openURL(urlAD);
         } catch (err) {
           console.error('[showAdInModal] 외부 브라우저 오픈 실패:', err);
-          showToast('브라우저를 열 수 없습니다.');
+          showToast(getToastBody('toast_browser_open_fail', '브라우저를 열 수 없습니다.'));
         }
         return;
       }
@@ -2293,7 +2293,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       if (!webViewUrl) {
         console.error('❌ webViewUrl도 없습니다.');
-        showToast('광고 정보를 찾을 수 없습니다.');
+        showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
         return;
       }
 
@@ -2380,18 +2380,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             }
           } else {
             console.error('❌ WebView URL로 광고 정보를 찾을 수 없습니다.');
-            showToast('광고 정보를 찾을 수 없습니다.');
+            showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
             return;
           }
         }
       } catch (error) {
         console.error('❌ 광고 정보 재구성 실패:', error);
-        showToast('광고 정보를 찾을 수 없습니다.');
+        showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
         return;
       }
     } else if (!advertisementParams && !selectedToken) {
       console.error('❌ i 아이콘 클릭 - advertisementParams와 selectedToken이 모두 없습니다.');
-      showToast('광고 정보를 찾을 수 없습니다.');
+      showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
       return;
     }
 
@@ -2512,7 +2512,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           await Linking.openURL(urlAD);
         } catch (err) {
           console.error('[다른 경로] 외부 브라우저 오픈 실패:', err);
-          showToast('브라우저를 열 수 없습니다.');
+          showToast(getToastBody('toast_browser_open_fail', '브라우저를 열 수 없습니다.'));
         }
         return;
       }
