@@ -162,7 +162,8 @@
           "preferAppsFlyerBackupRules": false
         }
       ],
-      "expo-tracking-transparency"
+      "expo-tracking-transparency",
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {
