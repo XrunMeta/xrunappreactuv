@@ -94,6 +94,36 @@ export async function v_3b9e74(): Promise<{
   };
 }
 
+let v_a6589e = null;
+const v_3515ef = 5 * 60 * 1000;
+export async function v_c778d2(): Promise<Record<string, { title: string; body: string; enabled: boolean }>> {
+  const v_5c2f9f = Date.now();
+  if (v_a6589e && v_5c2f9f - v_a6589e.fetchedAt < v_3515ef) {
+    return v_a6589e.value;
+  }
+  try {
+    const v_c01615 = process.env.EXPO_PUBLIC_API_ENV === 'preview'
+      ? 'https://oth-path-bab568.example.invalid'
+      : 'https://oth-path-f0013c.example.invalid';
+    const v_8f00b9 = await fetch(`${v_c01615}/nasmedia/video/toast-texts`);
+    if (v_8f00b9.ok) {
+      const v_9390e8 = await v_8f00b9.json() as { toasts: Record<string, { title: string; body: string; enabled: boolean }> };
+      v_a6589e = { value: v_9390e8.toasts ?? {}, fetchedAt: v_5c2f9f };
+      return v_a6589e.value;
+    }
+  } catch (v_49263d) {
+    console.warn('[nasmediaAd] toast-texts fetch failed:', v_49263d);
+  }
+  return v_a6589e?.value ?? {};
+}
+
+export function v_566465(v_8b9cd4, v_0debf4): string {
+  const v_8dcb51 = v_a6589e?.value ?? {};
+  const v_8d41d7 = v_8dcb51[v_8b9cd4];
+  if (v_8d41d7 && v_8d41d7.enabled && v_8d41d7.body) return v_8d41d7.body;
+  return v_0debf4;
+}
+
 export async function v_ab2b01(): Promise<boolean> {
   if (!v_6a3da4) {
     console.warn('[nasmediaAd] native module not linked (구 빌드)')

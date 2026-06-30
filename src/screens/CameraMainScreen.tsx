@@ -27,7 +27,7 @@ import { v_843035 } from '../constants';
 import { v_60c7c3, v_f71847 } from '../types';
 import { v_f84ef5, v_5d7ca4, v_563153, v_a7ab3c, v_71d37e, v_07f367, v_1c4683, v_aa7dc1, v_318c45, v_38f5f4, v_8cba1e, v_e3e9a7, v_5e0191 } from '../services';
 
-import { v_ab2b01, v_17d0bf, v_d46e1b, v_3b9e74 } from '../services/nasmediaAd';
+import { v_ab2b01, v_17d0bf, v_d46e1b, v_3b9e74, v_c778d2, v_566465 } from '../services/nasmediaAd';
 
 import { v_18f201 as v_8c1aee, v_3dc1fd, v_ad3a98, v_8c8ab6, v_f095b0 } from '../services/pangle';
 import { v_a0daa8, v_ce4741 } from '../navigation';
@@ -730,6 +730,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       v_f28ed2.current = v_f63e09;
       v_006d12.current = v_076342;
     }).catch(() => {  });
+
+    v_c778d2().catch(() => {  });
   }, []);
 
   type RecentAd = Partial<v_60c7c3> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
@@ -2860,7 +2862,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                               } catch (v_9e86fd) {
                                 console.warn('[AR-Pangle] grant 호출 실패:', v_9e86fd?.message);
                               }
-                              v_cba33f('광고 시청 완료 — 잠시 후 지갑에 입금돼요!');
+                              v_cba33f(v_566465('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
                             },
                             () => {
                               console.log('[AR-Pangle] 광고 닫힘 (미완료)');
