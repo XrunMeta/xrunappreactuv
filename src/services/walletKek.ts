@@ -15,12 +15,22 @@ export async function loadKek(): Promise<CryptoJS.lib.WordArray | null> {
   return hex ? hexToWordArray(hex) : null;
 }
 
+let _inflight: Promise<CryptoJS.lib.WordArray> | null = null;
+
 export async function getOrCreateKek(): Promise<CryptoJS.lib.WordArray> {
-  const existing = await loadKek();
-  if (existing) return existing;
-  const hex = bytesToHex(Crypto.getRandomBytes(32));
-  await SecureStore.setItemAsync(KEK_STORAGE_KEY, hex, STORE_OPTS);
-  return hexToWordArray(hex);
+  if (_inflight) return _inflight;
+  _inflight = (async () => {
+    const existing = await loadKek();
+    if (existing) return existing;
+    const hex = bytesToHex(Crypto.getRandomBytes(32));
+    await SecureStore.setItemAsync(KEK_STORAGE_KEY, hex, STORE_OPTS);
+    return hexToWordArray(hex);
+  })();
+  try {
+    return await _inflight;
+  } finally {
+    _inflight = null;
+  }
 }
 
 export async function deleteKek(): Promise<void> {

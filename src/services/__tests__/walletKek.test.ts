@@ -21,4 +21,14 @@ describe('walletKek', () => {
     await deleteKek();
     expect(await loadKek()).toBeNull();
   });
+
+  it('concurrent getOrCreateKek calls produce identical KEK', async () => {
+    const [r0, r1] = await Promise.all([getOrCreateKek(), getOrCreateKek()]);
+
+    expect(r0.toString()).toBe(r1.toString());
+
+    const stored = await loadKek();
+    expect(stored).not.toBeNull();
+    expect(r0.toString()).toBe(stored!.toString());
+  });
 });
