@@ -2860,7 +2860,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                               } catch (v_9e86fd) {
                                 console.warn('[AR-Pangle] grant 호출 실패:', v_9e86fd?.message);
                               }
-                              v_cba33f('광고 시청 완료 — 보상이 지급될 예정이에요');
+                              v_cba33f('광고 시청 완료 — 잠시 후 지갑에 입금돼요!');
                             },
                             () => {
                               console.log('[AR-Pangle] 광고 닫힘 (미완료)');
