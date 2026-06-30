@@ -961,6 +961,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const truncatedUrl = urlAD.length > 60 ? urlAD.substring(0, 60) + '...' : urlAD;
 
       console.log(`[${index + 1}] 광고 상세 정보:`);
+      console.log(`  - spotID: ${token.spotID || 'N/A'}`);
+      console.log(`  - brand: ${token.brand || 'N/A'}`);
       console.log(`  - campid: ${token.campid || 'N/A'}`);
       console.log(`  - name: ${token.name || 'N/A'}`);
       console.log(`  - ad_company: ${token.ad_company || 'N/A'}`);
@@ -2835,9 +2837,29 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                             adUnitId,
                             memberId ? String(memberId) : '',
                             deviceInfo,
-                            (reward) => {
+                            async (reward) => {
                               console.log('[AR-Pangle] 보상 수령:', reward, 'spotID:', token.spotID);
 
+                              try {
+                                const baseUrl = process.env.EXPO_PUBLIC_API_ENV === 'preview'
+                                  ? 'https://edge-preview.example.invalid'
+                                  : 'https://oth-path-gw.example.invalid';
+                                const txid = `pangle_${memberId ?? 0}_${Date.now()}`;
+                                const res = await fetch(`${baseUrl}/nasmedia/video/pangle-reward`, {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    member: memberId,
+                                    platform: Platform.OS,
+                                    ad_unit_id: adUnitId,
+                                    txid,
+                                  }),
+                                });
+                                const data = await res.json().catch(() => ({}));
+                                console.log('[AR-Pangle] grant 응답:', data);
+                              } catch (e: any) {
+                                console.warn('[AR-Pangle] grant 호출 실패:', e?.message);
+                              }
                               showToast('광고 시청 완료 — 보상이 지급될 예정이에요');
                             },
                             () => {
