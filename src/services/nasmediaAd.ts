@@ -53,10 +53,16 @@ export function v_d46e1b(): boolean {
 let v_6da25d = null;
 const v_c03020 = 5 * 60 * 1000;
 
-export async function v_3b9e74(): Promise<{ amount: number; active: boolean }> {
+export async function v_3b9e74(): Promise<{
+  amount: number; active: boolean;
+  pangleAmount: number; pangleActive: boolean;
+}> {
   const v_5c2f9f = Date.now();
   if (v_6da25d && v_5c2f9f - v_6da25d.fetchedAt < v_c03020) {
-    return { amount: v_6da25d.value, active: v_6da25d.active };
+    return {
+      amount: v_6da25d.value, active: v_6da25d.active,
+      pangleAmount: v_6da25d.pangleValue, pangleActive: v_6da25d.pangleActive,
+    };
   }
   try {
     const v_c01615 = process.env.EXPO_PUBLIC_API_ENV === 'preview'
@@ -66,16 +72,26 @@ export async function v_3b9e74(): Promise<{ amount: number; active: boolean }> {
       headers: { 'Cache-Control': 'no-cache' },
     });
     if (v_8f00b9.ok) {
-      const v_9390e8 = await v_8f00b9.json() as { reward_xrun: number; active: boolean };
+      const v_9390e8 = await v_8f00b9.json() as {
+        reward_xrun: number; active: boolean;
+        pangle_reward_xrun?: number; pangle_active?: boolean;
+      };
       const v_f63e09 = Number(v_9390e8.reward_xrun) || 0;
       const v_f8b770 = !!v_9390e8.active;
-      v_6da25d = { value: v_f63e09, active: v_f8b770, fetchedAt: v_5c2f9f };
-      return { amount: v_f63e09, active: v_f8b770 };
+      const v_076342 = Number(v_9390e8.pangle_reward_xrun ?? 0);
+      const v_fc8dc6 = !!v_9390e8.pangle_active;
+      v_6da25d = { value: v_f63e09, active: v_f8b770, pangleValue: v_076342, pangleActive: v_fc8dc6, fetchedAt: v_5c2f9f };
+      return { amount: v_f63e09, active: v_f8b770, pangleAmount: v_076342, pangleActive: v_fc8dc6 };
     }
   } catch (v_49263d) {
     console.warn('[nasmediaAd] reward-amount fetch failed:', v_49263d);
   }
-  return { amount: v_6da25d?.value ?? 0, active: v_6da25d?.active ?? false };
+  return {
+    amount: v_6da25d?.value ?? 0,
+    active: v_6da25d?.active ?? false,
+    pangleAmount: v_6da25d?.pangleValue ?? 0,
+    pangleActive: v_6da25d?.pangleActive ?? false,
+  };
 }
 
 export async function v_ab2b01(): Promise<boolean> {

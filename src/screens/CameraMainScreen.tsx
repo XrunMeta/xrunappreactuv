@@ -723,10 +723,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const v_a27ed2 = v_e662ae<NodeJS.Timeout | null>(null); 
 
   const v_f28ed2 = v_e662ae<number>(0);
+  const v_006d12 = v_e662ae<number>(0);
 
   v_c4deb2(() => {
-    v_3b9e74().then(({ amount: v_f63e09 }) => {
+    v_3b9e74().then(({ amount: v_f63e09, pangleAmount: v_076342 }) => {
       v_f28ed2.current = v_f63e09;
+      v_006d12.current = v_076342;
     }).catch(() => {  });
   }, []);
 
@@ -926,35 +928,30 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
       return { ...v_4ac6a7[v_a56041 % v_4ac6a7.length], ...v_9390e8 };
     });
 
-    const v_950238 = v_326be8.OS === 'ios' ? '105809' : '105817';
-    const v_f7d096 = 3;
-    if (v_368ba7.length >= v_f7d096) {
+    const v_ab8428 = v_f28ed2.current;
+    const v_076342 = v_006d12.current;
+    v_368ba7.forEach((v_21cc31) => {
+      if (v_21cc31.spotID === 5) {
 
-      const v_0f4768 = Array.from({ length: v_368ba7.length }, (v_37eab7, v_ebec57) => v_ebec57);
-      for (let v_ebec57 = v_0f4768.length - 1; v_ebec57 > 0; v_ebec57--) {
-        const v_b75e36 = Math.floor(Math.random() * (v_ebec57 + 1));
-        ;[v_0f4768[v_ebec57], v_0f4768[v_b75e36]] = [v_0f4768[v_b75e36], v_0f4768[v_ebec57]];
+        v_21cc31.isVideoToken = true;
+        v_21cc31.ad_company = 'nasmedia_video';
+        v_21cc31.name = '🎬 동영상 보고 적립';
+        v_21cc31.brand = '나스미디어';
+        v_21cc31.iconurl = '';
+        v_21cc31.xrunPrice = v_ab8428;
+        v_21cc31.coin = String(v_ab8428);
+      } else if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4) {
+
+        v_21cc31.isPangleToken = true;
+        v_21cc31.ad_company = 'pangle_video';
+        v_21cc31.name = '🎬 동영상 보고 적립';
+        v_21cc31.brand = 'Pangle';
+        v_21cc31.iconurl = '';
+        v_21cc31.xrunPrice = v_076342;
+        v_21cc31.coin = String(v_076342);
       }
-      const v_24327f = new Set(v_0f4768.slice(0, v_f7d096));
 
-      const v_769b05 = v_f28ed2.current;
-      v_368ba7.forEach((v_21cc31, v_ebec57) => {
-        if (v_24327f.has(v_ebec57)) {
-          v_21cc31.isVideoToken = true;
-          v_21cc31.videoAdUnitId = v_950238;
-          v_21cc31.ad_company = 'nasmedia_video';
-
-          v_21cc31.name = '🎬 동영상 보고 적립';
-          v_21cc31.brand = '나스미디어';
-          v_21cc31.iconurl = '';
-
-          if (v_769b05 > 0) {
-            v_21cc31.xrunPrice = v_769b05;
-            v_21cc31.coin = String(v_769b05);
-          }
-        }
-      });
-    }
+    });
 
     console.log('==========토큰 렌더링==========');
     console.log('');
