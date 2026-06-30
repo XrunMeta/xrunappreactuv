@@ -2835,37 +2835,50 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                           }
                           const v_61418d = v_3dc1fd();
                           const v_e7f87b = await v_f3de6d();
+
+                          let v_e8b20a = false;
+                          let v_282bc4 = false;
+                          const v_bb5dd3 = async () => {
+                            if (v_282bc4) return;
+                            v_282bc4 = true;
+                            try {
+                              const v_c01615 = process.env.EXPO_PUBLIC_API_ENV === 'preview'
+                                ? 'https://oth-path-bab568.example.invalid'
+                                : 'https://oth-path-f0013c.example.invalid';
+                              const v_95395f = `pangle_${v_717992 ?? 0}_${Date.now()}`;
+                              const v_8f00b9 = await fetch(`${v_c01615}/nasmedia/video/pangle-reward`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  member: v_717992,
+                                  platform: v_326be8.OS,
+                                  ad_unit_id: v_61418d,
+                                  txid: v_95395f,
+                                }),
+                              });
+                              const v_9390e8 = await v_8f00b9.json().catch(() => ({}));
+                              console.log('[AR-Pangle] grant 응답:', v_9390e8);
+                            } catch (v_9e86fd) {
+                              console.warn('[AR-Pangle] grant 호출 실패:', v_9e86fd?.message);
+                            }
+                            v_cba33f(v_566465('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
+                          };
                           await v_8c1aee(
                             v_61418d,
                             v_717992 ? String(v_717992) : '',
                             v_e7f87b,
-                            async (v_36c043) => {
-                              console.log('[AR-Pangle] 보상 수령:', v_36c043, 'spotID:', v_21cc31.spotID);
-
-                              try {
-                                const v_c01615 = process.env.EXPO_PUBLIC_API_ENV === 'preview'
-                                  ? 'https://oth-path-bab568.example.invalid'
-                                  : 'https://oth-path-f0013c.example.invalid';
-                                const v_95395f = `pangle_${v_717992 ?? 0}_${Date.now()}`;
-                                const v_8f00b9 = await fetch(`${v_c01615}/nasmedia/video/pangle-reward`, {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({
-                                    member: v_717992,
-                                    platform: v_326be8.OS,
-                                    ad_unit_id: v_61418d,
-                                    txid: v_95395f,
-                                  }),
-                                });
-                                const v_9390e8 = await v_8f00b9.json().catch(() => ({}));
-                                console.log('[AR-Pangle] grant 응답:', v_9390e8);
-                              } catch (v_9e86fd) {
-                                console.warn('[AR-Pangle] grant 호출 실패:', v_9e86fd?.message);
-                              }
-                              v_cba33f(v_566465('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
+                            (v_36c043) => {
+                              console.log('[AR-Pangle] 보상 수령 표식만 (실제 지급은 닫힘 시점):', v_36c043, 'spotID:', v_21cc31.spotID);
+                              v_e8b20a = true;
                             },
-                            () => {
-                              console.log('[AR-Pangle] 광고 닫힘 (미완료)');
+                            async () => {
+                              console.log('[AR-Pangle] 광고 닫힘 — rewardEarned:', v_e8b20a);
+                              if (v_e8b20a) {
+                                await v_bb5dd3();
+                              } else {
+
+                                console.log('[AR-Pangle] 시청 미완료 — 보상 지급 안 함');
+                              }
                             },
                             (v_49263d) => {
                               console.warn('[AR-Pangle] 로드 실패:', v_49263d?.message);
