@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CryptoJS from 'crypto-js';
 import * as secp from '@noble/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
+import { deriveScryptKey, randomIvHex, hexToWordArray } from './cryptoPrimitives';
+import { getOrCreateKek, loadKek } from './walletKek';
 
 export interface WalletKey {
   wallet_code: string;
@@ -19,6 +21,8 @@ export interface VaultEntry {
   c: string;        
   h?: string;       
   s: 's0' | 's1';   
+  ver?: 1 | 2;      
+  iv?: string;      
   b?: string;       
 
   a?: string;
@@ -164,6 +168,71 @@ export function pinVerifyHash(pin: string, email: string, member: number): strin
   return hash.toString(); 
 }
 
+export function pinSaltHex(email: string, member: number): string {
+  return CryptoJS.SHA256(normEmail(email) + ':' + String(member)).toString();
+}
+
+export async function encryptWithPinV2(
+  plaintextJson: string,
+  pin: string,
+  email: string,
+  member: number,
+): Promise<{ c: string; iv: string }> {
+
+  const dk = await deriveScryptKey(pin, pinSaltHex(email, member));
+  const ivInnerHex = randomIvHex();
+  const inner = CryptoJS.AES.encrypt(plaintextJson, dk, {
+    iv: hexToWordArray(ivInnerHex),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  }).toString(); 
+
+  const kek = await getOrCreateKek();
+  const ivOuterHex = randomIvHex();
+  const outer = CryptoJS.AES.encrypt(inner, kek, {
+    iv: hexToWordArray(ivOuterHex),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  }).toString(); 
+
+  return { c: `${ivOuterHex}:${outer}`, iv: ivInnerHex };
+}
+
+export async function decryptEntry(
+  entry: VaultEntry,
+  pin: string,
+  email: string,
+  member: number,
+): Promise<string> {
+  if (entry.ver === 2) {
+    const kek = await loadKek();
+    if (!kek) throw new Error('kek-missing');
+
+    const sep = entry.c.indexOf(':');
+    const ivOuterHex = entry.c.slice(0, sep);
+    const outerCipher = entry.c.slice(sep + 1);
+
+    const inner = CryptoJS.AES.decrypt(outerCipher, kek, {
+      iv: hexToWordArray(ivOuterHex),
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    }).toString(CryptoJS.enc.Utf8);
+
+    const dk = await deriveScryptKey(pin, pinSaltHex(email, member));
+    try {
+      return CryptoJS.AES.decrypt(inner, dk, {
+        iv: hexToWordArray(entry.iv!),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }).toString(CryptoJS.enc.Utf8);
+    } catch {
+      return '';
+    }
+  }
+
+  return decryptWithPin(entry.c, pin, email, member);
+}
+
 async function deriveEvmAddress(privateKeyHex: string): Promise<string> {
 
   const pkHex = privateKeyHex.startsWith('0x')
@@ -281,6 +350,8 @@ export async function upsertEntry(entry: VaultEntry): Promise<void> {
       u: entry.u,
       c: entry.c,
       s: entry.s,
+      ...(entry.ver !== undefined ? { ver: entry.ver } : {}),
+      ...(entry.iv !== undefined ? { iv: entry.iv } : {}),
       ...(entry.h ? { h: entry.h } : {}),
       ...(entry.b ? { b: entry.b } : {}),
       ...randomDecoys(),
@@ -308,6 +379,8 @@ export async function upsertEntryIfNotS1(entry: VaultEntry): Promise<{ applied: 
       u: entry.u,
       c: entry.c,
       s: entry.s,
+      ...(entry.ver !== undefined ? { ver: entry.ver } : {}),
+      ...(entry.iv !== undefined ? { iv: entry.iv } : {}),
       ...(entry.h ?? existingH ? { h: entry.h ?? existingH! } : {}),
       ...randomDecoys(),
     };
