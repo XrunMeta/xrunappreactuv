@@ -447,6 +447,11 @@ export const v_f4f851 = () => {
 
       console.log('[계정 연동] 완료 및 로그인 성공');
 
+      const v_492b89 = v_717992 ?? 0;
+      const v_26b830 = (v_f4fb5e).toLowerCase().trim();
+      v_23fcdd(v_492b89);
+      v_edcc4f(v_26b830);
+
       v_29378d(false);
 
       v_361e20(true);
@@ -1007,16 +1012,26 @@ ${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
       <Dialog
         visible={v_381ed1}
         title={v_8d41d7('screens.login.linkComplete')}
-        onClose={() => {
+        onClose={async () => {
           v_361e20(false);
-          v_9b57fc(v_ce4741.map);
+
+          if (v_9e80fd != null) {
+            await v_211c2c(v_9e80fd, v_55f663);
+          } else {
+            v_9b57fc(v_ce4741.map);
+          }
         }}
         actions={[
           {
             label: v_8d41d7('common.buttons.confirm') || '확인',
-            onPress: () => {
+            onPress: async () => {
               v_361e20(false);
-              v_9b57fc(v_ce4741.map);
+
+              if (v_9e80fd != null) {
+                await v_211c2c(v_9e80fd, v_55f663);
+              } else {
+                v_9b57fc(v_ce4741.map);
+              }
             },
             variant: 'primary',
           },
