@@ -57,14 +57,14 @@ let cachedRewardAmount: {
   pangleActive: boolean
   fetchedAt: number
 } | null = null;
-const REWARD_AMOUNT_CACHE_MS = 5 * 60 * 1000;
+const REWARD_AMOUNT_CACHE_MS = 30 * 1000; 
 
-export async function getNasmediaRewardAmount(): Promise<{
+export async function getNasmediaRewardAmount(opts?: { force?: boolean }): Promise<{
   amount: number; active: boolean;
   pangleAmount: number; pangleActive: boolean;
 }> {
   const now = Date.now();
-  if (cachedRewardAmount && now - cachedRewardAmount.fetchedAt < REWARD_AMOUNT_CACHE_MS) {
+  if (!opts?.force && cachedRewardAmount && now - cachedRewardAmount.fetchedAt < REWARD_AMOUNT_CACHE_MS) {
     return {
       amount: cachedRewardAmount.value, active: cachedRewardAmount.active,
       pangleAmount: cachedRewardAmount.pangleValue, pangleActive: cachedRewardAmount.pangleActive,

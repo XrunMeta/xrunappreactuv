@@ -930,19 +930,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       return { ...spots[index % spots.length], ...data };
     });
 
+    getNasmediaRewardAmount().then(({ amount, pangleAmount: pa }) => {
+      videoRewardAmountRef.current = amount;
+      pangleRewardAmountRef.current = pa;
+    }).catch(() => {  });
     const nasmediaAmount = videoRewardAmountRef.current;
     const pangleAmount = pangleRewardAmountRef.current;
     newOrganizedData.forEach((token: any) => {
-      if (token.spotID === 5) {
 
-        token.isVideoToken = true;
-        token.ad_company = 'nasmedia_video';
-        token.name = '🎬 동영상 보고 적립';
-        token.brand = '나스미디어';
-        token.iconurl = '';
-        token.xrunPrice = nasmediaAmount;
-        token.coin = String(nasmediaAmount);
-      } else if (token.spotID === 3 || token.spotID === 4) {
+      if (token.spotID === 3 || token.spotID === 4 || token.spotID === 5) {
 
         token.isPangleToken = true;
         token.ad_company = 'pangle_video';
@@ -2816,11 +2812,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                       isCompleted: isCompleted,
                     });
 
-                    if (token.spotID === 5) {
-                      navigate(ROUTES.showNapMxReward);
-                      return;
-                    }
-                    if (token.spotID === 3 || token.spotID === 4) {
+                    if (token.spotID === 3 || token.spotID === 4 || token.spotID === 5) {
                       (async () => {
                         try {
                           let ready = isPangleReadySync();
