@@ -27,7 +27,7 @@ import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
 
-import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable, getNasmediaRewardAmount } from '../services/nasmediaAd';
+import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable, getNasmediaRewardAmount, getToastTexts, getToastBody } from '../services/nasmediaAd';
 
 import { loadAndShowRewardedAd as pangleLoadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReady, isPangleReadySync, initializePangle } from '../services/pangle';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -730,6 +730,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       videoRewardAmountRef.current = amount;
       pangleRewardAmountRef.current = pangleAmount;
     }).catch(() => {  });
+
+    getToastTexts().catch(() => {  });
   }, []);
 
   type RecentAd = Partial<TokenData> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
@@ -2860,7 +2862,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                               } catch (e: any) {
                                 console.warn('[AR-Pangle] grant 호출 실패:', e?.message);
                               }
-                              showToast('광고 시청 완료 — 잠시 후 지갑에 입금돼요!');
+                              showToast(getToastBody('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
                             },
                             () => {
                               console.log('[AR-Pangle] 광고 닫힘 (미완료)');

@@ -100,6 +100,36 @@ export async function getNasmediaRewardAmount(): Promise<{
   };
 }
 
+let cachedToastTexts: { value: Record<string, { title: string; body: string; enabled: boolean }>; fetchedAt: number } | null = null;
+const TOAST_CACHE_MS = 5 * 60 * 1000;
+export async function getToastTexts(): Promise<Record<string, { title: string; body: string; enabled: boolean }>> {
+  const now = Date.now();
+  if (cachedToastTexts && now - cachedToastTexts.fetchedAt < TOAST_CACHE_MS) {
+    return cachedToastTexts.value;
+  }
+  try {
+    const baseUrl = process.env.EXPO_PUBLIC_API_ENV === 'preview'
+      ? 'https://edge-preview.example.invalid'
+      : 'https://oth-path-gw.example.invalid';
+    const res = await fetch(`${baseUrl}/nasmedia/video/toast-texts`);
+    if (res.ok) {
+      const data = await res.json() as { toasts: Record<string, { title: string; body: string; enabled: boolean }> };
+      cachedToastTexts = { value: data.toasts ?? {}, fetchedAt: now };
+      return cachedToastTexts.value;
+    }
+  } catch (err) {
+    console.warn('[nasmediaAd] toast-texts fetch failed:', err);
+  }
+  return cachedToastTexts?.value ?? {};
+}
+
+export function getToastBody(category: string, fallback: string): string {
+  const map = cachedToastTexts?.value ?? {};
+  const t = map[category];
+  if (t && t.enabled && t.body) return t.body;
+  return fallback;
+}
+
 export async function initNasmediaAd(): Promise<boolean> {
   if (!NasmediaAdModule) {
     console.warn('[nasmediaAd] native module not linked (구 빌드)')
