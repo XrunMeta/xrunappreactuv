@@ -37,6 +37,7 @@ import {
   restorePlainBackup,
   type BackupPayload,
   type PlainBackupPayload,
+  type WalletKey,
 } from '../services/walletKeyStore';
 
 type Stage = 'loading' | 'pin' | 'options' | 'busy' | 'gdrive-list';
@@ -73,6 +74,12 @@ export const WalletRestoreScreen = () => {
 
   const [passphraseModalVisible, setPassphraseModalVisible] = useState(false);
   const [passphraseInput, setPassphraseInput] = useState('');
+
+  const [pendingBv2Data, setPendingBv2Data] = useState<{
+    passphrase: string;
+    payload: BackupPayload;
+    source: string;
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,10 +122,24 @@ export const WalletRestoreScreen = () => {
     return () => { cancelled = true; };
   }, [goBack, showAlert, t]);
 
-  const onPinPromptSuccess = (_wallets: any[], pinValue?: string) => {
+  const onPinPromptSuccess = (_wallets: WalletKey[], pinValue?: string) => {
     const p = pinValue ?? '';
     setPin(p);
     setPinPromptVisible(false);
+
+    if (pendingBv2Data) {
+      const { passphrase, payload, source } = pendingBv2Data;
+      setPendingBv2Data(null);
+      if (memberId == null || !email) return;
+      setStage('busy');
+      restoreBackup(payload, email, memberId, passphrase, p).then((result) => {
+        setStage('options');
+        showRestoreResult(result.ok, result.imported, result.skipped, result.reason, source);
+      }).catch(() => {
+        setStage('options');
+      });
+      return;
+    }
 
     if (pendingBackup) {
       const { content, source } = pendingBackup;
@@ -129,6 +150,12 @@ export const WalletRestoreScreen = () => {
 
   const onPinPromptCancel = () => {
     setPinPromptVisible(false);
+
+    if (pendingBv2Data) {
+      setPendingBv2Data(null);
+      setStage('options');
+      return;
+    }
 
     if (pendingBackup) {
       setPendingBackup(null);
@@ -158,17 +185,75 @@ export const WalletRestoreScreen = () => {
     }
   };
 
-  const onPassphraseSubmit = () => {
+  const onPassphraseSubmit = async () => {
     if (!pendingBackup || !passphraseInput) return;
     const { content, source } = pendingBackup;
-    setPendingBackup(null);
-    setPassphraseModalVisible(false);
     const pp = passphraseInput;
+
     setPassphraseInput('');
-    runDecryption(content, source, pp);
+    setPassphraseModalVisible(false);
+
+    if (memberId == null || !email) return;
+    setStage('busy');
+
+    let json: string;
+    try {
+      json = await decryptBackupJsonAny(content.trim(), pp);
+    } catch {
+      setPendingBackup(null);
+      setStage('options');
+      await showAlert(
+        t('screens.walletRestore.alerts.decryptFailTitle'),
+        t('screens.walletRestore.alerts.decryptFailPin'),
+      );
+      return;
+    }
+    if (!json) {
+      setPendingBackup(null);
+      setStage('options');
+      await showAlert(
+        t('screens.walletRestore.alerts.decryptFailTitle'),
+        t('screens.walletRestore.alerts.decryptFailPassphrase') ||
+          '잘못된 비밀번호/passphrase 또는 손상된 백업입니다.',
+      );
+      return;
+    }
+
+    let payload: BackupPayload;
+    try {
+      payload = JSON.parse(json) as BackupPayload;
+    } catch {
+      setPendingBackup(null);
+      setStage('options');
+      await showAlert(
+        t('screens.walletRestore.alerts.formatErrorTitle'),
+        t('screens.walletRestore.alerts.jsonParseFail'),
+      );
+      return;
+    }
+
+    const networkCount = payload.entries?.length ?? 0;
+    const dateStr = new Date(payload.exported_at || 0).toLocaleString();
+    const msg = t('screens.walletRestore.alerts.restoreEncryptedTemplate', { date: dateStr, count: networkCount });
+    const okIdx = await showAlert(t('screens.walletRestore.alerts.restoreTitle'), msg, [
+      { text: t('common.cancel') || '취소' },
+      { text: t('common.confirm') || '복원하기' },
+    ]);
+
+    if (okIdx !== 1) {
+      setPendingBackup(null);
+      setStage('options');
+      return;
+    }
+
+    setPendingBv2Data({ passphrase: pp, payload, source });
+    setPendingBackup(null);
+    setStage('options');
+    setPinPromptVisible(true);
   };
 
   const onPassphraseCancel = () => {
+
     setPassphraseModalVisible(false);
     setPassphraseInput('');
     setPendingBackup(null);

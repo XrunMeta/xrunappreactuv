@@ -316,6 +316,77 @@ it('v1 backup entry restore → re-encrypted as v2 in vault', async () => {
   expect(e?.h).toBeUndefined();
 });
 
+it('C-1 — bv2 복원 후 vaultPin 으로 unlock 성공, passphrase 로는 실패 (decryptSecret≠vaultPin)', async () => {
+
+  const addr = await deriveAddr();
+  const wallets = [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }];
+  const { SHA256 } = require('crypto-js');
+  const normEmail = EMAIL.toLowerCase().trim();
+
+  const payload = {
+    v: 2 as const,
+    hash: SHA256(normEmail).toString(),
+    email: normEmail,
+    entries: [
+      {
+        network: 'eth' as const,
+        wallets,
+        s: 's1' as const,
+      },
+    ],
+    exported_at: Date.now(),
+  };
+
+  const passphrase = 'my-backup-passphrase!99'; 
+  const vaultPin = '654321';                    
+
+  await AsyncStorage.clear();
+
+  const result = await restoreBackup(payload, EMAIL, MEMBER, passphrase, vaultPin);
+  expect(result.ok).toBe(true);
+  expect(result.imported).toContain('eth');
+
+  const unlockOk = await unlockUserWallets(vaultPin, EMAIL, MEMBER);
+  expect(unlockOk.ok).toBe(true);
+  if (unlockOk.ok) {
+    expect(unlockOk.wallets.some((w) => w.private_key === PK)).toBe(true);
+  }
+
+  const unlockFail = await unlockUserWallets(passphrase, EMAIL, MEMBER);
+  expect(unlockFail.ok).toBe(false);
+});
+
+it('C-1 — v1 복원 하위호환: vaultPin 생략 시 decryptSecret(=PIN) 으로 vault 잠금', async () => {
+
+  const addr = await deriveAddr();
+  const wallets = [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }];
+  const pt = JSON.stringify(wallets);
+  const { SHA256 } = require('crypto-js');
+  const normEmail = EMAIL.toLowerCase().trim();
+
+  const payload = {
+    v: 1 as const,
+    hash: SHA256(normEmail).toString(),
+    email: normEmail,
+    entries: [
+      {
+        network: 'eth' as const,
+        c: encryptWithPin(pt, '123456', EMAIL, MEMBER),
+        h: pinVerifyHash('123456', EMAIL, MEMBER),
+        s: 's1' as const,
+      },
+    ],
+    exported_at: Date.now(),
+  };
+
+  const result = await restoreBackup(payload, EMAIL, MEMBER, '123456');
+  expect(result.ok).toBe(true);
+  expect(result.imported).toContain('eth');
+
+  const unlock = await unlockUserWallets('123456', EMAIL, MEMBER);
+  expect(unlock.ok).toBe(true);
+});
+
 it('detectLegacyEntries returns true when a v1 s1 entry exists', async () => {
 
   await upsertEntry({

@@ -24,7 +24,7 @@ import {
   WalletKeyPinPromptModal,
 } from '../components';
 import { useLegacyVaultSweep } from '../hooks/useLegacyVaultSweep';
-import { detectLegacyEntries } from '../services/walletKeyStore';
+import { detectLegacyEntries, type WalletKey } from '../services/walletKeyStore';
 import { COLORS, SIZES, COMMON_STYLES, FONTS, IS_DEV_MODE } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { setAyetUserId } from '../services/ayet';
@@ -117,7 +117,7 @@ export const LoginScreen = () => {
     }
   };
 
-  const onPinUpgradeSuccess = () => {
+  const onPinUpgradeSuccess = (_w: WalletKey[], _p: string) => {
     setPinUpgradeVisible(false);
     setDidJustLogin(false);
     navigate(ROUTES.map);

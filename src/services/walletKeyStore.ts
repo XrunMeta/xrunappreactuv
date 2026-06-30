@@ -698,8 +698,11 @@ export async function restoreBackup(
   payload: BackupPayload,
   email: string,
   member: number,
-  pin: string,
+  decryptSecret: string,
+  vaultPin?: string,
 ): Promise<RestoreResult> {
+
+  const effectiveVaultPin = vaultPin ?? decryptSecret;
   if (payload.v !== 1 && payload.v !== 2) {
     return { ok: false, imported: [], skipped: [], reason: 'invalid-version' };
   }
@@ -742,7 +745,7 @@ export async function restoreBackup(
 
       const { c: newC, iv: newIv } = await encryptWithPinV2(
         JSON.stringify(e.wallets),
-        pin,
+        effectiveVaultPin,
         email,
         member,
       );
@@ -764,14 +767,15 @@ export async function restoreBackup(
         skipped.push({ network: e.network, reason: 'malformed-v1-no-h' });
         continue;
       }
-      const expectedH = pinVerifyHash(pin, email, member);
+
+      const expectedH = pinVerifyHash(decryptSecret, email, member);
       if (e.h !== expectedH) {
         skipped.push({ network: e.network, reason: 'wrong-pin' });
         continue;
       }
       let plaintext: string;
       try {
-        plaintext = decryptWithPin(e.c, pin, email, member);
+        plaintext = decryptWithPin(e.c, decryptSecret, email, member);
       } catch {
         skipped.push({ network: e.network, reason: 'decrypt-error' });
         continue;
@@ -797,7 +801,7 @@ export async function restoreBackup(
         continue;
       }
 
-      const { c: newC, iv: newIv } = await encryptWithPinV2(plaintext, pin, email, member);
+      const { c: newC, iv: newIv } = await encryptWithPinV2(plaintext, effectiveVaultPin, email, member);
       await upsertEntry({
         u: userHash(email, member, e.network),
         c: newC,
