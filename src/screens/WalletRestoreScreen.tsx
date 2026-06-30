@@ -271,43 +271,6 @@ export const WalletRestoreScreen = () => {
     }
     const trimmed = content.trim();
 
-    if (trimmed.startsWith('bv2:')) {
-      let json: string;
-      try {
-        json = await decryptBackupJsonAny(trimmed, secretArg);
-      } catch {
-        await showAlert(t('screens.walletRestore.alerts.decryptFailTitle'), t('screens.walletRestore.alerts.decryptFailPin'));
-        return;
-      }
-
-      if (!json) {
-        await showAlert(
-          t('screens.walletRestore.alerts.decryptFailTitle'),
-          t('screens.walletRestore.alerts.decryptFailPassphrase') ||
-            '잘못된 비밀번호/passphrase 또는 손상된 백업입니다.',
-        );
-        return;
-      }
-      let payload: BackupPayload;
-      try {
-        payload = JSON.parse(json) as BackupPayload;
-      } catch {
-        await showAlert(t('screens.walletRestore.alerts.formatErrorTitle'), t('screens.walletRestore.alerts.jsonParseFail'));
-        return;
-      }
-      const networkCount = payload.entries?.length ?? 0;
-      const dateStr = new Date(payload.exported_at || 0).toLocaleString();
-      const msg = t('screens.walletRestore.alerts.restoreEncryptedTemplate', { date: dateStr, count: networkCount });
-      const ok = await showAlert(t('screens.walletRestore.alerts.restoreTitle'), msg, [
-        { text: t('common.cancel') || '취소' },
-        { text: t('common.confirm') || '복원하기' },
-      ]);
-      if (ok !== 1) return;
-      const result = await restoreBackup(payload, email, memberId, secretArg);
-      showRestoreResult(result.ok, result.imported, result.skipped, result.reason, sourceLabel);
-      return;
-    }
-
     if (CIPHER_HEAD_RE.test(trimmed)) {
 
       let json: string;
