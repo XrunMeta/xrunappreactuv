@@ -2835,37 +2835,50 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                           }
                           const adUnitId = getPangleRewardedAdUnitId();
                           const deviceInfo = await collectDeviceInfo();
+
+                          let rewardEarned = false;
+                          let grantSent = false;
+                          const doGrant = async () => {
+                            if (grantSent) return;
+                            grantSent = true;
+                            try {
+                              const baseUrl = process.env.EXPO_PUBLIC_API_ENV === 'preview'
+                                ? 'https://edge-preview.example.invalid'
+                                : 'https://oth-path-gw.example.invalid';
+                              const txid = `pangle_${memberId ?? 0}_${Date.now()}`;
+                              const res = await fetch(`${baseUrl}/nasmedia/video/pangle-reward`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  member: memberId,
+                                  platform: Platform.OS,
+                                  ad_unit_id: adUnitId,
+                                  txid,
+                                }),
+                              });
+                              const data = await res.json().catch(() => ({}));
+                              console.log('[AR-Pangle] grant 응답:', data);
+                            } catch (e: any) {
+                              console.warn('[AR-Pangle] grant 호출 실패:', e?.message);
+                            }
+                            showToast(getToastBody('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
+                          };
                           await pangleLoadAndShowRewardedAd(
                             adUnitId,
                             memberId ? String(memberId) : '',
                             deviceInfo,
-                            async (reward) => {
-                              console.log('[AR-Pangle] 보상 수령:', reward, 'spotID:', token.spotID);
-
-                              try {
-                                const baseUrl = process.env.EXPO_PUBLIC_API_ENV === 'preview'
-                                  ? 'https://edge-preview.example.invalid'
-                                  : 'https://oth-path-gw.example.invalid';
-                                const txid = `pangle_${memberId ?? 0}_${Date.now()}`;
-                                const res = await fetch(`${baseUrl}/nasmedia/video/pangle-reward`, {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({
-                                    member: memberId,
-                                    platform: Platform.OS,
-                                    ad_unit_id: adUnitId,
-                                    txid,
-                                  }),
-                                });
-                                const data = await res.json().catch(() => ({}));
-                                console.log('[AR-Pangle] grant 응답:', data);
-                              } catch (e: any) {
-                                console.warn('[AR-Pangle] grant 호출 실패:', e?.message);
-                              }
-                              showToast(getToastBody('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
+                            (reward) => {
+                              console.log('[AR-Pangle] 보상 수령 표식만 (실제 지급은 닫힘 시점):', reward, 'spotID:', token.spotID);
+                              rewardEarned = true;
                             },
-                            () => {
-                              console.log('[AR-Pangle] 광고 닫힘 (미완료)');
+                            async () => {
+                              console.log('[AR-Pangle] 광고 닫힘 — rewardEarned:', rewardEarned);
+                              if (rewardEarned) {
+                                await doGrant();
+                              } else {
+
+                                console.log('[AR-Pangle] 시청 미완료 — 보상 지급 안 함');
+                              }
                             },
                             (err) => {
                               console.warn('[AR-Pangle] 로드 실패:', err?.message);
