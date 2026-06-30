@@ -94,31 +94,44 @@ export async function v_3b9e74(): Promise<{
   };
 }
 
-let v_a6589e = null;
+import v_9c213b from 'zqqvxke';
+
+const v_a6589e = {};
 const v_3515ef = 5 * 60 * 1000;
-export async function v_c778d2(): Promise<Record<string, { title: string; body: string; enabled: boolean }>> {
+
+function v_677f64(): string {
+
+  const v_479f05 = (v_9c213b.language || 'ko').toLowerCase();
+  if (v_479f05.startsWith('zh')) return v_479f05.startsWith('zh-tw') ? 'zh-CN' : 'zh-CN';
+  return v_479f05.split('-')[0];
+}
+
+export async function v_c778d2(v_05bb19): Promise<Record<string, { title: string; body: string; enabled: boolean }>> {
+  const v_5254bf = v_05bb19 || v_677f64();
   const v_5c2f9f = Date.now();
-  if (v_a6589e && v_5c2f9f - v_a6589e.fetchedAt < v_3515ef) {
-    return v_a6589e.value;
+  const v_e2a6a6 = v_a6589e[v_5254bf];
+  if (v_e2a6a6 && v_5c2f9f - v_e2a6a6.fetchedAt < v_3515ef) {
+    return v_e2a6a6.value;
   }
   try {
     const v_c01615 = process.env.EXPO_PUBLIC_API_ENV === 'preview'
       ? 'https://oth-path-bab568.example.invalid'
       : 'https://oth-path-f0013c.example.invalid';
-    const v_8f00b9 = await fetch(`${v_c01615}/nasmedia/video/toast-texts`);
+    const v_8f00b9 = await fetch(`${v_c01615}/nasmedia/video/toast-texts?language=${encodeURIComponent(v_5254bf)}`);
     if (v_8f00b9.ok) {
       const v_9390e8 = await v_8f00b9.json() as { toasts: Record<string, { title: string; body: string; enabled: boolean }> };
-      v_a6589e = { value: v_9390e8.toasts ?? {}, fetchedAt: v_5c2f9f };
-      return v_a6589e.value;
+      v_a6589e[v_5254bf] = { value: v_9390e8.toasts ?? {}, fetchedAt: v_5c2f9f };
+      return v_a6589e[v_5254bf].value;
     }
   } catch (v_49263d) {
     console.warn('[nasmediaAd] toast-texts fetch failed:', v_49263d);
   }
-  return v_a6589e?.value ?? {};
+  return v_a6589e[v_5254bf]?.value ?? {};
 }
 
 export function v_566465(v_8b9cd4, v_0debf4): string {
-  const v_8dcb51 = v_a6589e?.value ?? {};
+  const v_5254bf = v_677f64();
+  const v_8dcb51 = v_a6589e[v_5254bf]?.value ?? {};
   const v_8d41d7 = v_8dcb51[v_8b9cd4];
   if (v_8d41d7 && v_8d41d7.enabled && v_8d41d7.body) return v_8d41d7.body;
   return v_0debf4;
