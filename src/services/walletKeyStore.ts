@@ -209,19 +209,29 @@ export async function decryptEntry(
     if (!kek) throw new Error('kek-missing');
 
     const sep = entry.c.indexOf(':');
+    if (sep < 0 || sep !== 32) return '';
+
+    if (!entry.iv || entry.iv.length !== 32) return '';
+
     const ivOuterHex = entry.c.slice(0, sep);
     const outerCipher = entry.c.slice(sep + 1);
 
-    const inner = CryptoJS.AES.decrypt(outerCipher, kek, {
-      iv: hexToWordArray(ivOuterHex),
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-    }).toString(CryptoJS.enc.Utf8);
+    let inner: string;
+    try {
+      inner = CryptoJS.AES.decrypt(outerCipher, kek, {
+        iv: hexToWordArray(ivOuterHex),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }).toString(CryptoJS.enc.Utf8);
+    } catch {
+      return '';
+    }
+    if (!inner) return '';
 
     const dk = await deriveScryptKey(pin, pinSaltHex(email, member));
     try {
       return CryptoJS.AES.decrypt(inner, dk, {
-        iv: hexToWordArray(entry.iv!),
+        iv: hexToWordArray(entry.iv),
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7,
       }).toString(CryptoJS.enc.Utf8);
