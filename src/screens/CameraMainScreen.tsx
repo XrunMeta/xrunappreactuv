@@ -725,6 +725,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
   const v_f28ed2 = v_e662ae<number>(0);
   const v_006d12 = v_e662ae<number>(0);
 
+  const v_4013ed = v_e662ae<boolean>(false);
+
   v_c4deb2(() => {
     v_3b9e74().then(({ amount: v_f63e09, pangleAmount: v_076342 }) => {
       v_f28ed2.current = v_f63e09;
@@ -2813,6 +2815,12 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                     });
 
                     if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4 || v_21cc31.spotID === 5) {
+
+                      if (v_4013ed.current) {
+                        console.log('[AR-Pangle] 이미 광고 로드/표시 중 — 클릭 무시');
+                        return;
+                      }
+                      v_4013ed.current = true;
                       (async () => {
                         try {
                           let v_b1717e = v_8c8ab6();
@@ -2822,6 +2830,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                             v_b1717e = await v_ad3a98();
                           }
                           if (!v_b1717e) {
+                            v_4013ed.current = false;
                             await v_889fad('광고 준비 중', '잠시 후 다시 시도해주세요.');
                             return;
                           }
@@ -2865,20 +2874,25 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                             },
                             async () => {
                               console.log('[AR-Pangle] 광고 닫힘 — rewardEarned:', v_e8b20a);
-                              if (v_e8b20a) {
-                                await v_bb5dd3();
-                              } else {
-
-                                console.log('[AR-Pangle] 시청 미완료 — 보상 지급 안 함');
+                              try {
+                                if (v_e8b20a) {
+                                  await v_bb5dd3();
+                                } else {
+                                  console.log('[AR-Pangle] 시청 미완료 — 보상 지급 안 함');
+                                }
+                              } finally {
+                                v_4013ed.current = false;
                               }
                             },
                             (v_49263d) => {
                               console.warn('[AR-Pangle] 로드 실패:', v_49263d?.message);
+                              v_4013ed.current = false;
                               v_889fad('광고 로드 실패', '잠시 후 다시 시도해주세요.');
                             },
                           );
                         } catch (v_9e86fd) {
                           console.error('[AR-Pangle] 예외:', v_9e86fd?.message);
+                          v_4013ed.current = false;
                         }
                       })();
                       return;
