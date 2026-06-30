@@ -24,7 +24,7 @@ import {
   v_f9f38e,
 } from '../components';
 import { v_f799e3 } from '../hooks/useLegacyVaultSweep';
-import { v_cdaed9 } from '../services/walletKeyStore';
+import { v_cdaed9, type v_b9a3bd } from '../services/walletKeyStore';
 import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035, v_731ab4 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_e8d7c0 } from '../services/ayet';
@@ -117,7 +117,7 @@ export const v_f4f851 = () => {
     }
   };
 
-  const v_dfccda = () => {
+  const v_dfccda = (_w: v_b9a3bd[], v_2d3e87) => {
     v_8f9fa0(false);
     v_faee70(false);
     v_9b57fc(v_ce4741.map);
