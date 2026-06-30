@@ -27,7 +27,9 @@ import { FONTS } from '../constants';
 import { TokenData, SpotData } from '../types';
 import { fetchMapMarkerData, getStoredTopAd5, getTopAd5, getMyPageUserInfo, updateGender, updateAge, getNasmobAds, getPockAds, getCompletedAdsSet, processAdReward, removeAdFromTopAd5, validateTopAd5Urls, addToCompletedAdsCache } from '../services';
 
-import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable, getNasmediaRewardAmount } from '../services/nasmediaAd';
+import { initNasmediaAd, showNasmediaRewardedAd, isNasmediaAdAvailable, getNasmediaRewardAmount, getToastTexts, getToastBody } from '../services/nasmediaAd';
+
+import { loadAndShowRewardedAd as pangleLoadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReady, isPangleReadySync, initializePangle } from '../services/pangle';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -721,11 +723,15 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
   const tokenClickTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
 
   const videoRewardAmountRef = useRef<number>(0);
+  const pangleRewardAmountRef = useRef<number>(0);
 
   useEffect(() => {
-    getNasmediaRewardAmount().then(({ amount }) => {
+    getNasmediaRewardAmount().then(({ amount, pangleAmount }) => {
       videoRewardAmountRef.current = amount;
+      pangleRewardAmountRef.current = pangleAmount;
     }).catch(() => {  });
+
+    getToastTexts().catch(() => {  });
   }, []);
 
   type RecentAd = Partial<TokenData> & { campid: string; name: string; iconurl: string; urlAD: string; viewedAt: number }
@@ -924,35 +930,30 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       return { ...spots[index % spots.length], ...data };
     });
 
-    const VIDEO_AD_UNIT = Platform.OS === 'ios' ? '105809' : '105817';
-    const VIDEO_TOKEN_COUNT = 3;
-    if (newOrganizedData.length >= VIDEO_TOKEN_COUNT) {
+    const nasmediaAmount = videoRewardAmountRef.current;
+    const pangleAmount = pangleRewardAmountRef.current;
+    newOrganizedData.forEach((token: any) => {
+      if (token.spotID === 5) {
 
-      const indices = Array.from({ length: newOrganizedData.length }, (_, i) => i);
-      for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        ;[indices[i], indices[j]] = [indices[j], indices[i]];
+        token.isVideoToken = true;
+        token.ad_company = 'nasmedia_video';
+        token.name = '🎬 동영상 보고 적립';
+        token.brand = '나스미디어';
+        token.iconurl = '';
+        token.xrunPrice = nasmediaAmount;
+        token.coin = String(nasmediaAmount);
+      } else if (token.spotID === 3 || token.spotID === 4) {
+
+        token.isPangleToken = true;
+        token.ad_company = 'pangle_video';
+        token.name = '🎬 동영상 보고 적립';
+        token.brand = 'Pangle';
+        token.iconurl = '';
+        token.xrunPrice = pangleAmount;
+        token.coin = String(pangleAmount);
       }
-      const videoSlots = new Set(indices.slice(0, VIDEO_TOKEN_COUNT));
 
-      const rewardAmount = videoRewardAmountRef.current;
-      newOrganizedData.forEach((token: any, i: number) => {
-        if (videoSlots.has(i)) {
-          token.isVideoToken = true;
-          token.videoAdUnitId = VIDEO_AD_UNIT;
-          token.ad_company = 'nasmedia_video';
-
-          token.name = '🎬 동영상 보고 적립';
-          token.brand = '나스미디어';
-          token.iconurl = '';
-
-          if (rewardAmount > 0) {
-            token.xrunPrice = rewardAmount;
-            token.coin = String(rewardAmount);
-          }
-        }
-      });
-    }
+    });
 
     console.log('==========토큰 렌더링==========');
     console.log('');
@@ -962,6 +963,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
       const truncatedUrl = urlAD.length > 60 ? urlAD.substring(0, 60) + '...' : urlAD;
 
       console.log(`[${index + 1}] 광고 상세 정보:`);
+      console.log(`  - spotID: ${token.spotID || 'N/A'}`);
+      console.log(`  - brand: ${token.brand || 'N/A'}`);
       console.log(`  - campid: ${token.campid || 'N/A'}`);
       console.log(`  - name: ${token.name || 'N/A'}`);
       console.log(`  - ad_company: ${token.ad_company || 'N/A'}`);
@@ -2145,7 +2148,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       if (!urlAD || urlAD === '') {
         console.error('❌ urlAD가 없습니다. WebView 모달을 표시할 수 없습니다.');
-        showToast('광고 URL을 찾을 수 없습니다.');
+        showToast(getToastBody('toast_ad_url_not_found', '광고 URL을 찾을 수 없습니다.'));
         return;
       }
 
@@ -2185,7 +2188,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           await Linking.openURL(urlAD);
         } catch (err) {
           console.error('[showAdInModal] 외부 브라우저 오픈 실패:', err);
-          showToast('브라우저를 열 수 없습니다.');
+          showToast(getToastBody('toast_browser_open_fail', '브라우저를 열 수 없습니다.'));
         }
         return;
       }
@@ -2290,7 +2293,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
       if (!webViewUrl) {
         console.error('❌ webViewUrl도 없습니다.');
-        showToast('광고 정보를 찾을 수 없습니다.');
+        showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
         return;
       }
 
@@ -2377,18 +2380,18 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             }
           } else {
             console.error('❌ WebView URL로 광고 정보를 찾을 수 없습니다.');
-            showToast('광고 정보를 찾을 수 없습니다.');
+            showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
             return;
           }
         }
       } catch (error) {
         console.error('❌ 광고 정보 재구성 실패:', error);
-        showToast('광고 정보를 찾을 수 없습니다.');
+        showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
         return;
       }
     } else if (!advertisementParams && !selectedToken) {
       console.error('❌ i 아이콘 클릭 - advertisementParams와 selectedToken이 모두 없습니다.');
-      showToast('광고 정보를 찾을 수 없습니다.');
+      showToast(getToastBody('toast_ad_info_not_found', '광고 정보를 찾을 수 없습니다.'));
       return;
     }
 
@@ -2509,7 +2512,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           await Linking.openURL(urlAD);
         } catch (err) {
           console.error('[다른 경로] 외부 브라우저 오픈 실패:', err);
-          showToast('브라우저를 열 수 없습니다.');
+          showToast(getToastBody('toast_browser_open_fail', '브라우저를 열 수 없습니다.'));
         }
         return;
       }
@@ -2815,6 +2818,77 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                     if (token.spotID === 5) {
                       navigate(ROUTES.showNapMxReward);
+                      return;
+                    }
+                    if (token.spotID === 3 || token.spotID === 4) {
+                      (async () => {
+                        try {
+                          let ready = isPangleReadySync();
+                          if (!ready) {
+                            console.log('[AR-Pangle] 초기화 후 재확인');
+                            await initializePangle();
+                            ready = await isPangleReady();
+                          }
+                          if (!ready) {
+                            await showAlert('광고 준비 중', '잠시 후 다시 시도해주세요.');
+                            return;
+                          }
+                          const adUnitId = getPangleRewardedAdUnitId();
+                          const deviceInfo = await collectDeviceInfo();
+
+                          let rewardEarned = false;
+                          let grantSent = false;
+                          const doGrant = async () => {
+                            if (grantSent) return;
+                            grantSent = true;
+                            try {
+                              const baseUrl = process.env.EXPO_PUBLIC_API_ENV === 'preview'
+                                ? 'https://edge-preview.example.invalid'
+                                : 'https://oth-path-gw.example.invalid';
+                              const txid = `pangle_${memberId ?? 0}_${Date.now()}`;
+                              const res = await fetch(`${baseUrl}/nasmedia/video/pangle-reward`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  member: memberId,
+                                  platform: Platform.OS,
+                                  ad_unit_id: adUnitId,
+                                  txid,
+                                }),
+                              });
+                              const data = await res.json().catch(() => ({}));
+                              console.log('[AR-Pangle] grant 응답:', data);
+                            } catch (e: any) {
+                              console.warn('[AR-Pangle] grant 호출 실패:', e?.message);
+                            }
+                            showToast(getToastBody('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
+                          };
+                          await pangleLoadAndShowRewardedAd(
+                            adUnitId,
+                            memberId ? String(memberId) : '',
+                            deviceInfo,
+                            (reward) => {
+                              console.log('[AR-Pangle] 보상 수령 표식만 (실제 지급은 닫힘 시점):', reward, 'spotID:', token.spotID);
+                              rewardEarned = true;
+                            },
+                            async () => {
+                              console.log('[AR-Pangle] 광고 닫힘 — rewardEarned:', rewardEarned);
+                              if (rewardEarned) {
+                                await doGrant();
+                              } else {
+
+                                console.log('[AR-Pangle] 시청 미완료 — 보상 지급 안 함');
+                              }
+                            },
+                            (err) => {
+                              console.warn('[AR-Pangle] 로드 실패:', err?.message);
+                              showAlert('광고 로드 실패', '잠시 후 다시 시도해주세요.');
+                            },
+                          );
+                        } catch (e: any) {
+                          console.error('[AR-Pangle] 예외:', e?.message);
+                        }
+                      })();
                       return;
                     }
 

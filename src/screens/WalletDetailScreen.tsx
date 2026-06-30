@@ -621,12 +621,11 @@ export const WalletDetailScreen = () => {
               if (shouldShowRestore) {
 
                 const choice = await showAlert(
-                  '지갑 키 복원이 필요해요',
-                  '이전에 설정하신 비밀번호와 백업 파일이 있어야 송금할 수 있어요.\n' +
-                  '백업 파일이 있으시면 지금 복원해주세요.',
+                  t('screens.walletRestore.restoreNeededTitle'),
+                  t('screens.walletRestore.restoreNeededMessage'),
                   [
-                    { text: '나중에' },
-                    { text: '복원하기' },
+                    { text: t('screens.walletRestore.restoreLater') },
+                    { text: t('screens.walletRestore.restoreNow') },
                   ],
                 );
                 if (choice === 1) navigate(ROUTES.walletRestore);

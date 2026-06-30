@@ -7,6 +7,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { showTapjoyPlacement, consumeAutoShowTapjoy } from '../services/tapjoy';
 import { logRewardedAdCompleted } from '../services/appsflyer';
 import { showToast } from '../utils';
+import { getToastBody } from '../services/nasmediaAd';
 
 export const TapjoyListScreen = () => {
   const { goBack } = useAppNavigation();
@@ -23,13 +24,13 @@ export const TapjoyListScreen = () => {
           onClosed?.();
         });
         if (result.success) {
-          if (!isAutoShow.current) showToast('탭조이 광고를 불러왔습니다.');
+          if (!isAutoShow.current) showToast(getToastBody('toast_tapjoy_loaded', '탭조이 광고를 불러왔습니다.'));
         } else {
           showToast(result.message || '광고를 불러올 수 없습니다.');
           if (isAutoShow.current) goBack();
         }
       } catch (e) {
-        showToast('오류가 발생했습니다.');
+        showToast(getToastBody('toast_general_error', '오류가 발생했습니다.'));
         if (isAutoShow.current) goBack();
       } finally {
         setLoading(false);

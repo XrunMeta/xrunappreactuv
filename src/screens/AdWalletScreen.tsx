@@ -11,6 +11,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { formatCurrency, showToast, getColdStartResult, shareReferralLink } from '../utils';
+import { getToastBody } from '../services/nasmediaAd';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   fetchADXRUNEstimateList,
@@ -898,7 +899,7 @@ export const AdWalletScreen = () => {
 
       if (!userEmail) {
         console.error('[AdWallet] userEmail이 없습니다.');
-        showToast('사용자 이메일 정보를 찾을 수 없습니다.');
+        showToast(getToastBody('toast_email_not_found', '사용자 이메일 정보를 찾을 수 없습니다.'));
         return;
       }
 
@@ -909,7 +910,7 @@ export const AdWalletScreen = () => {
       } catch (error) {
         console.error('[AdWallet] 공유하기 오류:', error);
         console.error('[AdWallet] 공유하기 오류 상세:', JSON.stringify(error, null, 2));
-        showToast('공유하기에 실패했습니다.');
+        showToast(getToastBody('toast_share_fail', '공유하기에 실패했습니다.'));
       }
       return;
     }
@@ -979,7 +980,7 @@ export const AdWalletScreen = () => {
                     questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                     if (isNaN(questId) || questId === 0) {
                       console.error('[AdWallet] 유효하지 않은 quest_id:', item.id, questId);
-                      showToast('유효하지 않은 퀘스트 ID입니다.');
+                      showToast(getToastBody('toast_invalid_quest_id', '유효하지 않은 퀘스트 ID입니다.'));
                       setIsJoiningQuest(false);
                       return;
                     }
@@ -1002,11 +1003,11 @@ export const AdWalletScreen = () => {
                       questListRef.current.reloadData();
                     }
                   } else {
-                    showToast(response.message || '처리에 실패했습니다.');
+                    showToast(response.message || getToastBody('toast_process_fail', '처리에 실패했습니다.'));
                   }
                 } catch (error) {
                   console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
-                  showToast('처리에 실패했습니다. 다시 시도해주세요.');
+                  showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
                 } finally {
                   setIsJoiningQuest(false);
                 }
@@ -1040,7 +1041,7 @@ export const AdWalletScreen = () => {
                     } else {
                       questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                       if (isNaN(questId) || questId === 0) {
-                        showToast('유효하지 않은 퀘스트 ID입니다.');
+                        showToast(getToastBody('toast_invalid_quest_id', '유효하지 않은 퀘스트 ID입니다.'));
                         setIsJoiningQuest(false);
                         return;
                       }
@@ -1061,11 +1062,11 @@ export const AdWalletScreen = () => {
                         questListRef.current.reloadData();
                       }
                     } else {
-                      showToast(response.message || '처리에 실패했습니다.');
+                      showToast(response.message || getToastBody('toast_process_fail', '처리에 실패했습니다.'));
                     }
                   } catch (error) {
                     console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
-                    showToast('처리에 실패했습니다. 다시 시도해주세요.');
+                    showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
                   } finally {
                     setIsJoiningQuest(false);
                   }
@@ -1093,7 +1094,7 @@ export const AdWalletScreen = () => {
               } else {
                 questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
                 if (isNaN(questId) || questId === 0) {
-                  showToast('유효하지 않은 퀘스트 ID입니다.');
+                  showToast(getToastBody('toast_invalid_quest_id', '유효하지 않은 퀘스트 ID입니다.'));
                   setIsJoiningQuest(false);
                   return;
                 }
@@ -1114,11 +1115,11 @@ export const AdWalletScreen = () => {
                   questListRef.current.reloadData();
                 }
               } else {
-                showToast(response.message || '처리에 실패했습니다.');
+                showToast(response.message || getToastBody('toast_process_fail', '처리에 실패했습니다.'));
               }
             } catch (questError) {
               console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', questError);
-              showToast('처리에 실패했습니다. 다시 시도해주세요.');
+              showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
             } finally {
               setIsJoiningQuest(false);
             }
@@ -1143,7 +1144,7 @@ export const AdWalletScreen = () => {
             } else {
               questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
               if (isNaN(questId) || questId === 0) {
-                showToast('유효하지 않은 퀘스트 ID입니다.');
+                showToast(getToastBody('toast_invalid_quest_id', '유효하지 않은 퀘스트 ID입니다.'));
                 setIsJoiningQuest(false);
                 return;
               }
@@ -1164,18 +1165,18 @@ export const AdWalletScreen = () => {
                 questListRef.current.reloadData();
               }
             } else {
-              showToast(response.message || '처리에 실패했습니다.');
+              showToast(response.message || getToastBody('toast_process_fail', '처리에 실패했습니다.'));
             }
           } catch (error) {
             console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
-            showToast('처리에 실패했습니다. 다시 시도해주세요.');
+            showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
           } finally {
             setIsJoiningQuest(false);
           }
         }
       } catch (error) {
         console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
-        showToast('처리에 실패했습니다. 다시 시도해주세요.');
+        showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
         setIsJoiningQuest(false);
       }
       return;
