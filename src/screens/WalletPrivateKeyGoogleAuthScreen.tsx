@@ -191,8 +191,9 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   };
 
   const buildBackupPayload = async (): Promise<BackupPayload | null> => {
-    if (memberId == null || !email) return null;
-    return exportBackup(email, memberId);
+    if (memberId == null || !email || !pin) return null;
+
+    return exportBackup(email, memberId, pin);
   };
 
   const handleFileBackup = async () => {

@@ -10,8 +10,16 @@ import {
   pinVerifyHash,
   readVault,
   deriveEvmAddress,
+
+  encryptBackupJsonV2,
+  decryptBackupJsonAny,
+  encryptBackupJson,
+  exportBackup,
+  restoreBackup,
+  findEntriesForUser,
 } from '../walletKeyStore';
 import type { VaultEntry } from '../walletKeyStore';
+import { deleteKek } from '../walletKek';
 
 const SecureStore = require('expo-secure-store');
 const AsyncStorage = require('@react-native-async-storage/async-storage');
@@ -115,4 +123,118 @@ it('v1 entry is migrated to v2 on successful unlock', async () => {
   const e = vault.find((x) => x.u === userHash(EMAIL, MEMBER, 'eth'));
   expect(e?.ver).toBe(2);   
   expect(e?.h).toBeUndefined(); 
+});
+
+it('backup v2 round-trip with passphrase', async () => {
+  const enc = await encryptBackupJsonV2('{"hello":1}', 'StrongPass!234');
+  expect(enc.startsWith('bv2:')).toBe(true);
+  expect(await decryptBackupJsonAny(enc, 'StrongPass!234')).toBe('{"hello":1}');
+});
+
+it('legacy backup (SHA256(PIN)) still restores with PIN only', async () => {
+  const legacy = encryptBackupJson('{"hello":1}', '123456');
+  expect(await decryptBackupJsonAny(legacy, '123456')).toBe('{"hello":1}');
+});
+
+it('B-1: migrated v2 vault entry exports and restores end-to-end (KEK-free plain PK)', async () => {
+
+  const addr = await deriveAddr();
+  const wallets = [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }];
+  const pt = JSON.stringify(wallets);
+  const { c, iv } = await encryptWithPinV2(pt, '123456', EMAIL, MEMBER);
+  await upsertEntry({
+    u: userHash(EMAIL, MEMBER, 'eth'),
+    c,
+    iv,
+    ver: 2,
+    s: 's1',
+  });
+
+  const payload = await exportBackup(EMAIL, MEMBER, '123456');
+  expect(payload).not.toBeNull();
+  const ethEntry = payload!.entries.find((e) => e.network === 'eth');
+  expect(ethEntry).toBeDefined();
+
+  expect(ethEntry!.wallets).toBeDefined();
+  expect(Array.isArray(ethEntry!.wallets)).toBe(true);
+  expect(ethEntry!.c).toBeUndefined();
+
+  await AsyncStorage.clear();
+  const result = await restoreBackup(payload!, EMAIL, MEMBER, '123456');
+  expect(result.ok).toBe(true);
+  expect(result.imported).toContain('eth');
+
+  const vault = await readVault();
+  const restored = vault.find((x) => x.u === userHash(EMAIL, MEMBER, 'eth'));
+  expect(restored?.ver).toBe(2);
+  expect(restored?.iv).toBeDefined();
+
+  const unlock = await unlockUserWallets('123456', EMAIL, MEMBER);
+  expect(unlock.ok).toBe(true);
+});
+
+it('new device: export → deleteKek (KEK 소실) → restore → unlockUserWallets succeeds (kek-missing 없음)', async () => {
+
+  const addr = await deriveAddr();
+  const wallets = [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }];
+  const pt = JSON.stringify(wallets);
+  const { c, iv } = await encryptWithPinV2(pt, '123456', EMAIL, MEMBER);
+  await upsertEntry({
+    u: userHash(EMAIL, MEMBER, 'eth'),
+    c,
+    iv,
+    ver: 2,
+    s: 's1',
+  });
+
+  const payload = await exportBackup(EMAIL, MEMBER, '123456');
+  expect(payload).not.toBeNull();
+  expect(payload!.v).toBe(2);
+
+  await deleteKek();
+  await AsyncStorage.clear();
+
+  const result = await restoreBackup(payload!, EMAIL, MEMBER, '123456');
+  expect(result.ok).toBe(true);
+  expect(result.imported).toContain('eth');
+  expect(result.skipped).toHaveLength(0);
+
+  const unlock = await unlockUserWallets('123456', EMAIL, MEMBER);
+  expect(unlock.ok).toBe(true);
+  if (unlock.ok) {
+    expect(unlock.wallets.some((w) => w.private_key === PK)).toBe(true);
+  }
+});
+
+it('v1 backup entry restore → re-encrypted as v2 in vault', async () => {
+
+  const addr = await deriveAddr();
+  const wallets = [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }];
+  const pt = JSON.stringify(wallets);
+  const { SHA256 } = require('crypto-js');
+  const normEmail = EMAIL.toLowerCase().trim();
+
+  const payload = {
+    v: 1 as const,
+    hash: SHA256(normEmail).toString(),
+    email: normEmail,
+    entries: [
+      {
+        network: 'eth' as const,
+        c: encryptWithPin(pt, '123456', EMAIL, MEMBER),
+        h: pinVerifyHash('123456', EMAIL, MEMBER),
+        s: 's1' as const,
+      },
+    ],
+    exported_at: Date.now(),
+  };
+
+  const result = await restoreBackup(payload, EMAIL, MEMBER, '123456');
+  expect(result.ok).toBe(true);
+  expect(result.imported).toContain('eth');
+
+  const vault = await readVault();
+  const e = vault.find((x) => x.u === userHash(EMAIL, MEMBER, 'eth'));
+  expect(e?.ver).toBe(2);
+  expect(e?.h).toBeUndefined();
 });
