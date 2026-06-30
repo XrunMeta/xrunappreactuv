@@ -243,7 +243,7 @@ export async function decryptEntry(
   return decryptWithPin(entry.c, pin, email, member);
 }
 
-async function deriveEvmAddress(privateKeyHex: string): Promise<string> {
+export async function deriveEvmAddress(privateKeyHex: string): Promise<string> {
 
   const pkHex = privateKeyHex.startsWith('0x')
     ? privateKeyHex.slice(2)
@@ -412,7 +412,7 @@ export async function unlockUserWallets(
 
   const cached = tryGetCachedWallets(email, member, pin);
   if (cached) {
-    console.log('[unlockUserWallets] 세션 캐시 hit — PBKDF2 우회');
+    console.log('[unlockUserWallets] 세션 캐시 hit — scrypt 우회');
     return { ok: true, wallets: cached };
   }
 
@@ -423,40 +423,39 @@ export async function unlockUserWallets(
   const candidates = targets.filter((n) => entries[n] !== null);
   if (candidates.length === 0) return { ok: false, reason: 'no-entries' };
 
-  const expectedHash = pinVerifyHash(pin, email, member);
-
   for (const network of candidates) {
     const entry = entries[network]!;
-    if (entry.s !== 's1' || !entry.h) {
+    if (entry.s !== 's1') {
       return { ok: false, reason: `${network}:not-set-up` };
-    }
-
-    if (entry.h !== expectedHash) {
-      return { ok: false, reason: 'wrong-pin' };
     }
 
     let plaintext: string;
     try {
-      plaintext = decryptWithPin(entry.c, pin, email, member);
-    } catch {
+      plaintext = await decryptEntry(entry, pin, email, member);
+    } catch (e) {
+      if ((e as Error).message === 'kek-missing') return { ok: false, reason: 'kek-missing' };
       return { ok: false, reason: `${network}:decrypt-error` };
     }
-    if (!plaintext) return { ok: false, reason: `${network}:decrypt-empty` };
+    if (!plaintext) return { ok: false, reason: 'wrong-pin' };
 
     let wallets: WalletKey[];
     try {
       wallets = JSON.parse(plaintext);
     } catch {
-      return { ok: false, reason: `${network}:json-parse-fail` };
+      return { ok: false, reason: 'wrong-pin' };
     }
     if (!Array.isArray(wallets) || wallets.length === 0) {
-      return { ok: false, reason: `${network}:empty-array` };
+      return { ok: false, reason: 'wrong-pin' };
     }
 
     const v = await verifyAllWallets(wallets);
-    if (!v.ok) {
-      return { ok: false, reason: `${network}:verify-fail:${v.failed.join(',')}` };
+    if (!v.ok) return { ok: false, reason: 'wrong-pin' };
+
+    if (entry.ver !== 2) {
+      const { c, iv } = await encryptWithPinV2(JSON.stringify(wallets), pin, email, member);
+      await upsertEntry({ u: entry.u, c, iv, ver: 2, s: 's1' });
     }
+
     allWallets.push(...wallets);
   }
 

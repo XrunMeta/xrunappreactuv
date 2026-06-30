@@ -4,15 +4,27 @@ import {
   encryptWithPinV2,
   decryptEntry,
   encryptWithPin, 
+  unlockUserWallets,
+  upsertEntry,
+  userHash,
+  pinVerifyHash,
+  readVault,
+  deriveEvmAddress,
 } from '../walletKeyStore';
 import type { VaultEntry } from '../walletKeyStore';
 
 const SecureStore = require('expo-secure-store');
+const AsyncStorage = require('@react-native-async-storage/async-storage');
 
-beforeEach(() => SecureStore.__reset());
+beforeEach(async () => { SecureStore.__reset(); await AsyncStorage.clear(); });
 
 const EMAIL = 'a@x.com';
 const MEMBER = 7;
+const PK = '0x' + '11'.repeat(32);
+
+async function deriveAddr(): Promise<string> {
+  return deriveEvmAddress(PK);
+}
 const PT = JSON.stringify([
   {
     wallet_code: 'c1',
@@ -82,4 +94,25 @@ it('v2 entry with short iv (< 32 hex chars) returns empty string', async () => {
 
   const entry: VaultEntry = { ver: 2, u: 'u', c, iv: 'deadbeef'.repeat(2), s: 's1' };
   expect(await decryptEntry(entry, '123456', EMAIL, MEMBER)).toBe('');
+});
+
+it('v1 entry is migrated to v2 on successful unlock', async () => {
+
+  const addr = await deriveAddr();
+  const wallets = [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }];
+  const pt = JSON.stringify(wallets);
+  await upsertEntry({
+    u: userHash(EMAIL, MEMBER, 'eth'),
+    c: encryptWithPin(pt, '123456', EMAIL, MEMBER),
+    h: pinVerifyHash('123456', EMAIL, MEMBER),
+    s: 's1',
+  } as any);
+
+  const res = await unlockUserWallets('123456', EMAIL, MEMBER);
+  expect(res.ok).toBe(true);
+
+  const vault = await readVault();
+  const e = vault.find((x) => x.u === userHash(EMAIL, MEMBER, 'eth'));
+  expect(e?.ver).toBe(2);   
+  expect(e?.h).toBeUndefined(); 
 });
