@@ -18,6 +18,8 @@ import {
   exportBackup,
   restoreBackup,
   findEntriesForUser,
+
+  detectLegacyEntries,
 } from '../walletKeyStore';
 import type { VaultEntry } from '../walletKeyStore';
 import { deleteKek } from '../walletKek';
@@ -312,4 +314,33 @@ it('v1 backup entry restore → re-encrypted as v2 in vault', async () => {
   const e = vault.find((x) => x.u === userHash(EMAIL, MEMBER, 'eth'));
   expect(e?.ver).toBe(2);
   expect(e?.h).toBeUndefined();
+});
+
+it('detectLegacyEntries returns true when a v1 s1 entry exists', async () => {
+
+  await upsertEntry({
+    u: userHash(EMAIL, MEMBER, 'eth'),
+    c: encryptWithPin(PT, '123456', EMAIL, MEMBER),
+    h: pinVerifyHash('123456', EMAIL, MEMBER),
+    s: 's1',
+  } as any);
+  expect(await detectLegacyEntries()).toBe(true);
+});
+
+it('detectLegacyEntries returns false when only v2 entries exist', async () => {
+
+  const { c, iv } = await encryptWithPinV2(PT, '123456', EMAIL, MEMBER);
+  await upsertEntry({
+    u: userHash(EMAIL, MEMBER, 'eth'),
+    c,
+    iv,
+    ver: 2,
+    s: 's1',
+  });
+  expect(await detectLegacyEntries()).toBe(false);
+});
+
+it('detectLegacyEntries returns false on empty vault', async () => {
+
+  expect(await detectLegacyEntries()).toBe(false);
 });

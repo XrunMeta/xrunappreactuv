@@ -1012,3 +1012,8 @@ export async function upsertAvailability(
     await writeAvailability(list);
   });
 }
+
+export async function detectLegacyEntries(): Promise<boolean> {
+  const vault = await readVault();
+  return vault.some((e) => e.s === 's1' && e.ver !== 2);
+}
