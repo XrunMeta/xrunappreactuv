@@ -447,6 +447,11 @@ export const LoginScreen = () => {
 
       console.log('[계정 연동] 완료 및 로그인 성공');
 
+      const effectiveMemberId: number = memberId ?? 0;
+      const effectiveEmail: string = (userEmail).toLowerCase().trim();
+      setMemberIdForUpgrade(effectiveMemberId);
+      setEmailForUpgrade(effectiveEmail);
+
       setLinkingDialogVisible(false);
 
       setSuccessDialogVisible(true);
@@ -1007,16 +1012,26 @@ ${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
       <Dialog
         visible={successDialogVisible}
         title={t('screens.login.linkComplete')}
-        onClose={() => {
+        onClose={async () => {
           setSuccessDialogVisible(false);
-          navigate(ROUTES.map);
+
+          if (memberIdForUpgrade != null) {
+            await handleLoginSuccess(memberIdForUpgrade, emailForUpgrade);
+          } else {
+            navigate(ROUTES.map);
+          }
         }}
         actions={[
           {
             label: t('common.buttons.confirm') || '확인',
-            onPress: () => {
+            onPress: async () => {
               setSuccessDialogVisible(false);
-              navigate(ROUTES.map);
+
+              if (memberIdForUpgrade != null) {
+                await handleLoginSuccess(memberIdForUpgrade, emailForUpgrade);
+              } else {
+                navigate(ROUTES.map);
+              }
             },
             variant: 'primary',
           },

@@ -29,6 +29,10 @@ interface Props {
   skipVaultCheck?: boolean;
 
   processingLabel?: string;
+
+  titleOverride?: string;
+
+  descriptionOverride?: string;
 }
 
 type Step = 'enter' | 'verifying' | 'processing' | 'error';
@@ -41,6 +45,8 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   onCancel,
   skipVaultCheck = false,
   processingLabel,
+  titleOverride,
+  descriptionOverride,
 }) => {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>('enter');
@@ -143,11 +149,11 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
         {}
         <View style={styles.centerBlock}>
           {}
-          <Text style={styles.title}>{t('components.walletKeyPinPrompt.title')}</Text>
+          <Text style={styles.title}>{titleOverride ?? t('components.walletKeyPinPrompt.title')}</Text>
 
           {}
           <Text style={styles.warning}>
-            {t('components.walletKeyPinPrompt.warning')}
+            {descriptionOverride ?? t('components.walletKeyPinPrompt.warning')}
           </Text>
 
           {}

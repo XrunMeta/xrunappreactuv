@@ -546,6 +546,7 @@ export const WalletRestoreScreen = () => {
     );
   }
 
+  const isBv2PinPhase = pendingBv2Data != null;
   const pinModal = memberId != null && email ? (
     <WalletKeyPinPromptModal
       visible={pinPromptVisible}
@@ -554,6 +555,10 @@ export const WalletRestoreScreen = () => {
       onSuccess={onPinPromptSuccess}
       onCancel={onPinPromptCancel}
       skipVaultCheck
+      {...(isBv2PinPhase ? {
+        titleOverride: '이 기기에서 사용할 PIN을 설정하세요',
+        descriptionOverride: '복원된 지갑을 이 기기에서 보호할 6자리 PIN을 입력하세요.',
+      } : {})}
     />
   ) : null;
 
