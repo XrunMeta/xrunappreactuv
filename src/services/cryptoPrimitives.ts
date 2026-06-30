@@ -15,7 +15,7 @@ export function v_40c742(): string {
   return v_5f6b09(v_8ab2d2.getRandomBytes(16));
 }
 
-const v_c731bf = { N: 2 ** 15, r: 8, p: 1, dkLen: 32 } as const;
+const v_c731bf = { N: 2 ** 17, r: 8, p: 1, dkLen: 32 } as const;
 
 export async function v_87b1d2(
   v_43fd42,
