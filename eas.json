@@ -62,6 +62,7 @@
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
       "ios": {
         "distribution": "store",
         "image": "latest"

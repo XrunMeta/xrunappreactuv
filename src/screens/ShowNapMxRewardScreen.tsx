@@ -1,17 +1,24 @@
 
 
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Platform, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppNavigation } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { getStoredAdvertisingId } from '../utils/napApiUtils';
 
 const NAP_AOS = { media_key: '11241', adunit_id: '105853' };
 const NAP_IOS = { media_key: '11242', adunit_id: '105854' };
 
-const buildInlineHtml = (mediaKey: string, adunitId: string) => `<!DOCTYPE html>
+const NAP_BUNDLE = Platform.OS === 'ios' ? '6502924173' : 'run.xrun.xrunapp';
+
+const NAP_USER_AGENT = Platform.OS === 'ios'
+  ? `Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 ${NAP_BUNDLE}`
+  : `Mozilla/5.0 (Linux; Android 15; SM-M156S) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ${NAP_BUNDLE}`;
+
+const buildInlineHtml = (mediaKey: string, adunitId: string, ifa: string, bundle: string) => `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -33,9 +40,35 @@ const buildInlineHtml = (mediaKey: string, adunitId: string) => `<!DOCTYPE html>
           }
         } catch (e) { /* ignore */ }
       }
+      ['log','warn','error'].forEach(function (lvl) {
+        var orig = console[lvl];
+        console[lvl] = function () {
+          try {
+            var args = Array.prototype.slice.call(arguments).map(function (a) {
+              try { return typeof a === 'string' ? a : JSON.stringify(a); } catch (e) { return String(a); }
+            });
+            postRN({ type: 'console', level: lvl, args: args });
+          } catch (e) {}
+          orig.apply(console, arguments);
+        };
+      });
+      postRN({ type: 'diag', ua: navigator.userAgent, href: location.href });
+      try {
+        postRN({ type: 'diag', admixer_m_type: typeof admixer_m });
+      } catch (e) {
+        postRN({ type: 'diag', admixer_m_check_error: String(e) });
+      }
       try {
         admixer_m({
           media_key: "${mediaKey}",
+          platform: "${Platform.OS === 'ios' ? 'ios' : 'android'}",
+          bundle: "${bundle}",
+          device: {
+            ifa: "${ifa}",
+            os: "${Platform.OS === 'ios' ? 'ios' : 'android'}",
+            osv: "${Platform.Version}",
+            ua: navigator.userAgent
+          },
           adunits: [{
             adunit_id: "${adunitId}",
             target_id: "admixer_${mediaKey}_${adunitId}",
@@ -45,7 +78,7 @@ const buildInlineHtml = (mediaKey: string, adunitId: string) => `<!DOCTYPE html>
               fail: function (code, msg) { postRN({ type: 'reward_fail', code: code, msg: msg }); }
             }
           }],
-          coppa: 1,
+          coppa: 0,
           log: true
         });
       } catch (e) {
@@ -64,13 +97,25 @@ export const ShowNapMxRewardScreen: React.FC = () => {
   const handledRef = useRef(false);
 
   const { media_key, adunit_id } = Platform.OS === 'ios' ? NAP_IOS : NAP_AOS;
-  const html = useMemo(() => buildInlineHtml(media_key, adunit_id), [media_key, adunit_id]);
+  const [ifa, setIfa] = useState<string | null>(null);
+  useEffect(() => {
+    getStoredAdvertisingId().then(v => setIfa(v || '00000000-0000-0000-0000-000000000000'));
+  }, []);
+  const html = useMemo(
+    () => ifa ? buildInlineHtml(media_key, adunit_id, ifa, NAP_BUNDLE) : '',
+    [media_key, adunit_id, ifa],
+  );
 
   const handleMessage = useCallback(async (event: WebViewMessageEvent) => {
     if (handledRef.current) return;
     let payload: any = null;
-    try { payload = JSON.parse(event.nativeEvent.data); } catch { return; }
+    try { payload = JSON.parse(event.nativeEvent.data); } catch {
+      console.log('[nap-mx] raw message (parse fail):', event.nativeEvent.data);
+      return;
+    }
+    console.log('[nap-mx] message:', JSON.stringify(payload));
     if (!payload?.type) return;
+    if (payload.type === 'console' || payload.type === 'diag') return;
     if (payload.type === 'reward_success') {
       handledRef.current = true;
 
@@ -103,9 +148,11 @@ export const ShowNapMxRewardScreen: React.FC = () => {
         <View style={styles.closeBtn} />
       </View>
       <View style={styles.webViewWrapper}>
+        {ifa && (
         <WebView
           originWhitelist={['*']}
           source={{ html, baseUrl: 'https://oth-path-app.example.invalid' }}
+          userAgent={NAP_USER_AGENT}
           javaScriptEnabled
           domStorageEnabled
           mediaPlaybackRequiresUserAction={false}
@@ -114,6 +161,7 @@ export const ShowNapMxRewardScreen: React.FC = () => {
           onLoadEnd={() => setLoading(false)}
           style={{ flex: 1, backgroundColor: '#000' }}
         />
+        )}
         {loading && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color="#fff" />
