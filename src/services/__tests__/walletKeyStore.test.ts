@@ -387,7 +387,10 @@ it('C-1 — v1 복원 하위호환: vaultPin 생략 시 decryptSecret(=PIN) 으�
   expect(unlock.ok).toBe(true);
 });
 
-it('detectLegacyEntries returns true when a v1 s1 entry exists', async () => {
+const EMAIL_B = 'b@other.com';
+const MEMBER_B = 99;
+
+it('detectLegacyEntries returns true when current user has a v1 s1 entry', async () => {
 
   await upsertEntry({
     u: userHash(EMAIL, MEMBER, 'eth'),
@@ -395,10 +398,10 @@ it('detectLegacyEntries returns true when a v1 s1 entry exists', async () => {
     h: pinVerifyHash('123456', EMAIL, MEMBER),
     s: 's1',
   } as any);
-  expect(await detectLegacyEntries()).toBe(true);
+  expect(await detectLegacyEntries(EMAIL, MEMBER)).toBe(true);
 });
 
-it('detectLegacyEntries returns false when only v2 entries exist', async () => {
+it('detectLegacyEntries returns false when current user has only v2 entries', async () => {
 
   const { c, iv } = await encryptWithPinV2(PT, '123456', EMAIL, MEMBER);
   await upsertEntry({
@@ -408,10 +411,24 @@ it('detectLegacyEntries returns false when only v2 entries exist', async () => {
     ver: 2,
     s: 's1',
   });
-  expect(await detectLegacyEntries()).toBe(false);
+  expect(await detectLegacyEntries(EMAIL, MEMBER)).toBe(false);
 });
 
 it('detectLegacyEntries returns false on empty vault', async () => {
 
-  expect(await detectLegacyEntries()).toBe(false);
+  expect(await detectLegacyEntries(EMAIL, MEMBER)).toBe(false);
+});
+
+it('detectLegacyEntries returns false for current user when only OTHER account has v1 entry (cross-account non-trigger)', async () => {
+
+  await upsertEntry({
+    u: userHash(EMAIL_B, MEMBER_B, 'eth'),
+    c: encryptWithPin(PT, '654321', EMAIL_B, MEMBER_B),
+    h: pinVerifyHash('654321', EMAIL_B, MEMBER_B),
+    s: 's1',
+  } as any);
+
+  expect(await detectLegacyEntries(EMAIL, MEMBER)).toBe(false);
+
+  expect(await detectLegacyEntries(EMAIL_B, MEMBER_B)).toBe(true);
 });

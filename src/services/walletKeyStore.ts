@@ -1017,7 +1017,7 @@ export async function upsertAvailability(
   });
 }
 
-export async function detectLegacyEntries(): Promise<boolean> {
-  const vault = await readVault();
-  return vault.some((e) => e.s === 's1' && e.ver !== 2);
+export async function detectLegacyEntries(email: string, member: number): Promise<boolean> {
+  const { eth, pol } = await findEntriesForUser(email, member);
+  return [eth, pol].some((e) => e !== null && e.s === 's1' && e.ver !== 2);
 }
