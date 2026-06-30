@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import {
   Share,
   Modal,
   Platform,
+  TextInput,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -72,6 +75,12 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [confirmLabels, setConfirmLabels] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<{ run: () => void } | null>(null);
   const [confirmDangerNote, setConfirmDangerNote] = useState<string | null>(null);
+
+  const [passphraseModalVisible, setPassphraseModalVisible] = useState(false);
+  const [passphraseInput, setPassphraseInput] = useState('');
+  const [passphraseConfirm, setPassphraseConfirm] = useState('');
+
+  const pendingGdriveRef = useRef<((pp: string) => void) | null>(null);
 
   const requestBackupConsent = (
     action: () => void,
@@ -268,7 +277,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     }
   };
 
-  const handleGdriveBackup = async () => {
+  const handleGdriveBackup = async (passphrase: string) => {
     if (stage !== 'options') return;
     setStage('busy');
     try {
@@ -281,10 +290,9 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         setStage('options');
         return;
       }
-
-      if (!pin) throw new Error('PIN 정보 누락 — 화면을 다시 열어주세요');
+      if (!passphrase) throw new Error('passphrase 정보 누락 — 다시 시도해주세요');
       const jsonRaw = JSON.stringify(payload);
-      const json = await encryptBackupJsonV2(jsonRaw, pin);
+      const json = await encryptBackupJsonV2(jsonRaw, passphrase);
       const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
@@ -542,7 +550,16 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
             <TouchableOpacity
               style={[styles.optionCard, stage === 'busy' && styles.disabled]}
-              onPress={() => requestBackupConsent(() => { void handleGdriveBackup(); }, { isGoogleDrive: true })}
+              onPress={() => requestBackupConsent(
+                () => {
+
+                  pendingGdriveRef.current = (pp: string) => { void handleGdriveBackup(pp); };
+                  setPassphraseInput('');
+                  setPassphraseConfirm('');
+                  setPassphraseModalVisible(true);
+                },
+                { isGoogleDrive: true },
+              )}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
@@ -657,6 +674,95 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           }}
         />
       )}
+
+      {}
+      <Modal
+        visible={passphraseModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => {
+          setPassphraseModalVisible(false);
+          setPassphraseInput('');
+          setPassphraseConfirm('');
+          pendingGdriveRef.current = null;
+        }}
+      >
+        <KeyboardAvoidingView
+          style={styles.passphraseOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View style={styles.passphraseCard}>
+            <Text style={styles.passphraseTitle}>
+              {t('screens.walletPrivateKeyGoogleAuth.passphraseModalTitle') || '클라우드 백업 비밀번호 설정'}
+            </Text>
+            <Text style={styles.passphraseWarning}>
+              {t('screens.walletPrivateKeyGoogleAuth.passphraseModalWarning') ||
+                '이 비밀번호를 분실하면 클라우드 백업을 복원할 수 없습니다. 안전한 곳에 따로 보관하세요.'}
+            </Text>
+            <TextInput
+              style={styles.passphraseTextField}
+              placeholder={t('screens.walletPrivateKeyGoogleAuth.passphraseInputPlaceholder') || '비밀번호 (8자 이상)'}
+              secureTextEntry
+              value={passphraseInput}
+              onChangeText={setPassphraseInput}
+              autoCapitalize="none"
+              testID="passphrase-input"
+            />
+            <TextInput
+              style={styles.passphraseTextField}
+              placeholder={t('screens.walletPrivateKeyGoogleAuth.passphraseConfirmPlaceholder') || '비밀번호 확인'}
+              secureTextEntry
+              value={passphraseConfirm}
+              onChangeText={setPassphraseConfirm}
+              autoCapitalize="none"
+              testID="passphrase-confirm"
+            />
+            {passphraseInput.length > 0 && passphraseConfirm.length > 0 && passphraseInput !== passphraseConfirm && (
+              <Text style={styles.passphraseMismatch}>
+                {t('screens.walletPrivateKeyGoogleAuth.passphraseMismatch') || '비밀번호가 일치하지 않습니다.'}
+              </Text>
+            )}
+            <View style={styles.passphraseButtonRow}>
+              <TouchableOpacity
+                style={[styles.passphraseButton, styles.passphraseCancelBtn]}
+                onPress={() => {
+                  setPassphraseModalVisible(false);
+                  setPassphraseInput('');
+                  setPassphraseConfirm('');
+                  pendingGdriveRef.current = null;
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.passphraseCancelText}>
+                  {t('screens.walletPrivateKeyGoogleAuth.cancel') || '취소'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.passphraseButton,
+                  styles.passphraseConfirmBtn,
+                  (passphraseInput.length < 8 || passphraseInput !== passphraseConfirm) && styles.passphraseDisabledBtn,
+                ]}
+                disabled={passphraseInput.length < 8 || passphraseInput !== passphraseConfirm}
+                onPress={() => {
+                  const pp = passphraseInput;
+                  setPassphraseModalVisible(false);
+                  setPassphraseInput('');
+                  setPassphraseConfirm('');
+                  pendingGdriveRef.current?.(pp);
+                  pendingGdriveRef.current = null;
+                }}
+                activeOpacity={0.8}
+                testID="passphrase-submit"
+              >
+                <Text style={styles.passphraseConfirmText}>
+                  {t('screens.walletPrivateKeyGoogleAuth.passphraseSubmit') || '백업하기'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
       {}
       <Modal
@@ -911,6 +1017,81 @@ const styles = StyleSheet.create({
     color: COLORS.darkGray,
     fontFamily: FONTS.medium,
     textDecorationLine: 'underline',
+  },
+
+  passphraseOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
+  },
+  passphraseCard: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 24,
+    paddingBottom: 32,
+    paddingHorizontal: 20,
+  },
+  passphraseTitle: {
+    fontSize: 17,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.titleText,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  passphraseWarning: {
+    fontSize: 13,
+    color: '#cf3a3a',
+    lineHeight: 19,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  passphraseTextField: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    fontSize: 14,
+    marginBottom: 10,
+    color: '#222',
+  },
+  passphraseMismatch: {
+    fontSize: 12,
+    color: '#cf3a3a',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  passphraseButtonRow: {
+    flexDirection: 'row',
+    marginTop: 8,
+    gap: 10,
+  },
+  passphraseButton: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  passphraseCancelBtn: {
+    backgroundColor: '#eeeeee',
+  },
+  passphraseConfirmBtn: {
+    backgroundColor: COLORS.buttonPrimary,
+  },
+  passphraseDisabledBtn: {
+    backgroundColor: '#c5c5c5',
+  },
+  passphraseCancelText: {
+    fontSize: 15,
+    color: '#343434',
+    fontFamily: FONTS.medium,
+  },
+  passphraseConfirmText: {
+    fontSize: 15,
+    color: '#ffffff',
+    fontFamily: FONTS.semiBold,
   },
 
   consentOverlay: {

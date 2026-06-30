@@ -14,13 +14,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { COLORS, FONTS, SIZES } from '../constants';
 import {
-  userHash,
   findEntry,
   findEntriesForUser,
   upsertEntry,
   deobfuscateWithMember,
-  encryptWithPinV2,
   verifyAllWallets,
+  setupPinForUser,
   type WalletKey,
   type VaultEntry,
   type WalletNetwork,
@@ -89,7 +88,6 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
     await new Promise<void>((r) => setTimeout(r, 0));
 
     const targetNetworks: WalletNetwork[] = ['eth', 'pol'];
-    const committedNetworks: WalletNetwork[] = [];
     try {
       const entries = await findEntriesForUser(email, memberId);
 
@@ -99,6 +97,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       });
       if (toCommit.length === 0) throw new Error('no-vault-entry-to-commit');
 
+      const allWalletsForSetup: WalletKey[] = [];
       for (const network of toCommit) {
         const entry = entries[network];
         if (!entry || !entry.c) throw new Error(`vault-entry-missing:${network}`);
@@ -116,17 +115,10 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
         const v = await verifyAllWallets(wallets);
         if (!v.ok) throw new Error(`verify-fail:${network}:${v.failed.join(',')}`);
 
-        const { c: cipher2, iv: iv2 } = await encryptWithPinV2(plaintextJson, pin, email, memberId);
-
-        await upsertEntry({
-          u: userHash(email, memberId, network),
-          c: cipher2,
-          iv: iv2,
-          ver: 2,
-          s: 's1',
-        });
-        committedNetworks.push(network);
+        allWalletsForSetup.push(...wallets);
       }
+
+      await setupPinForUser(allWalletsForSetup, pin, email, memberId);
 
       const PIN_SYNC_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
       const normEmail = (email ?? '').toLowerCase().trim();

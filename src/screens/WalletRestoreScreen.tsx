@@ -7,6 +7,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,6 +32,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   jwtPayloadSub,
   decryptBackupJson,
+  decryptBackupJsonAny,
   restoreBackup,
   restorePlainBackup,
   type BackupPayload,
@@ -65,6 +70,9 @@ export const WalletRestoreScreen = () => {
   const [driveFiles, setDriveFiles] = useState<DriveFile[]>([]);
 
   const [pendingBackup, setPendingBackup] = useState<{ content: string; source: string } | null>(null);
+
+  const [passphraseModalVisible, setPassphraseModalVisible] = useState(false);
+  const [passphraseInput, setPassphraseInput] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -139,31 +147,98 @@ export const WalletRestoreScreen = () => {
       return;
     }
     setPendingBackup({ content, source: sourceLabel });
-    setPinPromptVisible(true);
+    const trimmed = content.trim();
+    if (trimmed.startsWith('bv2:')) {
+
+      setPassphraseInput('');
+      setPassphraseModalVisible(true);
+    } else {
+
+      setPinPromptVisible(true);
+    }
+  };
+
+  const onPassphraseSubmit = () => {
+    if (!pendingBackup || !passphraseInput) return;
+    const { content, source } = pendingBackup;
+    setPendingBackup(null);
+    setPassphraseModalVisible(false);
+    const pp = passphraseInput;
+    setPassphraseInput('');
+    runDecryption(content, source, pp);
+  };
+
+  const onPassphraseCancel = () => {
+    setPassphraseModalVisible(false);
+    setPassphraseInput('');
+    setPendingBackup(null);
+    setStage('options');
   };
 
   const runDecryption = async (
     content: string,
     sourceLabel: string,
-    pinArg: string,
+    secretArg: string,
   ) => {
-    if (memberId == null || !email || !pinArg) {
+    if (memberId == null || !email || !secretArg) {
       await showAlert(t('screens.walletRestore.alerts.errorTitle'), t('screens.walletRestore.alerts.missingAuthInfo'));
       return;
     }
     const trimmed = content.trim();
 
-    if (CIPHER_HEAD_RE.test(trimmed)) {
-
+    if (trimmed.startsWith('bv2:')) {
       let json: string;
       try {
-        json = decryptBackupJson(trimmed, pinArg);
+        json = await decryptBackupJsonAny(trimmed, secretArg);
       } catch {
         await showAlert(t('screens.walletRestore.alerts.decryptFailTitle'), t('screens.walletRestore.alerts.decryptFailPin'));
         return;
       }
+
       if (!json) {
-        await showAlert(t('screens.walletRestore.alerts.decryptFailTitle'), t('screens.walletRestore.alerts.decryptFailGeneric'));
+        await showAlert(
+          t('screens.walletRestore.alerts.decryptFailTitle'),
+          t('screens.walletRestore.alerts.decryptFailPassphrase') ||
+            '잘못된 비밀번호/passphrase 또는 손상된 백업입니다.',
+        );
+        return;
+      }
+      let payload: BackupPayload;
+      try {
+        payload = JSON.parse(json) as BackupPayload;
+      } catch {
+        await showAlert(t('screens.walletRestore.alerts.formatErrorTitle'), t('screens.walletRestore.alerts.jsonParseFail'));
+        return;
+      }
+      const networkCount = payload.entries?.length ?? 0;
+      const dateStr = new Date(payload.exported_at || 0).toLocaleString();
+      const msg = t('screens.walletRestore.alerts.restoreEncryptedTemplate', { date: dateStr, count: networkCount });
+      const ok = await showAlert(t('screens.walletRestore.alerts.restoreTitle'), msg, [
+        { text: t('common.cancel') || '취소' },
+        { text: t('common.confirm') || '복원하기' },
+      ]);
+      if (ok !== 1) return;
+      const result = await restoreBackup(payload, email, memberId, secretArg);
+      showRestoreResult(result.ok, result.imported, result.skipped, result.reason, sourceLabel);
+      return;
+    }
+
+    if (CIPHER_HEAD_RE.test(trimmed)) {
+
+      let json: string;
+      try {
+        json = decryptBackupJson(trimmed, secretArg);
+      } catch {
+        await showAlert(t('screens.walletRestore.alerts.decryptFailTitle'), t('screens.walletRestore.alerts.decryptFailPin'));
+        return;
+      }
+
+      if (!json) {
+        await showAlert(
+          t('screens.walletRestore.alerts.decryptFailTitle'),
+          t('screens.walletRestore.alerts.decryptFailGeneric') ||
+            '잘못된 비밀번호/passphrase 또는 손상된 백업입니다.',
+        );
         return;
       }
       let payload: BackupPayload;
@@ -182,7 +257,7 @@ export const WalletRestoreScreen = () => {
         { text: t('common.confirm') || '복원하기' },
       ]);
       if (ok !== 1) return;
-      const result = await restoreBackup(payload, email, memberId, pinArg);
+      const result = await restoreBackup(payload, email, memberId, secretArg);
       showRestoreResult(result.ok, result.imported, result.skipped, result.reason, sourceLabel);
       return;
     }
@@ -218,7 +293,7 @@ export const WalletRestoreScreen = () => {
           { text: t('common.confirm') || '복원하기' },
         ]);
         if (ok !== 1) return;
-        const result = await restorePlainBackup(plain, email, memberId, pinArg);
+        const result = await restorePlainBackup(plain, email, memberId, secretArg);
         showRestoreResult(
           result.ok,
           result.imported,
@@ -434,10 +509,66 @@ export const WalletRestoreScreen = () => {
     />
   ) : null;
 
+  const passphraseModal = (
+    <Modal
+      visible={passphraseModalVisible}
+      animationType="slide"
+      transparent
+      onRequestClose={onPassphraseCancel}
+    >
+      <KeyboardAvoidingView
+        style={restoreStyles.ppOverlay}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={restoreStyles.ppCard}>
+          <Text style={restoreStyles.ppTitle}>
+            {t('screens.walletRestore.passphraseModalTitle') || '백업 비밀번호 입력'}
+          </Text>
+          <Text style={restoreStyles.ppDesc}>
+            {t('screens.walletRestore.passphraseModalDesc') ||
+              '이 백업은 passphrase로 암호화되어 있습니다. 백업 시 설정한 비밀번호를 입력하세요.'}
+          </Text>
+          <TextInput
+            style={restoreStyles.ppInput}
+            placeholder={t('screens.walletRestore.passphraseInputPlaceholder') || 'passphrase 입력'}
+            secureTextEntry
+            value={passphraseInput}
+            onChangeText={setPassphraseInput}
+            autoCapitalize="none"
+            testID="restore-passphrase-input"
+          />
+          <View style={restoreStyles.ppButtonRow}>
+            <TouchableOpacity
+              style={[restoreStyles.ppButton, restoreStyles.ppCancelBtn]}
+              onPress={onPassphraseCancel}
+              activeOpacity={0.8}
+            >
+              <Text style={restoreStyles.ppCancelText}>{t('common.cancel') || '취소'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                restoreStyles.ppButton,
+                restoreStyles.ppConfirmBtn,
+                !passphraseInput && restoreStyles.ppDisabledBtn,
+              ]}
+              disabled={!passphraseInput}
+              onPress={onPassphraseSubmit}
+              activeOpacity={0.8}
+              testID="restore-passphrase-submit"
+            >
+              <Text style={restoreStyles.ppConfirmText}>{t('common.confirm') || '복원 시작'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+
   if (stage === 'gdrive-list') {
     return (
       <SafeView style={styles.container}>
         {pinModal}
+        {passphraseModal}
         <Header
           title={t('screens.walletRestore.title') || '지갑 복원'}
           onBackPress={() => setStage('options')}
@@ -480,6 +611,7 @@ export const WalletRestoreScreen = () => {
   return (
     <SafeView style={styles.container}>
       {pinModal}
+      {passphraseModal}
       <Header title={t('screens.walletRestore.title') || '지갑 복원'} onBackPress={goBack} showBackButton />
       <SafeScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.heading}>
@@ -495,6 +627,7 @@ export const WalletRestoreScreen = () => {
           activeOpacity={0.85}
           onPress={handleRestoreFromFile}
           disabled={stage === 'busy'}
+          testID="restore-from-file-btn"
         >
           <View style={styles.optionIcon}>
             <Ionicons name="document-outline" size={28} color={COLORS.buttonPrimary} />
@@ -625,4 +758,60 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     textAlign: 'center',
   },
+});
+
+const restoreStyles = StyleSheet.create({
+  ppOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
+  },
+  ppCard: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 24,
+    paddingBottom: 32,
+    paddingHorizontal: 20,
+  },
+  ppTitle: {
+    fontSize: 17,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.titleText,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  ppDesc: {
+    fontSize: 13,
+    color: COLORS.darkGray,
+    lineHeight: 19,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  ppInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    fontSize: 14,
+    marginBottom: 16,
+    color: '#222',
+  },
+  ppButtonRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  ppButton: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ppCancelBtn: { backgroundColor: '#eeeeee' },
+  ppConfirmBtn: { backgroundColor: COLORS.buttonPrimary },
+  ppDisabledBtn: { backgroundColor: '#c5c5c5' },
+  ppCancelText: { fontSize: 15, color: '#343434', fontFamily: FONTS.medium },
+  ppConfirmText: { fontSize: 15, color: '#ffffff', fontFamily: FONTS.semiBold },
 });
