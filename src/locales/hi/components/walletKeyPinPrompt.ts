@@ -8,4 +8,7 @@ export default {
   error: 'गलत PIN। कृपया पुनः प्रयास करें',
   formatError: 'कृपया 6 अंक दर्ज करें',
   cancel: 'रद्द करें',
+  confirmTitle: 'PIN फिर से दर्ज करें',
+  confirmPrompt: 'पुष्टि के लिए वही PIN फिर से दर्ज करें',
+  mismatch: 'PIN मेल नहीं खाते। कृपया फिर से दर्ज करें।',
 };

@@ -60,4 +60,11 @@ export default {
   gdrivePlainSaveFail: 'Google Drive plaintext save failed',
   copyFail: 'Copy failed',
   unknownError: 'Unknown error',
+  passphraseModalTitle: 'Set backup password',
+  passphraseModalWarning: 'This password encrypts your backup file. If you forget it, the backup cannot be restored — keep it somewhere safe.',
+  passphraseInputPlaceholder: 'Enter backup password',
+  passphraseConfirmPlaceholder: 'Re-enter backup password',
+  passphraseTooShort: 'Password must be at least 8 characters.',
+  passphraseMismatch: 'Passwords do not match.',
+  passphraseSubmit: 'Back up',
 };

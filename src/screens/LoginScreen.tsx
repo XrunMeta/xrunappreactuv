@@ -21,7 +21,10 @@ import {
   SafeScrollView,
   SegmentedControl,
   Dialog,
+  WalletKeyPinPromptModal,
 } from '../components';
+import { useLegacyVaultSweep } from '../hooks/useLegacyVaultSweep';
+import { detectLegacyEntries, type WalletKey } from '../services/walletKeyStore';
 import { COLORS, SIZES, COMMON_STYLES, FONTS, IS_DEV_MODE } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { setAyetUserId } from '../services/ayet';
@@ -89,6 +92,43 @@ export const LoginScreen = () => {
   const [appleLoginData, setAppleLoginData] = useState<any>(null);
   const [isLinkingLoading, setIsLinkingLoading] = useState(false);
   const [successDialogVisible, setSuccessDialogVisible] = useState(false);
+
+  const [didJustLogin, setDidJustLogin] = useState(false);
+  const { needsPinUpgrade } = useLegacyVaultSweep(didJustLogin, emailForUpgrade, memberIdForUpgrade ?? 0);
+  const [memberIdForUpgrade, setMemberIdForUpgrade] = useState<number | null>(null);
+  const [emailForUpgrade, setEmailForUpgrade] = useState('');
+  const [pinUpgradeVisible, setPinUpgradeVisible] = useState(false);
+
+  React.useEffect(() => {
+    if (needsPinUpgrade && didJustLogin) setPinUpgradeVisible(true);
+  }, [needsPinUpgrade, didJustLogin]);
+
+  const handleLoginSuccess = async (mid: number, userEmail: string) => {
+    const normEmail = userEmail.toLowerCase().trim();
+    setMemberIdForUpgrade(mid);
+    setEmailForUpgrade(normEmail);
+    setDidJustLogin(true); 
+
+    const legacy = await detectLegacyEntries(normEmail, mid);
+    if (legacy) {
+      setPinUpgradeVisible(true); 
+    } else {
+      navigate(ROUTES.map);
+    }
+  };
+
+  const onPinUpgradeSuccess = (_w: WalletKey[], _p: string) => {
+    setPinUpgradeVisible(false);
+    setDidJustLogin(false);
+    navigate(ROUTES.map);
+  };
+
+  const onPinUpgradeCancel = () => {
+
+    setPinUpgradeVisible(false);
+    setDidJustLogin(false);
+    navigate(ROUTES.map);
+  };
 
   const emailVerificationRoute: any = ROUTES.emailVerification;
 
@@ -309,7 +349,7 @@ export const LoginScreen = () => {
         registerPushToken(userData.member, navigate).catch(() => {});
       }
 
-      navigate(ROUTES.map);
+      await handleLoginSuccess(userData.member, email.trim());
     } catch (error) {
       console.error('[로그인] 로그인 오류:', error);
       await showAlert(
@@ -406,6 +446,11 @@ export const LoginScreen = () => {
       console.log('[계정 연동] 로그인 상태 유지 저장 완료');
 
       console.log('[계정 연동] 완료 및 로그인 성공');
+
+      const effectiveMemberId: number = memberId ?? 0;
+      const effectiveEmail: string = (userEmail).toLowerCase().trim();
+      setMemberIdForUpgrade(effectiveMemberId);
+      setEmailForUpgrade(effectiveEmail);
 
       setLinkingDialogVisible(false);
 
@@ -552,7 +597,7 @@ export const LoginScreen = () => {
       }
 
       console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
-      navigate(ROUTES.map);
+      await handleLoginSuccess(memberId, email);
     } catch (error: any) {
       console.error('[구글 로그인] 오류:', error);
 
@@ -722,7 +767,7 @@ export const LoginScreen = () => {
       }
 
       console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
-      navigate(ROUTES.map);
+      await handleLoginSuccess(memberId, email);
     } catch (error: any) {
       console.error('[애플 로그인] 오류:', error);
       await showAlert(
@@ -967,16 +1012,26 @@ ${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
       <Dialog
         visible={successDialogVisible}
         title={t('screens.login.linkComplete')}
-        onClose={() => {
+        onClose={async () => {
           setSuccessDialogVisible(false);
-          navigate(ROUTES.map);
+
+          if (memberIdForUpgrade != null) {
+            await handleLoginSuccess(memberIdForUpgrade, emailForUpgrade);
+          } else {
+            navigate(ROUTES.map);
+          }
         }}
         actions={[
           {
             label: t('common.buttons.confirm') || '확인',
-            onPress: () => {
+            onPress: async () => {
               setSuccessDialogVisible(false);
-              navigate(ROUTES.map);
+
+              if (memberIdForUpgrade != null) {
+                await handleLoginSuccess(memberIdForUpgrade, emailForUpgrade);
+              } else {
+                navigate(ROUTES.map);
+              }
             },
             variant: 'primary',
           },
@@ -988,6 +1043,17 @@ ${linkingType === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
           </Text>
         </View>
       </Dialog>
+
+      {}
+      {memberIdForUpgrade != null && emailForUpgrade !== '' && (
+        <WalletKeyPinPromptModal
+          visible={pinUpgradeVisible}
+          memberId={memberIdForUpgrade}
+          email={emailForUpgrade}
+          onSuccess={onPinUpgradeSuccess}
+          onCancel={onPinUpgradeCancel}
+        />
+      )}
 
     </View>
   );

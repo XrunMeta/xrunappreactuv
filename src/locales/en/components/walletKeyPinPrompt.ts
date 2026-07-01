@@ -8,4 +8,7 @@ export default {
   error: 'Wrong PIN. Please try again',
   formatError: 'Please enter 6 digits',
   cancel: 'Cancel',
+  confirmTitle: 'Re-enter PIN',
+  confirmPrompt: 'Enter the same PIN once more to confirm',
+  mismatch: 'PINs do not match. Please try again.',
 };

@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CryptoJS from 'crypto-js';
 import * as secp from '@noble/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
+import { deriveScryptKey, randomIvHex, hexToWordArray } from './cryptoPrimitives';
+import { getOrCreateKek, loadKek } from './walletKek';
 
 export interface WalletKey {
   wallet_code: string;
@@ -19,6 +21,8 @@ export interface VaultEntry {
   c: string;        
   h?: string;       
   s: 's0' | 's1';   
+  ver?: 1 | 2;      
+  iv?: string;      
   b?: string;       
 
   a?: string;
@@ -164,7 +168,82 @@ export function pinVerifyHash(pin: string, email: string, member: number): strin
   return hash.toString(); 
 }
 
-async function deriveEvmAddress(privateKeyHex: string): Promise<string> {
+export function pinSaltHex(email: string, member: number): string {
+  return CryptoJS.SHA256(normEmail(email) + ':' + String(member)).toString();
+}
+
+export async function encryptWithPinV2(
+  plaintextJson: string,
+  pin: string,
+  email: string,
+  member: number,
+): Promise<{ c: string; iv: string }> {
+
+  const dk = await deriveScryptKey(pin, pinSaltHex(email, member));
+  const ivInnerHex = randomIvHex();
+  const inner = CryptoJS.AES.encrypt(plaintextJson, dk, {
+    iv: hexToWordArray(ivInnerHex),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  }).toString(); 
+
+  const kek = await getOrCreateKek();
+  const ivOuterHex = randomIvHex();
+  const outer = CryptoJS.AES.encrypt(inner, kek, {
+    iv: hexToWordArray(ivOuterHex),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  }).toString(); 
+
+  return { c: `${ivOuterHex}:${outer}`, iv: ivInnerHex };
+}
+
+export async function decryptEntry(
+  entry: VaultEntry,
+  pin: string,
+  email: string,
+  member: number,
+): Promise<string> {
+  if (entry.ver === 2) {
+    const kek = await loadKek();
+    if (!kek) throw new Error('kek-missing');
+
+    const sep = entry.c.indexOf(':');
+    if (sep < 0 || sep !== 32) return '';
+
+    if (!entry.iv || entry.iv.length !== 32) return '';
+
+    const ivOuterHex = entry.c.slice(0, sep);
+    const outerCipher = entry.c.slice(sep + 1);
+
+    let inner: string;
+    try {
+      inner = CryptoJS.AES.decrypt(outerCipher, kek, {
+        iv: hexToWordArray(ivOuterHex),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }).toString(CryptoJS.enc.Utf8);
+    } catch {
+      return '';
+    }
+    if (!inner) return '';
+
+    const dk = await deriveScryptKey(pin, pinSaltHex(email, member));
+    try {
+      return CryptoJS.AES.decrypt(inner, dk, {
+        iv: hexToWordArray(entry.iv),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }).toString(CryptoJS.enc.Utf8);
+    } catch {
+      return '';
+    }
+  }
+
+  return decryptWithPin(entry.c, pin, email, member);
+}
+
+export async function deriveEvmAddress(privateKeyHex: string): Promise<string> {
 
   const pkHex = privateKeyHex.startsWith('0x')
     ? privateKeyHex.slice(2)
@@ -281,6 +360,8 @@ export async function upsertEntry(entry: VaultEntry): Promise<void> {
       u: entry.u,
       c: entry.c,
       s: entry.s,
+      ...(entry.ver !== undefined ? { ver: entry.ver } : {}),
+      ...(entry.iv !== undefined ? { iv: entry.iv } : {}),
       ...(entry.h ? { h: entry.h } : {}),
       ...(entry.b ? { b: entry.b } : {}),
       ...randomDecoys(),
@@ -308,6 +389,8 @@ export async function upsertEntryIfNotS1(entry: VaultEntry): Promise<{ applied: 
       u: entry.u,
       c: entry.c,
       s: entry.s,
+      ...(entry.ver !== undefined ? { ver: entry.ver } : {}),
+      ...(entry.iv !== undefined ? { iv: entry.iv } : {}),
       ...(entry.h ?? existingH ? { h: entry.h ?? existingH! } : {}),
       ...randomDecoys(),
     };
@@ -329,7 +412,7 @@ export async function unlockUserWallets(
 
   const cached = tryGetCachedWallets(email, member, pin);
   if (cached) {
-    console.log('[unlockUserWallets] 세션 캐시 hit — PBKDF2 우회');
+    console.log('[unlockUserWallets] 세션 캐시 hit — scrypt 우회');
     return { ok: true, wallets: cached };
   }
 
@@ -340,40 +423,39 @@ export async function unlockUserWallets(
   const candidates = targets.filter((n) => entries[n] !== null);
   if (candidates.length === 0) return { ok: false, reason: 'no-entries' };
 
-  const expectedHash = pinVerifyHash(pin, email, member);
-
   for (const network of candidates) {
     const entry = entries[network]!;
-    if (entry.s !== 's1' || !entry.h) {
+    if (entry.s !== 's1') {
       return { ok: false, reason: `${network}:not-set-up` };
-    }
-
-    if (entry.h !== expectedHash) {
-      return { ok: false, reason: 'wrong-pin' };
     }
 
     let plaintext: string;
     try {
-      plaintext = decryptWithPin(entry.c, pin, email, member);
-    } catch {
+      plaintext = await decryptEntry(entry, pin, email, member);
+    } catch (e) {
+      if ((e as Error).message === 'kek-missing') return { ok: false, reason: 'kek-missing' };
       return { ok: false, reason: `${network}:decrypt-error` };
     }
-    if (!plaintext) return { ok: false, reason: `${network}:decrypt-empty` };
+    if (!plaintext) return { ok: false, reason: 'wrong-pin' };
 
     let wallets: WalletKey[];
     try {
       wallets = JSON.parse(plaintext);
     } catch {
-      return { ok: false, reason: `${network}:json-parse-fail` };
+      return { ok: false, reason: 'wrong-pin' };
     }
     if (!Array.isArray(wallets) || wallets.length === 0) {
-      return { ok: false, reason: `${network}:empty-array` };
+      return { ok: false, reason: 'wrong-pin' };
     }
 
     const v = await verifyAllWallets(wallets);
-    if (!v.ok) {
-      return { ok: false, reason: `${network}:verify-fail:${v.failed.join(',')}` };
+    if (!v.ok) return { ok: false, reason: 'wrong-pin' };
+
+    if (entry.ver !== 2) {
+      const { c, iv } = await encryptWithPinV2(JSON.stringify(wallets), pin, email, member);
+      await upsertEntry({ u: entry.u, c, iv, ver: 2, s: 's1' });
     }
+
     allWallets.push(...wallets);
   }
 
@@ -463,13 +545,16 @@ function tryGetCachedWallets(email: string, member: number, pin: string): Wallet
 
 export interface BackupEntry {
   network: WalletNetwork;
-  c: string;     
-  h: string;     
-  s: 's1';       
+  wallets?: WalletKey[];   
+  c?: string;              
+  h?: string;              
+  s: 's1';                 
+  ver?: 1 | 2;            
+  iv?: string;            
 }
 
 export interface BackupPayload {
-  v: 1;
+  v: 1 | 2;
   hash: string;         
   email: string;        
   entries: BackupEntry[];
@@ -479,18 +564,43 @@ export interface BackupPayload {
 export async function exportBackup(
   email: string,
   member: number,
+  pin: string,
 ): Promise<BackupPayload | null> {
   const entries = await findEntriesForUser(email, member);
   const result: BackupEntry[] = [];
   for (const network of ['eth', 'pol'] as const) {
     const e = entries[network];
-    if (!e || e.s !== 's1' || !e.h) continue;
-    result.push({ network, c: e.c, h: e.h, s: 's1' });
+    if (!e || e.s !== 's1') continue;
+
+    let plaintext: string;
+    try {
+      if (e.ver === 2) {
+
+        plaintext = await decryptEntry(e, pin, email, member);
+      } else {
+
+        plaintext = decryptWithPin(e.c, pin, email, member);
+      }
+    } catch {
+
+      continue;
+    }
+    if (!plaintext) continue;
+
+    let wallets: WalletKey[];
+    try {
+      wallets = JSON.parse(plaintext);
+    } catch {
+      continue;
+    }
+    if (!Array.isArray(wallets) || wallets.length === 0) continue;
+
+    result.push({ network, wallets, s: 's1' });
   }
   if (result.length === 0) return null;
   const normalized = normEmail(email);
   return {
-    v: 1,
+    v: 2,
     hash: CryptoJS.SHA256(normalized).toString(),
     email: normalized,
     entries: result,
@@ -520,6 +630,47 @@ export function encryptBackupJson(json: string, pin: string): string {
   return `${ivHex}:${cipher.toString()}`;
 }
 
+export async function encryptBackupJsonV2(json: string, secret: string): Promise<string> {
+  const saltHex = randomIvHex() + randomIvHex(); 
+  const ivHex = randomIvHex();                   
+  const key = await deriveScryptKey(secret, saltHex);
+  const cipher = CryptoJS.AES.encrypt(json, key, {
+    iv: hexToWordArray(ivHex),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  }).toString();
+  return `bv2:${saltHex}:${ivHex}:${cipher}`;
+}
+
+export async function decryptBackupJsonAny(encrypted: string, secret: string): Promise<string> {
+  if (encrypted.startsWith('bv2:')) {
+
+    const rest = encrypted.slice(4); 
+    const sep1 = rest.indexOf(':');
+    if (sep1 < 0) return ''; 
+    const saltHex = rest.slice(0, sep1);
+    const afterSalt = rest.slice(sep1 + 1);
+    const sep2 = afterSalt.indexOf(':');
+    if (sep2 < 0) return ''; 
+    const ivHex = afterSalt.slice(0, sep2);
+    const cipher = afterSalt.slice(sep2 + 1);
+
+    if (saltHex.length !== 64 || ivHex.length !== 32 || !cipher) return '';
+    const key = await deriveScryptKey(secret, saltHex);
+    try {
+      return CryptoJS.AES.decrypt(cipher, key, {
+        iv: hexToWordArray(ivHex),
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }).toString(CryptoJS.enc.Utf8);
+    } catch {
+
+      return '';
+    }
+  }
+  return decryptBackupJson(encrypted, secret); 
+}
+
 export function decryptBackupJson(encrypted: string, pin: string): string {
   const idx = encrypted.indexOf(':');
   if (idx <= 0) throw new Error('invalid backup format');
@@ -547,9 +698,12 @@ export async function restoreBackup(
   payload: BackupPayload,
   email: string,
   member: number,
-  pin: string,
+  decryptSecret: string,
+  vaultPin?: string,
 ): Promise<RestoreResult> {
-  if (payload.v !== 1) {
+
+  const effectiveVaultPin = vaultPin ?? decryptSecret;
+  if (payload.v !== 1 && payload.v !== 2) {
     return { ok: false, imported: [], skipped: [], reason: 'invalid-version' };
   }
   if (!Array.isArray(payload.entries) || payload.entries.length === 0) {
@@ -563,7 +717,6 @@ export async function restoreBackup(
   if (payload.hash !== expectedHash) {
     return { ok: false, imported: [], skipped: [], reason: 'hash-mismatch' };
   }
-  const expectedH = pinVerifyHash(pin, email, member);
 
   const imported: WalletNetwork[] = [];
   const skipped: { network: string; reason: string }[] = [];
@@ -573,48 +726,91 @@ export async function restoreBackup(
       skipped.push({ network: String(e.network), reason: 'unknown-network' });
       continue;
     }
-    if (e.s !== 's1' || !e.c || !e.h) {
+    if (e.s !== 's1') {
       skipped.push({ network: e.network, reason: 'malformed' });
       continue;
     }
-    if (e.h !== expectedH) {
-      skipped.push({ network: e.network, reason: 'wrong-pin' });
-      continue;
+
+    if (payload.v === 2) {
+
+      if (!e.wallets || !Array.isArray(e.wallets) || e.wallets.length === 0) {
+        skipped.push({ network: e.network, reason: 'malformed-v2-no-wallets' });
+        continue;
+      }
+      const v = await verifyAllWallets(e.wallets);
+      if (!v.ok) {
+        skipped.push({ network: e.network, reason: `verify-fail:${v.failed.join(',')}` });
+        continue;
+      }
+
+      const { c: newC, iv: newIv } = await encryptWithPinV2(
+        JSON.stringify(e.wallets),
+        effectiveVaultPin,
+        email,
+        member,
+      );
+      await upsertEntry({
+        u: userHash(email, member, e.network),
+        c: newC,
+        iv: newIv,
+        ver: 2,
+        s: 's1',
+      });
+      imported.push(e.network);
+    } else {
+
+      if (!e.c) {
+        skipped.push({ network: e.network, reason: 'malformed' });
+        continue;
+      }
+      if (!e.h) {
+        skipped.push({ network: e.network, reason: 'malformed-v1-no-h' });
+        continue;
+      }
+
+      const expectedH = pinVerifyHash(decryptSecret, email, member);
+      if (e.h !== expectedH) {
+        skipped.push({ network: e.network, reason: 'wrong-pin' });
+        continue;
+      }
+      let plaintext: string;
+      try {
+        plaintext = decryptWithPin(e.c, decryptSecret, email, member);
+      } catch {
+        skipped.push({ network: e.network, reason: 'decrypt-error' });
+        continue;
+      }
+      if (!plaintext) {
+        skipped.push({ network: e.network, reason: 'decrypt-empty' });
+        continue;
+      }
+      let wallets: WalletKey[];
+      try {
+        wallets = JSON.parse(plaintext);
+      } catch {
+        skipped.push({ network: e.network, reason: 'json-parse-fail' });
+        continue;
+      }
+      if (!Array.isArray(wallets) || wallets.length === 0) {
+        skipped.push({ network: e.network, reason: 'empty-array' });
+        continue;
+      }
+      const v = await verifyAllWallets(wallets);
+      if (!v.ok) {
+        skipped.push({ network: e.network, reason: `verify-fail:${v.failed.join(',')}` });
+        continue;
+      }
+
+      const { c: newC, iv: newIv } = await encryptWithPinV2(plaintext, effectiveVaultPin, email, member);
+      await upsertEntry({
+        u: userHash(email, member, e.network),
+        c: newC,
+        iv: newIv,
+        ver: 2,
+        s: 's1',
+      });
+      imported.push(e.network);
     }
-    let plaintext: string;
-    try {
-      plaintext = decryptWithPin(e.c, pin, email, member);
-    } catch {
-      skipped.push({ network: e.network, reason: 'decrypt-error' });
-      continue;
-    }
-    if (!plaintext) {
-      skipped.push({ network: e.network, reason: 'decrypt-empty' });
-      continue;
-    }
-    let wallets: WalletKey[];
-    try {
-      wallets = JSON.parse(plaintext);
-    } catch {
-      skipped.push({ network: e.network, reason: 'json-parse-fail' });
-      continue;
-    }
-    if (!Array.isArray(wallets) || wallets.length === 0) {
-      skipped.push({ network: e.network, reason: 'empty-array' });
-      continue;
-    }
-    const v = await verifyAllWallets(wallets);
-    if (!v.ok) {
-      skipped.push({ network: e.network, reason: `verify-fail:${v.failed.join(',')}` });
-      continue;
-    }
-    await upsertEntry({
-      u: userHash(email, member, e.network),
-      c: e.c,
-      h: e.h,
-      s: 's1',
-    });
-    imported.push(e.network);
   }
 
   return {
@@ -635,6 +831,24 @@ export interface PlainBackupPayload {
     private_key: string;     
   }>;
   exported_at: number;
+}
+
+export async function setupPinForUser(
+  wallets: WalletKey[],
+  pin: string,
+  email: string,
+  member: number,
+): Promise<void> {
+  const grouped: Partial<Record<WalletNetwork, WalletKey[]>> = {};
+  for (const w of wallets) {
+    const net = NETWORK_MAP[w.wallet_code];
+    if (!net) continue;
+    (grouped[net] ??= []).push(w);
+  }
+  for (const [network, group] of Object.entries(grouped) as [WalletNetwork, WalletKey[]][]) {
+    const { c, iv } = await encryptWithPinV2(JSON.stringify(group), pin, email, member);
+    await upsertEntry({ u: userHash(email, member, network), c, iv, ver: 2, s: 's1' });
+  }
 }
 
 export interface RestorePlainResult {
@@ -698,12 +912,12 @@ export async function restorePlainBackup(
       continue;
     }
     const plaintext = JSON.stringify(wallets);
-    const cipher = encryptWithPin(plaintext, pin, email, member);
-    const h = pinVerifyHash(pin, email, member);
+    const { c, iv } = await encryptWithPinV2(plaintext, pin, email, member);
     await upsertEntry({
       u: userHash(email, member, network),
-      c: cipher,
-      h,
+      c,
+      iv,
+      ver: 2,
       s: 's1',
     });
     imported.push(network);
@@ -801,4 +1015,9 @@ export async function upsertAvailability(
     }
     await writeAvailability(list);
   });
+}
+
+export async function detectLegacyEntries(email: string, member: number): Promise<boolean> {
+  const { eth, pol } = await findEntriesForUser(email, member);
+  return [eth, pol].some((e) => e !== null && e.s === 's1' && e.ver !== 2);
 }

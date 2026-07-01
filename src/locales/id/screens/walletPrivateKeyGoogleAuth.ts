@@ -60,4 +60,11 @@ export default {
   gdrivePlainSaveFail: 'Penyimpanan teks biasa Google Drive gagal',
   copyFail: 'Salin gagal',
   unknownError: 'Kesalahan tidak diketahui',
+  passphraseModalTitle: 'Atur kata sandi cadangan',
+  passphraseModalWarning: 'Kata sandi ini akan mengenkripsi file cadangan Anda. Jika Anda lupa kata sandi, pemulihan tidak dapat dilakukan, jadi simpan dengan aman.',
+  passphraseInputPlaceholder: 'Masukkan kata sandi cadangan',
+  passphraseConfirmPlaceholder: 'Masukkan ulang kata sandi cadangan',
+  passphraseTooShort: 'Kata sandi harus minimal 8 karakter.',
+  passphraseMismatch: 'Kata sandi tidak cocok.',
+  passphraseSubmit: 'Cadangkan',
 };

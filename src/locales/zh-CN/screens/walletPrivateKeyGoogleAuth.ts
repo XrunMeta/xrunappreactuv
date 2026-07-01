@@ -60,4 +60,11 @@ export default {
   gdrivePlainSaveFail: 'Google Drive 明文保存失败',
   copyFail: '复制失败',
   unknownError: '未知错误',
+  passphraseModalTitle: '设置备份密码',
+  passphraseModalWarning: '此密码将用于加密备份文件。如果忘记密码将无法恢复，请妥善保管。',
+  passphraseInputPlaceholder: '输入备份密码',
+  passphraseConfirmPlaceholder: '再次输入备份密码',
+  passphraseTooShort: '密码必须至少8个字符。',
+  passphraseMismatch: '密码不匹配。',
+  passphraseSubmit: '备份',
 };

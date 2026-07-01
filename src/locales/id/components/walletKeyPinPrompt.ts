@@ -8,4 +8,7 @@ export default {
   error: 'PIN salah. Silakan coba lagi',
   formatError: 'Silakan masukkan 6 digit',
   cancel: 'Batal',
+  confirmTitle: 'Masukkan Ulang PIN',
+  confirmPrompt: 'Masukkan PIN yang sama sekali lagi untuk konfirmasi',
+  mismatch: 'PIN tidak cocok. Silakan coba lagi.',
 };

@@ -60,4 +60,11 @@ export default {
   gdrivePlainSaveFail: 'Lưu văn bản thuần Google Drive thất bại',
   copyFail: 'Sao chép thất bại',
   unknownError: 'Lỗi không xác định',
+  passphraseModalTitle: 'Đặt mật khẩu sao lưu',
+  passphraseModalWarning: 'Mật khẩu này sẽ mã hóa tệp sao lưu của bạn. Nếu quên mật khẩu, bạn sẽ không thể khôi phục, vì vậy hãy lưu giữ an toàn.',
+  passphraseInputPlaceholder: 'Nhập mật khẩu sao lưu',
+  passphraseConfirmPlaceholder: 'Nhập lại mật khẩu sao lưu',
+  passphraseTooShort: 'Mật khẩu phải có ít nhất 8 ký tự.',
+  passphraseMismatch: 'Mật khẩu không khớp.',
+  passphraseSubmit: 'Sao lưu',
 };
