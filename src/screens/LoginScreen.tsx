@@ -21,7 +21,10 @@ import {
   v_570c34,
   v_b34ce5,
   v_c2fdd1,
+  v_f9f38e,
 } from '../components';
+import { v_f799e3 } from '../hooks/useLegacyVaultSweep';
+import { v_cdaed9, type v_b9a3bd } from '../services/walletKeyStore';
 import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035, v_731ab4 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_e8d7c0 } from '../services/ayet';
@@ -89,6 +92,43 @@ export const v_f4f851 = () => {
   const [v_1ba8b3, v_36dc47] = v_5ab095<any>(null);
   const [v_784d4b, v_3cf566] = v_5ab095(false);
   const [v_381ed1, v_361e20] = v_5ab095(false);
+
+  const [v_014952, v_faee70] = v_5ab095(false);
+  const { needsPinUpgrade: v_de8f06 } = v_f799e3(v_014952, v_55f663, v_9e80fd ?? 0);
+  const [v_9e80fd, v_23fcdd] = v_5ab095<number | null>(null);
+  const [v_55f663, v_edcc4f] = v_5ab095('');
+  const [v_e8e4ec, v_8f9fa0] = v_5ab095(false);
+
+  v_a3453e.useEffect(() => {
+    if (v_de8f06 && v_014952) v_8f9fa0(true);
+  }, [v_de8f06, v_014952]);
+
+  const v_211c2c = async (v_73ad51, v_f4fb5e) => {
+    const v_dabeaa = v_f4fb5e.toLowerCase().trim();
+    v_23fcdd(v_73ad51);
+    v_edcc4f(v_dabeaa);
+    v_faee70(true); 
+
+    const v_66ed66 = await v_cdaed9(v_dabeaa, v_73ad51);
+    if (v_66ed66) {
+      v_8f9fa0(true); 
+    } else {
+      v_9b57fc(v_ce4741.map);
+    }
+  };
+
+  const v_dfccda = (_w: v_b9a3bd[], v_2d3e87) => {
+    v_8f9fa0(false);
+    v_faee70(false);
+    v_9b57fc(v_ce4741.map);
+  };
+
+  const v_d6ca4c = () => {
+
+    v_8f9fa0(false);
+    v_faee70(false);
+    v_9b57fc(v_ce4741.map);
+  };
 
   const v_0d972d = v_ce4741.emailVerification;
 
@@ -309,7 +349,7 @@ export const v_f4f851 = () => {
         v_cec605(v_ef7306.member, v_9b57fc).catch(() => {});
       }
 
-      v_9b57fc(v_ce4741.map);
+      await v_211c2c(v_ef7306.member, v_e0c7e8.trim());
     } catch (v_5e9bfe) {
       console.error('[로그인] 로그인 오류:', v_5e9bfe);
       await v_889fad(
@@ -406,6 +446,11 @@ export const v_f4f851 = () => {
       console.log('[계정 연동] 로그인 상태 유지 저장 완료');
 
       console.log('[계정 연동] 완료 및 로그인 성공');
+
+      const v_492b89 = v_717992 ?? 0;
+      const v_26b830 = (v_f4fb5e).toLowerCase().trim();
+      v_23fcdd(v_492b89);
+      v_edcc4f(v_26b830);
 
       v_29378d(false);
 
@@ -552,7 +597,7 @@ export const v_f4f851 = () => {
       }
 
       console.log('[구글 로그인] 기존 사용자, 메인 화면으로 이동');
-      v_9b57fc(v_ce4741.map);
+      await v_211c2c(v_717992, v_e0c7e8);
     } catch (v_5e9bfe) {
       console.error('[구글 로그인] 오류:', v_5e9bfe);
 
@@ -722,7 +767,7 @@ export const v_f4f851 = () => {
       }
 
       console.log('[애플 로그인] 기존 사용자, 메인 화면으로 이동');
-      v_9b57fc(v_ce4741.map);
+      await v_211c2c(v_717992, v_e0c7e8);
     } catch (v_5e9bfe) {
       console.error('[애플 로그인] 오류:', v_5e9bfe);
       await v_889fad(
@@ -967,16 +1012,26 @@ ${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
       <Dialog
         visible={v_381ed1}
         title={v_8d41d7('screens.login.linkComplete')}
-        onClose={() => {
+        onClose={async () => {
           v_361e20(false);
-          v_9b57fc(v_ce4741.map);
+
+          if (v_9e80fd != null) {
+            await v_211c2c(v_9e80fd, v_55f663);
+          } else {
+            v_9b57fc(v_ce4741.map);
+          }
         }}
         actions={[
           {
             label: v_8d41d7('common.buttons.confirm') || '확인',
-            onPress: () => {
+            onPress: async () => {
               v_361e20(false);
-              v_9b57fc(v_ce4741.map);
+
+              if (v_9e80fd != null) {
+                await v_211c2c(v_9e80fd, v_55f663);
+              } else {
+                v_9b57fc(v_ce4741.map);
+              }
             },
             variant: 'primary',
           },
@@ -988,6 +1043,17 @@ ${v_2156ca === 'google' ? '구글' : '애플'} 계정과 xrun계정`}
           </Text>
         </View>
       </Dialog>
+
+      {}
+      {v_9e80fd != null && v_55f663 !== '' && (
+        <WalletKeyPinPromptModal
+          visible={v_e8e4ec}
+          memberId={v_9e80fd}
+          email={v_55f663}
+          onSuccess={v_dfccda}
+          onCancel={v_d6ca4c}
+        />
+      )}
 
     </View>
   );
