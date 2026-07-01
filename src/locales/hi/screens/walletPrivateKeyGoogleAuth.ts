@@ -60,4 +60,11 @@ export default {
   gdrivePlainSaveFail: 'Google Drive सादा सहेजने में विफल',
   copyFail: 'कॉपी विफल',
   unknownError: 'अज्ञात त्रुटि',
+  passphraseModalTitle: 'बैकअप पासवर्ड सेट करें',
+  passphraseModalWarning: 'यह पासवर्ड आपकी बैकअप फ़ाइल को एन्क्रिप्ट करेगा। पासवर्ड भूलने पर पुनर्स्थापना संभव नहीं होगी, इसे सुरक्षित रखें।',
+  passphraseInputPlaceholder: 'बैकअप पासवर्ड दर्ज करें',
+  passphraseConfirmPlaceholder: 'बैकअप पासवर्ड पुनः दर्ज करें',
+  passphraseTooShort: 'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।',
+  passphraseMismatch: 'पासवर्ड मेल नहीं खाते।',
+  passphraseSubmit: 'बैकअप करें',
 };

@@ -33,9 +33,11 @@ interface Props {
   titleOverride?: string;
 
   descriptionOverride?: string;
+
+  requireConfirm?: boolean;
 }
 
-type Step = 'enter' | 'verifying' | 'processing' | 'error';
+type Step = 'enter' | 'confirm' | 'verifying' | 'processing' | 'error';
 
 export const WalletKeyPinPromptModal: React.FC<Props> = ({
   memberId,
@@ -47,23 +49,43 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
   processingLabel,
   titleOverride,
   descriptionOverride,
+  requireConfirm = false,
 }) => {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>('enter');
   const [pin, setPin] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [firstPin, setFirstPin] = useState(''); 
 
   useEffect(() => {
     if (visible) {
       setStep('enter');
       setPin('');
+      setFirstPin('');
       setErrorMsg('');
     }
   }, [visible]);
 
   useEffect(() => {
-    if ((step === 'enter' || step === 'error') && pin.length === 6) {
-      handleVerify(pin);
+    if (pin.length !== 6) return;
+    if (step === 'enter' || step === 'error') {
+      if (requireConfirm) {
+        setFirstPin(pin);
+        setPin('');
+        setErrorMsg('');
+        setStep('confirm');
+      } else {
+        handleVerify(pin);
+      }
+    } else if (step === 'confirm') {
+      if (pin === firstPin) {
+        handleVerify(pin);
+      } else {
+        setErrorMsg(t('components.walletKeyPinPrompt.mismatch') || 'PIN 이 일치하지 않아요. 다시 입력해주세요.');
+        setPin('');
+        setFirstPin('');
+        setStep('error');
+      }
     }
 
   }, [pin, step]);
@@ -115,7 +137,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
     if (step === 'error') {
       setStep('enter');
       setErrorMsg('');
-    } else if (step !== 'enter') return;
+    } else if (step !== 'enter' && step !== 'confirm') return;
     if (pin.length >= 6) return;
     setPin(pin + d);
   };
@@ -126,12 +148,12 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
       setErrorMsg('');
       return;
     }
-    if (step !== 'enter') return;
+    if (step !== 'enter' && step !== 'confirm') return;
     if (pin.length === 0) return;
     setPin(pin.slice(0, -1));
   };
 
-  const isInputStep = step === 'enter' || step === 'error';
+  const isInputStep = step === 'enter' || step === 'error' || step === 'confirm';
 
   return (
     <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onCancel}>
@@ -149,7 +171,11 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
         {}
         <View style={styles.centerBlock}>
           {}
-          <Text style={styles.title}>{titleOverride ?? t('components.walletKeyPinPrompt.title')}</Text>
+          <Text style={styles.title}>
+            {step === 'confirm'
+              ? (t('components.walletKeyPinPrompt.confirmTitle') || 'PIN 다시 입력')
+              : (titleOverride ?? t('components.walletKeyPinPrompt.title'))}
+          </Text>
 
           {}
           <Text style={styles.warning}>
@@ -159,6 +185,11 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
           {}
           {step === 'enter' && (
             <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.enterPrompt')}</Text>
+          )}
+          {step === 'confirm' && (
+            <Text style={styles.prompt}>
+              {t('components.walletKeyPinPrompt.confirmPrompt') || '확인을 위해 같은 PIN 을 한 번 더 입력해주세요'}
+            </Text>
           )}
           {step === 'verifying' && (
             <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.verifying')}</Text>

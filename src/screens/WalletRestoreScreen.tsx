@@ -42,6 +42,20 @@ import {
 
 type Stage = 'loading' | 'pin' | 'options' | 'busy' | 'gdrive-list';
 
+function formatBackupDate(ms: number | string | undefined): string {
+  const d = new Date(ms || 0);
+  if (isNaN(d.getTime())) return '';
+  try {
+    const s = d.toLocaleString(undefined, {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+    });
+    if (s && !/invalid/i.test(s)) return s;
+  } catch {  }
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 const NETWORK_LABEL: Record<string, string> = {
   eth: 'Ethereum',
   pol: 'Polygon',
@@ -235,7 +249,7 @@ export const WalletRestoreScreen = () => {
     }
 
     const networkCount = payload.entries?.length ?? 0;
-    const dateStr = new Date(payload.exported_at || 0).toLocaleString();
+    const dateStr = formatBackupDate(payload.exported_at);
     const msg = t('screens.walletRestore.alerts.restoreEncryptedTemplate', { date: dateStr, count: networkCount });
     const okIdx = await showAlert(t('screens.walletRestore.alerts.restoreTitle'), msg, [
       { text: t('common.cancel') || '취소' },
@@ -300,7 +314,7 @@ export const WalletRestoreScreen = () => {
       }
 
       const networkCount = payload.entries?.length ?? 0;
-      const dateStr = new Date(payload.exported_at || 0).toLocaleString();
+      const dateStr = formatBackupDate(payload.exported_at);
       const msg = t('screens.walletRestore.alerts.restoreEncryptedTemplate', { date: dateStr, count: networkCount });
       const ok = await showAlert(t('screens.walletRestore.alerts.restoreTitle'), msg, [
         { text: t('common.cancel') || '취소' },
@@ -336,7 +350,7 @@ export const WalletRestoreScreen = () => {
         const addrLines = plain.wallets
           .map((w) => `   ${NETWORK_NAME[w.network] || w.network}    ${w.address.slice(0, 10)}…${w.address.slice(-6)}`)
           .join('\n');
-        const dateStr = new Date(plain.exported_at || 0).toLocaleString();
+        const dateStr = formatBackupDate(plain.exported_at);
         const msg = t('screens.walletRestore.alerts.restorePlainTemplate', { date: dateStr, wallets: addrLines });
         const ok = await showAlert(t('screens.walletRestore.alerts.restoreTitle'), msg, [
           { text: t('common.cancel') || '취소' },
@@ -557,6 +571,7 @@ export const WalletRestoreScreen = () => {
       onSuccess={onPinPromptSuccess}
       onCancel={onPinPromptCancel}
       skipVaultCheck
+      requireConfirm={isBv2PinPhase}
       {...(isBv2PinPhase ? {
         titleOverride: '이 기기에서 사용할 PIN을 설정하세요',
         descriptionOverride: '복원된 지갑을 이 기기에서 보호할 6자리 PIN을 입력하세요.',
@@ -656,7 +671,7 @@ export const WalletRestoreScreen = () => {
                 <Text style={styles.optionTitle} numberOfLines={1}>{f.name}</Text>
                 <Text style={styles.optionDesc}>
                   {f.isPlainGuess ? '⚠️ 평문 백업' : '🔒 PIN 암호화'}
-                  {f.modifiedTime ? ` · ${new Date(f.modifiedTime).toLocaleString()}` : ''}
+                  {f.modifiedTime ? ` · ${formatBackupDate(f.modifiedTime)}` : ''}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />

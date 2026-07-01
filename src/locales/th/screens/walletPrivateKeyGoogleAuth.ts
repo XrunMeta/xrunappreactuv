@@ -60,4 +60,11 @@ export default {
   gdrivePlainSaveFail: 'บันทึกข้อความธรรมดา Google Drive ล้มเหลว',
   copyFail: 'คัดลอกล้มเหลว',
   unknownError: 'ข้อผิดพลาดที่ไม่รู้จัก',
+  passphraseModalTitle: 'ตั้งรหัสผ่านสำรองข้อมูล',
+  passphraseModalWarning: 'รหัสผ่านนี้จะใช้เข้ารหัสไฟล์สำรองข้อมูลของคุณ หากลืมรหัสผ่านจะไม่สามารถกู้คืนได้ กรุณาเก็บรักษาอย่างปลอดภัย',
+  passphraseInputPlaceholder: 'ป้อนรหัสผ่านสำรองข้อมูล',
+  passphraseConfirmPlaceholder: 'ป้อนรหัสผ่านสำรองข้อมูลอีกครั้ง',
+  passphraseTooShort: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',
+  passphraseMismatch: 'รหัสผ่านไม่ตรงกัน',
+  passphraseSubmit: 'สำรองข้อมูล',
 };

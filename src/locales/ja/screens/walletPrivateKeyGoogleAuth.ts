@@ -60,4 +60,11 @@ export default {
   gdrivePlainSaveFail: 'Google Drive 平文保存失敗',
   copyFail: 'コピー失敗',
   unknownError: '不明なエラー',
+  passphraseModalTitle: 'バックアップパスワードの設定',
+  passphraseModalWarning: 'このパスワードでバックアップファイルを暗号化します。パスワードを忘れると復元できませんので、安全に保管してください。',
+  passphraseInputPlaceholder: 'バックアップパスワードを入力',
+  passphraseConfirmPlaceholder: 'バックアップパスワードを再入力',
+  passphraseTooShort: 'パスワードは8文字以上である必要があります。',
+  passphraseMismatch: 'パスワードが一致しません。',
+  passphraseSubmit: 'バックアップする',
 };
