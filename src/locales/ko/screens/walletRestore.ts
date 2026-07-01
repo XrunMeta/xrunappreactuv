@@ -24,6 +24,7 @@ export default {
     decryptFailTitle: '복호화 실패',
     decryptFailPin: 'PIN 이 백업 시점과 다르거나 파일이 손상되었습니다',
     decryptFailGeneric: '백업 파일을 풀 수 없습니다 (PIN 불일치)',
+    decryptFailPassphrase: '백업 비밀번호가 백업 시점과 다르거나 파일이 손상되었습니다. 백업할 때 입력한 비밀번호를 다시 확인해주세요.',
     formatErrorTitle: '파일 형식 오류',
     jsonParseFail: '백업 JSON 파싱 실패',
     unsupportedFormat: '지원하지 않는 백업 형식입니다',
@@ -59,4 +60,7 @@ export default {
     fileSource: '파일',
     driveSource: 'Drive',
   },
+  passphraseModalTitle: '백업 비밀번호 입력',
+  passphraseModalDesc: '백업할 때 설정한 비밀번호를 입력해주세요.',
+  passphraseInputPlaceholder: '백업 비밀번호',
 };

@@ -24,6 +24,7 @@ export default {
     decryptFailTitle: 'Decryption failed',
     decryptFailPin: 'PIN differs from backup time or file is corrupted',
     decryptFailGeneric: 'Cannot decrypt backup file (PIN mismatch)',
+    decryptFailPassphrase: 'The backup password differs from when the backup was created, or the file is corrupted. Please double-check the password you set during backup.',
     formatErrorTitle: 'File format error',
     jsonParseFail: 'Backup JSON parse failed',
     unsupportedFormat: 'Unsupported backup format',
@@ -59,4 +60,7 @@ export default {
     fileSource: 'File',
     driveSource: 'Drive',
   },
+  passphraseModalTitle: 'Enter backup password',
+  passphraseModalDesc: 'Enter the password you set when creating the backup.',
+  passphraseInputPlaceholder: 'Backup password',
 };
