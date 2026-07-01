@@ -64,4 +64,6 @@ export default {
   passphraseModalDesc: 'バックアップ時に設定したパスワードを入力してください。旧バージョンのファイルバックアップはウォレットPINを入力してください。',
   passphraseInputPlaceholder: 'バックアップパスワード',
   restoring: '復元中です...\n少々お待ちください',
+  restoreSetPinTitle: 'この端末で使用する PIN を設定してください',
+  restoreSetPinDesc: '復元したウォレットをこの端末で保護する 6 桁の PIN を入力してください。',
 };

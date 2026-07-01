@@ -41,6 +41,12 @@ import { getWalletKeyATStatus } from '../services';
 
 type Stage = 'loading' | 'pin' | 'options' | 'view' | 'busy';
 
+function backupFileStamp(ms: number): string {
+  const d = new Date(ms);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+}
+
 const NETWORK_LABEL: Record<WalletNetwork, string> = {
   eth: 'Ethereum',
   pol: 'Polygon',
@@ -232,7 +238,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
       const json = JSON.stringify(payload);
       const encrypted = await encryptBackupJsonV2(json, passphrase);
-      const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
+      const fileName = `xrunwallet-${backupFileStamp(payload.exported_at)}.keyencrypted`;
 
       if (Platform.OS === 'android') {
         const SAF = (FileSystem as any).StorageAccessFramework;
@@ -297,7 +303,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       if (!passphrase) throw new Error('passphrase 정보 누락 — 다시 시도해주세요');
       const jsonRaw = JSON.stringify(payload);
       const json = await encryptBackupJsonV2(jsonRaw, passphrase);
-      const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
+      const fileName = `xrunwallet-${backupFileStamp(payload.exported_at)}.keyencrypted`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
       let current: any = null;
@@ -379,7 +385,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
       const payload = buildPlainBackup(email, wallets);
       const json = JSON.stringify(payload, null, 2);
-      const fileName = `xrunwallet-PLAIN-${payload.exported_at}.keyplain`;
+      const fileName = `xrunwallet-PLAIN-${backupFileStamp(payload.exported_at)}.keyplain`;
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
       let current: any = null;

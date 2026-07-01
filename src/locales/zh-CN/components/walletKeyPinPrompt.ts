@@ -8,4 +8,7 @@ export default {
   error: 'PIN 错误，请重新输入',
   formatError: '请输入 6 位数字',
   cancel: '取消',
+  confirmTitle: '再次输入 PIN',
+  confirmPrompt: '为确认身份，请再次输入相同的 PIN',
+  mismatch: 'PIN 不一致，请重新输入。',
 };

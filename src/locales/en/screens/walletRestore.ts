@@ -64,4 +64,6 @@ export default {
   passphraseModalDesc: 'Enter the password you set when creating the backup. For older file backups, enter your wallet PIN.',
   passphraseInputPlaceholder: 'Backup password',
   restoring: 'Restoring...\nPlease wait a moment',
+  restoreSetPinTitle: 'Set a PIN for this device',
+  restoreSetPinDesc: 'Enter a 6-digit PIN to protect the restored wallet on this device.',
 };

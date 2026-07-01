@@ -573,8 +573,8 @@ export const WalletRestoreScreen = () => {
       skipVaultCheck
       requireConfirm={isBv2PinPhase}
       {...(isBv2PinPhase ? {
-        titleOverride: '이 기기에서 사용할 PIN을 설정하세요',
-        descriptionOverride: '복원된 지갑을 이 기기에서 보호할 6자리 PIN을 입력하세요.',
+        titleOverride: t('screens.walletRestore.restoreSetPinTitle'),
+        descriptionOverride: t('screens.walletRestore.restoreSetPinDesc'),
       } : {})}
     />
   ) : null;

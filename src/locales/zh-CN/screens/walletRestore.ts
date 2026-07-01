@@ -63,4 +63,6 @@ export default {
   passphraseModalDesc: '请输入备份时设置的密码。旧版本文件备份请输入钱包 PIN。',
   passphraseInputPlaceholder: '备份密码',
   restoring: '正在恢复中...\n请稍候',
+  restoreSetPinTitle: '请设置在此设备上使用的 PIN',
+  restoreSetPinDesc: '请输入 6 位 PIN，以在此设备上保护已恢复的钱包。',
 };

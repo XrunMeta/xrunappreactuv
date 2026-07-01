@@ -8,4 +8,7 @@ export default {
   error: 'PIN sai. Vui lòng thử lại',
   formatError: 'Vui lòng nhập 6 chữ số',
   cancel: 'Hủy',
+  confirmTitle: 'Nhập lại PIN',
+  confirmPrompt: 'Vui lòng nhập lại cùng một PIN để xác nhận',
+  mismatch: 'PIN không khớp. Vui lòng nhập lại.',
 };

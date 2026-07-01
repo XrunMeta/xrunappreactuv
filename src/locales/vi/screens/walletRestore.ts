@@ -64,4 +64,6 @@ export default {
   passphraseModalDesc: 'Vui lòng nhập mật khẩu bạn đã đặt khi sao lưu. Với bản sao lưu tệp cũ, hãy nhập mã PIN ví.',
   passphraseInputPlaceholder: 'Mật khẩu sao lưu',
   restoring: 'Đang khôi phục...\nVui lòng đợi trong giây lát',
+  restoreSetPinTitle: 'Đặt PIN để sử dụng trên thiết bị này',
+  restoreSetPinDesc: 'Nhập mã PIN 6 chữ số để bảo vệ ví đã khôi phục trên thiết bị này.',
 };

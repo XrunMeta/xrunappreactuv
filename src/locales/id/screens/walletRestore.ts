@@ -64,4 +64,6 @@ export default {
   passphraseModalDesc: 'Masukkan kata sandi yang Anda tetapkan saat membuat cadangan. Untuk cadangan file versi lama, masukkan PIN dompet.',
   passphraseInputPlaceholder: 'Kata sandi cadangan',
   restoring: 'Sedang memulihkan...\nMohon tunggu sebentar',
+  restoreSetPinTitle: 'Atur PIN untuk digunakan di perangkat ini',
+  restoreSetPinDesc: 'Masukkan PIN 6 digit untuk melindungi dompet yang dipulihkan di perangkat ini.',
 };
