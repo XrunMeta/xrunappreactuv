@@ -727,6 +727,8 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
   const v_4013ed = v_e662ae<boolean>(false);
 
+  const v_a9da4b = v_e662ae<boolean>(true);
+
   v_c4deb2(() => {
     v_3b9e74().then(({ amount: v_f63e09, pangleAmount: v_076342 }) => {
       v_f28ed2.current = v_f63e09;
@@ -938,10 +940,11 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
     }).catch(() => {  });
     const v_ab8428 = v_f28ed2.current;
     const v_076342 = v_006d12.current;
+
+    const v_189c13 = !v_a9da4b.current;
     v_368ba7.forEach((v_21cc31) => {
-
-      if (v_21cc31.spotID === 3 || v_21cc31.spotID === 4 || v_21cc31.spotID === 5) {
-
+      const v_7e6365 = v_21cc31.spotID === 3 || v_21cc31.spotID === 4 || v_21cc31.spotID === 5 || v_189c13;
+      if (v_7e6365) {
         v_21cc31.isPangleToken = true;
         v_21cc31.ad_company = 'pangle_video';
         v_21cc31.name = '🎬 동영상 보고 적립';
@@ -1049,6 +1052,14 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
             latitude: v_4a8217.coords.latitude,
             longitude: v_4a8217.coords.longitude,
           };
+
+          const v_e1b1cf = v_746c3b.latitude;
+          const v_c87b30 = v_746c3b.longitude;
+          const v_f34719 = v_e1b1cf >= 33.0 && v_e1b1cf <= 38.7 && v_c87b30 >= 124.5 && v_c87b30 <= 131.9;
+          if (v_a9da4b.current !== v_f34719) {
+            console.log('[AR] 국가 판별 변경:', v_a9da4b.current ? 'KR' : '해외', '→', v_f34719 ? 'KR' : '해외', `(lat=${v_e1b1cf}, lng=${v_c87b30})`);
+          }
+          v_a9da4b.current = v_f34719;
 
           let v_264a98 = v_746c3b;
           try {
