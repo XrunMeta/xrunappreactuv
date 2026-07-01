@@ -15,7 +15,7 @@ export function randomIvHex(): string {
   return bytesToHex(Crypto.getRandomBytes(16));
 }
 
-const SCRYPT_PARAMS = { N: 2 ** 17, r: 8, p: 1, dkLen: 32 } as const;
+const SCRYPT_PARAMS = { N: 2 ** 14, r: 8, p: 1, dkLen: 32 } as const;
 
 export async function deriveScryptKey(
   secret: string,
