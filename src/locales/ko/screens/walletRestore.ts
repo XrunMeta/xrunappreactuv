@@ -2,12 +2,12 @@ export default {
   title: '지갑 복원',
   heading: '복원 소스 선택',
   subheading:
-    '백업 파일을 선택해 키를 복원합니다. PIN 으로 암호화된 백업만 사용할 수 있어요.',
+    '백업 파일을 선택해 키를 복원합니다. 백업할 때 설정한 비밀번호(구버전 백업은 지갑 PIN)를 입력해야 복원할 수 있어요.',
   fromFile: '파일에서 복원',
   fromFileDesc: '단말 저장소의 백업 파일 (.txt) 선택',
   fromGDrive: 'Google Drive 에서 복원',
   fromGDriveDesc: 'Drive 에 저장한 백업 파일 가져오기',
-  note: '복원 시 같은 PIN 을 입력해야 백업 내용을 풀 수 있습니다. PIN 을 잊으면 복원이 불가능합니다.',
+  note: '복원하려면 백업할 때 설정한 비밀번호를 입력해야 해요. 구버전 파일 백업은 지갑 PIN 을 입력하세요. 비밀번호를 잊으면 복원이 불가능합니다.',
   comingSoonTitle: '준비 중',
   comingSoonMessage: '복원 기능은 다음 업데이트에서 지원될 예정입니다.',
   restoreNeededTitle: '지갑 키 복원이 필요해요',
@@ -61,6 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: '백업 비밀번호 입력',
-  passphraseModalDesc: '백업할 때 설정한 비밀번호를 입력해주세요.',
+  passphraseModalDesc: '백업할 때 설정한 비밀번호를 입력해주세요. 구버전 파일 백업은 지갑 PIN 을 입력하세요.',
   passphraseInputPlaceholder: '백업 비밀번호',
+  restoring: '복원 중입니다...\n잠시만 기다려주세요',
 };

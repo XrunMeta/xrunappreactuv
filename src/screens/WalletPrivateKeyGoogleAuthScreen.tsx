@@ -205,7 +205,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     return exportBackup(email, memberId, pin);
   };
 
-  const handleFileBackup = async () => {
+  const handleFileBackup = async (passphrase: string) => {
     if (stage !== 'options') return;
     if (!pin) {
       await showAlert(
@@ -217,6 +217,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       return;
     }
     setStage('busy');
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
     try {
       const payload = await buildBackupPayload();
       if (!payload) {
@@ -229,7 +231,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
 
       const json = JSON.stringify(payload);
-      const encrypted = await encryptBackupJsonV2(json, pin);
+      const encrypted = await encryptBackupJsonV2(json, passphrase);
       const fileName = `xrunwallet-${payload.exported_at}.keyencrypted`;
 
       if (Platform.OS === 'android') {
@@ -280,6 +282,8 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const handleGdriveBackup = async (passphrase: string) => {
     if (stage !== 'options') return;
     setStage('busy');
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
     try {
       const payload = await buildBackupPayload();
       if (!payload) {
@@ -536,7 +540,13 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
 
             <TouchableOpacity
               style={[styles.optionCard, stage === 'busy' && styles.disabled]}
-              onPress={() => requestBackupConsent(() => { void handleFileBackup(); }, {})}
+              onPress={() => requestBackupConsent(() => {
+
+                pendingGdriveRef.current = (pp: string) => { void handleFileBackup(pp); };
+                setPassphraseInput('');
+                setPassphraseConfirm('');
+                setPassphraseModalVisible(true);
+              }, {})}
               disabled={stage === 'busy'}
               activeOpacity={0.7}
             >
@@ -706,6 +716,10 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               value={passphraseInput}
               onChangeText={setPassphraseInput}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
+              importantForAutofill="no"
+              spellCheck={false}
               testID="passphrase-input"
             />
             <TextInput
@@ -715,9 +729,18 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               value={passphraseConfirm}
               onChangeText={setPassphraseConfirm}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
+              importantForAutofill="no"
+              spellCheck={false}
               testID="passphrase-confirm"
             />
-            {passphraseInput.length > 0 && passphraseConfirm.length > 0 && passphraseInput !== passphraseConfirm && (
+            {passphraseInput.length > 0 && passphraseInput.length < 8 && (
+              <Text style={styles.passphraseMismatch}>
+                {t('screens.walletPrivateKeyGoogleAuth.passphraseTooShort') || '비밀번호는 8자 이상이어야 해요.'}
+              </Text>
+            )}
+            {passphraseInput.length >= 8 && passphraseConfirm.length > 0 && passphraseInput !== passphraseConfirm && (
               <Text style={styles.passphraseMismatch}>
                 {t('screens.walletPrivateKeyGoogleAuth.passphraseMismatch') || '비밀번호가 일치하지 않습니다.'}
               </Text>

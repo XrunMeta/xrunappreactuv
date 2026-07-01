@@ -2,12 +2,12 @@ export default {
   title: 'Restore Wallet',
   heading: 'Choose Restore Source',
   subheading:
-    'Select a backup file to restore your keys. Only PIN-encrypted backups are supported.',
+    'Select a backup file to restore your keys. Enter the password you set during backup (older backups use your wallet PIN) to restore.',
   fromFile: 'Restore from File',
   fromFileDesc: 'Pick a backup file (.txt) from device storage',
   fromGDrive: 'Restore from Google Drive',
   fromGDriveDesc: 'Import a backup file saved on Drive',
-  note: 'You must enter the same PIN used during backup to decrypt. Lost PIN means lost restore.',
+  note: 'To restore, enter the password you set during backup. Older file backups use your wallet PIN. If you forget the password, restore is impossible.',
   comingSoonTitle: 'Coming Soon',
   comingSoonMessage: 'Restore feature will be available in a future update.',
   restoreNeededTitle: 'Wallet key restore needed',
@@ -61,6 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: 'Enter backup password',
-  passphraseModalDesc: 'Enter the password you set when creating the backup.',
+  passphraseModalDesc: 'Enter the password you set when creating the backup. For older file backups, enter your wallet PIN.',
   passphraseInputPlaceholder: 'Backup password',
+  restoring: 'Restoring...\nPlease wait a moment',
 };

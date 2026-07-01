@@ -196,6 +196,8 @@ export const WalletRestoreScreen = () => {
     if (memberId == null || !email) return;
     setStage('busy');
 
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
     let json: string;
     try {
       json = await decryptBackupJsonAny(content.trim(), pp);
@@ -588,6 +590,10 @@ export const WalletRestoreScreen = () => {
             value={passphraseInput}
             onChangeText={setPassphraseInput}
             autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="off"
+            importantForAutofill="no"
+            spellCheck={false}
             testID="restore-passphrase-input"
           />
           <View style={restoreStyles.ppButtonRow}>
@@ -729,6 +735,14 @@ export const WalletRestoreScreen = () => {
             '복원 시 같은 PIN 을 입력해야 백업 내용을 풀 수 있습니다. PIN 을 잊으면 복원이 불가능합니다.'}
         </Text>
       </SafeScrollView>
+      {stage === 'busy' && (
+        <View style={restoreStyles.busyOverlay}>
+          <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+          <Text style={restoreStyles.busyText}>
+            {t('screens.walletRestore.restoring') || '복원 중입니다...\n잠시만 기다려주세요'}
+          </Text>
+        </View>
+      )}
     </SafeView>
   );
 };
@@ -815,16 +829,17 @@ const styles = StyleSheet.create({
 
 const restoreStyles = StyleSheet.create({
   ppOverlay: {
+
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.55)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   ppCard: {
     backgroundColor: '#ffffff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderRadius: 20,
     paddingTop: 24,
-    paddingBottom: 32,
+    paddingBottom: 24,
     paddingHorizontal: 20,
   },
   ppTitle: {
@@ -867,4 +882,19 @@ const restoreStyles = StyleSheet.create({
   ppDisabledBtn: { backgroundColor: '#c5c5c5' },
   ppCancelText: { fontSize: 15, color: '#343434', fontFamily: FONTS.medium },
   ppConfirmText: { fontSize: 15, color: '#ffffff', fontFamily: FONTS.semiBold },
+
+  busyOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
+  },
+  busyText: {
+    marginTop: 14,
+    fontSize: 15,
+    color: COLORS.titleText,
+    fontFamily: FONTS.medium,
+    textAlign: 'center',
+  },
 });

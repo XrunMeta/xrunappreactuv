@@ -64,6 +64,7 @@ export default {
   passphraseModalWarning: '이 비밀번호로 백업 파일을 암호화합니다. 비밀번호를 잊으면 복원할 수 없으니 안전하게 보관해주세요.',
   passphraseInputPlaceholder: '백업 비밀번호 입력',
   passphraseConfirmPlaceholder: '백업 비밀번호 다시 입력',
+  passphraseTooShort: '비밀번호는 8자 이상이어야 해요.',
   passphraseMismatch: '비밀번호가 일치하지 않습니다.',
   passphraseSubmit: '백업하기',
 };
