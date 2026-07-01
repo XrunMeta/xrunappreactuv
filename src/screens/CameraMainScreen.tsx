@@ -727,6 +727,8 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
   const pangleAdInFlightRef = useRef<boolean>(false);
 
+  const isInKoreaRef = useRef<boolean>(true);
+
   useEffect(() => {
     getNasmediaRewardAmount().then(({ amount, pangleAmount }) => {
       videoRewardAmountRef.current = amount;
@@ -938,10 +940,11 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
     }).catch(() => {  });
     const nasmediaAmount = videoRewardAmountRef.current;
     const pangleAmount = pangleRewardAmountRef.current;
+
+    const allPangle = !isInKoreaRef.current;
     newOrganizedData.forEach((token: any) => {
-
-      if (token.spotID === 3 || token.spotID === 4 || token.spotID === 5) {
-
+      const isPangleSpot = token.spotID === 3 || token.spotID === 4 || token.spotID === 5 || allPangle;
+      if (isPangleSpot) {
         token.isPangleToken = true;
         token.ad_company = 'pangle_video';
         token.name = '🎬 동영상 보고 적립';
@@ -1049,6 +1052,14 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
             latitude: newLocation.coords.latitude,
             longitude: newLocation.coords.longitude,
           };
+
+          const lat = newLocationData.latitude;
+          const lng = newLocationData.longitude;
+          const inKr = lat >= 33.0 && lat <= 38.7 && lng >= 124.5 && lng <= 131.9;
+          if (isInKoreaRef.current !== inKr) {
+            console.log('[AR] 국가 판별 변경:', isInKoreaRef.current ? 'KR' : '해외', '→', inKr ? 'KR' : '해외', `(lat=${lat}, lng=${lng})`);
+          }
+          isInKoreaRef.current = inKr;
 
           let locationToUse = newLocationData;
           try {
