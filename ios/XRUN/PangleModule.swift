@@ -130,13 +130,14 @@ class PangleModule: RCTEventEmitter {
 }
 
 extension PangleModule: PAGRewardedAdDelegate {
-  func adDidShow(_ ad: PAGRewardedAd) {}
 
-  func adDidClick(_ ad: PAGRewardedAd) {}
+  func adDidShow(_ ad: PAGAdProtocol) {}
 
-  func adDidDismiss(_ ad: PAGRewardedAd) {
+  func adDidClick(_ ad: PAGAdProtocol) {}
+
+  func adDidDismiss(_ ad: PAGAdProtocol) {
     sendEvent(withName: "onRewardedAdClose", body: nil)
-    if rewardedAd === ad {
+    if let dismissed = ad as? PAGRewardedAd, rewardedAd === dismissed {
       rewardedAd = nil
     }
   }
