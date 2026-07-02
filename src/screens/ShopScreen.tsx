@@ -709,36 +709,9 @@ export const v_10886b = () => {
                 >
                     {v_11083e === 'xrunStore' ? (
                         <>
-                            {}
-                            {v_d51f37 && (
-                                <View style={v_d81136.devCountryRow}>
-                                    <Text style={v_d81136.devCountryLabel}>DEV 국가:</Text>
-                                    {(['AUTO', 'KR', 'ID'] as const).map((v_3f4e2e) => (
-                                        <TouchableOpacity
-                                            key={v_3f4e2e}
-                                            onPress={async () => {
-                                                v_e94174(v_3f4e2e);
-                                                if (v_3f4e2e === 'AUTO') {
-                                                    await v_e84827.removeItem('devShopForceCountry');
+                            {
 
-                                                    await v_e84827.removeItem('shopGpsCountry');
-                                                    v_068f20(null); 
-                                                } else {
-                                                    await v_e84827.setItem('devShopForceCountry', v_3f4e2e);
-
-                                                    v_068f20(v_3f4e2e);
-                                                }
-                                            }}
-                                            style={[v_d81136.devCountryChip, v_01305e === v_3f4e2e && v_d81136.devCountryChipActive]}
-                                        >
-                                            <Text style={[v_d81136.devCountryChipText, v_01305e === v_3f4e2e && v_d81136.devCountryChipTextActive]}>
-                                                {v_3f4e2e === 'AUTO' ? '🌐 GPS' : v_3f4e2e === 'KR' ? '🇰🇷 KR' : '🇮🇩 ID'}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                    <Text style={v_d81136.devCountryCurrent}>현재: {v_b70da2 ?? '...'}</Text>
-                                </View>
-                            )}
+}
 
                             {}
                             {v_ae728d && (
