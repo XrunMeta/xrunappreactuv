@@ -638,7 +638,7 @@ export const getIosGuideShowStatus = async (navigation?: any): Promise<boolean> 
   return true; 
 };
 
-export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean> => {
+export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean | null> => {
   try {
     const server = await checkServerVersion();
     if (server?.data && server.data.iosOnWallet !== undefined) {
@@ -657,14 +657,17 @@ export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean>
     }, navigation);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
-    return data?.data?.iosOnWallet === 1;
+    if (data?.data?.iosOnWallet !== undefined) {
+      return data.data.iosOnWallet === 1;
+    }
+    return null;
   } catch (error) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', error);
-    return false;
+    return null;
   }
 };
 
-export const getAndroidWalletShowStatus = async (navigation?: any): Promise<boolean> => {
+export const getAndroidWalletShowStatus = async (navigation?: any): Promise<boolean | null> => {
   try {
     const server = await checkServerVersion();
     if (server?.data && server.data.androidOnWallet !== undefined) {
@@ -683,10 +686,13 @@ export const getAndroidWalletShowStatus = async (navigation?: any): Promise<bool
     }, navigation);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
-    return data?.data?.androidOnWallet === 1;
+    if (data?.data?.androidOnWallet !== undefined) {
+      return data.data.androidOnWallet === 1;
+    }
+    return null;
   } catch (error) {
     console.error('Android 지갑 표시 상태 가져오기 오류:', error);
-    return false;
+    return null;
   }
 };
 

@@ -77,10 +77,12 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
     const fetchStatus = async () => {
       try {
+
         const next = Platform.OS === 'ios'
           ? await getIosWalletShowStatus(navigate)
           : await getAndroidWalletShowStatus(navigate);
-        setShowWallet(next);
+        if (next === null || next === undefined) return; 
+        setShowWallet((prev) => (prev === next ? prev : next));
         AsyncStorage.setItem(cacheKey, next ? '1' : '0').catch(() => {});
       } catch (error) {
         console.error('[BottomNavigationBar] 지갑 표시 상태 오류:', error);
