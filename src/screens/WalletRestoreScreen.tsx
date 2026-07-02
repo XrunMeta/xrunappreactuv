@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -98,6 +98,9 @@ export const WalletRestoreScreen = () => {
   const [otpInput, setOtpInput] = useState('');
   const [otpSending, setOtpSending] = useState(false);
   const [otpVerifiedPin, setOtpVerifiedPin] = useState<string | null>(null);
+
+  const [otpSecondsLeft, setOtpSecondsLeft] = useState<number>(300); 
+  const otpHiddenInputRef = useRef<TextInput | null>(null);
 
   const [pendingBv2Data, setPendingBv2Data] = useState<{
     passphrase: string;
@@ -692,6 +695,39 @@ export const WalletRestoreScreen = () => {
     </Modal>
   );
 
+  const OTP_LENGTH = 6;
+  const otpFormattedTimer = useMemo(() => {
+    const minutes = Math.floor(otpSecondsLeft / 60).toString().padStart(2, '0');
+    const seconds = (otpSecondsLeft % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }, [otpSecondsLeft]);
+  useEffect(() => {
+    if (!otpModalVisible) return;
+    if (otpSecondsLeft <= 0) return;
+    const timer = setInterval(() => setOtpSecondsLeft((s) => s - 1), 1000);
+    return () => clearInterval(timer);
+  }, [otpSecondsLeft, otpModalVisible]);
+  useEffect(() => {
+    if (otpModalVisible) setOtpSecondsLeft(300);
+  }, [otpModalVisible]);
+  const handleOtpResend = async () => {
+    if (!email) return;
+    try {
+      setOtpSending(true);
+      const ok = await sendEmailVerificationCode(email);
+      setOtpSending(false);
+      if (ok) {
+        setOtpSecondsLeft(300);
+        setOtpInput('');
+        await showAlert(
+          t('screens.verificationCode.alerts.resendComplete') || '재전송 완료',
+          t('screens.verificationCode.success.resendComplete') || '인증번호가 다시 발송됐어요.',
+        );
+      }
+    } catch (e) {
+      setOtpSending(false);
+    }
+  };
   const otpModal = (
     <Modal
       visible={otpModalVisible}
@@ -700,7 +736,7 @@ export const WalletRestoreScreen = () => {
     >
       <View style={restoreStyles.ppScreenContainer}>
         <Header
-          title={t('screens.walletRestore.otpModalTitle') || '이메일 인증'}
+          title={t('screens.verificationCode.title') || '이메일 인증'}
           onBackPress={onOtpCancel}
           showBackButton
         />
@@ -710,33 +746,65 @@ export const WalletRestoreScreen = () => {
           showsVerticalScrollIndicator={false}
           autoAdjustKeyboardPadding={true}
         >
-          <View style={restoreStyles.ppFormFieldContainer}>
-            <FormField
-              label={t('screens.walletRestore.otpInputLabel') || '인증번호'}
-              placeholder={t('screens.walletRestore.otpInputPlaceholder') || '이메일로 받은 인증번호 입력'}
-              keyboardType="number-pad"
-              value={otpInput}
-              onChangeText={(text) => setOtpInput(text.replace(/[^0-9]/g, ''))}
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="one-time-code"
-              maxLength={8}
-              containerStyle={restoreStyles.ppFieldContainer}
-              testID="restore-otp-input"
-            />
-
-            <Text style={restoreStyles.ppHelperText}>
-              {t('screens.walletRestore.otpModalDesc') ||
-                `${email} 로 인증번호를 발송했어요. 이메일을 확인하고 6자리 번호를 입력해주세요.`}
+          <View style={restoreStyles.otpDescriptionWrapper}>
+            <Text style={restoreStyles.otpDescription}>
+              {(email || '이메일') + (t('screens.verificationCode.description') || ' 로 인증번호를 발송했어요. 6자리 번호를 입력해주세요.')}
             </Text>
           </View>
 
-          <View style={restoreStyles.ppBottomSection}>
+          <View style={restoreStyles.otpCodeRow}>
+            {Array.from({ length: OTP_LENGTH }).map((_, index) => {
+              const digit = otpInput[index] ?? '';
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={restoreStyles.otpCodeBox}
+                  onPress={() => otpHiddenInputRef.current?.focus()}
+                  activeOpacity={0.7}
+                >
+                  <Text style={restoreStyles.otpCodeText}>{digit}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <TextInput
+            ref={otpHiddenInputRef}
+            value={otpInput}
+            onChangeText={(text) => setOtpInput(text.replace(/[^0-9]/g, '').slice(0, OTP_LENGTH))}
+            keyboardType="number-pad"
+            maxLength={OTP_LENGTH}
+            style={restoreStyles.otpHiddenInput}
+            autoFocus={false}
+            testID="restore-otp-input"
+          />
+
+          <TouchableOpacity
+            style={restoreStyles.otpResendWrapper}
+            onPress={otpSecondsLeft <= 0 && !otpSending ? handleOtpResend : undefined}
+            activeOpacity={otpSecondsLeft <= 0 && !otpSending ? 0.7 : 1}
+            disabled={otpSecondsLeft > 0 || otpSending}
+          >
+            {otpSending ? (
+              <ActivityIndicator size="small" color="#2873ff" />
+            ) : (
+              <Text style={restoreStyles.otpResendText}>
+                {(t('screens.verificationCode.resendCode') || '인증번호 재전송') + ' '}
+                {otpSecondsLeft > 0 && (
+                  <Text style={restoreStyles.otpResendTimer} numberOfLines={1}>
+                    {otpFormattedTimer}
+                  </Text>
+                )}
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={restoreStyles.otpButtonWrapper}>
             <PrimaryButton
-              title={t('screens.walletRestore.otpSubmit') || '인증하고 복원'}
+              title={t('screens.verificationCode.verifyButton') || '인증하기'}
               fullWidth
               onPress={onOtpSubmit}
-              disabled={otpInput.length < 4 || otpSending}
+              disabled={otpInput.length !== OTP_LENGTH || otpSending}
               testID="restore-otp-submit"
             />
           </View>
@@ -975,6 +1043,69 @@ const restoreStyles = StyleSheet.create({
   },
   ppBottomSection: {
     ...COMMON_STYLES.bottomButtonContainer,
+  },
+
+  otpDescriptionWrapper: {
+    width: '100%',
+    maxWidth: 327,
+    alignSelf: 'center',
+    marginBottom: 24,
+    marginTop: 20,
+  },
+  otpDescription: {
+    fontSize: FONTS.size.msmall,
+    lineHeight: 24,
+    color: '#747474',
+    fontFamily: 'Roboto-Regular',
+  },
+  otpCodeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: 327,
+    alignSelf: 'center',
+    marginBottom: 24,
+  },
+  otpCodeBox: {
+    width: 45,
+    height: 50,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#dedede',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+  otpCodeText: {
+    fontSize: FONTS.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: COLORS.headerText,
+  },
+  otpHiddenInput: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    opacity: 0,
+  },
+  otpResendWrapper: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  otpResendText: {
+    fontSize: FONTS.size.medium,
+    lineHeight: 24,
+    color: COLORS.headerText,
+    fontFamily: 'Roboto-Medium',
+  },
+  otpResendTimer: {
+    color: '#2873ff',
+    fontFamily: 'Roboto-Medium',
+  },
+  otpButtonWrapper: {
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
+    marginBottom: 32,
   },
 
   ppOverlay: {
