@@ -68,7 +68,7 @@ public class AppDelegate: ExpoAppDelegate {
     #endif
     AyetSDK.shared.initialize(placementId: 22062, externalIdentifier: "guest")
 
-    AMMediation.shared.initialize(mediaKey: "10407", adunitID: ["105809"])
+    AMMediation.shared.initialize(mediaKey: 10407, adunitID: [105809])
     NSLog("[NasmediaAd] iOS SDK initialized")
 
     let delegate = ReactNativeDelegate()
