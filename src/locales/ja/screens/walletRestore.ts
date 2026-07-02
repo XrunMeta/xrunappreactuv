@@ -17,6 +17,44 @@ export default {
   restoreNow: '復元',
   driveAuthFailTitle: 'Google ログインが必要',
   driveAuthFailMessage: '再度ログインしてください\nもう一度 Google Drive ボタンをタップしてください',
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: 'Google Play サービスが必要',
+      message: 'このデバイスでは Google Play サービスを利用できません。\nPlay サービスをインストール/更新してから再試行してください。',
+    },
+    SIGN_IN_CANCELLED: {
+      title: 'Google ログインをキャンセルしました',
+      message: 'Google ログイン画面を閉じました。\nGoogle ドライブのバックアップを読み込むにはログインが必要です。',
+    },
+    SIGN_IN_FAIL: {
+      title: 'Google ログイン失敗',
+      message: 'Google ログイン中にエラーが発生しました。\nしばらくしてから再試行してください。',
+    },
+    SCOPE_DENIED: {
+      title: 'ドライブの権限が必要',
+      message: 'Google ドライブへのアクセス権限が許可されませんでした。\n再試行時に「許可」を選択してください。',
+    },
+    TOKEN_FAIL: {
+      title: '認証トークン取得失敗',
+      message: 'Google 認証トークンを取得できませんでした。\nネットワーク接続を確認して再試行してください。',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API が無効',
+      message: 'Google Drive API が有効になっていません。\n管理者にお問い合わせください。',
+    },
+    LIST_UNAUTHORIZED: {
+      title: 'ドライブへのアクセス権限なし',
+      message: 'ドライブへのアクセス権限が期限切れです。\n再度ログインしてください。',
+    },
+    LIST_FAIL: {
+      title: 'ドライブの取得失敗',
+      message: 'バックアップファイル一覧を取得できませんでした。\nしばらくしてから再試行してください。',
+    },
+    NETWORK_FAIL: {
+      title: 'ネットワークエラー',
+      message: 'インターネット接続を確認して再試行してください。',
+    },
+  },
   alerts: {
     errorTitle: 'エラー',
     missingAuthInfo: '認証情報がありません',

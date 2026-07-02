@@ -531,12 +531,28 @@ export const WalletRestoreScreen = () => {
     }
   };
 
+  const throwDriveErr = (code: string, cause?: any): never => {
+    const e: any = new Error(code);
+    e.code = code;
+    e.cause = cause;
+    throw e;
+  };
+
   const ensureDriveAccessToken = async (): Promise<string> => {
-    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => {});
+    const playOk = await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false }).catch(() => false);
+    if (playOk === false) throwDriveErr('NO_PLAY_SERVICES');
     let current: any = null;
     try { current = GoogleSignin.getCurrentUser(); } catch {  }
     if (!current) {
-      await GoogleSignin.signIn();
+      try {
+        await GoogleSignin.signIn();
+      } catch (signErr: any) {
+        const code = signErr?.code;
+        if (code === 'SIGN_IN_CANCELLED' || code === '-5' || /cancel/i.test(String(signErr?.message ?? ''))) {
+          throwDriveErr('SIGN_IN_CANCELLED', signErr);
+        }
+        throwDriveErr('SIGN_IN_FAIL', signErr);
+      }
     }
     try {
       await GoogleSignin.addScopes({
@@ -544,10 +560,16 @@ export const WalletRestoreScreen = () => {
       });
     } catch (scopeErr: any) {
       if (__DEV__) console.warn('[WalletRestore] addScopes:', scopeErr);
+      throwDriveErr('SCOPE_DENIED', scopeErr);
     }
-    const tokens = await GoogleSignin.getTokens();
+    let tokens: any = null;
+    try {
+      tokens = await GoogleSignin.getTokens();
+    } catch (tokenErr: any) {
+      throwDriveErr('TOKEN_FAIL', tokenErr);
+    }
     const accessToken = tokens?.accessToken;
-    if (!accessToken) throw new Error('Google access token 획득 실패');
+    if (!accessToken) throwDriveErr('TOKEN_FAIL');
     return accessToken;
   };
 
@@ -555,15 +577,23 @@ export const WalletRestoreScreen = () => {
 
     const q = "name contains 'xrunwallet-' and trashed=false";
     const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,modifiedTime,size)&orderBy=modifiedTime%20desc&pageSize=30`;
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    if (!res.ok) {
-      const errBody = await res.text();
-      if (res.status === 403 && /has not been used|disabled/i.test(errBody)) {
-        throw new Error('Google Drive API 가 활성화되어 있지 않습니다.\nGCP 콘솔에서 활성화 필요.');
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    } catch (netErr: any) {
+      throwDriveErr('NETWORK_FAIL', netErr);
+    }
+    if (!res!.ok) {
+      const errBody = await res!.text();
+      if (res!.status === 403 && /has not been used|disabled/i.test(errBody)) {
+        throwDriveErr('DRIVE_API_DISABLED', errBody);
       }
-      throw new Error(`Drive list ${res.status}: ${errBody.slice(0, 200)}`);
+      if (res!.status === 401 || res!.status === 403) {
+        throwDriveErr('LIST_UNAUTHORIZED', `${res!.status}: ${errBody.slice(0, 200)}`);
+      }
+      throwDriveErr('LIST_FAIL', `${res!.status}: ${errBody.slice(0, 200)}`);
     }
     const json = (await res.json()) as { files: Array<{ id: string; name: string; modifiedTime?: string; size?: string }> };
     return (json.files || []).map((f) => ({
@@ -592,11 +622,18 @@ export const WalletRestoreScreen = () => {
       setStage('gdrive-list');
     } catch (e: any) {
       setStage('options');
-      if (__DEV__) console.warn('[WalletRestore] gdrive list fail:', e);
+      if (__DEV__) console.warn('[WalletRestore] gdrive list fail:', e?.code, e?.message);
 
+      const code: string = e?.code ?? 'UNKNOWN';
+      const titleKey = `screens.walletRestore.driveErr.${code}.title`;
+      const msgKey = `screens.walletRestore.driveErr.${code}.message`;
+      const title = t(titleKey);
+      const message = t(msgKey);
+
+      const isFallback = title === titleKey || message === msgKey;
       await showAlert(
-        t('screens.walletRestore.driveAuthFailTitle'),
-        t('screens.walletRestore.driveAuthFailMessage'),
+        isFallback ? t('screens.walletRestore.driveAuthFailTitle') : title,
+        isFallback ? t('screens.walletRestore.driveAuthFailMessage') : message,
       );
     }
   };

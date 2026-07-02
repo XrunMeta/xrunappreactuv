@@ -17,6 +17,44 @@ export default {
   restoreNow: 'Pulihkan',
   driveAuthFailTitle: 'Login Google diperlukan',
   driveAuthFailMessage: 'Silakan masuk lagi\nKemudian ketuk tombol Google Drive lagi',
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: 'Google Play Services diperlukan',
+      message: 'Google Play Services tidak tersedia di perangkat ini.\nSilakan instal/perbarui Play Services dan coba lagi.',
+    },
+    SIGN_IN_CANCELLED: {
+      title: 'Login Google dibatalkan',
+      message: 'Anda menutup jendela login Google.\nLogin diperlukan untuk memuat cadangan Google Drive.',
+    },
+    SIGN_IN_FAIL: {
+      title: 'Login Google gagal',
+      message: 'Terjadi kesalahan saat login Google.\nSilakan coba lagi nanti.',
+    },
+    SCOPE_DENIED: {
+      title: 'Izin Drive diperlukan',
+      message: 'Izin akses Google Drive belum diberikan.\nPilih "Izinkan" saat mencoba lagi.',
+    },
+    TOKEN_FAIL: {
+      title: 'Gagal mendapatkan token autentikasi',
+      message: 'Tidak dapat memperoleh token autentikasi Google.\nPeriksa koneksi jaringan dan coba lagi.',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API dinonaktifkan',
+      message: 'Google Drive API tidak diaktifkan.\nSilakan hubungi administrator.',
+    },
+    LIST_UNAUTHORIZED: {
+      title: 'Akses Drive ditolak',
+      message: 'Izin akses Drive telah kedaluwarsa.\nSilakan masuk lagi.',
+    },
+    LIST_FAIL: {
+      title: 'Pencarian Drive gagal',
+      message: 'Tidak dapat mengambil daftar file cadangan.\nSilakan coba lagi nanti.',
+    },
+    NETWORK_FAIL: {
+      title: 'Kesalahan jaringan',
+      message: 'Silakan periksa koneksi internet dan coba lagi.',
+    },
+  },
   alerts: {
     errorTitle: 'Kesalahan',
     missingAuthInfo: 'Informasi otentikasi hilang',

@@ -17,6 +17,44 @@ export default {
   restoreNow: 'กู้คืน',
   driveAuthFailTitle: 'ต้องลงชื่อเข้าใช้ Google',
   driveAuthFailMessage: 'กรุณาลงชื่อเข้าใช้อีกครั้ง\nจากนั้นแตะปุ่ม Google Drive อีกครั้ง',
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: 'ต้องใช้ Google Play Services',
+      message: 'ไม่สามารถใช้ Google Play Services บนอุปกรณ์นี้\nกรุณาติดตั้ง/อัปเดต Play Services แล้วลองใหม่',
+    },
+    SIGN_IN_CANCELLED: {
+      title: 'ยกเลิกการลงชื่อเข้าใช้ Google',
+      message: 'คุณปิดหน้าต่างลงชื่อเข้าใช้ Google\nต้องลงชื่อเข้าใช้เพื่อโหลดข้อมูลสำรองจาก Google Drive',
+    },
+    SIGN_IN_FAIL: {
+      title: 'ลงชื่อเข้าใช้ Google ล้มเหลว',
+      message: 'เกิดข้อผิดพลาดขณะลงชื่อเข้าใช้ Google\nกรุณาลองใหม่ในภายหลัง',
+    },
+    SCOPE_DENIED: {
+      title: 'ต้องการสิทธิ์ Drive',
+      message: 'ยังไม่ได้อนุญาตการเข้าถึง Google Drive\nกรุณาเลือก "อนุญาต" เมื่อลองใหม่',
+    },
+    TOKEN_FAIL: {
+      title: 'รับ token การยืนยันตัวตนล้มเหลว',
+      message: 'ไม่สามารถรับ token การยืนยันตัวตนของ Google ได้\nตรวจสอบการเชื่อมต่อเครือข่ายและลองใหม่',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API ถูกปิดใช้งาน',
+      message: 'Google Drive API ยังไม่ได้เปิดใช้งาน\nกรุณาติดต่อผู้ดูแลระบบ',
+    },
+    LIST_UNAUTHORIZED: {
+      title: 'ไม่มีสิทธิ์เข้าถึง Drive',
+      message: 'สิทธิ์เข้าถึง Drive หมดอายุแล้ว\nกรุณาลงชื่อเข้าใช้อีกครั้ง',
+    },
+    LIST_FAIL: {
+      title: 'ค้นหา Drive ล้มเหลว',
+      message: 'ไม่สามารถดึงรายการไฟล์สำรองได้\nกรุณาลองใหม่ในภายหลัง',
+    },
+    NETWORK_FAIL: {
+      title: 'ข้อผิดพลาดเครือข่าย',
+      message: 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตและลองใหม่',
+    },
+  },
   alerts: {
     errorTitle: 'ข้อผิดพลาด',
     missingAuthInfo: 'ขาดข้อมูลการตรวจสอบสิทธิ์',

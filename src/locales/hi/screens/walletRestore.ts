@@ -17,6 +17,44 @@ export default {
   restoreNow: 'पुनर्स्थापित',
   driveAuthFailTitle: 'Google साइन-इन आवश्यक',
   driveAuthFailMessage: 'कृपया पुनः साइन इन करें\nफिर Google Drive बटन पर फिर से टैप करें',
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: 'Google Play सेवाएं आवश्यक',
+      message: 'इस डिवाइस पर Google Play सेवाएं उपलब्ध नहीं हैं।\nकृपया Play सेवाएं इंस्टॉल/अपडेट करें और पुनः प्रयास करें।',
+    },
+    SIGN_IN_CANCELLED: {
+      title: 'Google साइन-इन रद्द किया गया',
+      message: 'आपने Google साइन-इन विंडो बंद कर दी।\nGoogle Drive बैकअप लोड करने के लिए साइन-इन आवश्यक है।',
+    },
+    SIGN_IN_FAIL: {
+      title: 'Google साइन-इन विफल',
+      message: 'Google साइन-इन के दौरान त्रुटि हुई।\nकृपया कुछ समय बाद पुनः प्रयास करें।',
+    },
+    SCOPE_DENIED: {
+      title: 'Drive अनुमति आवश्यक',
+      message: 'Google Drive की एक्सेस अनुमति नहीं दी गई।\nपुनः प्रयास करते समय "अनुमति दें" चुनें।',
+    },
+    TOKEN_FAIL: {
+      title: 'ऑथ टोकन प्राप्त करने में विफल',
+      message: 'Google ऑथ टोकन प्राप्त नहीं हो सका।\nनेटवर्क कनेक्शन जांचें और पुनः प्रयास करें।',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API अक्षम',
+      message: 'Google Drive API सक्षम नहीं है।\nकृपया एडमिन से संपर्क करें।',
+    },
+    LIST_UNAUTHORIZED: {
+      title: 'Drive एक्सेस अस्वीकृत',
+      message: 'Drive एक्सेस की समय-सीमा समाप्त हो गई है।\nकृपया पुनः साइन इन करें।',
+    },
+    LIST_FAIL: {
+      title: 'Drive खोज विफल',
+      message: 'बैकअप फ़ाइल सूची लोड नहीं हो सकी।\nकृपया कुछ समय बाद पुनः प्रयास करें।',
+    },
+    NETWORK_FAIL: {
+      title: 'नेटवर्क त्रुटि',
+      message: 'कृपया इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।',
+    },
+  },
   alerts: {
     errorTitle: 'त्रुटि',
     missingAuthInfo: 'प्रमाणीकरण जानकारी अनुपस्थित',

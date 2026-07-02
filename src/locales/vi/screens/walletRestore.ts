@@ -17,6 +17,44 @@ export default {
   restoreNow: 'Khôi phục',
   driveAuthFailTitle: 'Cần đăng nhập Google',
   driveAuthFailMessage: 'Vui lòng đăng nhập lại\nSau đó nhấn lại nút Google Drive',
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: 'Cần Google Play Services',
+      message: 'Google Play Services không khả dụng trên thiết bị này.\nVui lòng cài đặt/cập nhật Play Services và thử lại.',
+    },
+    SIGN_IN_CANCELLED: {
+      title: 'Đã hủy đăng nhập Google',
+      message: 'Bạn đã đóng cửa sổ đăng nhập Google.\nCần đăng nhập để tải bản sao lưu Google Drive.',
+    },
+    SIGN_IN_FAIL: {
+      title: 'Đăng nhập Google thất bại',
+      message: 'Đã xảy ra lỗi khi đăng nhập Google.\nVui lòng thử lại sau ít phút.',
+    },
+    SCOPE_DENIED: {
+      title: 'Cần quyền truy cập Drive',
+      message: 'Quyền truy cập Google Drive chưa được cấp.\nHãy chọn "Cho phép" khi thử lại.',
+    },
+    TOKEN_FAIL: {
+      title: 'Không lấy được token xác thực',
+      message: 'Không thể lấy token xác thực Google.\nKiểm tra kết nối mạng và thử lại.',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API bị vô hiệu',
+      message: 'Google Drive API chưa được bật.\nVui lòng liên hệ quản trị viên.',
+    },
+    LIST_UNAUTHORIZED: {
+      title: 'Không có quyền truy cập Drive',
+      message: 'Quyền truy cập Drive đã hết hạn.\nVui lòng đăng nhập lại.',
+    },
+    LIST_FAIL: {
+      title: 'Không lấy được danh sách Drive',
+      message: 'Không thể lấy danh sách tệp sao lưu.\nVui lòng thử lại sau ít phút.',
+    },
+    NETWORK_FAIL: {
+      title: 'Lỗi mạng',
+      message: 'Vui lòng kiểm tra kết nối Internet và thử lại.',
+    },
+  },
   alerts: {
     errorTitle: 'Lỗi',
     missingAuthInfo: 'Thiếu thông tin xác thực',

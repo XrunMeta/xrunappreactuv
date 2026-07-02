@@ -16,6 +16,44 @@ export default {
   restoreNow: '恢复',
   driveAuthFailTitle: '需要 Google 登录',
   driveAuthFailMessage: '请重新登录\n然后再次点击 Google Drive 按钮',
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: '需要 Google Play 服务',
+      message: '此设备无法使用 Google Play 服务。\n请安装/更新 Play 服务后重试。',
+    },
+    SIGN_IN_CANCELLED: {
+      title: '已取消 Google 登录',
+      message: '您关闭了 Google 登录窗口。\n加载 Google Drive 备份需要登录。',
+    },
+    SIGN_IN_FAIL: {
+      title: 'Google 登录失败',
+      message: 'Google 登录时发生错误。\n请稍后重试。',
+    },
+    SCOPE_DENIED: {
+      title: '需要 Drive 权限',
+      message: '未授予 Google Drive 访问权限。\n重试时请选择"允许"。',
+    },
+    TOKEN_FAIL: {
+      title: '获取认证令牌失败',
+      message: '无法获取 Google 认证令牌。\n请检查网络连接后重试。',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API 已停用',
+      message: 'Google Drive API 未启用。\n请联系管理员。',
+    },
+    LIST_UNAUTHORIZED: {
+      title: 'Drive 访问被拒绝',
+      message: 'Drive 访问权限已过期。\n请重新登录。',
+    },
+    LIST_FAIL: {
+      title: 'Drive 查询失败',
+      message: '无法获取备份文件列表。\n请稍后重试。',
+    },
+    NETWORK_FAIL: {
+      title: '网络错误',
+      message: '请检查互联网连接后重试。',
+    },
+  },
   alerts: {
     errorTitle: '错误',
     missingAuthInfo: '认证信息缺失',

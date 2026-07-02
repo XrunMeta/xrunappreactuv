@@ -17,6 +17,45 @@ export default {
   restoreNow: '복원하기',
   driveAuthFailTitle: '구글 로그인 필요',
   driveAuthFailMessage: '다시 로그인 해주세요\n다시 Google Drive 버튼을 클릭 해주세요',
+
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: 'Google Play 서비스 필요',
+      message: '이 기기에서 Google Play 서비스를 사용할 수 없어요.\nPlay 서비스를 설치/업데이트하고 다시 시도해주세요.',
+    },
+    SIGN_IN_CANCELLED: {
+      title: '구글 로그인 취소됨',
+      message: '구글 로그인 창을 닫으셨어요.\n구글 드라이브 백업을 불러오려면 로그인이 필요해요.',
+    },
+    SIGN_IN_FAIL: {
+      title: '구글 로그인 실패',
+      message: '구글 로그인 도중 오류가 발생했어요.\n잠시 후 다시 시도해주세요.',
+    },
+    SCOPE_DENIED: {
+      title: '드라이브 권한 필요',
+      message: '구글 드라이브 접근 권한이 승인되지 않았어요.\n다시 시도할 때 "허용" 을 선택해주세요.',
+    },
+    TOKEN_FAIL: {
+      title: '인증 토큰 획득 실패',
+      message: '구글 인증 토큰을 받지 못했어요.\n네트워크 연결을 확인하고 다시 시도해주세요.',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API 비활성화',
+      message: 'Google Drive API 가 활성화되어 있지 않아요.\n관리자에게 문의해주세요.',
+    },
+    LIST_UNAUTHORIZED: {
+      title: '드라이브 접근 권한 없음',
+      message: '드라이브 접근 권한이 만료되었어요.\n다시 로그인 해주세요.',
+    },
+    LIST_FAIL: {
+      title: '드라이브 조회 실패',
+      message: '백업 파일 목록을 불러올 수 없어요.\n잠시 후 다시 시도해주세요.',
+    },
+    NETWORK_FAIL: {
+      title: '네트워크 오류',
+      message: '인터넷 연결을 확인하고 다시 시도해주세요.',
+    },
+  },
   alerts: {
     errorTitle: '오류',
     missingAuthInfo: '인증 정보 누락',

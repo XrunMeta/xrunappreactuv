@@ -17,6 +17,44 @@ export default {
   restoreNow: 'Restore',
   driveAuthFailTitle: 'Google sign-in required',
   driveAuthFailMessage: 'Please sign in again\nThen tap the Google Drive button again',
+  driveErr: {
+    NO_PLAY_SERVICES: {
+      title: 'Google Play Services required',
+      message: 'Google Play Services is unavailable on this device.\nPlease install/update Play Services and try again.',
+    },
+    SIGN_IN_CANCELLED: {
+      title: 'Google sign-in cancelled',
+      message: 'You closed the Google sign-in window.\nSign-in is required to load your Google Drive backup.',
+    },
+    SIGN_IN_FAIL: {
+      title: 'Google sign-in failed',
+      message: 'An error occurred during Google sign-in.\nPlease try again in a moment.',
+    },
+    SCOPE_DENIED: {
+      title: 'Drive permission required',
+      message: 'Google Drive access permission was not granted.\nPlease tap "Allow" when retrying.',
+    },
+    TOKEN_FAIL: {
+      title: 'Failed to get auth token',
+      message: 'Could not get Google auth token.\nCheck your network connection and try again.',
+    },
+    DRIVE_API_DISABLED: {
+      title: 'Drive API disabled',
+      message: 'Google Drive API is not enabled.\nPlease contact support.',
+    },
+    LIST_UNAUTHORIZED: {
+      title: 'Drive access denied',
+      message: 'Drive access has expired.\nPlease sign in again.',
+    },
+    LIST_FAIL: {
+      title: 'Drive lookup failed',
+      message: 'Could not fetch backup file list.\nPlease try again in a moment.',
+    },
+    NETWORK_FAIL: {
+      title: 'Network error',
+      message: 'Please check your internet connection and try again.',
+    },
+  },
   alerts: {
     errorTitle: 'Error',
     missingAuthInfo: 'Missing authentication info',
