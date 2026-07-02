@@ -22,8 +22,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Clipboard from 'expo-clipboard';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal, WalletKeyPinSetupModal } from '../components';
-import { COLORS, FONTS, SIZES } from '../constants';
+import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal, WalletKeyPinSetupModal, FormField, PrimaryButton } from '../components';
+import { Feather } from '@expo/vector-icons';
+import { COLORS, FONTS, SIZES, COMMON_STYLES, FORM_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
@@ -85,6 +86,11 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
   const [passphraseModalVisible, setPassphraseModalVisible] = useState(false);
   const [passphraseInput, setPassphraseInput] = useState('');
   const [passphraseConfirm, setPassphraseConfirm] = useState('');
+
+  const [passphraseSecure, setPassphraseSecure] = useState(true);
+  const [passphraseConfirmSecure, setPassphraseConfirmSecure] = useState(true);
+
+  const filterPasswordInput = (value: string) => value.replace(/[^\x21-\x7E]/g, '');
 
   const pendingGdriveRef = useRef<((pp: string) => void) | null>(null);
 
@@ -601,21 +607,9 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.optionCard, styles.dangerCard, stage === 'busy' && styles.disabled]}
-              onPress={() => requestBackupConsent(handleGdrivePlainBackup, { isGoogleDrive: true, dangerNote: t('screens.walletPrivateKeyGoogleAuth.consentDangerPlain') })}
-              disabled={stage === 'busy'}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="warning-outline" size={28} color="#ffffff" />
-              <View style={styles.optionTextWrap}>
-                <Text style={styles.dangerLabel}>{t('screens.walletPrivateKeyGoogleAuth.optionPlainLabel')}</Text>
-                <Text style={styles.dangerDesc}>
-                  {t('screens.walletPrivateKeyGoogleAuth.optionPlainDesc')}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#ffffff" />
-            </TouchableOpacity>
+            {
+
+}
 
             {stage === 'busy' && (
               <View style={styles.busyOverlay}>
@@ -691,11 +685,11 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         />
       )}
 
-      {}
+      {
+}
       <Modal
         visible={passphraseModalVisible}
         animationType="slide"
-        transparent
         onRequestClose={() => {
           setPassphraseModalVisible(false);
           setPassphraseInput('');
@@ -703,76 +697,85 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
           pendingGdriveRef.current = null;
         }}
       >
-        <KeyboardAvoidingView
-          style={styles.passphraseOverlay}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View style={styles.passphraseCard}>
-            <Text style={styles.passphraseTitle}>
-              {t('screens.walletPrivateKeyGoogleAuth.passphraseModalTitle') || '클라우드 백업 비밀번호 설정'}
-            </Text>
-            <Text style={styles.passphraseWarning}>
-              {t('screens.walletPrivateKeyGoogleAuth.passphraseModalWarning') ||
-                '이 비밀번호를 분실하면 클라우드 백업을 복원할 수 없습니다. 안전한 곳에 따로 보관하세요.'}
-            </Text>
-            <TextInput
-              style={styles.passphraseTextField}
-              placeholder={t('screens.walletPrivateKeyGoogleAuth.passphraseInputPlaceholder') || '비밀번호 (8자 이상)'}
-              secureTextEntry
-              value={passphraseInput}
-              onChangeText={setPassphraseInput}
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="off"
-              importantForAutofill="no"
-              spellCheck={false}
-              testID="passphrase-input"
-            />
-            <TextInput
-              style={styles.passphraseTextField}
-              placeholder={t('screens.walletPrivateKeyGoogleAuth.passphraseConfirmPlaceholder') || '비밀번호 확인'}
-              secureTextEntry
-              value={passphraseConfirm}
-              onChangeText={setPassphraseConfirm}
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="off"
-              importantForAutofill="no"
-              spellCheck={false}
-              testID="passphrase-confirm"
-            />
-            {passphraseInput.length > 0 && passphraseInput.length < 8 && (
-              <Text style={styles.passphraseMismatch}>
-                {t('screens.walletPrivateKeyGoogleAuth.passphraseTooShort') || '비밀번호는 8자 이상이어야 해요.'}
+        <View style={styles.passphraseScreenContainer}>
+          <Header
+            title={t('screens.walletPrivateKeyGoogleAuth.passphraseModalTitle') || '클라우드 백업 비밀번호 설정'}
+            onBackPress={() => {
+              setPassphraseModalVisible(false);
+              setPassphraseInput('');
+              setPassphraseConfirm('');
+              pendingGdriveRef.current = null;
+            }}
+            showBackButton
+          />
+          <SafeScrollView
+            contentContainerStyle={styles.passphraseScrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            autoAdjustKeyboardPadding={true}
+          >
+            <View style={styles.passphraseFormFieldContainer}>
+              <FormField
+                label={t('screens.walletPrivateKeyGoogleAuth.passphraseInputLabel') || '백업 비밀번호'}
+                placeholder={t('screens.walletPrivateKeyGoogleAuth.passphraseInputPlaceholder') || '비밀번호 (8자 이상)'}
+                secureTextEntry={passphraseSecure}
+                value={passphraseInput}
+                onChangeText={(text) => setPassphraseInput(filterPasswordInput(text))}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="off"
+                importantForAutofill="no"
+                spellCheck={false}
+                rightAccessory={
+                  <TouchableOpacity onPress={() => setPassphraseSecure((prev) => !prev)}>
+                    <Feather name={passphraseSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
+                  </TouchableOpacity>
+                }
+                containerStyle={styles.passphraseFieldContainer}
+                testID="passphrase-input"
+              />
+
+              <FormField
+                label={t('screens.walletPrivateKeyGoogleAuth.passphraseConfirmLabel') || '비밀번호 확인'}
+                placeholder={t('screens.walletPrivateKeyGoogleAuth.passphraseConfirmPlaceholder') || '비밀번호 확인'}
+                secureTextEntry={passphraseConfirmSecure}
+                value={passphraseConfirm}
+                onChangeText={(text) => setPassphraseConfirm(filterPasswordInput(text))}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="off"
+                importantForAutofill="no"
+                spellCheck={false}
+                rightAccessory={
+                  <TouchableOpacity onPress={() => setPassphraseConfirmSecure((prev) => !prev)}>
+                    <Feather name={passphraseConfirmSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
+                  </TouchableOpacity>
+                }
+                containerStyle={styles.passphraseFieldContainer}
+                testID="passphrase-confirm"
+              />
+
+              <Text style={styles.passphraseHelperText}>
+                {t('screens.walletPrivateKeyGoogleAuth.passphraseModalWarning') ||
+                  '이 비밀번호를 분실하면 클라우드 백업을 복원할 수 없습니다. 안전한 곳에 따로 보관하세요.'}
               </Text>
-            )}
-            {passphraseInput.length >= 8 && passphraseConfirm.length > 0 && passphraseInput !== passphraseConfirm && (
-              <Text style={styles.passphraseMismatch}>
-                {t('screens.walletPrivateKeyGoogleAuth.passphraseMismatch') || '비밀번호가 일치하지 않습니다.'}
-              </Text>
-            )}
-            <View style={styles.passphraseButtonRow}>
-              <TouchableOpacity
-                style={[styles.passphraseButton, styles.passphraseCancelBtn]}
-                onPress={() => {
-                  setPassphraseModalVisible(false);
-                  setPassphraseInput('');
-                  setPassphraseConfirm('');
-                  pendingGdriveRef.current = null;
-                }}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.passphraseCancelText}>
-                  {t('screens.walletPrivateKeyGoogleAuth.cancel') || '취소'}
+
+              {passphraseInput.length > 0 && passphraseInput.length < 8 && (
+                <Text style={styles.passphraseMismatch}>
+                  {t('screens.walletPrivateKeyGoogleAuth.passphraseTooShort') || '비밀번호는 8자 이상이어야 해요.'}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.passphraseButton,
-                  styles.passphraseConfirmBtn,
-                  (passphraseInput.length < 8 || passphraseInput !== passphraseConfirm) && styles.passphraseDisabledBtn,
-                ]}
-                disabled={passphraseInput.length < 8 || passphraseInput !== passphraseConfirm}
+              )}
+              {passphraseInput.length >= 8 && passphraseConfirm.length > 0 && passphraseInput !== passphraseConfirm && (
+                <Text style={styles.passphraseMismatch}>
+                  {t('screens.walletPrivateKeyGoogleAuth.passphraseMismatch') || '비밀번호가 일치하지 않습니다.'}
+                </Text>
+              )}
+            </View>
+
+            <View style={styles.passphraseBottomSection}>
+              <PrimaryButton
+                title={t('screens.walletPrivateKeyGoogleAuth.passphraseSubmit') || '백업하기'}
+                fullWidth
                 onPress={() => {
                   const pp = passphraseInput;
                   setPassphraseModalVisible(false);
@@ -781,16 +784,12 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                   pendingGdriveRef.current?.(pp);
                   pendingGdriveRef.current = null;
                 }}
-                activeOpacity={0.8}
+                disabled={passphraseInput.length < 8 || passphraseInput !== passphraseConfirm}
                 testID="passphrase-submit"
-              >
-                <Text style={styles.passphraseConfirmText}>
-                  {t('screens.walletPrivateKeyGoogleAuth.passphraseSubmit') || '백업하기'}
-                </Text>
-              </TouchableOpacity>
+              />
             </View>
-          </View>
-        </KeyboardAvoidingView>
+          </SafeScrollView>
+        </View>
       </Modal>
 
       {}
@@ -1046,6 +1045,30 @@ const styles = StyleSheet.create({
     color: COLORS.darkGray,
     fontFamily: FONTS.medium,
     textDecorationLine: 'underline',
+  },
+
+  passphraseScreenContainer: {
+    ...COMMON_STYLES.container,
+  },
+  passphraseScrollContent: {
+    flexGrow: 1,
+    ...COMMON_STYLES.scrollContent,
+  },
+  passphraseFormFieldContainer: {
+    ...FORM_STYLES.fieldContainer,
+  },
+  passphraseFieldContainer: {
+    borderWidth: 0,
+  },
+  passphraseHelperText: {
+    fontSize: FONTS.size.small,
+    lineHeight: 15,
+    color: '#747474',
+    fontFamily: 'Roboto-Regular',
+    marginTop: 8,
+  },
+  passphraseBottomSection: {
+    ...COMMON_STYLES.bottomButtonContainer,
   },
 
   passphraseOverlay: {
