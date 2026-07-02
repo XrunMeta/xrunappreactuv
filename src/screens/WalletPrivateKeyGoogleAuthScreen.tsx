@@ -755,17 +755,17 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                 testID="passphrase-confirm"
               />
 
-              <Text style={styles.passphraseHelperText}>
-                {t('screens.walletPrivateKeyGoogleAuth.passphraseModalWarning') ||
-                  '이 비밀번호를 분실하면 클라우드 백업을 복원할 수 없습니다. 안전한 곳에 따로 보관하세요.'}
-              </Text>
-
               {}
               {passphraseInput.length >= 8 && passphraseConfirm.length > 0 && passphraseInput !== passphraseConfirm && (
                 <Text style={styles.passphraseMismatch}>
                   {t('screens.walletPrivateKeyGoogleAuth.passphraseMismatch') || '비밀번호가 일치하지 않습니다.'}
                 </Text>
               )}
+
+              <Text style={styles.passphraseHelperText}>
+                {t('screens.walletPrivateKeyGoogleAuth.passphraseModalWarning') ||
+                  '이 비밀번호를 분실하면 클라우드 백업을 복원할 수 없습니다. 안전한 곳에 따로 보관하세요.'}
+              </Text>
             </View>
 
             <View style={styles.passphraseBottomSection}>
