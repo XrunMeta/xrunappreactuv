@@ -31,6 +31,14 @@ export default {
       title: '구글 로그인 실패',
       message: '구글 로그인 도중 오류가 발생했어요.\n잠시 후 다시 시도해주세요.',
     },
+    SIGN_IN_IN_PROGRESS: {
+      title: '이미 로그인 진행 중',
+      message: '이전 구글 로그인 요청이 아직 처리 중이에요.\n앱을 완전히 종료 후 재실행하고 다시 시도해주세요.',
+    },
+    SIGN_IN_CONFIG_ERROR: {
+      title: '앱 설정 오류',
+      message: 'Google 로그인 앱 설정에 문제가 있어요.\n(DEVELOPER_ERROR — SHA-1 지문 또는 OAuth 클라이언트 ID 불일치)\n관리자에게 문의해주세요.',
+    },
     SCOPE_DENIED: {
       title: '드라이브 권한 필요',
       message: '구글 드라이브 접근 권한이 승인되지 않았어요.\n다시 시도할 때 "허용" 을 선택해주세요.',

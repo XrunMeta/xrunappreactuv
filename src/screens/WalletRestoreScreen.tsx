@@ -547,11 +547,34 @@ export const WalletRestoreScreen = () => {
       try {
         await GoogleSignin.signIn();
       } catch (signErr: any) {
-        const code = signErr?.code;
-        if (code === 'SIGN_IN_CANCELLED' || code === '-5' || /cancel/i.test(String(signErr?.message ?? ''))) {
+        const code = String(signErr?.code ?? '');
+        const msg = String(signErr?.message ?? '');
+        console.warn('[WalletRestore] signIn err code=', code, 'msg=', msg);
+
+        if (code === 'SIGN_IN_CANCELLED' || code === '-5' || code === '12501' || /cancel/i.test(msg)) {
           throwDriveErr('SIGN_IN_CANCELLED', signErr);
         }
-        throwDriveErr('SIGN_IN_FAIL', signErr);
+        if (code === 'IN_PROGRESS' || code === '-1' || code === '8') {
+
+          throwDriveErr('SIGN_IN_IN_PROGRESS', signErr);
+        }
+        if (code === 'PLAY_SERVICES_NOT_AVAILABLE' || code === '-3' || code === '2') {
+          throwDriveErr('NO_PLAY_SERVICES', signErr);
+        }
+        if (code === 'DEVELOPER_ERROR' || code === '10') {
+
+          throwDriveErr('SIGN_IN_CONFIG_ERROR', signErr);
+        }
+        if (code === 'NETWORK_ERROR' || code === '-13' || code === '7') {
+          throwDriveErr('NETWORK_FAIL', signErr);
+        }
+
+        const e: any = new Error(`SIGN_IN_FAIL:${code}:${msg}`);
+        e.code = 'SIGN_IN_FAIL';
+        e.rawCode = code;
+        e.rawMessage = msg;
+        e.cause = signErr;
+        throw e;
       }
     }
     try {
@@ -622,13 +645,17 @@ export const WalletRestoreScreen = () => {
       setStage('gdrive-list');
     } catch (e: any) {
       setStage('options');
-      if (__DEV__) console.warn('[WalletRestore] gdrive list fail:', e?.code, e?.message);
+      console.warn('[WalletRestore] gdrive list fail:', e?.code, e?.rawCode, e?.message);
 
       const code: string = e?.code ?? 'UNKNOWN';
       const titleKey = `screens.walletRestore.driveErr.${code}.title`;
       const msgKey = `screens.walletRestore.driveErr.${code}.message`;
       const title = t(titleKey);
-      const message = t(msgKey);
+      let message = t(msgKey);
+
+      if (code === 'SIGN_IN_FAIL' && (e?.rawCode || e?.rawMessage)) {
+        message = `${message}\n\n[code: ${e.rawCode || '-'}]\n${(e.rawMessage || '').slice(0, 200)}`;
+      }
 
       const isFallback = title === titleKey || message === msgKey;
       await showAlert(
