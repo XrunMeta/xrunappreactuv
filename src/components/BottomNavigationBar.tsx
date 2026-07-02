@@ -77,10 +77,12 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 
     const v_b7726a = async () => {
       try {
+
         const v_a448ad = v_326be8.OS === 'ios'
           ? await v_85f2c8(v_9b57fc)
           : await v_3ca33e(v_9b57fc);
-        v_603c21(v_a448ad);
+        if (v_a448ad === null || v_a448ad === undefined) return; 
+        v_603c21((v_ba2215) => (v_ba2215 === v_a448ad ? v_ba2215 : v_a448ad));
         v_e84827.setItem(v_7ac310, v_a448ad ? '1' : '0').catch(() => {});
       } catch (v_5e9bfe) {
         console.error('[BottomNavigationBar] 지갑 표시 상태 오류:', v_5e9bfe);

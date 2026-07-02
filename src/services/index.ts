@@ -638,7 +638,7 @@ export const v_6acfff = async (v_c65f5d): Promise<boolean> => {
   return true; 
 };
 
-export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
+export const v_85f2c8 = async (v_c65f5d): Promise<boolean | null> => {
   try {
     const v_88781f = await v_de7bac();
     if (v_88781f?.data && v_88781f.data.iosOnWallet !== undefined) {
@@ -657,14 +657,17 @@ export const v_85f2c8 = async (v_c65f5d): Promise<boolean> => {
     }, v_c65f5d);
     if (!v_3393e3.ok) throw new Error(`HTTP error! status: ${v_3393e3.status}`);
     const v_9390e8 = await v_3393e3.json();
-    return v_9390e8?.data?.iosOnWallet === 1;
+    if (v_9390e8?.data?.iosOnWallet !== undefined) {
+      return v_9390e8.data.iosOnWallet === 1;
+    }
+    return null;
   } catch (v_5e9bfe) {
     console.error('iOS 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
-    return false;
+    return null;
   }
 };
 
-export const v_3ca33e = async (v_c65f5d): Promise<boolean> => {
+export const v_3ca33e = async (v_c65f5d): Promise<boolean | null> => {
   try {
     const v_88781f = await v_de7bac();
     if (v_88781f?.data && v_88781f.data.androidOnWallet !== undefined) {
@@ -683,10 +686,13 @@ export const v_3ca33e = async (v_c65f5d): Promise<boolean> => {
     }, v_c65f5d);
     if (!v_3393e3.ok) throw new Error(`HTTP error! status: ${v_3393e3.status}`);
     const v_9390e8 = await v_3393e3.json();
-    return v_9390e8?.data?.androidOnWallet === 1;
+    if (v_9390e8?.data?.androidOnWallet !== undefined) {
+      return v_9390e8.data.androidOnWallet === 1;
+    }
+    return null;
   } catch (v_5e9bfe) {
     console.error('Android 지갑 표시 상태 가져오기 오류:', v_5e9bfe);
-    return false;
+    return null;
   }
 };
 
