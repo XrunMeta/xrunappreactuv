@@ -25,8 +25,10 @@ try {
 }
 import * as FileSystem from 'expo-file-system/legacy';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal } from '../components';
-import { COLORS, FONTS, SIZES } from '../constants';
+import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal, FormField, PrimaryButton } from '../components';
+import { Feather } from '@expo/vector-icons';
+import { COLORS, FONTS, SIZES, COMMON_STYLES, FORM_STYLES } from '../constants';
+import { sendEmailVerificationCode } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
@@ -89,6 +91,14 @@ export const WalletRestoreScreen = () => {
   const [passphraseModalVisible, setPassphraseModalVisible] = useState(false);
   const [passphraseInput, setPassphraseInput] = useState('');
 
+  const [passphraseSecure, setPassphraseSecure] = useState(true);
+  const filterPasswordInput = (value: string) => value.replace(/[^\x21-\x7E]/g, '');
+
+  const [otpModalVisible, setOtpModalVisible] = useState(false);
+  const [otpInput, setOtpInput] = useState('');
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifiedPin, setOtpVerifiedPin] = useState<string | null>(null);
+
   const [pendingBv2Data, setPendingBv2Data] = useState<{
     passphrase: string;
     payload: BackupPayload;
@@ -136,22 +146,30 @@ export const WalletRestoreScreen = () => {
     return () => { cancelled = true; };
   }, [goBack, showAlert, t]);
 
-  const onPinPromptSuccess = (_wallets: WalletKey[], pinValue?: string) => {
+  const onPinPromptSuccess = async (_wallets: WalletKey[], pinValue?: string) => {
     const p = pinValue ?? '';
     setPin(p);
     setPinPromptVisible(false);
 
     if (pendingBv2Data) {
-      const { passphrase, payload, source } = pendingBv2Data;
-      setPendingBv2Data(null);
-      if (memberId == null || !email) return;
-      setStage('busy');
-      restoreBackup(payload, email, memberId, passphrase, p).then((result) => {
+      setOtpVerifiedPin(p);
+      if (!email) return;
+      try {
+        setOtpSending(true);
+        await sendEmailVerificationCode(email);
+        setOtpSending(false);
+        setOtpInput('');
+        setOtpModalVisible(true);
+      } catch (e: any) {
+        setOtpSending(false);
+        console.warn('[WalletRestore] OTP 발송 실패:', e?.message);
+        await showAlert(
+          t('screens.walletRestore.otpSendFailTitle') || '인증번호 발송 실패',
+          t('screens.walletRestore.otpSendFailMessage') || '잠시 후 다시 시도해주세요.',
+        );
+        setPendingBv2Data(null);
         setStage('options');
-        showRestoreResult(result.ok, result.imported, result.skipped, result.reason, source);
-      }).catch(() => {
-        setStage('options');
-      });
+      }
       return;
     }
 
@@ -160,6 +178,39 @@ export const WalletRestoreScreen = () => {
       setPendingBackup(null);
       runDecryption(content, source, p);
     }
+  };
+
+  const onOtpSubmit = async () => {
+    if (!pendingBv2Data || !otpVerifiedPin || memberId == null || !email) return;
+    const code = otpInput.trim();
+    if (code.length < 4) {
+      await showAlert(
+        t('screens.walletRestore.otpInvalidTitle') || '인증번호 오류',
+        t('screens.walletRestore.otpInvalidMessage') || '인증번호를 정확히 입력해주세요.',
+      );
+      return;
+    }
+
+    const { passphrase, payload, source } = pendingBv2Data;
+    setPendingBv2Data(null);
+    setOtpModalVisible(false);
+    setOtpVerifiedPin(null);
+    setStage('busy');
+    try {
+      const result = await restoreBackup(payload, email, memberId, passphrase, otpVerifiedPin);
+      setStage('options');
+      showRestoreResult(result.ok, result.imported, result.skipped, result.reason, source);
+    } catch (e) {
+      setStage('options');
+    }
+  };
+
+  const onOtpCancel = () => {
+    setOtpModalVisible(false);
+    setOtpInput('');
+    setOtpVerifiedPin(null);
+    setPendingBv2Data(null);
+    setStage('options');
   };
 
   const onPinPromptCancel = () => {
@@ -563,6 +614,7 @@ export const WalletRestoreScreen = () => {
   }
 
   const isBv2PinPhase = pendingBv2Data != null;
+
   const pinModal = memberId != null && email ? (
     <WalletKeyPinPromptModal
       visible={pinPromptVisible}
@@ -571,10 +623,10 @@ export const WalletRestoreScreen = () => {
       onSuccess={onPinPromptSuccess}
       onCancel={onPinPromptCancel}
       skipVaultCheck
-      requireConfirm={isBv2PinPhase}
+      requireConfirm={false}
       {...(isBv2PinPhase ? {
-        titleOverride: t('screens.walletRestore.restoreSetPinTitle'),
-        descriptionOverride: t('screens.walletRestore.restoreSetPinDesc'),
+        titleOverride: t('screens.walletRestore.restoreVerifyPinTitle') || '지갑 PIN 확인',
+        descriptionOverride: t('screens.walletRestore.restoreVerifyPinDesc') || '백업 시 사용한 지갑 PIN 을 입력해주세요.',
       } : {})}
     />
   ) : null;
@@ -583,58 +635,111 @@ export const WalletRestoreScreen = () => {
     <Modal
       visible={passphraseModalVisible}
       animationType="slide"
-      transparent
       onRequestClose={onPassphraseCancel}
     >
-      <KeyboardAvoidingView
-        style={restoreStyles.ppOverlay}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <View style={restoreStyles.ppCard}>
-          <Text style={restoreStyles.ppTitle}>
-            {t('screens.walletRestore.passphraseModalTitle') || '백업 비밀번호 입력'}
-          </Text>
-          <Text style={restoreStyles.ppDesc}>
-            {t('screens.walletRestore.passphraseModalDesc') ||
-              '이 백업은 passphrase로 암호화되어 있습니다. 백업 시 설정한 비밀번호를 입력하세요.'}
-          </Text>
-          <TextInput
-            style={restoreStyles.ppInput}
-            placeholder={t('screens.walletRestore.passphraseInputPlaceholder') || 'passphrase 입력'}
-            secureTextEntry
-            value={passphraseInput}
-            onChangeText={setPassphraseInput}
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="off"
-            importantForAutofill="no"
-            spellCheck={false}
-            testID="restore-passphrase-input"
-          />
-          <View style={restoreStyles.ppButtonRow}>
-            <TouchableOpacity
-              style={[restoreStyles.ppButton, restoreStyles.ppCancelBtn]}
-              onPress={onPassphraseCancel}
-              activeOpacity={0.8}
-            >
-              <Text style={restoreStyles.ppCancelText}>{t('common.cancel') || '취소'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                restoreStyles.ppButton,
-                restoreStyles.ppConfirmBtn,
-                !passphraseInput && restoreStyles.ppDisabledBtn,
-              ]}
-              disabled={!passphraseInput}
-              onPress={onPassphraseSubmit}
-              activeOpacity={0.8}
-              testID="restore-passphrase-submit"
-            >
-              <Text style={restoreStyles.ppConfirmText}>{t('common.confirm') || '복원 시작'}</Text>
-            </TouchableOpacity>
+      <View style={restoreStyles.ppScreenContainer}>
+        <Header
+          title={t('screens.walletRestore.passphraseModalTitle') || '백업 비밀번호 입력'}
+          onBackPress={onPassphraseCancel}
+          showBackButton
+        />
+        <SafeScrollView
+          contentContainerStyle={restoreStyles.ppScrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          autoAdjustKeyboardPadding={true}
+        >
+          <View style={restoreStyles.ppFormFieldContainer}>
+            <FormField
+              label={t('screens.walletRestore.passphraseInputLabel') || '백업 비밀번호'}
+              placeholder={t('screens.walletRestore.passphraseInputPlaceholder') || '백업 비밀번호'}
+              secureTextEntry={passphraseSecure}
+              value={passphraseInput}
+              onChangeText={(text) => setPassphraseInput(filterPasswordInput(text))}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
+              importantForAutofill="no"
+              spellCheck={false}
+              rightAccessory={
+                <TouchableOpacity onPress={() => setPassphraseSecure((prev) => !prev)}>
+                  <Feather name={passphraseSecure ? 'eye-off' : 'eye'} size={20} color="#b3b6be" />
+                </TouchableOpacity>
+              }
+              containerStyle={restoreStyles.ppFieldContainer}
+              testID="restore-passphrase-input"
+            />
+
+            <Text style={restoreStyles.ppHelperText}>
+              {t('screens.walletRestore.passphraseModalDesc') ||
+                '이 백업은 백업 시 설정한 비밀번호로 암호화되어 있습니다. 그 비밀번호를 입력해주세요.'}
+            </Text>
           </View>
-        </View>
-      </KeyboardAvoidingView>
+
+          <View style={restoreStyles.ppBottomSection}>
+            <PrimaryButton
+              title={t('screens.walletRestore.passphraseSubmit') || '복원 시작'}
+              fullWidth
+              onPress={onPassphraseSubmit}
+              disabled={!passphraseInput}
+              testID="restore-passphrase-submit"
+            />
+          </View>
+        </SafeScrollView>
+      </View>
+    </Modal>
+  );
+
+  const otpModal = (
+    <Modal
+      visible={otpModalVisible}
+      animationType="slide"
+      onRequestClose={onOtpCancel}
+    >
+      <View style={restoreStyles.ppScreenContainer}>
+        <Header
+          title={t('screens.walletRestore.otpModalTitle') || '이메일 인증'}
+          onBackPress={onOtpCancel}
+          showBackButton
+        />
+        <SafeScrollView
+          contentContainerStyle={restoreStyles.ppScrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          autoAdjustKeyboardPadding={true}
+        >
+          <View style={restoreStyles.ppFormFieldContainer}>
+            <FormField
+              label={t('screens.walletRestore.otpInputLabel') || '인증번호'}
+              placeholder={t('screens.walletRestore.otpInputPlaceholder') || '이메일로 받은 인증번호 입력'}
+              keyboardType="number-pad"
+              value={otpInput}
+              onChangeText={(text) => setOtpInput(text.replace(/[^0-9]/g, ''))}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="one-time-code"
+              maxLength={8}
+              containerStyle={restoreStyles.ppFieldContainer}
+              testID="restore-otp-input"
+            />
+
+            <Text style={restoreStyles.ppHelperText}>
+              {t('screens.walletRestore.otpModalDesc') ||
+                `${email} 로 인증번호를 발송했어요. 이메일을 확인하고 6자리 번호를 입력해주세요.`}
+            </Text>
+          </View>
+
+          <View style={restoreStyles.ppBottomSection}>
+            <PrimaryButton
+              title={t('screens.walletRestore.otpSubmit') || '인증하고 복원'}
+              fullWidth
+              onPress={onOtpSubmit}
+              disabled={otpInput.length < 4 || otpSending}
+              testID="restore-otp-submit"
+            />
+          </View>
+        </SafeScrollView>
+      </View>
     </Modal>
   );
 
@@ -643,6 +748,7 @@ export const WalletRestoreScreen = () => {
       <SafeView style={styles.container}>
         {pinModal}
         {passphraseModal}
+        {otpModal}
         <Header
           title={t('screens.walletRestore.title') || '지갑 복원'}
           onBackPress={() => setStage('options')}
@@ -843,6 +949,31 @@ const styles = StyleSheet.create({
 });
 
 const restoreStyles = StyleSheet.create({
+
+  ppScreenContainer: {
+    ...COMMON_STYLES.container,
+  },
+  ppScrollContent: {
+    flexGrow: 1,
+    ...COMMON_STYLES.scrollContent,
+  },
+  ppFormFieldContainer: {
+    ...FORM_STYLES.fieldContainer,
+  },
+  ppFieldContainer: {
+    borderWidth: 0,
+  },
+  ppHelperText: {
+    fontSize: FONTS.size.small,
+    lineHeight: 15,
+    color: '#747474',
+    fontFamily: 'Roboto-Regular',
+    marginTop: 8,
+  },
+  ppBottomSection: {
+    ...COMMON_STYLES.bottomButtonContainer,
+  },
+
   ppOverlay: {
 
     flex: 1,
