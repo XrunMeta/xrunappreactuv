@@ -1327,10 +1327,15 @@ export const v_f40fc5 = () => {
                 ? `${v_8d41d7('screens.signup.ageLabel')} (${v_8d41d7('screens.signup.optional') || '선택사항'})`
                 : v_8d41d7('screens.signup.ageLabel')}
             </Text>
-            <View style={[v_d81136.inlineOptions]}>
+            {}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={v_d81136.ageScrollContent}
+            >
               {v_a3453e.useMemo(() => {
-                return v_600254 
-                  ? v_0c96f7 
+                return v_600254
+                  ? v_0c96f7
                   : v_0c96f7.filter(v_0bd920 => v_0bd920 !== '0');
               }, [v_600254]).map((v_0bd920, v_a56041, v_09228c) => {
                 const v_26dce6 = v_f83808 === v_0bd920;
@@ -1341,11 +1346,11 @@ export const v_f40fc5 = () => {
                     label={v_0bd920 === '0' ? (v_8d41d7('screens.signup.ageSelect') || '선택') : v_0bd920}
                     selected={v_26dce6}
                     onPress={() => v_64a312(v_0bd920)}
-                    flex={1}
+                    style={v_d81136.ageOption}
                   />
                 );
               })}
-            </View>
+            </ScrollView>
           </View>
 
           <FormField
@@ -1606,6 +1611,16 @@ const v_d81136 = v_472849.create({
     justifyContent: 'flex-start',
     gap: 8,
     width: '100%',
+  },
+  ageScrollContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 4,
+  },
+  ageOption: {
+    minWidth: 72,
+    paddingHorizontal: 16,
   },
   eyeButton: {
     height: 24,
