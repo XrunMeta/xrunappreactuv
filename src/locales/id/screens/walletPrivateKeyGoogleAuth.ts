@@ -63,7 +63,7 @@ export default {
   passphraseModalTitle: 'Atur kata sandi cadangan',
   passphraseModalWarning: 'Setiap file cadangan memiliki kata sandi tersendiri.\nIngat nama file dan kata sandinya bersama-sama,\nlalu masukkan kata sandi yang sama saat pemulihan.\nJika lupa, cadangan tidak dapat dipulihkan — simpan dengan aman.',
   passphraseInputLabel: 'Kata sandi cadangan',
-  passphraseInputPlaceholder: 'Masukkan kata sandi cadangan',
+  passphraseInputPlaceholder: 'Minimal 8 karakter',
   passphraseConfirmLabel: 'Konfirmasi kata sandi cadangan',
   passphraseConfirmPlaceholder: 'Masukkan ulang kata sandi cadangan',
   passphraseTooShort: 'Kata sandi harus minimal 8 karakter.',

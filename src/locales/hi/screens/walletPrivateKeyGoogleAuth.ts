@@ -63,7 +63,7 @@ export default {
   passphraseModalTitle: 'बैकअप पासवर्ड सेट करें',
   passphraseModalWarning: 'प्रत्येक बैकअप फ़ाइल का अपना अलग पासवर्ड होता है।\nफ़ाइल का नाम और पासवर्ड दोनों साथ याद रखें,\nऔर पुनर्स्थापना के समय वही पासवर्ड दर्ज करें जो बैकअप के समय सेट किया था।\nपासवर्ड भूलने पर पुनर्स्थापना संभव नहीं है — इसे सुरक्षित रखें।',
   passphraseInputLabel: 'बैकअप पासवर्ड',
-  passphraseInputPlaceholder: 'बैकअप पासवर्ड दर्ज करें',
+  passphraseInputPlaceholder: 'कम से कम 8 अक्षर',
   passphraseConfirmLabel: 'बैकअप पासवर्ड की पुष्टि करें',
   passphraseConfirmPlaceholder: 'बैकअप पासवर्ड पुनः दर्ज करें',
   passphraseTooShort: 'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।',

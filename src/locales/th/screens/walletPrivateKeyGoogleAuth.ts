@@ -63,7 +63,7 @@ export default {
   passphraseModalTitle: 'ตั้งรหัสผ่านสำรองข้อมูล',
   passphraseModalWarning: 'ไฟล์สำรองข้อมูลแต่ละไฟล์มีรหัสผ่านของตนเอง\nกรุณาจดจำชื่อไฟล์และรหัสผ่านคู่กัน\nและป้อนรหัสผ่านเดียวกันกับตอนสำรองข้อมูลเมื่อกู้คืน\nหากลืมรหัสผ่านจะไม่สามารถกู้คืนได้ กรุณาเก็บรักษาอย่างปลอดภัย',
   passphraseInputLabel: 'รหัสผ่านสำรองข้อมูล',
-  passphraseInputPlaceholder: 'ป้อนรหัสผ่านสำรองข้อมูล',
+  passphraseInputPlaceholder: 'อย่างน้อย 8 ตัวอักษร',
   passphraseConfirmLabel: 'ยืนยันรหัสผ่านสำรองข้อมูล',
   passphraseConfirmPlaceholder: 'ป้อนรหัสผ่านสำรองข้อมูลอีกครั้ง',
   passphraseTooShort: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',

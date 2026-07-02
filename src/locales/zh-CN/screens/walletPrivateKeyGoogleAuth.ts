@@ -63,7 +63,7 @@ export default {
   passphraseModalTitle: '设置备份密码',
   passphraseModalWarning: '每个备份文件都会保存独立的密码。\n请一并记住文件名和密码，\n恢复时请输入备份时设置的相同密码。\n若忘记密码将无法恢复，请妥善保管。',
   passphraseInputLabel: '备份密码',
-  passphraseInputPlaceholder: '输入备份密码',
+  passphraseInputPlaceholder: '至少 8 位字符',
   passphraseConfirmLabel: '确认备份密码',
   passphraseConfirmPlaceholder: '再次输入备份密码',
   passphraseTooShort: '密码必须至少8个字符。',

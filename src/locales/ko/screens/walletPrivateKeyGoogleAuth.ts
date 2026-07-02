@@ -63,7 +63,7 @@ export default {
   passphraseModalTitle: '백업 비밀번호 설정',
   passphraseModalWarning: '백업 파일마다 개별 비밀번호가 저장됩니다.\n파일명과 비밀번호를 함께 기억해두시고,\n복원 시 백업할 때 입력했던 비밀번호를 그대로 입력해주세요.\n비밀번호를 잊으면 복원할 수 없으니 안전하게 보관해주세요.',
   passphraseInputLabel: '백업 비밀번호',
-  passphraseInputPlaceholder: '백업 비밀번호 입력',
+  passphraseInputPlaceholder: '8자 이상',
   passphraseConfirmLabel: '백업 비밀번호 확인',
   passphraseConfirmPlaceholder: '백업 비밀번호 다시 입력',
   passphraseTooShort: '비밀번호는 8자 이상이어야 해요.',

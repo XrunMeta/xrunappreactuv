@@ -760,11 +760,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                   '이 비밀번호를 분실하면 클라우드 백업을 복원할 수 없습니다. 안전한 곳에 따로 보관하세요.'}
               </Text>
 
-              {passphraseInput.length > 0 && passphraseInput.length < 8 && (
-                <Text style={styles.passphraseMismatch}>
-                  {t('screens.walletPrivateKeyGoogleAuth.passphraseTooShort') || '비밀번호는 8자 이상이어야 해요.'}
-                </Text>
-              )}
+              {}
               {passphraseInput.length >= 8 && passphraseConfirm.length > 0 && passphraseInput !== passphraseConfirm && (
                 <Text style={styles.passphraseMismatch}>
                   {t('screens.walletPrivateKeyGoogleAuth.passphraseMismatch') || '비밀번호가 일치하지 않습니다.'}

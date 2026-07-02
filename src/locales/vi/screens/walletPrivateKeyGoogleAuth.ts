@@ -63,7 +63,7 @@ export default {
   passphraseModalTitle: 'Đặt mật khẩu sao lưu',
   passphraseModalWarning: 'Mỗi tệp sao lưu có mật khẩu riêng.\nHãy ghi nhớ tên tệp cùng với mật khẩu,\nvà nhập chính xác mật khẩu đã đặt khi sao lưu để khôi phục.\nNếu quên mật khẩu, không thể khôi phục — hãy giữ an toàn.',
   passphraseInputLabel: 'Mật khẩu sao lưu',
-  passphraseInputPlaceholder: 'Nhập mật khẩu sao lưu',
+  passphraseInputPlaceholder: 'Từ 8 ký tự trở lên',
   passphraseConfirmLabel: 'Xác nhận mật khẩu sao lưu',
   passphraseConfirmPlaceholder: 'Nhập lại mật khẩu sao lưu',
   passphraseTooShort: 'Mật khẩu phải có ít nhất 8 ký tự.',
