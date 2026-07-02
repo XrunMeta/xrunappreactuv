@@ -155,7 +155,7 @@ export const ShopScreen = () => {
     const [shopCountry, setShopCountry] = useState<'KR' | 'ID' | null>(null);  
     const [gpsDenied, setGpsDenied] = useState<boolean>(false);
 
-    const SHOP_DEV_EMAILS = ['oth-test@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+    const SHOP_DEV_EMAILS = ['oth-test@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
     const [isDevAccount, setIsDevAccount] = useState<boolean>(false);
     const [forceCountry, setForceCountry] = useState<'AUTO' | 'KR' | 'ID'>('AUTO');
     const { navigate } = useAppNavigation();

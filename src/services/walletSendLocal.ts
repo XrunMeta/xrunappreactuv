@@ -260,7 +260,7 @@ export async function sendOnchainLocal(
 export const sendPolygonLocal = sendOnchainLocal;
 
 export function isLocalSendEnabledForUser(email: string | null | undefined): boolean {
-  const LOCAL_SEND_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
+  const LOCAL_SEND_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
   const normEmail = (email ?? '').toLowerCase().trim();
   return LOCAL_SEND_DEV_EMAILS.includes(normEmail);
 }
