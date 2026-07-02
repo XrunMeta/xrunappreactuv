@@ -709,36 +709,9 @@ export const ShopScreen = () => {
                 >
                     {tab === 'xrunStore' ? (
                         <>
-                            {}
-                            {isDevAccount && (
-                                <View style={styles.devCountryRow}>
-                                    <Text style={styles.devCountryLabel}>DEV 국가:</Text>
-                                    {(['AUTO', 'KR', 'ID'] as const).map((c) => (
-                                        <TouchableOpacity
-                                            key={c}
-                                            onPress={async () => {
-                                                setForceCountry(c);
-                                                if (c === 'AUTO') {
-                                                    await AsyncStorage.removeItem('devShopForceCountry');
+                            {
 
-                                                    await AsyncStorage.removeItem('shopGpsCountry');
-                                                    setShopCountry(null); 
-                                                } else {
-                                                    await AsyncStorage.setItem('devShopForceCountry', c);
-
-                                                    setShopCountry(c);
-                                                }
-                                            }}
-                                            style={[styles.devCountryChip, forceCountry === c && styles.devCountryChipActive]}
-                                        >
-                                            <Text style={[styles.devCountryChipText, forceCountry === c && styles.devCountryChipTextActive]}>
-                                                {c === 'AUTO' ? '🌐 GPS' : c === 'KR' ? '🇰🇷 KR' : '🇮🇩 ID'}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                    <Text style={styles.devCountryCurrent}>현재: {shopCountry ?? '...'}</Text>
-                                </View>
-                            )}
+}
 
                             {}
                             {gpsDenied && (
