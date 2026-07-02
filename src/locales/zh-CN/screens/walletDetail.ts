@@ -22,6 +22,7 @@ export default {
   cat_ar_settle: 'AR广告结算',
   cat_ar_settle_pocr: 'AR广告结算1',
   cat_ar_settle_nas: 'AR广告结算2',
+  cat_ar_settle_pangle: 'AR广告结算3',
   cat_referral_settle: '推荐结算',
   cat_recommender_reward: '推荐人奖励',
   cat_signup_reward: '注册奖励',

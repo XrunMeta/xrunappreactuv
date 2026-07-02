@@ -1327,10 +1327,15 @@ export const SignupScreen = () => {
                 ? `${t('screens.signup.ageLabel')} (${t('screens.signup.optional') || '선택사항'})`
                 : t('screens.signup.ageLabel')}
             </Text>
-            <View style={[styles.inlineOptions]}>
+            {}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.ageScrollContent}
+            >
               {React.useMemo(() => {
-                return isOptionalFields 
-                  ? AGE_OPTIONS 
+                return isOptionalFields
+                  ? AGE_OPTIONS
                   : AGE_OPTIONS.filter(option => option !== '0');
               }, [isOptionalFields]).map((option, index, array) => {
                 const isActive = ageRange === option;
@@ -1341,11 +1346,11 @@ export const SignupScreen = () => {
                     label={option === '0' ? (t('screens.signup.ageSelect') || '선택') : option}
                     selected={isActive}
                     onPress={() => setAgeRange(option)}
-                    flex={1}
+                    style={styles.ageOption}
                   />
                 );
               })}
-            </View>
+            </ScrollView>
           </View>
 
           <FormField
@@ -1606,6 +1611,16 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: 8,
     width: '100%',
+  },
+  ageScrollContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 4,
+  },
+  ageOption: {
+    minWidth: 72,
+    paddingHorizontal: 16,
   },
   eyeButton: {
     height: 24,

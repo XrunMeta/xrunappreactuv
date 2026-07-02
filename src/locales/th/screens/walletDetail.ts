@@ -22,6 +22,7 @@ export default {
   cat_ar_settle: 'การชำระเงิน AR',
   cat_ar_settle_pocr: 'การชำระเงิน AR 1',
   cat_ar_settle_nas: 'การชำระเงิน AR 2',
+  cat_ar_settle_pangle: 'การชำระเงิน AR 3',
   cat_referral_settle: 'การชำระเงินแนะนำ',
   cat_recommender_reward: 'รางวัลผู้แนะนำ',
   cat_signup_reward: 'รางวัลสมัครสมาชิก',

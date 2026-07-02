@@ -22,6 +22,7 @@ export default {
   cat_ar_settle: 'AR Ad Settlement',
   cat_ar_settle_pocr: 'AR Ad Settlement 1',
   cat_ar_settle_nas: 'AR Ad Settlement 2',
+  cat_ar_settle_pangle: 'AR Ad Settlement 3',
   cat_referral_settle: 'Referral Settlement',
   cat_recommender_reward: 'Recommender Reward',
   cat_signup_reward: 'Signup Reward',

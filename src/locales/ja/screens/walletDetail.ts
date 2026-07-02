@@ -22,6 +22,7 @@ export default {
   cat_ar_settle: 'AR広告精算',
   cat_ar_settle_pocr: 'AR広告精算1',
   cat_ar_settle_nas: 'AR広告精算2',
+  cat_ar_settle_pangle: 'AR広告精算3',
   cat_referral_settle: 'リファラル精算',
   cat_recommender_reward: '推薦者報酬',
   cat_signup_reward: '新規登録報酬',
