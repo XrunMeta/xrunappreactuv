@@ -61,7 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: '백업 비밀번호 입력',
-  passphraseModalDesc: '백업할 때 설정한 비밀번호를 입력해주세요. 구버전 파일 백업은 지갑 PIN 을 입력하세요.',
+  passphraseModalDesc: '백업할때 설정한 비밀번호를 입력해주세요.',
   passphraseInputPlaceholder: '백업 비밀번호',
   restoring: '복원 중입니다...\n잠시만 기다려주세요',
   restoreSetPinTitle: '이 기기에서 사용할 PIN을 설정하세요',

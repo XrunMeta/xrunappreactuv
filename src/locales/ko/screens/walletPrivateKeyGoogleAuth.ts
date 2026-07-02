@@ -61,7 +61,7 @@ export default {
   copyFail: '복사 실패',
   unknownError: '알 수 없는 오류',
   passphraseModalTitle: '백업 비밀번호 설정',
-  passphraseModalWarning: '이 비밀번호로 백업 파일을 암호화합니다. 비밀번호를 잊으면 복원할 수 없으니 안전하게 보관해주세요.',
+  passphraseModalWarning: '백업 파일마다 개별 비밀번호가 저장됩니다.\n파일명과 비밀번호를 함께 기억해두시고,\n복원 시 백업할 때 입력했던 비밀번호를 그대로 입력해주세요.\n비밀번호를 잊으면 복원할 수 없으니 안전하게 보관해주세요.',
   passphraseInputPlaceholder: '백업 비밀번호 입력',
   passphraseConfirmPlaceholder: '백업 비밀번호 다시 입력',
   passphraseTooShort: '비밀번호는 8자 이상이어야 해요.',
