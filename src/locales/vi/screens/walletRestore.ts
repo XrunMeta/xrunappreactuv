@@ -61,7 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: 'Nhập mật khẩu sao lưu',
-  passphraseModalDesc: 'Vui lòng nhập mật khẩu bạn đã đặt khi sao lưu. Với bản sao lưu tệp cũ, hãy nhập mã PIN ví.',
+  passphraseModalDesc: 'Vui lòng nhập mật khẩu bạn đã đặt khi sao lưu.',
   passphraseInputPlaceholder: 'Mật khẩu sao lưu',
   restoring: 'Đang khôi phục...\nVui lòng đợi trong giây lát',
   restoreSetPinTitle: 'Đặt PIN để sử dụng trên thiết bị này',

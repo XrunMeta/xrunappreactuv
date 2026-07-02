@@ -61,7 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: 'バックアップパスワードの入力',
-  passphraseModalDesc: 'バックアップ時に設定したパスワードを入力してください。旧バージョンのファイルバックアップはウォレットPINを入力してください。',
+  passphraseModalDesc: 'バックアップ時に設定したパスワードを入力してください。',
   passphraseInputPlaceholder: 'バックアップパスワード',
   restoring: '復元中です...\n少々お待ちください',
   restoreSetPinTitle: 'この端末で使用する PIN を設定してください',

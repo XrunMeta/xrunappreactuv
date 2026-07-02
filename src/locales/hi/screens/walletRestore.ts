@@ -61,7 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: 'बैकअप पासवर्ड दर्ज करें',
-  passphraseModalDesc: 'बैकअप के समय सेट किया गया पासवर्ड दर्ज करें। पुराने संस्करण की फ़ाइल बैकअप के लिए वॉलेट PIN दर्ज करें।',
+  passphraseModalDesc: 'बैकअप के समय सेट किया गया पासवर्ड दर्ज करें।',
   passphraseInputPlaceholder: 'बैकअप पासवर्ड',
   restoring: 'पुनर्स्थापना हो रही है...\nकृपया थोड़ा प्रतीक्षा करें',
   restoreSetPinTitle: 'इस डिवाइस के लिए PIN सेट करें',

@@ -61,7 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: 'Enter backup password',
-  passphraseModalDesc: 'Enter the password you set when creating the backup. For older file backups, enter your wallet PIN.',
+  passphraseModalDesc: 'Enter the password you set when creating the backup.',
   passphraseInputPlaceholder: 'Backup password',
   restoring: 'Restoring...\nPlease wait a moment',
   restoreSetPinTitle: 'Set a PIN for this device',

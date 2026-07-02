@@ -61,7 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: 'Masukkan kata sandi cadangan',
-  passphraseModalDesc: 'Masukkan kata sandi yang Anda tetapkan saat membuat cadangan. Untuk cadangan file versi lama, masukkan PIN dompet.',
+  passphraseModalDesc: 'Masukkan kata sandi yang Anda tetapkan saat membuat cadangan.',
   passphraseInputPlaceholder: 'Kata sandi cadangan',
   restoring: 'Sedang memulihkan...\nMohon tunggu sebentar',
   restoreSetPinTitle: 'Atur PIN untuk digunakan di perangkat ini',

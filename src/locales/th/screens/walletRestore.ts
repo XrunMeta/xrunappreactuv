@@ -61,7 +61,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: 'ป้อนรหัสผ่านสำรองข้อมูล',
-  passphraseModalDesc: 'กรุณาป้อนรหัสผ่านที่ตั้งไว้ตอนสำรองข้อมูล สำหรับไฟล์สำรองข้อมูลรุ่นเก่า กรุณาป้อน PIN กระเป๋าเงิน',
+  passphraseModalDesc: 'กรุณาป้อนรหัสผ่านที่ตั้งไว้ตอนสำรองข้อมูล',
   passphraseInputPlaceholder: 'รหัสผ่านสำรองข้อมูล',
   restoring: 'กำลังกู้คืน...\nกรุณารอสักครู่',
   restoreSetPinTitle: 'ตั้งค่า PIN สำหรับใช้งานบนอุปกรณ์นี้',

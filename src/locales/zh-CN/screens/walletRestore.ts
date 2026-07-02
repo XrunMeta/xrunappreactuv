@@ -60,7 +60,7 @@ export default {
     driveSource: 'Drive',
   },
   passphraseModalTitle: '输入备份密码',
-  passphraseModalDesc: '请输入备份时设置的密码。旧版本文件备份请输入钱包 PIN。',
+  passphraseModalDesc: '请输入备份时设置的密码。',
   passphraseInputPlaceholder: '备份密码',
   restoring: '正在恢复中...\n请稍候',
   restoreSetPinTitle: '请设置在此设备上使用的 PIN',

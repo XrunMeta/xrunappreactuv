@@ -61,7 +61,7 @@ export default {
   copyFail: 'コピー失敗',
   unknownError: '不明なエラー',
   passphraseModalTitle: 'バックアップパスワードの設定',
-  passphraseModalWarning: 'このパスワードでバックアップファイルを暗号化します。パスワードを忘れると復元できませんので、安全に保管してください。',
+  passphraseModalWarning: 'バックアップファイルごとに個別のパスワードが保存されます。\nファイル名とパスワードを一緒に記憶しておき、\n復元時にはバックアップ時と同じパスワードを入力してください。\nパスワードを忘れると復元できませんので、安全に保管してください。',
   passphraseInputPlaceholder: 'バックアップパスワードを入力',
   passphraseConfirmPlaceholder: 'バックアップパスワードを再入力',
   passphraseTooShort: 'パスワードは8文字以上である必要があります。',

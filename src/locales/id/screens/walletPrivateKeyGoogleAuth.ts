@@ -61,7 +61,7 @@ export default {
   copyFail: 'Salin gagal',
   unknownError: 'Kesalahan tidak diketahui',
   passphraseModalTitle: 'Atur kata sandi cadangan',
-  passphraseModalWarning: 'Kata sandi ini akan mengenkripsi file cadangan Anda. Jika Anda lupa kata sandi, pemulihan tidak dapat dilakukan, jadi simpan dengan aman.',
+  passphraseModalWarning: 'Setiap file cadangan memiliki kata sandi tersendiri.\nIngat nama file dan kata sandinya bersama-sama,\nlalu masukkan kata sandi yang sama saat pemulihan.\nJika lupa, cadangan tidak dapat dipulihkan — simpan dengan aman.',
   passphraseInputPlaceholder: 'Masukkan kata sandi cadangan',
   passphraseConfirmPlaceholder: 'Masukkan ulang kata sandi cadangan',
   passphraseTooShort: 'Kata sandi harus minimal 8 karakter.',

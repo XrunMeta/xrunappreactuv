@@ -61,7 +61,7 @@ export default {
   copyFail: 'Copy failed',
   unknownError: 'Unknown error',
   passphraseModalTitle: 'Set backup password',
-  passphraseModalWarning: 'This password encrypts your backup file. If you forget it, the backup cannot be restored — keep it somewhere safe.',
+  passphraseModalWarning: 'Each backup file has its own password.\nRemember the filename and password together,\nand enter the same password at restore time.\nIf forgotten, the backup cannot be restored — keep it safe.',
   passphraseInputPlaceholder: 'Enter backup password',
   passphraseConfirmPlaceholder: 'Re-enter backup password',
   passphraseTooShort: 'Password must be at least 8 characters.',
