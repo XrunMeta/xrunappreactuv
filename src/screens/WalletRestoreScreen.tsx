@@ -108,6 +108,22 @@ export const WalletRestoreScreen = () => {
     source: string;
   } | null>(null);
 
+  const OTP_LENGTH = 6;
+  const otpFormattedTimer = useMemo(() => {
+    const minutes = Math.floor(otpSecondsLeft / 60).toString().padStart(2, '0');
+    const seconds = (otpSecondsLeft % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }, [otpSecondsLeft]);
+  useEffect(() => {
+    if (!otpModalVisible) return;
+    if (otpSecondsLeft <= 0) return;
+    const timer = setInterval(() => setOtpSecondsLeft((s) => s - 1), 1000);
+    return () => clearInterval(timer);
+  }, [otpSecondsLeft, otpModalVisible]);
+  useEffect(() => {
+    if (otpModalVisible) setOtpSecondsLeft(300);
+  }, [otpModalVisible]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -695,21 +711,6 @@ export const WalletRestoreScreen = () => {
     </Modal>
   );
 
-  const OTP_LENGTH = 6;
-  const otpFormattedTimer = useMemo(() => {
-    const minutes = Math.floor(otpSecondsLeft / 60).toString().padStart(2, '0');
-    const seconds = (otpSecondsLeft % 60).toString().padStart(2, '0');
-    return `${minutes}:${seconds}`;
-  }, [otpSecondsLeft]);
-  useEffect(() => {
-    if (!otpModalVisible) return;
-    if (otpSecondsLeft <= 0) return;
-    const timer = setInterval(() => setOtpSecondsLeft((s) => s - 1), 1000);
-    return () => clearInterval(timer);
-  }, [otpSecondsLeft, otpModalVisible]);
-  useEffect(() => {
-    if (otpModalVisible) setOtpSecondsLeft(300);
-  }, [otpModalVisible]);
   const handleOtpResend = async () => {
     if (!email) return;
     try {
