@@ -152,22 +152,15 @@ export const WalletRestoreScreen = () => {
     setPinPromptVisible(false);
 
     if (pendingBv2Data) {
-      setOtpVerifiedPin(p);
-      if (!email) return;
+      const { passphrase, payload, source } = pendingBv2Data;
+      setPendingBv2Data(null);
+      if (memberId == null || !email) return;
+      setStage('busy');
       try {
-        setOtpSending(true);
-        await sendEmailVerificationCode(email);
-        setOtpSending(false);
-        setOtpInput('');
-        setOtpModalVisible(true);
-      } catch (e: any) {
-        setOtpSending(false);
-        console.warn('[WalletRestore] OTP 발송 실패:', e?.message);
-        await showAlert(
-          t('screens.walletRestore.otpSendFailTitle') || '인증번호 발송 실패',
-          t('screens.walletRestore.otpSendFailMessage') || '잠시 후 다시 시도해주세요.',
-        );
-        setPendingBv2Data(null);
+        const result = await restoreBackup(payload, email, memberId, passphrase, p);
+        setStage('options');
+        showRestoreResult(result.ok, result.imported, result.skipped, result.reason, source);
+      } catch (e) {
         setStage('options');
       }
       return;
@@ -181,7 +174,7 @@ export const WalletRestoreScreen = () => {
   };
 
   const onOtpSubmit = async () => {
-    if (!pendingBv2Data || !otpVerifiedPin || memberId == null || !email) return;
+    if (!pendingBv2Data || memberId == null || !email) return;
     const code = otpInput.trim();
     if (code.length < 4) {
       await showAlert(
@@ -191,24 +184,15 @@ export const WalletRestoreScreen = () => {
       return;
     }
 
-    const { passphrase, payload, source } = pendingBv2Data;
-    setPendingBv2Data(null);
     setOtpModalVisible(false);
-    setOtpVerifiedPin(null);
-    setStage('busy');
-    try {
-      const result = await restoreBackup(payload, email, memberId, passphrase, otpVerifiedPin);
-      setStage('options');
-      showRestoreResult(result.ok, result.imported, result.skipped, result.reason, source);
-    } catch (e) {
-      setStage('options');
-    }
+    setOtpInput('');
+
+    setPinPromptVisible(true);
   };
 
   const onOtpCancel = () => {
     setOtpModalVisible(false);
     setOtpInput('');
-    setOtpVerifiedPin(null);
     setPendingBv2Data(null);
     setStage('options');
   };
@@ -316,7 +300,25 @@ export const WalletRestoreScreen = () => {
     setPendingBv2Data({ passphrase: pp, payload, source });
     setPendingBackup(null);
     setStage('options');
-    setPinPromptVisible(true);
+    if (!email) {
+      setPendingBv2Data(null);
+      return;
+    }
+    try {
+      setOtpSending(true);
+      await sendEmailVerificationCode(email);
+      setOtpSending(false);
+      setOtpInput('');
+      setOtpModalVisible(true);
+    } catch (e: any) {
+      setOtpSending(false);
+      console.warn('[WalletRestore] OTP 발송 실패:', e?.message);
+      await showAlert(
+        t('screens.walletRestore.otpSendFailTitle') || '인증번호 발송 실패',
+        t('screens.walletRestore.otpSendFailMessage') || '잠시 후 다시 시도해주세요.',
+      );
+      setPendingBv2Data(null);
+    }
   };
 
   const onPassphraseCancel = () => {
