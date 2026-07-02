@@ -794,6 +794,7 @@ export const WalletRestoreScreen = () => {
     <SafeView style={styles.container}>
       {pinModal}
       {passphraseModal}
+      {otpModal}
       <Header title={t('screens.walletRestore.title') || '지갑 복원'} onBackPress={goBack} showBackButton />
       <SafeScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.heading}>
