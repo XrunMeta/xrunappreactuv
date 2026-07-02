@@ -222,7 +222,7 @@ try {
 
 export const MapMainScreen: React.FC = () => {
 
-  const { navigate, previousScreen } = useAppNavigation();
+  const { navigate, previousScreen, reset: resetNav } = useAppNavigation();
 
   const { t } = useTranslation();
 
@@ -252,13 +252,11 @@ export const MapMainScreen: React.FC = () => {
 
         if (shouldShowTutorial(pending, completed)) {
           await AsyncStorage.removeItem(TUTORIAL_PENDING_KEY);
-          navigate(ROUTES.walletKeyTutorial);
+          resetNav(ROUTES.walletKeyTutorial);
           return;
         }
 
         if (completed === 'true') return;
-        const jwt = await AsyncStorage.getItem('jwt');
-        const memberId = jwt ? jwtPayloadSub(jwt) : null;
         let emailRaw = await AsyncStorage.getItem('userEmail');
         if (!emailRaw) {
           try {
@@ -266,21 +264,16 @@ export const MapMainScreen: React.FC = () => {
             if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
           } catch {  }
         }
-        if (memberId == null || !emailRaw) return;
+        if (!emailRaw) return;
         const PIN_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
         const normEmail = emailRaw.toLowerCase().trim();
         if (!PIN_DEV_EMAILS.includes(normEmail)) return;
-        const entries = await findEntriesForUser(emailRaw, memberId);
-        const needPinSetup = (e: { s: string; h?: string } | null) =>
-          e !== null && e.s === 's0' && !e.h;
-        if (needPinSetup(entries.eth) || needPinSetup(entries.pol)) {
-          navigate(ROUTES.walletKeyTutorial);
-        }
+        resetNav(ROUTES.walletKeyTutorial);
       } catch (e) {
         console.warn('[MapMain] 튜토리얼 가드 확인 실패:', e);
       }
     })();
-  }, [navigate]);
+  }, [navigate, resetNav]);
 
   useEffect(() => {
     checkForUpdate();
