@@ -12,6 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../constants';
 import { SafeView, FormCheckbox, PrimaryButton } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -75,6 +76,8 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
   const { reset, goBack } = useAppNavigation();
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
+
+  const insets = useSafeAreaInsets();
   const [currentPage, setCurrentPage] = useState(0);
   const [agreed, setAgreed] = useState(false);
 
@@ -122,7 +125,7 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
   return (
     <SafeView style={styles.container}>
       {}
-      <View style={styles.progressHeader}>
+      <View style={[styles.progressHeader, { paddingTop: insets.top + 12 }]}>
         <View style={styles.progressTrack}>
           <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
         </View>
