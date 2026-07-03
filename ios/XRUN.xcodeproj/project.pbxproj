@@ -7,6 +7,7 @@
 	objects = {
 
 		13B07FBF1A68108700A75B9A  = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A ; };
+		F1F2F3F4F5F6F7F8F9FA0001  = {isa = PBXBuildFile; fileRef = F1F2F3F4F5F6F7F8F9FA0002 ; };
 		373437363531313737646233346530346163623666636232  = {isa = PBXBuildFile; fileRef = 376638326339383330393366343932666132323664653233 ; };
 		3E461D99554A48A4959DE609  = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 ; };
 		4F9496F44D04B58C89A2EB01  = {isa = PBXBuildFile; fileRef = C2E94C61601A010BD91707A8 ; };
@@ -24,6 +25,7 @@
 		13B07F961A680F5B00A75B9A  = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XRUN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A  = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = XRUN/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A  = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = XRUN/Info.plist; sourceTree = "<group>"; };
+		F1F2F3F4F5F6F7F8F9FA0002  = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "XRUN/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		376638326339383330393366343932666132323664653233  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PangleModule.swift; path = XRUN/PangleModule.swift; sourceTree = "<group>"; };
 		383261643435666135386665346137333962636630663538  = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PangleModule.m; path = XRUN/PangleModule.m; sourceTree = "<group>"; };
 		64D1A1786E0A56CD31FC4094  = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XRUN.debug.xcconfig"; path = "Target Support Files/Pods-XRUN/Pods-XRUN.debug.xcconfig"; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 				BB2F792B24A3F905000567C9 ,
 				13B07FB51A68108700A75B9A ,
 				13B07FB61A68108700A75B9A ,
+				F1F2F3F4F5F6F7F8F9FA0002 ,
 				AA286B85B6C04FC6940260E9 ,
 				C2E94C61601A010BD91707A8 ,
 			);
@@ -210,6 +213,7 @@
 				13B07FBF1A68108700A75B9A ,
 				3E461D99554A48A4959DE609 ,
 				4F9496F44D04B58C89A2EB01 ,
+				F1F2F3F4F5F6F7F8F9FA0001 ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
