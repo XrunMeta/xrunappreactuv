@@ -164,7 +164,9 @@
         }
       ],
       "expo-tracking-transparency",
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-firebase/app",
+      "@react-native-firebase/analytics"
     ],
     "extra": {
       "eas": {

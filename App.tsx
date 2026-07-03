@@ -81,6 +81,7 @@ import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
 import { AdisonTestScreen } from './src/screens/AdisonTestScreen';
 
 import { NavigationProvider, useAppNavigation, ROUTES } from './src/navigation';
+import { logScreen, setAnalyticsUserId } from './src/services/analytics';
 import { AppProvider, OTAUpdateProvider, useAppContext } from './src/context';
 import { AlertDialogProvider } from './src/context/AlertDialogContext';
 import { AddTokenDialog, AliveService, NotificationToastService, EmergencyStopDialog, VersionUpdateDialog, OTAUpdateDialog, DevDebugPanel } from './src/components';
@@ -146,6 +147,8 @@ const ScreenHost = () => {
           setAyetUserId(String(userData.member));
 
           registerPushToken(userData.member).catch(() => {});
+
+          setAnalyticsUserId(userData.member);
         }
       } catch (_) {}
     })();
@@ -398,6 +401,10 @@ const ScreenHost = () => {
   useEffect(() => {
     console.log('[App] 화면 변경 시 및 앱 포커스 시 광고 완료 상태 확인');
 
+  }, [currentScreen]);
+
+  useEffect(() => {
+    if (currentScreen) logScreen(currentScreen);
   }, [currentScreen]);
 
   if (currentScreen === 'login') {
