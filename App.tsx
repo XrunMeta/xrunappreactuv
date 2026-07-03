@@ -81,6 +81,7 @@ import { v_d997a9 } from './src/screens/AdisonOfferwallScreen';
 import { v_e90247 } from './src/screens/AdisonTestScreen';
 
 import { v_00e8f9, v_a0daa8, v_ce4741 } from './src/navigation';
+import { v_22de27, v_ded979 } from './src/services/analytics';
 import { v_4b64f4, v_ad0e9f, v_700ef9 } from './src/context';
 import { v_0c450d } from './src/context/AlertDialogContext';
 import { v_aabda8, v_b631a8, v_7e2242, v_2806ef, v_6e8088, v_7f5f8a, v_6b4f38 } from './src/components';
@@ -146,6 +147,8 @@ const v_c0dbdf = () => {
           v_e8d7c0(String(v_ef7306.member));
 
           v_cec605(v_ef7306.member).catch(() => {});
+
+          v_ded979(v_ef7306.member);
         }
       } catch (v_37eab7) {}
     })();
@@ -398,6 +401,10 @@ const v_c0dbdf = () => {
   v_c4deb2(() => {
     console.log('[App] 화면 변경 시 및 앱 포커스 시 광고 완료 상태 확인');
 
+  }, [v_0f0c7b]);
+
+  v_c4deb2(() => {
+    if (v_0f0c7b) v_22de27(v_0f0c7b);
   }, [v_0f0c7b]);
 
   if (v_0f0c7b === 'login') {
