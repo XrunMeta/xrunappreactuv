@@ -8,6 +8,8 @@ import AdSupport
 
 import AdMixerMediation
 
+import FirebaseCore
+
 #if canImport(GoogleMaps)
 import GoogleMaps
 #endif
@@ -58,6 +60,8 @@ public class AppDelegate: ExpoAppDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+
+    FirebaseApp.configure()
 
     requestATTIfNeeded()
 
