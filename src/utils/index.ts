@@ -175,6 +175,12 @@ export const v_a3bbf0 = async (
     console.log('[shareReferralLink] Share API 결과:', v_43c42e);
 
     if (v_43c42e.action === v_5f4661.sharedAction) {
+
+      import('../services/analytics').then(({ logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da }) => {
+        v_ae251a(v_a9f6da.REFERRAL_SHARED, {
+          activity_type: v_43c42e.activityType || 'unknown',
+        });
+      }).catch(() => {});
       if (v_43c42e.activityType) {
         console.log(`[shareReferralLink] ${v_43c42e.activityType}로 성공적으로 공유됨`);
       } else {

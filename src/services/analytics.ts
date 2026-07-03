@@ -24,3 +24,19 @@ export const v_ded979 = (v_717992) =>
 
 export const v_144a89 = (v_b24339, v_3b402b) =>
   v_29dbaf(() => v_a1be42().setUserProperty(v_b24339, v_3b402b));
+
+export const v_a9f6da = {
+  SIGN_UP: 'sign_up',
+  TUTORIAL_COMPLETE: 'tutorial_complete',
+  PIN_SETUP_COMPLETED: 'pin_setup_completed',
+  AD_REWARD_RECEIVED: 'ad_reward_received',
+  FIRST_AD_SLOT_SELECTED: 'first_ad_slot_selected',
+  WALLET_BACKUP_COMPLETED: 'wallet_backup_completed',
+  WALLET_RESTORE_COMPLETED: 'wallet_restore_completed',
+  SEND_TRANSACTION: 'send_transaction',
+  SHOP_PURCHASE: 'shop_purchase',
+  ATTENDANCE_CHECKED: 'attendance_checked',
+  NOTIFICATION_OPENED: 'notification_opened',
+  REFERRAL_SHARED: 'referral_shared',
+  REFERRAL_SIGNUP_COMPLETED: 'referral_signup_completed',
+} as const;

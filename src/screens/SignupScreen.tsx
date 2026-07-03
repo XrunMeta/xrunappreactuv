@@ -16,6 +16,7 @@ import {
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_ae251a, v_a9f6da } from '../services/analytics';
 import {
   v_fa3feb,
   v_368e80,
@@ -936,6 +937,11 @@ export const v_f40fc5 = () => {
 
           await v_e84827.setItem('appleSignupCompleted', 'true');
           await v_e84827.setItem('appleSignupCompletedEmail', v_e0c7e8.trim());
+
+          v_ae251a(v_a9f6da.SIGN_UP, { method: 'apple' });
+          if (v_9bf12c?.trim()) {
+            v_ae251a(v_a9f6da.REFERRAL_SIGNUP_COMPLETED, { method: 'apple' });
+          }
 
           try {
             await v_e84827.removeItem(v_4e5f7b);

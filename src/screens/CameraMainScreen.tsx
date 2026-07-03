@@ -2245,6 +2245,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
               v_ce5e26,
               v_9b57fc,
             );
+
+            import('../services/analytics').then(({ logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da }) => {
+              v_ae251a(v_a9f6da.AD_REWARD_RECEIVED, { source: v_ce5e26 });
+            }).catch(() => {});
           } catch (v_53d118) {
             if (v_53d118?.code !== 404 && !v_53d118?.message?.includes('404')) {
               console.warn('[WebView 모달] processAdReward 실패:', v_53d118);
@@ -2873,6 +2877,10 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                             } catch (v_9e86fd) {
                               console.warn('[AR-Pangle] grant 호출 실패:', v_9e86fd?.message);
                             }
+
+                            import('../services/analytics').then(({ logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da }) => {
+                              v_ae251a(v_a9f6da.AD_REWARD_RECEIVED, { source: 'pangle' });
+                            }).catch(() => {});
                             v_cba33f(v_566465('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
                           };
                           await v_8c1aee(

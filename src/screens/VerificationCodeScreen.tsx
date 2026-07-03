@@ -268,6 +268,16 @@ export const v_667a00 = () => {
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
 
           try {
+            const { logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da } = await import('../services/analytics');
+            const v_bfe9b9 = v_d0472c ? 'apple' : v_47b466 ? 'google' : 'email';
+            v_ae251a(v_a9f6da.SIGN_UP, { method: v_bfe9b9 });
+            const v_f456c8 = await v_e84827.getItem('signupReferralEmail');
+            if (v_f456c8?.trim()) {
+              v_ae251a(v_a9f6da.REFERRAL_SIGNUP_COMPLETED, { method: v_bfe9b9 });
+            }
+          } catch {  }
+
+          try {
             await v_e84827.removeItem(v_4e5f7b);
             await v_e84827.setItem(v_019a30, 'true');
           } catch (v_9e86fd) {

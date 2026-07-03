@@ -2818,6 +2818,15 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const v_fc58d0 = async (spot: v_f71847) => {
 
+    try {
+      const v_2aa951 = await v_e84827.getItem('analytics_first_ad_slot_selected');
+      if (v_2aa951 !== 'true') {
+        const { logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da } = await import('../services/analytics');
+        v_ae251a(v_a9f6da.FIRST_AD_SLOT_SELECTED, { spotID: String(v_c5ac8b.spotID ?? '') });
+        await v_e84827.setItem('analytics_first_ad_slot_selected', 'true');
+      }
+    } catch {  }
+
     const v_aa0917 = String(v_c5ac8b.campid || '');
     if (v_aa0917) {
       try {

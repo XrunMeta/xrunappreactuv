@@ -160,6 +160,10 @@ const v_c0dbdf = () => {
       try {
         const v_9390e8 = (v_3393e3?.notification?.request?.content?.data ?? {}) as Record<string, unknown>;
         const v_3b27d9 = String(v_9390e8.type ?? '');
+
+        import('./src/services/analytics').then(({ logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da }) => {
+          v_ae251a(v_a9f6da.NOTIFICATION_OPENED, { type: v_3b27d9 || 'unknown' });
+        }).catch(() => {});
         if (v_3b27d9 === 'inquiry_reply') {
           v_9b57fc(v_ce4741.myInfoNotify);
           return;

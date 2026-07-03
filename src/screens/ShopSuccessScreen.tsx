@@ -1,4 +1,4 @@
-import v_a3453e from 'bapkr';
+import v_a3453e, { v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_556baf } from '../components';
@@ -10,6 +10,12 @@ const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
 export const v_8734da = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { t: v_8d41d7 } = v_772971();
+
+  v_c4deb2(() => {
+    import('../services/analytics').then(({ logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da }) => {
+      v_ae251a(v_a9f6da.SHOP_PURCHASE);
+    }).catch(() => {});
+  }, []);
 
   const v_03cae9 = () => {
     v_c7ac57(); 
