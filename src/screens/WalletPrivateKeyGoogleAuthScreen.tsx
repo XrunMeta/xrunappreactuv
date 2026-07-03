@@ -259,6 +259,10 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         }
         const newUri = await SAF.createFileAsync(perm.directoryUri, fileName, 'application/octet-stream');
         await SAF.writeAsStringAsync(newUri, encrypted);
+
+        import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+          logEvent(XRUN_EVENTS.WALLET_BACKUP_COMPLETED, { destination: 'file' });
+        }).catch(() => {});
         await showAlert(
           t('screens.walletPrivateKeyGoogleAuth.alertBackupComplete'),
           `${fileName}`,
@@ -276,6 +280,10 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         } catch {
 
         }
+
+        import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+          logEvent(XRUN_EVENTS.WALLET_BACKUP_COMPLETED, { destination: 'file' });
+        }).catch(() => {});
         await showAlert(
           t('screens.walletPrivateKeyGoogleAuth.alertBackupComplete'),
           `${fileName}`,
@@ -369,6 +377,9 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
       }
       await res.json(); 
 
+      import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+        logEvent(XRUN_EVENTS.WALLET_BACKUP_COMPLETED, { destination: 'gdrive' });
+      }).catch(() => {});
       await showAlert(
         t('screens.walletPrivateKeyGoogleAuth.alertBackupComplete'),
         `${fileName}`,

@@ -54,6 +54,13 @@ export const WalletTransactionResultScreen = () => {
       setToAddress(transactionResult.toAddress);
       setGasPrice(transactionResult.gasPrice);
       setNetwork(transactionResult.network);
+
+      import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+        logEvent(XRUN_EVENTS.SEND_TRANSACTION, {
+          symbol: transactionResult.symbol,
+          network: transactionResult.network,
+        });
+      }).catch(() => {});
     }
   }, [transactionResult]);
 

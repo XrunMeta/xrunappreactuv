@@ -160,6 +160,10 @@ const ScreenHost = () => {
       try {
         const data = (response?.notification?.request?.content?.data ?? {}) as Record<string, unknown>;
         const type = String(data.type ?? '');
+
+        import('./src/services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+          logEvent(XRUN_EVENTS.NOTIFICATION_OPENED, { type: type || 'unknown' });
+        }).catch(() => {});
         if (type === 'inquiry_reply') {
           navigate(ROUTES.myInfoNotify);
           return;

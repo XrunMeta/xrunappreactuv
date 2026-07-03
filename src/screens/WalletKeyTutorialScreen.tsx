@@ -17,6 +17,7 @@ import { COLORS } from '../constants';
 import { SafeView, FormCheckbox, PrimaryButton } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { recordWalletTutorialComplete } from '../services';
+import { logEvent, XRUN_EVENTS } from '../services/analytics';
 import {
   TOTAL_PAGES,
   isLastPage,
@@ -105,6 +106,8 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
     } catch (e) {
       console.warn('[WalletKeyTutorial] 완료 플래그 저장 실패:', e);
     }
+
+    logEvent(XRUN_EVENTS.TUTORIAL_COMPLETE, { mode });
     recordWalletTutorialComplete().catch((e) =>
       console.warn('[WalletKeyTutorial] DB 기록 실패 (로컬만 저장됨):', e),
     );

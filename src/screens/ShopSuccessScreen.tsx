@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Header, SafeView } from '../components';
@@ -10,6 +10,12 @@ const LOGO = require('../../assets/xrun-horizontal-logo.png');
 export const ShopSuccessScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+      logEvent(XRUN_EVENTS.SHOP_PURCHASE);
+    }).catch(() => {});
+  }, []);
 
   const handleConfirm = () => {
     goBack(); 

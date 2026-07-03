@@ -24,3 +24,19 @@ export const setAnalyticsUserId = (memberId: number | string | null) =>
 
 export const setAnalyticsUserProperty = (key: string, value: string | null) =>
   safe(() => analytics().setUserProperty(key, value));
+
+export const XRUN_EVENTS = {
+  SIGN_UP: 'sign_up',
+  TUTORIAL_COMPLETE: 'tutorial_complete',
+  PIN_SETUP_COMPLETED: 'pin_setup_completed',
+  AD_REWARD_RECEIVED: 'ad_reward_received',
+  FIRST_AD_SLOT_SELECTED: 'first_ad_slot_selected',
+  WALLET_BACKUP_COMPLETED: 'wallet_backup_completed',
+  WALLET_RESTORE_COMPLETED: 'wallet_restore_completed',
+  SEND_TRANSACTION: 'send_transaction',
+  SHOP_PURCHASE: 'shop_purchase',
+  ATTENDANCE_CHECKED: 'attendance_checked',
+  NOTIFICATION_OPENED: 'notification_opened',
+  REFERRAL_SHARED: 'referral_shared',
+  REFERRAL_SIGNUP_COMPLETED: 'referral_signup_completed',
+} as const;

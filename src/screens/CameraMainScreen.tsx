@@ -2245,6 +2245,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
               adType,
               navigate,
             );
+
+            import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+              logEvent(XRUN_EVENTS.AD_REWARD_RECEIVED, { source: adType });
+            }).catch(() => {});
           } catch (rewardError: any) {
             if (rewardError?.code !== 404 && !rewardError?.message?.includes('404')) {
               console.warn('[WebView 모달] processAdReward 실패:', rewardError);
@@ -2873,6 +2877,10 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                             } catch (e: any) {
                               console.warn('[AR-Pangle] grant 호출 실패:', e?.message);
                             }
+
+                            import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+                              logEvent(XRUN_EVENTS.AD_REWARD_RECEIVED, { source: 'pangle' });
+                            }).catch(() => {});
                             showToast(getToastBody('toast_ar_pangle_success', '광고 시청 완료 — 잠시 후 지갑에 입금돼요!'));
                           };
                           await pangleLoadAndShowRewardedAd(

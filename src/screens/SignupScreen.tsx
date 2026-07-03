@@ -16,6 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logEvent, XRUN_EVENTS } from '../services/analytics';
 import {
   FormCheckbox,
   FormField,
@@ -936,6 +937,11 @@ export const SignupScreen = () => {
 
           await AsyncStorage.setItem('appleSignupCompleted', 'true');
           await AsyncStorage.setItem('appleSignupCompletedEmail', email.trim());
+
+          logEvent(XRUN_EVENTS.SIGN_UP, { method: 'apple' });
+          if (referralEmail?.trim()) {
+            logEvent(XRUN_EVENTS.REFERRAL_SIGNUP_COMPLETED, { method: 'apple' });
+          }
 
           try {
             await AsyncStorage.removeItem(TUTORIAL_COMPLETED_KEY);

@@ -139,6 +139,10 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
 
       markWalletKeyAT().catch(() => {  });
 
+      import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+        logEvent(XRUN_EVENTS.PIN_SETUP_COMPLETED);
+      }).catch(() => {  });
+
       onSuccess();
     } catch (verifyErr) {
       const reasonStr =

@@ -2818,6 +2818,15 @@ export const MapMainScreen: React.FC = () => {
 
   const handleMarkerPress = async (spot: SpotData) => {
 
+    try {
+      const flag = await AsyncStorage.getItem('analytics_first_ad_slot_selected');
+      if (flag !== 'true') {
+        const { logEvent, XRUN_EVENTS } = await import('../services/analytics');
+        logEvent(XRUN_EVENTS.FIRST_AD_SLOT_SELECTED, { spotID: String(spot.spotID ?? '') });
+        await AsyncStorage.setItem('analytics_first_ad_slot_selected', 'true');
+      }
+    } catch {  }
+
     const campid = String(spot.campid || '');
     if (campid) {
       try {

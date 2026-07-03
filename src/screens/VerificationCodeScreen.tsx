@@ -268,6 +268,16 @@ export const VerificationCodeScreen = () => {
           console.log('[회원가입] 회원가입 및 로그인 확인 성공');
 
           try {
+            const { logEvent, XRUN_EVENTS } = await import('../services/analytics');
+            const method = isAppleSignupMode ? 'apple' : isGoogleSignupMode ? 'google' : 'email';
+            logEvent(XRUN_EVENTS.SIGN_UP, { method });
+            const referralFromStorage = await AsyncStorage.getItem('signupReferralEmail');
+            if (referralFromStorage?.trim()) {
+              logEvent(XRUN_EVENTS.REFERRAL_SIGNUP_COMPLETED, { method });
+            }
+          } catch {  }
+
+          try {
             await AsyncStorage.removeItem(TUTORIAL_COMPLETED_KEY);
             await AsyncStorage.setItem(TUTORIAL_PENDING_KEY, 'true');
           } catch (e) {

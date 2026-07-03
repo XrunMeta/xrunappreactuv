@@ -1229,6 +1229,10 @@ export const AdWalletScreen = () => {
                 );
 
                 if (response.status === 'success') {
+
+                  import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+                    logEvent(XRUN_EVENTS.ATTENDANCE_CHECKED);
+                  }).catch(() => {});
                   showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
 
                   if (questListRef.current) {

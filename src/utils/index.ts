@@ -175,6 +175,12 @@ export const shareReferralLink = async (
     console.log('[shareReferralLink] Share API 결과:', result);
 
     if (result.action === Share.sharedAction) {
+
+      import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
+        logEvent(XRUN_EVENTS.REFERRAL_SHARED, {
+          activity_type: result.activityType || 'unknown',
+        });
+      }).catch(() => {});
       if (result.activityType) {
         console.log(`[shareReferralLink] ${result.activityType}로 성공적으로 공유됨`);
       } else {
