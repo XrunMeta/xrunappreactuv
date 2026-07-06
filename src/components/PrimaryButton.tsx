@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, GestureResponderEvent } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 import { trackEvent } from '../services/clickTracker';
+import { LoadingText } from './AnimatedDots';
 
 interface PrimaryButtonProps extends TouchableOpacityProps {
   title: string;
@@ -47,7 +48,8 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       onPress={handlePress}
       {...props}
     >
-      <Text style={styles.text}>{title}</Text>
+      {}
+      <LoadingText text={title} style={styles.text} />
     </TouchableOpacity>
   );
 };
