@@ -475,17 +475,12 @@ export const WalletRestoreScreen = () => {
       return;
     }
 
-    const successList = imported.map((n) => `✓ ${NETWORK_LABEL[n] || n}`).join('\n');
-    const skipDetail = skipped.length > 0
-      ? '\n\n' + t('screens.walletRestore.alerts.completeSkippedHeader') + '\n' + skipped.map((s) => `· ${NETWORK_LABEL[s.network] || s.network}`).join('\n')
-      : '';
-
     import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
       logEvent(XRUN_EVENTS.WALLET_RESTORE_COMPLETED, { count: imported.length });
     }).catch(() => {});
     showAlert(
       t('screens.walletRestore.alerts.completeTitle'),
-      t('screens.walletRestore.alerts.completeTemplate', { list: successList }) + skipDetail,
+      t('screens.walletRestore.alerts.completeTemplate'),
       [{ text: t('common.confirm') || '확인' }],
     ).then(() => {
       navigate(ROUTES.wallet);
