@@ -1,8 +1,6 @@
 import v_a3453e, { v_df9f57 } from 'bapkr';
 import { v_3094a2, v_472849 } from 'rcmrninabrnb';
-import { v_772971 } from 'jmpfvteuuztnp';
 import { v_eaeabd } from './TaboolaBannerCore';
-import { v_143351 } from './PangleBanner';
 import { v_1bfbd0 } from '../constants';
 import { v_80493f, v_17555f, v_dc5d8f } from '../services/taboola';
 
@@ -27,9 +25,6 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
   onLoadComplete: v_5c5995,
 }) => {
 
-  const { i18n: v_9c213b } = v_772971();
-  const v_2d4f8e = (v_9c213b.language || 'ko').toLowerCase().startsWith('ko');
-
   const v_193481 = v_df9f57(() => {
 
     if (v_bb5e8c === 'myinfo' || v_bb5e8c === 'shop' || v_bb5e8c === 'apploading') {
@@ -44,10 +39,6 @@ export const TaboolaBanner: v_a3453e.FC<TaboolaBannerProps> = ({
       v_5c5995();
     }
   };
-
-  if (!v_2d4f8e) {
-    return <PangleBanner style={v_4affe9} />;
-  }
 
   return (
     <TaboolaBannerCore
