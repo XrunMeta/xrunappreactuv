@@ -193,7 +193,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             </Text>
           )}
           {step === 'verifying' && (
-            <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.verifying')}</Text>
+            <LoadingText text={t('components.walletKeyPinPrompt.verifying')} style={styles.prompt} />
           )}
           {step === 'processing' && (
             <View>

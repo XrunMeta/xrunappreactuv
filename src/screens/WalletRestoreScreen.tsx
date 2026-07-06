@@ -26,6 +26,7 @@ try {
 import * as FileSystem from 'expo-file-system/legacy';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal, FormField, PrimaryButton } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { Feather } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES, COMMON_STYLES, FORM_STYLES } from '../constants';
 import { sendEmailVerificationCode } from '../services';
@@ -994,9 +995,18 @@ export const WalletRestoreScreen = () => {
       {stage === 'busy' && (
         <View style={restoreStyles.busyOverlay}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-          <Text style={restoreStyles.busyText}>
-            {t('screens.walletRestore.restoring') || '복원 중입니다...\n잠시만 기다려주세요'}
-          </Text>
+          {(() => {
+            const raw = t('screens.walletRestore.restoring') || '복원 중입니다...\n잠시만 기다려주세요';
+            const [firstLine, ...restLines] = raw.split('\n');
+            return (
+              <>
+                <LoadingText text={firstLine} style={restoreStyles.busyText} />
+                {restLines.length > 0 && (
+                  <Text style={restoreStyles.busyText}>{restLines.join('\n')}</Text>
+                )}
+              </>
+            );
+          })()}
         </View>
       )}
     </SafeView>

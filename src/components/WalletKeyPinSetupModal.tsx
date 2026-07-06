@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { COLORS, FONTS, SIZES } from '../constants';
+import { LoadingText } from './AnimatedDots';
 import {
   findEntry,
   findEntriesForUser,
@@ -232,7 +233,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
             <Text style={styles.prompt}>{t('components.walletKeyPinSetup.confirmPrompt')}</Text>
           )}
           {step === 'verifying' && (
-            <Text style={styles.prompt}>{t('components.walletKeyPinSetup.verifying')}</Text>
+            <LoadingText text={t('components.walletKeyPinSetup.verifying')} style={styles.prompt} />
           )}
           {step === 'error' && (
             <Text style={styles.prompt}>{t('components.walletKeyPinSetup.errorPrompt')}</Text>
