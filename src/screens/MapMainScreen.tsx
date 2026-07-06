@@ -46,7 +46,7 @@ import { useOTAUpdate } from '../context/OTAUpdateContext';
 
 import { SpotData } from '../types';
 
-import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl } from '../services';
+import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl, getAuthHeader } from '../services';
 import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
 import { getWalletKeyATStatus, fetchAndSaveWallets, getIosGuideShowStatus } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
@@ -450,6 +450,21 @@ export const MapMainScreen: React.FC = () => {
         if (cancelled) return;
         if (triggerNeeded) {
 
+          try {
+            const baseUrl = getApiBaseUrl();
+            const auth = await getAuthHeader();
+            const statusRes = await fetch(`${baseUrl}/wallet-tutorial/status?member=${memberId}`, {
+              headers: { Authorization: auth },
+            });
+            if (statusRes.ok) {
+              const statusJson = await statusRes.json().catch(() => null);
+              const serverAt = statusJson?.data?.[0]?.at;
+              if (serverAt == null) {
+
+                await AsyncStorage.removeItem(TUTORIAL_COMPLETED_KEY);
+              }
+            }
+          } catch {  }
           const tutorialDone = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
           if (tutorialDone !== 'true') {
             navigate(ROUTES.walletKeyTutorial);
