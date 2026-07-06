@@ -481,6 +481,16 @@ export const MapMainScreen: React.FC = () => {
           const atStatus = await getWalletKeyATStatus().catch(() => ({ at: false, at_at: null, ok: false }));
           if (cancelled) return;
           console.log('[MapMain] AT 상태', atStatus, 'email=', normEmail, 'member=', memberId);
+
+          if (atStatus.ok && !atStatus.at) {
+            try {
+              await fetchAndSaveWallets();
+              console.log('[MapMain] AT 없음 — fetchAndSaveWallets 로 vault 자동 채움');
+            } catch (e) {
+              console.warn('[MapMain] fetchAndSaveWallets 실패:', e);
+            }
+            return;
+          }
           const choice = await showAlert(
             t('screens.walletRestore.restoreNeededTitle'),
             t('screens.walletRestore.restoreNeededMessage'),
