@@ -46,7 +46,7 @@ import { v_ba5086 } from '../context/OTAUpdateContext';
 
 import { v_f71847 } from '../types';
 
-import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9 } from '../services';
+import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9, v_23dd22 } from '../services';
 import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
 import { v_ecc3ca, v_5ed938, v_6acfff } from '../services';
 import { v_295e39 } from '../services/taboola';
@@ -450,6 +450,21 @@ export const MapMainScreen: v_a3453e.FC = () => {
         if (v_2008a4) return;
         if (v_aa192c) {
 
+          try {
+            const v_c01615 = v_755eb9();
+            const v_68f0aa = await v_23dd22();
+            const v_d99f16 = await fetch(`${v_c01615}/wallet-tutorial/status?member=${v_717992}`, {
+              headers: { Authorization: v_68f0aa },
+            });
+            if (v_d99f16.ok) {
+              const v_9e0bc2 = await v_d99f16.json().catch(() => null);
+              const v_a3505b = v_9e0bc2?.data?.[0]?.at;
+              if (v_a3505b == null) {
+
+                await v_e84827.removeItem(v_4e5f7b);
+              }
+            }
+          } catch {  }
           const v_86a649 = await v_e84827.getItem(v_4e5f7b);
           if (v_86a649 !== 'true') {
             v_9b57fc(v_ce4741.walletKeyTutorial);
