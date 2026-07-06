@@ -2,6 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_4623af, v_19b633, v_472849, v_629153, v_fee73b } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
 import { v_e1c2cb } from '../services/clickTracker';
+import { v_412fbc } from './AnimatedDots';
 
 interface PrimaryButtonProps extends v_629153 {
   title: string;
@@ -47,7 +48,8 @@ export const PrimaryButton: v_a3453e.FC<PrimaryButtonProps> = ({
       onPress={v_5ba0f2}
       {...v_b1927c}
     >
-      <Text style={v_d81136.text}>{v_9f1622}</Text>
+      {}
+      <LoadingText text={v_9f1622} style={v_d81136.text} />
     </TouchableOpacity>
   );
 };
