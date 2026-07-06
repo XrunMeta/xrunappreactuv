@@ -481,6 +481,16 @@ export const MapMainScreen: v_a3453e.FC = () => {
           const v_5a9fc7 = await v_ecc3ca().catch(() => ({ at: false, at_at: null, ok: false }));
           if (v_2008a4) return;
           console.log('[MapMain] AT 상태', v_5a9fc7, 'email=', v_dabeaa, 'member=', v_717992);
+
+          if (v_5a9fc7.ok && !v_5a9fc7.at) {
+            try {
+              await v_5ed938();
+              console.log('[MapMain] AT 없음 — fetchAndSaveWallets 로 vault 자동 채움');
+            } catch (v_9e86fd) {
+              console.warn('[MapMain] fetchAndSaveWallets 실패:', v_9e86fd);
+            }
+            return;
+          }
           const v_7be387 = await v_889fad(
             v_8d41d7('screens.walletRestore.restoreNeededTitle'),
             v_8d41d7('screens.walletRestore.restoreNeededMessage'),
