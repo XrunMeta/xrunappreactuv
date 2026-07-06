@@ -35,6 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomNavigationBar, MapBottomPanel, SafeView, LevelNotification, WalletKeyPinSetupModal } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 
 import { CameraMainScreen } from './CameraMainScreen';
 
@@ -3742,7 +3743,7 @@ export const MapMainScreen: React.FC = () => {
 
             <ActivityIndicator size="large" color="#343a5a" />
 
-            <Text style={styles.loadingText}>{t('common.messages.loading')}</Text>
+            <LoadingText text={t('common.messages.loading')} style={styles.loadingText} />
 
           </View>
 

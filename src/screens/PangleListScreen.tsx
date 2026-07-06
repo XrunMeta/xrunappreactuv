@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Pla
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReady, isPangleReadySync, initializePangle } from '../services/pangle';
@@ -152,7 +153,7 @@ export const PangleListScreen = () => {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={styles.loadingText}>{t('screens.pangleList.loading')}</Text>
+            <LoadingText text={t('screens.pangleList.loading')} style={styles.loadingText} />
           </View>
         ) : pangleAds.length === 0 ? (
           <View style={styles.emptyContainer}>

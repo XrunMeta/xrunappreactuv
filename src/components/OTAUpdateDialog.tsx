@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, AppSt
 import { useTranslation } from 'react-i18next';
 import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
+import { LoadingText } from './AnimatedDots';
 
 export type OTAUpdateDialogProps = { isAdFinished?: boolean };
 
@@ -142,7 +143,7 @@ const OTAUpdateDialog: React.FC<OTAUpdateDialogProps> = ({ isAdFinished = true }
                                 borderWidth={0}
                                 height={10}
                             />
-                            <Text style={styles.downloadingText}>{t('common.messages.loading')}</Text>
+                            <LoadingText text={t('common.messages.loading')} style={styles.downloadingText} />
                         </View>
                     ) : (
                         <TouchableOpacity

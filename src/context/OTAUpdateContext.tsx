@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, Alert, Platform, BackH
 import { useTranslation } from 'react-i18next';
 import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
+import { LoadingText } from '../components/AnimatedDots';
 
 type OTAUpdateContextValue = {
   checkForUpdate: () => Promise<void>;
@@ -109,7 +110,7 @@ export const OTAUpdateProvider = ({ children }: { children: React.ReactNode }) =
                     borderWidth={0}
                     height={10}
                   />
-                  <Text style={styles.downloadingText}>{t('common.messages.loading')}</Text>
+                  <LoadingText text={t('common.messages.loading')} style={styles.downloadingText} />
                 </View>
               ) : (
                 <TouchableOpacity style={styles.mainButton} onPress={handleUpdate} activeOpacity={0.8}>

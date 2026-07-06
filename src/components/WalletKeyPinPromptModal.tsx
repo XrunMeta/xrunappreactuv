@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
+import { LoadingText } from './AnimatedDots';
 import {
   unlockUserWallets,
   type WalletKey,
@@ -195,7 +196,13 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.verifying')}</Text>
           )}
           {step === 'processing' && (
-            <Text style={styles.prompt}>{processingLabel || t('components.walletKeyPinPrompt.processingDefault')}{'\n'}{t('components.walletKeyPinPrompt.processingSubtitle')}</Text>
+            <View>
+              <LoadingText
+                text={processingLabel || t('components.walletKeyPinPrompt.processingDefault')}
+                style={styles.prompt}
+              />
+              <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.processingSubtitle')}</Text>
+            </View>
           )}
           {step === 'error' && (
             <Text style={styles.prompt}>{t('components.walletKeyPinPrompt.error')}</Text>

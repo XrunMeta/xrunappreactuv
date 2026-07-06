@@ -12,6 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { getCompletedAds, getSavedAds } from '../services';
@@ -162,9 +163,10 @@ export const AdvertiseScreen = () => {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-            <Text style={[styles.normalText, { color: '#7d7e83', marginTop: 12 }]}>
-              {t('screens.advertiseScreen.loading')}
-            </Text>
+            <LoadingText
+              text={t('screens.advertiseScreen.loading')}
+              style={[styles.normalText, { color: '#7d7e83', marginTop: 12 }]}
+            />
           </View>
         ) : completedAds.length === 0 ? (
           <View style={styles.emptyContainer}>

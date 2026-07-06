@@ -17,6 +17,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { SafeView, Header } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppNavigation } from '../navigation';
@@ -631,7 +632,7 @@ export const ShopItemRegisterScreen = () => {
                   {isLoadingCurrentImage ? (
                     <View style={styles.currentImageLoader}>
                       <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-                      <Text style={styles.currentImageLoaderText}>{t('common.messages.loading')}</Text>
+                      <LoadingText text={t('common.messages.loading')} style={styles.currentImageLoaderText} />
                     </View>
                   ) : currentImageBase64 ? (
                     <>

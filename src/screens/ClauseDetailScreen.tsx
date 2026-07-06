@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -69,7 +70,7 @@ export const ClauseDetailScreen = () => {
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-            <Text style={styles.loadingText}>{t('screens.myInfoClauses.loading')}</Text>
+            <LoadingText text={t('screens.myInfoClauses.loading')} style={styles.loadingText} />
           </View>
         ) : error ? (
           <View style={styles.errorContainer}>

@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, ActivityIndicator, Alert } from 'react-native';
 import { SafeScrollView } from '../components';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { COMMON_STYLES, FONTS, COLORS } from '../constants';
@@ -64,7 +65,7 @@ export const TermsScreen = () => {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-            <Text style={styles.loadingText}>{t('screens.terms.loading', '약관을 불러오는 중...')}</Text>
+            <LoadingText text={t('screens.terms.loading', '약관을 불러오는 중...')} style={styles.loadingText} />
           </View>
         ) : error ? (
           <View style={styles.errorContainer}>

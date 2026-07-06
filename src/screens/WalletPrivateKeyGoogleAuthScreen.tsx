@@ -23,6 +23,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Clipboard from 'expo-clipboard';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Header, SafeView, SafeScrollView, WalletKeyPinPromptModal, WalletKeyPinSetupModal, FormField, PrimaryButton } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { Feather } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES, COMMON_STYLES, FORM_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
@@ -626,7 +627,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             {stage === 'busy' && (
               <View style={styles.busyOverlay}>
                 <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-                <Text style={styles.busyText}>{t('screens.walletPrivateKeyGoogleAuth.processing')}</Text>
+                <LoadingText text={t('screens.walletPrivateKeyGoogleAuth.processing')} style={styles.busyText} />
               </View>
             )}
           </View>

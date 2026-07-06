@@ -48,6 +48,7 @@ import {
 } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { TaboolaBanner } from '../components/TaboolaBanner';
+import { LoadingText } from '../components/AnimatedDots';
 import { getTokenIcon } from '../constants/tokenMeta';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
@@ -1058,7 +1059,7 @@ export const WalletScreen = () => {
         <View style={styles.listWrapper}>
           {isLoading ? (
             <View style={styles.loadingContainer}>
-              <Text>{t('screens.wallet.loading')}</Text>
+              <LoadingText text={t('screens.wallet.loading')} />
             </View>
           ) : (
             <DataList

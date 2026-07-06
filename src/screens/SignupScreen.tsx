@@ -27,6 +27,7 @@ import {
   Dialog,
   CountryCodeListItem,
 } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { COLORS, SIZES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
@@ -1151,7 +1152,7 @@ export const SignupScreen = () => {
           {isClauseLoading ? (
             <View style={styles.clauseLoadingContainer}>
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
-              <Text style={styles.clauseLoadingText}>{t('screens.myInfoClauses.loading')}</Text>
+              <LoadingText text={t('screens.myInfoClauses.loading')} style={styles.clauseLoadingText} />
             </View>
           ) : clauseError ? (
             <Text style={styles.clauseErrorText}>{clauseError}</Text>

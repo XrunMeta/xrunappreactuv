@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Dialog, SafeScrollView } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { useTranslation } from 'react-i18next';
 import BigNumber from 'bignumber.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -291,7 +292,7 @@ export const WalletTransactionProgressScreen = () => {
 
         <View style={styles.progressRow}>
           {isProcessing && <ActivityIndicator size="small" color={COLORS.buttonPrimary} />}
-          <Text style={styles.progressText}>{statusMessage}</Text>
+          <LoadingText text={statusMessage} style={styles.progressText} />
         </View>
 
         {!isProcessing && isSuccess && (

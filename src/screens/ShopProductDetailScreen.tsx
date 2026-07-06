@@ -17,6 +17,7 @@ import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWi
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
+import { LoadingText } from '../components/AnimatedDots';
 import { sendOnchainLocal, isLocalSendEnabledForUser } from '../services/walletSendLocal';
 import { findEntriesForUser, type WalletKey } from '../services/walletKeyStore';
 
@@ -977,9 +978,11 @@ export const ShopProductDetailScreen = () => {
                             style={styles.purchaseButtonGradient}
                         >
                             {iakPurchaseLoading ? <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} /> : null}
-                            <Text style={styles.purchaseButtonText}>
-                                {iakPurchaseLoading ? t('screens.shop.iak.processing') : t('screens.shop.iak.buyButton')}
-                            </Text>
+                            {iakPurchaseLoading ? (
+                                <LoadingText text={t('screens.shop.iak.processing')} style={styles.purchaseButtonText} />
+                            ) : (
+                                <Text style={styles.purchaseButtonText}>{t('screens.shop.iak.buyButton')}</Text>
+                            )}
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : isXplayShop ? (
@@ -998,9 +1001,11 @@ export const ShopProductDetailScreen = () => {
                             {xplayPurchaseLoading ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" style={styles.purchaseIcon} />
                             ) : null}
-                            <Text style={styles.purchaseButtonText}>
-                                {xplayPurchaseLoading ? t('screens.shopProductDetail.processing') : t('screens.shopProductDetail.purchaseWithXRUN')}
-                            </Text>
+                            {xplayPurchaseLoading ? (
+                                <LoadingText text={t('screens.shopProductDetail.processing')} style={styles.purchaseButtonText} />
+                            ) : (
+                                <Text style={styles.purchaseButtonText}>{t('screens.shopProductDetail.purchaseWithXRUN')}</Text>
+                            )}
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : (
