@@ -33,6 +33,7 @@ export default {
   consentCheck2: 'Saya memahami kehilangan kunci berarti kehilangan akses ke dompet',
   consentCheck3: 'Tidak boleh dibagikan dengan orang lain',
   consentCheck4: 'Saya memahami hal di atas dan berjanji tidak akan membagikan dengan siapa pun',
+  consentCheck5: 'Saya tidak dapat menggunakan dompet jika lupa PIN dan kata sandi yang saya atur, meski ada cadangan',
   consentCheckGdrive: 'Akun Google ini adalah pribadi dan hanya digunakan oleh saya',
   consentDangerView: 'PK teks biasa akan muncul di layar. Pastikan tidak ada orang di sekitar terlebih dahulu.',
   consentDangerPlain: '⚠️ Opsi ini menyimpan PK ke Google Drive tanpa enkripsi. Siapa pun yang mendapat file dapat memindahkan aset Anda segera.',

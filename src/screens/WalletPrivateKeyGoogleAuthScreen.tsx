@@ -76,6 +76,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
     t('screens.walletPrivateKeyGoogleAuth.consentCheck2'),
     t('screens.walletPrivateKeyGoogleAuth.consentCheck3'),
     t('screens.walletPrivateKeyGoogleAuth.consentCheck4'),
+    t('screens.walletPrivateKeyGoogleAuth.consentCheck5'),
   ];
   const CONSENT_GDRIVE_LABEL = t('screens.walletPrivateKeyGoogleAuth.consentCheckGdrive');
 

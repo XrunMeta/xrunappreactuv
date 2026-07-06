@@ -33,6 +33,7 @@ export default {
   consentCheck2: 'I understand losing the key means losing wallet access',
   consentCheck3: 'It must not be shared with others',
   consentCheck4: 'I understand the above and promise not to share with anyone',
+  consentCheck5: 'I cannot use the wallet if I forget the PIN and password I set, even with a backup',
   consentCheckGdrive: 'This Google account is personal and used only by me',
   consentDangerView: 'Plaintext PK will appear on screen. Make sure no one else is nearby first.',
   consentDangerPlain: '⚠️ This option saves PK to Google Drive without encryption. Anyone who gets the file can move your assets immediately.',

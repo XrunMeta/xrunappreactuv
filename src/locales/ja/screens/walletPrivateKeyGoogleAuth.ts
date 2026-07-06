@@ -33,6 +33,7 @@ export default {
   consentCheck2: 'キーを紛失するとウォレットを使用できなくなることを理解しています',
   consentCheck3: '他人と共有してはいけない情報です',
   consentCheck4: '上記内容を理解し、誰にも共有しないことを約束します',
+  consentCheck5: '設定した PIN 番号とパスワードを忘れた場合、バックアップがあってもウォレットを使用できません',
   consentCheckGdrive: 'この Google アカウントは個人用で、私だけが使用するアカウントです',
   consentDangerView: '平文 PK が画面に表示されます。周りに他人がいないか先に確認してください。',
   consentDangerPlain: '⚠️ このオプションは PK を暗号化なしで Google Drive に保存します。ファイルが誰かの手に渡れば、資産を即座に移動できます。',

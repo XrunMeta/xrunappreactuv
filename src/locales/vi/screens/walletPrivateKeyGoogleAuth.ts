@@ -33,6 +33,7 @@ export default {
   consentCheck2: 'Tôi hiểu mất khóa có nghĩa là mất quyền truy cập ví',
   consentCheck3: 'Không được chia sẻ với người khác',
   consentCheck4: 'Tôi hiểu điều trên và hứa không chia sẻ với bất kỳ ai',
+  consentCheck5: 'Nếu quên mã PIN và mật khẩu đã đặt, tôi không thể sử dụng ví ngay cả khi có bản sao lưu',
   consentCheckGdrive: 'Tài khoản Google này là cá nhân và chỉ tôi sử dụng',
   consentDangerView: 'PK văn bản thuần sẽ hiển thị trên màn hình. Hãy đảm bảo không có ai gần đó trước.',
   consentDangerPlain: '⚠️ Tùy chọn này lưu PK vào Google Drive không mã hóa. Bất kỳ ai có được file có thể chuyển tài sản ngay lập tức.',

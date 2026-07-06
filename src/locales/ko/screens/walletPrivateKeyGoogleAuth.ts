@@ -33,6 +33,7 @@ export default {
   consentCheck2: '키를 분실하면 지갑을 사용할 수 없음을 알고 있습니다',
   consentCheck3: '다른 사람과 공유하면 안되는 정보입니다',
   consentCheck4: '위 내용을 이해했으며 누구에게도 공유하지 않을 것을 약속합니다',
+  consentCheck5: '설정하신 PIN 번호와 비밀번호를 잊어버린 경우에도 지갑을 사용할 수 없습니다',
   consentCheckGdrive: '이 Google 계정은 개인용이며, 본인만 사용하는 계정입니다',
   consentDangerView: '평문 PK 가 화면에 표시됩니다. 주변에 다른 사람이 없는지 먼저 확인해주세요.',
   consentDangerPlain: '⚠️ 이 옵션은 PK 를 암호화 없이 Google Drive 에 저장합니다. 파일이 누구든 손에 들어가면 자산을 즉시 옮길 수 있습니다.',

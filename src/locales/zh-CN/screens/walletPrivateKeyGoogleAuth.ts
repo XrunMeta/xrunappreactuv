@@ -33,6 +33,7 @@ export default {
   consentCheck2: '我了解丢失密钥将无法使用钱包',
   consentCheck3: '不可与他人分享的信息',
   consentCheck4: '我已理解上述内容，承诺不与任何人分享',
+  consentCheck5: '如果忘记设置的 PIN 密码，即使有备份也无法使用钱包',
   consentCheckGdrive: '此 Google 账户为个人使用，仅本人使用',
   consentDangerView: '明文 PK 将在屏幕上显示。请先确认周围没有其他人。',
   consentDangerPlain: '⚠️ 此选项将 PK 未加密保存到 Google Drive。文件落入任何人手中都可立即转移资产。',
