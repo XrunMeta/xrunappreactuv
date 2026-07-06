@@ -3,14 +3,24 @@
 const fs = require('fs');
 const path = require('path');
 
-function writeSecretToFile(secretName, b64, relPath) {
-  if (!b64) {
+function writeSecretToFile(secretName, valueOrPath, relPath) {
+  if (!valueOrPath) {
     console.log(`[eas-pre-install] ${secretName} not set — skipping ${relPath}`);
     return;
   }
   const target = path.join(__dirname, '..', relPath);
   try {
-    const content = Buffer.from(b64, 'base64').toString('utf8');
+
+    let content;
+    if (typeof valueOrPath === 'string' && valueOrPath.length < 4096 && fs.existsSync(valueOrPath)) {
+
+      const raw = fs.readFileSync(valueOrPath, 'utf8').trim();
+      content = Buffer.from(raw, 'base64').toString('utf8');
+      console.log(`[eas-pre-install] ${secretName} read from FILE ${valueOrPath}`);
+    } else {
+
+      content = Buffer.from(valueOrPath, 'base64').toString('utf8');
+    }
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, content, 'utf8');
     console.log(`[eas-pre-install] wrote ${target} (${content.length} bytes from ${secretName})`);
