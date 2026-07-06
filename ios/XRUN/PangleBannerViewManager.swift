@@ -9,7 +9,7 @@ class PangleBannerViewManager: RCTViewManager {
   override func view() -> UIView! { PangleBannerView() }
 }
 
-class PangleBannerView: UIView, PAGBannerAdDelegate {
+class PangleBannerView: UIView {
   private var bannerAd: PAGBannerAd?
   private var loadedAdUnitId: String = ""
 
@@ -44,10 +44,8 @@ class PangleBannerView: UIView, PAGBannerAdDelegate {
         print("[PangleBanner] ad nil")
         return
       }
-      ad.delegate = self
       self.bannerAd = ad
       DispatchQueue.main.async {
-
         self.subviews.forEach { $0.removeFromSuperview() }
         let bannerView = ad.bannerView
         bannerView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,8 +59,4 @@ class PangleBannerView: UIView, PAGBannerAdDelegate {
       }
     }
   }
-
-  func adDidShow(_ ad: PAGAdProtocol) {}
-  func adDidClick(_ ad: PAGAdProtocol) {}
-  func adDidDismiss(_ ad: PAGAdProtocol) {}
 }
