@@ -27,6 +27,7 @@ import {
   v_c2fdd1,
   v_ecee91,
 } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -1151,7 +1152,7 @@ export const v_f40fc5 = () => {
           {v_295e3d ? (
             <View style={v_d81136.clauseLoadingContainer}>
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-              <Text style={v_d81136.clauseLoadingText}>{v_8d41d7('screens.myInfoClauses.loading')}</Text>
+              <LoadingText text={v_8d41d7('screens.myInfoClauses.loading')} style={v_d81136.clauseLoadingText} />
             </View>
           ) : v_528eae ? (
             <Text style={v_d81136.clauseErrorText}>{v_528eae}</Text>

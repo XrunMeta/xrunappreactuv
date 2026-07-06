@@ -3,6 +3,7 @@ import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v
 import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_94035f from 'ryynyumnbcgyvtiickefs';
 import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
+import { v_412fbc } from './AnimatedDots';
 
 export type OTAUpdateDialogProps = { isAdFinished?: boolean };
 
@@ -142,7 +143,7 @@ const OTAUpdateDialog: v_a3453e.FC<OTAUpdateDialogProps> = ({ isAdFinished: v_65
                                 borderWidth={0}
                                 height={10}
                             />
-                            <Text style={v_d81136.downloadingText}>{v_8d41d7('common.messages.loading')}</Text>
+                            <LoadingText text={v_8d41d7('common.messages.loading')} style={v_d81136.downloadingText} />
                         </View>
                     ) : (
                         <TouchableOpacity

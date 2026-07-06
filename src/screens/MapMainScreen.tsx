@@ -35,6 +35,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
 import { v_f4e704, v_a77ce6, v_556baf, v_66b9cc, v_197924 } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 
 import { v_cc3e1f } from './CameraMainScreen';
 
@@ -3742,7 +3743,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
             <ActivityIndicator size="large" color="#343a5a" />
 
-            <Text style={v_d81136.loadingText}>{v_8d41d7('common.messages.loading')}</Text>
+            <LoadingText text={v_8d41d7('common.messages.loading')} style={v_d81136.loadingText} />
 
           </View>
 

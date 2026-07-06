@@ -3,6 +3,7 @@ import { v_3094a2, v_19b633, v_472849, v_4623af, v_39a996, v_cf9c33, v_326be8 } 
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_18f201, v_3dc1fd, v_ad3a98, v_8c8ab6, v_f095b0 } from '../services/pangle';
@@ -152,7 +153,7 @@ export const v_4a5627 = () => {
         {v_683210 ? (
           <View style={v_d81136.loadingContainer}>
             <ActivityIndicator size="large" color={v_1bfbd0.primary} />
-            <Text style={v_d81136.loadingText}>{v_8d41d7('screens.pangleList.loading')}</Text>
+            <LoadingText text={v_8d41d7('screens.pangleList.loading')} style={v_d81136.loadingText} />
           </View>
         ) : v_e90e69.length === 0 ? (
           <View style={v_d81136.emptyContainer}>

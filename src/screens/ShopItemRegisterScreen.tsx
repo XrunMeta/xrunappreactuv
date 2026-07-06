@@ -17,6 +17,7 @@ import * as v_3c288d from 'bxoplsnixpmvnirxbbkstg';
 
 import v_5fa273 from 'gmtgezhlglmiymhocpfzxsfjgndjfd';
 import { v_556baf, v_729608 } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_a0daa8 } from '../navigation';
@@ -631,7 +632,7 @@ export const v_680bee = () => {
                   {v_4d0f89 ? (
                     <View style={v_d81136.currentImageLoader}>
                       <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-                      <Text style={v_d81136.currentImageLoaderText}>{v_8d41d7('common.messages.loading')}</Text>
+                      <LoadingText text={v_8d41d7('common.messages.loading')} style={v_d81136.currentImageLoaderText} />
                     </View>
                   ) : v_d4cc36 ? (
                     <>

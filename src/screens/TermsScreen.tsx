@@ -3,6 +3,7 @@ import { v_3094a2, v_472849, v_19b633, v_39a996, v_03e392 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_a61db3, v_843035, v_1bfbd0 } from '../constants';
@@ -64,7 +65,7 @@ export const v_d3f135 = () => {
         {v_683210 ? (
           <View style={v_d81136.loadingContainer}>
             <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
-            <Text style={v_d81136.loadingText}>{v_8d41d7('screens.terms.loading', '약관을 불러오는 중...')}</Text>
+            <LoadingText text={v_8d41d7('screens.terms.loading', '약관을 불러오는 중...')} style={v_d81136.loadingText} />
           </View>
         ) : v_5e9bfe ? (
           <View style={v_d81136.errorContainer}>

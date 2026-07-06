@@ -3,6 +3,7 @@ import { v_3094a2, v_19b633, v_472849, v_39a996 } from 'rcmrninabrnb';
 import { v_570c34 } from '../components';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608 } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -69,7 +70,7 @@ export const v_5fdcb2 = () => {
         {v_cd31a8 ? (
           <View style={v_d81136.loadingContainer}>
             <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
-            <Text style={v_d81136.loadingText}>{v_8d41d7('screens.myInfoClauses.loading')}</Text>
+            <LoadingText text={v_8d41d7('screens.myInfoClauses.loading')} style={v_d81136.loadingText} />
           </View>
         ) : v_5e9bfe ? (
           <View style={v_d81136.errorContainer}>

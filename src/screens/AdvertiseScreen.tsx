@@ -12,6 +12,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8 } from '../navigation';
 import { v_f4cc2d, v_010f9a } from '../services';
@@ -162,9 +163,10 @@ export const v_52e916 = () => {
         {v_683210 ? (
           <View style={v_d81136.loadingContainer}>
             <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
-            <Text style={[v_d81136.normalText, { color: '#7d7e83', marginTop: 12 }]}>
-              {v_8d41d7('screens.advertiseScreen.loading')}
-            </Text>
+            <LoadingText
+              text={v_8d41d7('screens.advertiseScreen.loading')}
+              style={[v_d81136.normalText, { color: '#7d7e83', marginTop: 12 }]}
+            />
           </View>
         ) : v_00f110.length === 0 ? (
           <View style={v_d81136.emptyContainer}>

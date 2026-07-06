@@ -17,6 +17,7 @@ import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 import { v_f9f38e } from '../components';
+import { v_412fbc } from '../components/AnimatedDots';
 import { v_e134f3, v_5e6c2c } from '../services/walletSendLocal';
 import { v_9d7f6b, type v_b9a3bd } from '../services/walletKeyStore';
 
@@ -977,9 +978,11 @@ export const v_a59951 = () => {
                             style={v_d81136.purchaseButtonGradient}
                         >
                             {v_673bf2 ? <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} /> : null}
-                            <Text style={v_d81136.purchaseButtonText}>
-                                {v_673bf2 ? v_8d41d7('screens.shop.iak.processing') : v_8d41d7('screens.shop.iak.buyButton')}
-                            </Text>
+                            {v_673bf2 ? (
+                                <LoadingText text={v_8d41d7('screens.shop.iak.processing')} style={v_d81136.purchaseButtonText} />
+                            ) : (
+                                <Text style={v_d81136.purchaseButtonText}>{v_8d41d7('screens.shop.iak.buyButton')}</Text>
+                            )}
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : v_5db874 ? (
@@ -998,9 +1001,11 @@ export const v_a59951 = () => {
                             {v_18a900 ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" style={v_d81136.purchaseIcon} />
                             ) : null}
-                            <Text style={v_d81136.purchaseButtonText}>
-                                {v_18a900 ? v_8d41d7('screens.shopProductDetail.processing') : v_8d41d7('screens.shopProductDetail.purchaseWithXRUN')}
-                            </Text>
+                            {v_18a900 ? (
+                                <LoadingText text={v_8d41d7('screens.shopProductDetail.processing')} style={v_d81136.purchaseButtonText} />
+                            ) : (
+                                <Text style={v_d81136.purchaseButtonText}>{v_8d41d7('screens.shopProductDetail.purchaseWithXRUN')}</Text>
+                            )}
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : (
