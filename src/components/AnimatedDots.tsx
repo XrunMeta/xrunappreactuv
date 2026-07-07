@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, TextStyle } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TextStyle } from 'react-native';
 
 interface AnimatedDotsProps {
 
@@ -7,53 +7,25 @@ interface AnimatedDotsProps {
 
   interval?: number;
 
-  duration?: number;
-
   style?: TextStyle;
 }
 
 export const AnimatedDots: React.FC<AnimatedDotsProps> = ({
   count = 3,
-  interval = 200,
-  duration = 900,
+  interval = 400,
   style,
 }) => {
-  const opacities = useRef(
-    Array.from({ length: count }, () => new Animated.Value(0))
-  ).current;
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
-    const loops = opacities.map((opacity, i) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(i * interval),
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: duration / 2,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: duration / 2,
-            useNativeDriver: true,
-          }),
-          Animated.delay((count - 1 - i) * interval),
-        ])
-      )
-    );
-    loops.forEach(l => l.start());
-    return () => loops.forEach(l => l.stop());
-  }, [count, interval, duration, opacities]);
+    const timer = setInterval(() => {
+      setStep((prev) => (prev + 1) % (count + 1));
+    }, interval);
+    return () => clearInterval(timer);
+  }, [count, interval]);
 
-  return (
-    <>
-      {opacities.map((opacity, i) => (
-        <Animated.Text key={i} style={[style, { opacity }]}>
-          .
-        </Animated.Text>
-      ))}
-    </>
-  );
+  const dotsStr = '.'.repeat(step) + ' '.repeat(count - step);
+  return <Text style={style}>{dotsStr}</Text>;
 };
 
 interface LoadingTextProps {
@@ -78,7 +50,6 @@ export const LoadingText: React.FC<LoadingTextProps> = ({
     return <Text style={style}>{text}</Text>;
   }
   const base = text.slice(0, match.index).trimEnd();
-
   return (
     <Text style={[style, containerStyle]}>
       {base}
