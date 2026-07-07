@@ -186,6 +186,8 @@ export const v_1f4a13 = (): void => {
   v_cc2596()
     .then(async (v_c87b30) => {
       console.log('[i18n] 적용 대상 언어:', v_c87b30, '(현재:', v_9c213b.language, ')');
+
+      v_f93aba(v_c87b30).catch(v_9e86fd => console.warn('[i18n] startup server sync failed:', v_9e86fd?.message));
       if (v_c87b30 === v_9c213b.language) {
         console.log('[i18n] 이미 적용됨 — skip');
         return;
