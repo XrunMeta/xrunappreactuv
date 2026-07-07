@@ -15,11 +15,12 @@ export const AnimatedDots: v_a3453e.FC<AnimatedDotsProps> = ({
   interval: v_ad1d65 = 400,
   style: v_7fa4e4,
 }) => {
-  const [v_729796, v_fd7d1f] = v_5ab095(0);
+
+  const [v_729796, v_fd7d1f] = v_5ab095(1);
 
   v_c4deb2(() => {
     const v_cb36b1 = setInterval(() => {
-      v_fd7d1f((v_ba2215) => (v_ba2215 + 1) % (v_9e8c70 + 1));
+      v_fd7d1f((v_ba2215) => (v_ba2215 % v_9e8c70) + 1);
     }, v_ad1d65);
     return () => clearInterval(v_cb36b1);
   }, [v_9e8c70, v_ad1d65]);
