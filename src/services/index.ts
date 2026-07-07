@@ -5252,6 +5252,16 @@ export const purchaseGiftRecord = async (
   return response.data;
 };
 
+export const sponsorGasForGiftPurchase = async (
+  member: string | number,
+  goods_code: string,
+  navigation?: any,
+): Promise<{ status: string; code: number; message: string; data: Array<{ pol_tx_hash: string; pol_amount: string }> | null }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post('/sponsorGas', { member, goods_code });
+  return response.data;
+};
+
 export const purchaseXrunItemRecord = async (
   member: string | number,
   item: number,

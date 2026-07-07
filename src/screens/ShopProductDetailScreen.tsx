@@ -13,7 +13,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAndroidNavigationBarHeight } from 'react-native-navigation-bar-height';
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord, purchaseIakWithXrun, purchaseIakPrepare, purchaseIakRecord } from '../services';
+import { getAyetPointsBalance, getUserBalance, getMyPageUserInfo, purchaseGiftWithXplayPoints, fetchWalletData, purchaseXrunItem, purchaseXrunItemPrepare, purchaseXrunItemRecord, purchaseGiftPrepare, purchaseGiftRecord, purchaseIakWithXrun, purchaseIakPrepare, purchaseIakRecord, sponsorGasForGiftPurchase } from '../services';
 import { getProductDetail } from '../services/giftishowBiz';
 import type { GiftishowProductDetailItem } from '../services/giftishowBiz';
 import { WalletKeyPinPromptModal } from '../components';
@@ -1253,6 +1253,19 @@ export const ShopProductDetailScreen = () => {
                                     throw new Error(prep?.message || 'prepare 실패');
                                 }
                                 const meta = prep.data[0];
+
+                                try {
+                                    const sponsor = await sponsorGasForGiftPurchase(member!, String(product.id), navigate);
+                                    if (sponsor?.status !== 'success' || !sponsor.data?.[0]?.pol_tx_hash) {
+                                        console.warn('[gift purchase] sponsor gas warn:', sponsor?.message);
+
+                                    } else {
+                                        console.log('[gift purchase] sponsor gas ok:', sponsor.data[0]);
+                                    }
+                                } catch (spErr: any) {
+                                    console.warn('[gift purchase] sponsor gas exception:', spErr?.message);
+
+                                }
                                 const send = await sendOnchainLocal({
                                     privateKey: target.private_key,
                                     fromAddress: meta.userAddress,
