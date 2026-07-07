@@ -370,7 +370,8 @@ export const AdWalletScreen = () => {
 
       const amountNum = parseFloat(amountValue);
       const flooredAmount = Math.floor(amountNum * 100) / 100;
-      const expectedAdRevenue = `${flooredAmount.toFixed(2)} XRUN`;
+
+      const expectedAdRevenue = `${parseFloat(flooredAmount.toFixed(2))} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
       const itemId = item.transaction || item.id;
@@ -444,7 +445,8 @@ export const AdWalletScreen = () => {
       const displayRewardAmount = rewardAmount;
 
       const flooredAmount = Math.floor(displayRewardAmount * 100) / 100;
-      const expectedAdRevenue = `${flooredAmount.toFixed(2)} XRUN`;
+
+      const expectedAdRevenue = `${parseFloat(flooredAmount.toFixed(2))} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
       const isReviewStatus = item.event_status === 'review';
@@ -540,14 +542,14 @@ export const AdWalletScreen = () => {
       else if (extrastr3 === 'zone1-instant') typeLabel = t('screens.adWallet.playZone1Reward');
       else if (extrastr3 === 'zone2-instant') typeLabel = t('screens.adWallet.playZone2Reward');
 
-      let adRevenueSettlement = '0.00 XRUN';
+      let adRevenueSettlement = '0 XRUN';
       if (item.amountasxrun) {
         const settlementNum = parseFloat(item.amountasxrun);
         const flooredSettlement = Math.floor(settlementNum * 10000) / 10000;
 
         const formatted = flooredSettlement % 1 === 0 || Math.round(flooredSettlement * 100) / 100 === flooredSettlement
-          ? flooredSettlement.toFixed(2)
-          : parseFloat(flooredSettlement.toFixed(4)).toString();
+          ? String(parseFloat(flooredSettlement.toFixed(2)))
+          : String(parseFloat(flooredSettlement.toFixed(4)));
         adRevenueSettlement = `${formatted} XRUN`;
       }
 
