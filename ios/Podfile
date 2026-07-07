@@ -26,6 +26,15 @@ target 'XRUN' do
 # @generated begin AppsFlyer Strict Mode - expo prebuild (DO NOT MODIFY) sync-b29372208dd0dbd1274e957795cd756926086c3a
 $RNAppsFlyerStrictMode=false
 # @generated end AppsFlyer Strict Mode
+  # 🔥 [2026-07-06] Firebase (RNFirebase) 가 GoogleUtilities 를 static library 로
+  #   Swift 에서 import 하려면 modular headers 필요. 없으면 pod install 실패:
+  #     "The Swift pod FirebaseCoreInternal depends upon GoogleUtilities, which does not define modules."
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseCoreExtension', :modular_headers => true
+  pod 'FirebaseInstallations', :modular_headers => true
+  pod 'GoogleDataTransport', :modular_headers => true
+  pod 'nanopb', :modular_headers => true
   use_expo_modules!
 # @generated begin AppsFlyer Purchase Connector - expo prebuild (DO NOT MODIFY) sync-8e832a4c46996cdfdec883811dff1a0327251ea6
 $AppsFlyerPurchaseConnector=true
