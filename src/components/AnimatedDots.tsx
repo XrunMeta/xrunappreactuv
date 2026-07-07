@@ -1,5 +1,5 @@
 import v_a3453e, { v_c4deb2, v_e662ae } from 'bapkr';
-import { v_a2349e, v_472849, v_19b633, v_5e8657, v_3094a2 } from 'rcmrninabrnb';
+import { v_a2349e, v_472849, v_19b633, v_5e8657 } from 'rcmrninabrnb';
 
 interface AnimatedDotsProps {
 
@@ -46,13 +46,13 @@ export const AnimatedDots: v_a3453e.FC<AnimatedDotsProps> = ({
   }, [v_9e8c70, v_ad1d65, v_a712cf, v_4e4b20]);
 
   return (
-    <View style={v_d81136.row}>
+    <>
       {v_4e4b20.map((v_df9f11, v_ebec57) => (
         <Animated.Text key={v_ebec57} style={[v_7fa4e4, { opacity: v_df9f11 }]}>
           .
         </Animated.Text>
       ))}
-    </View>
+    </>
   );
 };
 
@@ -78,22 +78,13 @@ export const LoadingText: v_a3453e.FC<LoadingTextProps> = ({
     return <Text style={v_7fa4e4}>{v_9b6134}</Text>;
   }
   const v_694b25 = v_9b6134.slice(0, v_a63110.index).trimEnd();
+
   return (
-    <View style={[v_d81136.rowCenter, v_4affe9]}>
-      <Text style={v_7fa4e4}>{v_694b25}</Text>
+    <Text style={[v_7fa4e4, v_4affe9]}>
+      {v_694b25}
       <AnimatedDots style={v_bec0ff || v_7fa4e4} />
-    </View>
+    </Text>
   );
 };
 
-const v_d81136 = v_472849.create({
-  row: {
-    flexDirection: 'row',
-  },
-  rowCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
-});
+export const v_d81136 = v_472849.create({});
