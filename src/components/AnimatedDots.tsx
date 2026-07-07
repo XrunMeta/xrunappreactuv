@@ -15,11 +15,12 @@ export const AnimatedDots: React.FC<AnimatedDotsProps> = ({
   interval = 400,
   style,
 }) => {
-  const [step, setStep] = useState(0);
+
+  const [step, setStep] = useState(1);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setStep((prev) => (prev + 1) % (count + 1));
+      setStep((prev) => (prev % count) + 1);
     }, interval);
     return () => clearInterval(timer);
   }, [count, interval]);
