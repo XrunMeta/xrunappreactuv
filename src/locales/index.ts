@@ -186,6 +186,8 @@ export const applyStoredLanguageAsync = (): void => {
   getStoredLanguage()
     .then(async (lng) => {
       console.log('[i18n] 적용 대상 언어:', lng, '(현재:', i18n.language, ')');
+
+      syncLanguageToServer(lng).catch(e => console.warn('[i18n] startup server sync failed:', e?.message));
       if (lng === i18n.language) {
         console.log('[i18n] 이미 적용됨 — skip');
         return;
