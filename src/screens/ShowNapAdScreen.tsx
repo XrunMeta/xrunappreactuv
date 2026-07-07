@@ -822,7 +822,8 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
             {t('screens.showNapAd.reward')} : {(() => {
               const price = advertisementParams?.xrunPrice || 0;
               const priceValue = parseFloat(String(price));
-              return isNaN(priceValue) ? '0.00' : priceValue.toFixed(2);
+
+              return isNaN(priceValue) ? '0' : String(parseFloat(priceValue.toFixed(2)));
             })()} XRUN
           </Text>
           <Text style={styles.campaignDesc}>
