@@ -735,7 +735,8 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
             {v_8d41d7('screens.showNapAd.reward')} : {(() => {
               const v_6bbb57 = v_d0b6d4?.xrunPrice || 0;
               const v_123554 = parseFloat(String(v_6bbb57));
-              return isNaN(v_123554) ? '0.00' : v_123554.toFixed(2);
+
+              return isNaN(v_123554) ? '0' : String(parseFloat(v_123554.toFixed(2)));
             })()} XRUN
           </Text>
           <Text style={v_d81136.campaignDesc}>
