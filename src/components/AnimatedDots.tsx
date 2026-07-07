@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, TextStyle, View } from 'react-native';
+import { Animated, StyleSheet, Text, TextStyle } from 'react-native';
 
 interface AnimatedDotsProps {
 
@@ -46,13 +46,13 @@ export const AnimatedDots: React.FC<AnimatedDotsProps> = ({
   }, [count, interval, duration, opacities]);
 
   return (
-    <View style={styles.row}>
+    <>
       {opacities.map((opacity, i) => (
         <Animated.Text key={i} style={[style, { opacity }]}>
           .
         </Animated.Text>
       ))}
-    </View>
+    </>
   );
 };
 
@@ -78,22 +78,13 @@ export const LoadingText: React.FC<LoadingTextProps> = ({
     return <Text style={style}>{text}</Text>;
   }
   const base = text.slice(0, match.index).trimEnd();
+
   return (
-    <View style={[styles.rowCenter, containerStyle]}>
-      <Text style={style}>{base}</Text>
+    <Text style={[style, containerStyle]}>
+      {base}
       <AnimatedDots style={dotsStyle || style} />
-    </View>
+    </Text>
   );
 };
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-  },
-  rowCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
-});
+export const styles = StyleSheet.create({});
