@@ -115,7 +115,7 @@ export const v_03a231 = () => {
       const v_43c42e = await v_db8d16();
       if (!v_43c42e.ok) {
 
-        if (v_7e32fb()) v_c7ac57();
+        if (v_7e32fb) v_c7ac57();
       }
     })();
 

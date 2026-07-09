@@ -502,6 +502,22 @@ export const MapMainScreen: v_a3453e.FC = () => {
             try {
               await v_5ed938();
               console.log('[MapMain] AT 없음 — fetchAndSaveWallets 로 vault 자동 채움');
+
+              const v_1fa4b7 = await v_9d7f6b(v_b4e012, v_717992);
+              const v_75b0ce = v_9034c6(v_1fa4b7.eth) || v_9034c6(v_1fa4b7.pol);
+              if (v_75b0ce && !v_2008a4) {
+
+                const v_86a649 = await v_e84827.getItem(v_4e5f7b);
+                if (v_86a649 !== 'true') {
+                  v_9b57fc(v_ce4741.walletKeyTutorial);
+                  return;
+                }
+                v_b51724((v_ba2215) => {
+                  if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_dabeaa) return v_ba2215;
+                  return { memberId: v_717992, email: v_dabeaa };
+                });
+                v_f4280a(true);
+              }
             } catch (v_9e86fd) {
               console.warn('[MapMain] fetchAndSaveWallets 실패:', v_9e86fd);
             }

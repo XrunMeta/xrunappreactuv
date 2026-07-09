@@ -182,6 +182,8 @@ const v_2219b3 = <T extends Record<string, any>>(
         v_9aecf5,
       ]}
       showsVerticalScrollIndicator={false}
+      alwaysBounceVertical={true}
+      bounces={true}
       refreshControl={
         v_d5345f ? (
           <RefreshControl
