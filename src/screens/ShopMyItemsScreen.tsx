@@ -23,7 +23,7 @@ interface MyItemData {
     brand: string;
     title: string;
     image: ImageSourcePropType;
-    status: 'available' | 'used' | 'pending';
+    status: 'available' | 'used' | 'expired' | 'pending';
     purchaseDate: string;
     tr_id?: string;
 
@@ -43,14 +43,44 @@ interface MyItemData {
     isTransferTicket?: boolean;
 }
 
-function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' | 'pending' {
-  if (pin_status === '01') return 'available';
-  if (pin_status === '99') return 'pending';
+function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' | 'expired' | 'pending' {
+  if (!pin_status) return 'used';
+  const availableSet = new Set(['01', '06', '15']); 
+  const expiredSet = new Set(['08', '09']); 
+  const pendingSet = new Set(['99']);
+  if (availableSet.has(pin_status)) return 'available';
+  if (expiredSet.has(pin_status)) return 'expired';
+  if (pendingSet.has(pin_status)) return 'pending';
   return 'used';
 }
 
+function pinStatusLabel(pin_status?: string): string {
+  const map: Record<string, string> = {
+    '01': '발행',
+    '02': '교환',
+    '03': '반품',
+    '04': '관리폐기',
+    '05': '환불',
+    '06': '재발행',
+    '07': '구매취소',
+    '08': '기간만료',
+    '09': '잔액기간만료',
+    '10': '기간만료취소',
+    '11': '환전',
+    '12': '환급',
+    '13': '잔액환급',
+    '14': '잔액기간만료취소',
+    '15': '등록',
+    '16': '등록취소',
+    '17': '바우처(비활성)',
+    '99': '발송대기',
+  };
+  return map[String(pin_status ?? '')] ?? String(pin_status ?? '-');
+}
+
 function isCancelledGiftishowCoupon(coupon: MyGiftishowCouponItem): boolean {
-  const cancelledStatusSet = new Set(['07', '12', '16', '22']); 
+
+  const cancelledStatusSet = new Set(['07', '10', '14', '16']);
   if (coupon.pin_status && cancelledStatusSet.has(String(coupon.pin_status))) return true;
 
   const anyCoupon = coupon as any;
@@ -89,11 +119,12 @@ function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
     title: c.goods_name ?? '-',
     image,
     status: mapPinStatusToAvailable(c.pin_status),
+    statusLabel: pinStatusLabel(c.pin_status),
     purchaseDate: formatPurchaseDate(c.purchase_date),
     type: 'giftishow',
     couponImgUrl: c.coupon_img_url || undefined,
     sortKey,
-  };
+  } as MyItemData;
 }
 
 function xrunPurchasedToMyItemData(p: PurchasedItemData, index: number): MyItemData {
@@ -337,13 +368,18 @@ export const ShopMyItemsScreen = () => {
                                 <Text style={styles.itemBrand}>{item.brand === 'SHOP' ? t('screens.shop.shopBrand') : item.brand}</Text>
                                 <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : isPending ? styles.statusTagPending : styles.statusTagUsed]}>
                                     <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : isPending ? styles.statusTagTextPending : styles.statusTagTextUsed]}>
-                                        {isIakCompleted
-                                            ? t('screens.shop.completedShort')
-                                            : isAvailable
-                                                ? t('screens.shop.availableShort')
-                                                : isPending
-                                                    ? t('screens.shop.pendingShort')
-                                                    : t('screens.shop.usedShort')}
+                                        {}
+                                        {item.type === 'giftishow' && (item as any).statusLabel
+                                            ? (item as any).statusLabel
+                                            : isIakCompleted
+                                                ? t('screens.shop.completedShort')
+                                                : isAvailable
+                                                    ? t('screens.shop.availableShort')
+                                                    : isPending
+                                                        ? t('screens.shop.pendingShort')
+                                                        : item.status === 'expired'
+                                                            ? (t('screens.shop.expiredShort') || '기간만료')
+                                                            : t('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>
@@ -458,6 +494,8 @@ export const ShopMyItemsScreen = () => {
                         />
                     </View>
                 )}
+
+                {}
 
                 {}
                 <SafeScrollView
@@ -590,6 +628,46 @@ const styles = StyleSheet.create({
         fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#1a2e35',
+    },
+
+    categoryTabsRow: {
+        flexDirection: 'row',
+        marginHorizontal: 16,
+        marginBottom: 12,
+        borderRadius: 10,
+        backgroundColor: '#F5F6F8',
+        padding: 4,
+    },
+    categoryTab: {
+        flex: 1,
+        paddingVertical: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 8,
+    },
+    categoryTabSelected: {
+        backgroundColor: '#ffffff',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    categoryTabLabel: {
+        fontSize: 13,
+        fontFamily: 'Roboto-Medium',
+        color: '#6a7282',
+    },
+    categoryTabLabelSelected: {
+        color: '#101828',
+        fontFamily: 'Roboto-Bold',
+    },
+    categoryTabCount: {
+        fontSize: 12,
+        color: '#9ca3af',
+    },
+    categoryTabCountSelected: {
+        color: '#0296f2',
     },
     itemsList: {
         paddingHorizontal: 16,
