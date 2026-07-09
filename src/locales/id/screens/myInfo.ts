@@ -31,6 +31,12 @@ export default {
     shareFailed: 'Berbagi Gagal',
     shareFailedMessage: 'Informasi email pengguna tidak ditemukan.',
   },
+  appleEmailGuide: {
+    title: 'Cara memeriksa email virtual',
+    subtitle: 'Email virtual dari Apple Sign-In (@privaterelay.appleid.com) dapat dilihat melalui jalur berikut.',
+    footNote: 'Ketuk XRUN di menu tersebut untuk melihat alamat email yang diberikan.',
+    confirm: 'OK',
+  },
 };
 
 

@@ -31,6 +31,12 @@ export default {
     shareFailed: 'Share Failed',
     shareFailedMessage: 'User email information not found.',
   },
+  appleEmailGuide: {
+    title: 'How to check virtual email',
+    subtitle: 'For Apple Sign-In users, the assigned virtual email (@privaterelay.appleid.com) can be found via the path below.',
+    footNote: 'Tap XRUN in that menu to see the assigned email.',
+    confirm: 'OK',
+  },
 };
 
 

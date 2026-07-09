@@ -31,6 +31,12 @@ export default {
     shareFailed: 'Chia sẻ thất bại',
     shareFailedMessage: 'Không tìm thấy thông tin email người dùng.',
   },
+  appleEmailGuide: {
+    title: 'Cách kiểm tra email ảo',
+    subtitle: 'Email ảo (@privaterelay.appleid.com) từ đăng nhập Apple có thể xem qua đường dẫn bên dưới.',
+    footNote: 'Nhấn vào mục XRUN để xem địa chỉ email được cấp.',
+    confirm: 'OK',
+  },
 };
 
 

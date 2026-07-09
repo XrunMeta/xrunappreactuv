@@ -31,6 +31,12 @@ export default {
     shareFailed: 'साझाकरण विफल',
     shareFailedMessage: 'उपयोगकर्ता ईमेल जानकारी नहीं मिली।',
   },
+  appleEmailGuide: {
+    title: 'वर्चुअल ईमेल कैसे देखें',
+    subtitle: 'Apple साइन-इन के लिए जारी वर्चुअल ईमेल (@privaterelay.appleid.com) नीचे दिए गए पथ से देखा जा सकता है।',
+    footNote: 'XRUN पर टैप करने पर जारी ईमेल पता दिखेगा।',
+    confirm: 'ठीक है',
+  },
 };
 
 

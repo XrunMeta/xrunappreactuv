@@ -31,5 +31,11 @@ export default {
     shareFailed: '공유 실패',
     shareFailedMessage: '사용자 이메일 정보를 찾을 수 없습니다.',
   },
+  appleEmailGuide: {
+    title: '가상 이메일 확인 방법',
+    subtitle: 'Apple 로그인 시 발급된 가상 이메일 (@privaterelay.appleid.com) 은 아래 경로에서 확인할 수 있어요.',
+    footNote: '해당 경로에서 XRUN 항목을 탭하면 발급된 이메일 주소를 볼 수 있습니다.',
+    confirm: '확인',
+  },
 };
 

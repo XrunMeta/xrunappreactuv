@@ -31,6 +31,12 @@ export default {
     shareFailed: '分享失败',
     shareFailedMessage: '找不到用户邮箱信息。',
   },
+  appleEmailGuide: {
+    title: '如何查看虚拟邮箱',
+    subtitle: 'Apple 登录时生成的虚拟邮箱 (@privaterelay.appleid.com) 可通过以下路径查看。',
+    footNote: '点击 XRUN 项目即可查看已生成的邮箱地址。',
+    confirm: '确认',
+  },
 };
 
 

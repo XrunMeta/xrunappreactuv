@@ -64,7 +64,6 @@ const v_2219b3 = <T extends Record<string, any>>(
 
   v_298205(v_6d4ed3, () => ({
     reloadData: () => {
-      v_d57c80([]);
       v_be9dba(1);
       v_1454f0(true);
       v_3a7d09(null);
@@ -210,7 +209,7 @@ const v_2219b3 = <T extends Record<string, any>>(
       scrollEventThrottle={16}
     >
       {}
-      {v_683210 && (
+      {v_683210 && !v_612e9f && v_9390e8.length === 0 && (
         <View style={v_d81136.loadingContainer}>
           <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
         </View>
@@ -224,7 +223,7 @@ const v_2219b3 = <T extends Record<string, any>>(
       )}
 
       {}
-      {!v_683210 && (
+      {(!v_683210 || v_9390e8.length > 0) && (
         <>
           {v_9390e8.map((v_8c0b26, v_a56041) => {
 
