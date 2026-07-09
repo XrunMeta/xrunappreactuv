@@ -57,7 +57,7 @@ function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' | 'e
 function pinStatusLabel(pin_status?: string): string {
   const map: Record<string, string> = {
     '01': '발행',
-    '02': '교환',
+    '02': '사용완료',
     '03': '반품',
     '04': '관리폐기',
     '05': '환불',
