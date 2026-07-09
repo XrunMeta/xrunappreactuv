@@ -23,7 +23,7 @@ export const ChangePasswordScreen = () => {
   useEffect(() => {
     (async () => {
       if (!(await isAppleLoggedIn())) return;
-      const result = await verifyAppleIdentity();
+      const result = await verifyAppleIdentity('changePassword');
       if (!result.ok) goBack();
     })();
 

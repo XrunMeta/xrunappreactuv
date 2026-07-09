@@ -4,12 +4,28 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import appleAuth from '@invertase/react-native-apple-authentication';
 
-export async function verifyAppleIdentity(): Promise<{ ok: boolean; cancelled?: boolean; reason?: string }> {
+const verifiedScreens = new Set<string>();
+
+export type ReauthScreenKey = 'myInfoEdit' | 'phoneEdit' | 'changePassword';
+
+export function markAppleReauthVerified(screenKey: ReauthScreenKey): void {
+  verifiedScreens.add(screenKey);
+}
+
+export function clearAppleReauthCache(): void {
+  verifiedScreens.clear();
+}
+
+export async function verifyAppleIdentity(screenKey?: ReauthScreenKey): Promise<{ ok: boolean; cancelled?: boolean; reason?: string; cached?: boolean }> {
   if (Platform.OS !== 'ios') {
     return { ok: false, reason: 'not-ios' };
   }
   if (!appleAuth.isSupported) {
     return { ok: false, reason: 'not-supported' };
+  }
+
+  if (screenKey && verifiedScreens.has(screenKey)) {
+    return { ok: true, cached: true };
   }
   try {
     const response = await appleAuth.performRequest({
@@ -19,6 +35,7 @@ export async function verifyAppleIdentity(): Promise<{ ok: boolean; cancelled?: 
     if (!response.identityToken) {
       return { ok: false, reason: 'no-identity-token' };
     }
+    if (screenKey) verifiedScreens.add(screenKey);
     return { ok: true };
   } catch (error: any) {
     if (error?.code === appleAuth.Error.CANCELED) {

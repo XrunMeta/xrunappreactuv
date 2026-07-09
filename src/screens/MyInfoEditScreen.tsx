@@ -100,7 +100,7 @@ export const MyInfoEditScreen = () => {
   useEffect(() => {
     (async () => {
       if (!(await isAppleLoggedIn())) return;
-      const result = await verifyAppleIdentity();
+      const result = await verifyAppleIdentity('myInfoEdit');
       if (!result.ok) {
         if (canGoBack) goBack();
         else reset(ROUTES.myInfo);
