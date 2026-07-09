@@ -14,7 +14,6 @@ import { Header, TaboolaBanner } from '../components';
 import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
-import { verifyAppleIdentity, isAppleLoggedIn } from '../services/appleReauth';
 import { unbindAdisonUid } from '../services/adison';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
@@ -108,18 +107,6 @@ export const MyInfoScreen = () => {
     ],
     [t],
   );
-
-  useEffect(() => {
-    (async () => {
-      if (!(await isAppleLoggedIn())) return;
-      const result = await verifyAppleIdentity();
-      if (!result.ok) {
-
-        if (canGoBack) goBack();
-      }
-    })();
-
-  }, []);
 
   useEffect(() => {
     const loadUserInfo = async () => {

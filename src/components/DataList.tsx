@@ -64,7 +64,6 @@ const DataListComponent = <T extends Record<string, any>>(
 
   useImperativeHandle(ref, () => ({
     reloadData: () => {
-      setData([]);
       setCurrentPage(1);
       setHasMore(true);
       setError(null);
@@ -210,7 +209,7 @@ const DataListComponent = <T extends Record<string, any>>(
       scrollEventThrottle={16}
     >
       {}
-      {loading && (
+      {loading && !refreshing && data.length === 0 && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
         </View>
@@ -224,7 +223,7 @@ const DataListComponent = <T extends Record<string, any>>(
       )}
 
       {}
-      {!loading && (
+      {(!loading || data.length > 0) && (
         <>
           {data.map((item, index) => {
 

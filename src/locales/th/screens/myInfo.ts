@@ -31,6 +31,12 @@ export default {
     shareFailed: 'การแชร์ล้มเหลว',
     shareFailedMessage: 'ไม่พบข้อมูลอีเมลผู้ใช้',
   },
+  appleEmailGuide: {
+    title: 'วิธีตรวจสอบอีเมลเสมือน',
+    subtitle: 'อีเมลเสมือนจาก Apple Sign-In (@privaterelay.appleid.com) สามารถดูได้ผ่านเส้นทางนี้',
+    footNote: 'แตะ XRUN ในเมนูเพื่อดูอีเมลที่ออกให้',
+    confirm: 'ตกลง',
+  },
 };
 
 

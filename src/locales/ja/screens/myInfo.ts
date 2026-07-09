@@ -31,6 +31,12 @@ export default {
     shareFailed: '共有失敗',
     shareFailedMessage: 'ユーザーのメール情報が見つかりません。',
   },
+  appleEmailGuide: {
+    title: '仮想メール確認方法',
+    subtitle: 'Appleサインインで発行された仮想メール (@privaterelay.appleid.com) は以下の経路で確認できます。',
+    footNote: '該当経路でXRUN項目をタップすると発行されたメールアドレスを確認できます。',
+    confirm: '確認',
+  },
 };
 
 
