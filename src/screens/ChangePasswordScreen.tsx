@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import { COLORS, COMMON_STYLES, FONTS, FORM_STYLES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { updatePassword } from '../services';
+import { verifyAppleIdentity, isAppleLoggedIn } from '../services/appleReauth';
 
 export const ChangePasswordScreen = () => {
   const { t } = useTranslation();
@@ -18,6 +19,15 @@ export const ChangePasswordScreen = () => {
   const [newPasswordSecure, setNewPasswordSecure] = useState(true);
   const [confirmPasswordSecure, setConfirmPasswordSecure] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (!(await isAppleLoggedIn())) return;
+      const result = await verifyAppleIdentity();
+      if (!result.ok) goBack();
+    })();
+
+  }, []);
 
   const filterPasswordInput = (value: string) => value.replace(/[^\x21-\x7E]/g, '');
 

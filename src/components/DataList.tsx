@@ -184,7 +184,15 @@ const DataListComponent = <T extends Record<string, any>>(
       showsVerticalScrollIndicator={false}
       refreshControl={
         onRefresh ? (
-          <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={!!refreshing}
+            onRefresh={onRefresh}
+            tintColor={COLORS.primary}
+            colors={[COLORS.primary]}
+            progressBackgroundColor="#ffffff"
+            title="새로고침 중..."
+            titleColor={COLORS.text}
+          />
         ) : undefined
       }
       onScroll={({ nativeEvent }) => {

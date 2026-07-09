@@ -43,20 +43,26 @@ const TRAILING_DOTS_RE = /(\s*(?:\.{3}|…|(?:\. ?){2,3}))\s*$/;
 export const LoadingText: React.FC<LoadingTextProps> = ({
   text,
   style,
-  dotsStyle,
+  dotsStyle: _dotsStyle,
   containerStyle,
 }) => {
   const match = text.match(TRAILING_DOTS_RE);
+  const base = match ? text.slice(0, match.index).trimEnd() : text;
+  const count = 3;
+  const interval = 400;
+  const [step, setStep] = useState(1);
+  useEffect(() => {
+    if (!match) return;
+    const timer = setInterval(() => {
+      setStep((prev) => (prev % count) + 1);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [match]);
   if (!match) {
-    return <Text style={style}>{text}</Text>;
+    return <Text style={[style, containerStyle]}>{text}</Text>;
   }
-  const base = text.slice(0, match.index).trimEnd();
-  return (
-    <Text style={[style, containerStyle]}>
-      {base}
-      <AnimatedDots style={dotsStyle || style} />
-    </Text>
-  );
+  const dotsStr = '.'.repeat(step) + ' '.repeat(count - step);
+  return <Text style={[style, containerStyle]}>{`${base}${dotsStr}`}</Text>;
 };
 
 export const styles = StyleSheet.create({});

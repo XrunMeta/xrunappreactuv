@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Text, FlatList, TouchableOpacity, Image, RefreshControl } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
@@ -403,6 +403,12 @@ export const ReferralSettlementScreen = () => {
               keyExtractor={(item) => item.id}
               onEndReached={loadMoreData}
               onEndReachedThreshold={0.5}
+              refreshControl={
+                <RefreshControl
+                  refreshing={false}
+                  onRefresh={() => { if (memberId) fetchSettlementData(memberId); }}
+                />
+              }
               ListFooterComponent={
                 isLoadingMore ? (
                   <View style={styles.loadingMoreContainer}>

@@ -80,6 +80,18 @@ export const AdWalletScreen = () => {
   const questListRef = useRef<DataListRef>(null);
   const settledListRef = useRef<DataListRef>(null);
 
+  const [refreshingPending, setRefreshingPending] = useState(false);
+  const [refreshingQuest, setRefreshingQuest] = useState(false);
+  const [refreshingSettled, setRefreshingSettled] = useState(false);
+  const makeRefreshHandler = useCallback(
+    (ref: React.RefObject<DataListRef>, setter: React.Dispatch<React.SetStateAction<boolean>>) => () => {
+      setter(true);
+      try { ref.current?.reloadData(); } catch {  }
+      setTimeout(() => setter(false), 500);
+    },
+    [],
+  );
+
   useEffect(() => {
     const getMember = async () => {
       try {
@@ -1235,7 +1247,6 @@ export const AdWalletScreen = () => {
                   import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
                     logEvent(XRUN_EVENTS.ATTENDANCE_CHECKED);
                   }).catch(() => {});
-                  showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
 
                   if (questListRef.current) {
                     questListRef.current.reloadData();
@@ -1270,7 +1281,7 @@ export const AdWalletScreen = () => {
               )
                 .then((response) => {
                   if (response.status === 'success') {
-                    showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+
                     if (questListRef.current) {
                       questListRef.current.reloadData();
                     }
@@ -1301,7 +1312,7 @@ export const AdWalletScreen = () => {
             );
 
             if (response.status === 'success') {
-              showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+
               if (questListRef.current) {
                 questListRef.current.reloadData();
               }
@@ -1328,7 +1339,7 @@ export const AdWalletScreen = () => {
           );
 
           if (response.status === 'success') {
-            showToast(t('screens.adWallet.attendanceCheckCompletedToast'));
+
             if (questListRef.current) {
               questListRef.current.reloadData();
             }
@@ -1633,6 +1644,8 @@ export const AdWalletScreen = () => {
               contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `pending-${item.id}-${index}`}
               itemProps={{ tab }}
+              refreshing={refreshingPending}
+              onRefresh={makeRefreshHandler(pendingListRef, setRefreshingPending)}
             />
           ) : tab === 'quest' ? (
             <DataList
@@ -1644,6 +1657,8 @@ export const AdWalletScreen = () => {
               keyExtractor={(item, index) => `quest-${item.id}-${index}`}
               onItemPress={handleQuestItemPress}
               itemProps={{ tab }}
+              refreshing={refreshingQuest}
+              onRefresh={makeRefreshHandler(questListRef, setRefreshingQuest)}
             />
           ) : (
             <DataList
@@ -1654,6 +1669,8 @@ export const AdWalletScreen = () => {
               contentContainerStyle={styles.dataList}
               keyExtractor={(item, index) => `settled-${item.id}-${index}`}
               itemProps={{ tab }}
+              refreshing={refreshingSettled}
+              onRefresh={makeRefreshHandler(settledListRef, setRefreshingSettled)}
             />
           )}
         </View>

@@ -369,62 +369,64 @@ export const VerificationCodeScreen = () => {
             }
           } else {
             const isGmail = (pendingData.email || '').toLowerCase().includes('@gmail.com');
+
+            const signupEmailLower = (pendingData.email || '').trim().toLowerCase();
+            let googleLinkedOk = false;
+
             if (isGmail) {
+              const choice = await showAlert(
+                t('screens.verificationCode.gmailGoogleLink.askTitle') || '구글 계정 연동',
+                t('screens.verificationCode.gmailGoogleLink.askMessage')
+                  || '가입하신 Gmail 계정을 Google 로그인과 연동하시겠어요?\n연동하면 다음부터 간편하게 로그인할 수 있습니다.',
+                [
+                  { text: t('screens.verificationCode.gmailGoogleLink.skip') || '나중에', style: 'cancel' },
+                  { text: t('screens.verificationCode.gmailGoogleLink.link') || '연동하기' },
+                ],
+              );
 
-              const signupEmailLower = (pendingData.email || '').trim().toLowerCase();
-              while (true) {
-                const result = await getGoogleIdToken();
-                if (!result) {
-                  await showAlert(
-                    t('screens.verificationCode.gmailGoogleLogin.title') || '구글 로그인 안내',
-                    t('screens.verificationCode.gmailGoogleLogin.message') || 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
-                    [{ text: t('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
-                  );
-                  continue;
-                }
+              if (choice === 1) {
 
-                if (result.email && signupEmailLower && result.email !== signupEmailLower) {
-
-                  await showAlert(
-                    t('screens.verificationCode.gmailGoogleLogin.emailMismatchTitle') || '이메일 불일치',
-                    t('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage', { email: pendingData.email })
-                      || `가입 시 입력하신 이메일 (${pendingData.email}) 과 구글 로그인에 사용하신 이메일이 다릅니다.\n\n같은 이메일로 다시 로그인해주세요.`,
-                    [{ text: t('screens.verificationCode.gmailGoogleLogin.emailMismatchButton') || '확인', onPress: () => {} }],
-                    { hideCloseButton: true },
-                  );
-                  continue;
-                }
                 try {
-                  const loginResponse = await loginWithGoogleIdToken(result.idToken, navigate);
-                  if (loginResponse.status === 'success' && loginResponse.data?.[0]) {
-                    const userData = loginResponse.data[0];
-                    const extrastr = userData.extrastr;
-                    const member = userData.member;
-                    if (extrastr && member) {
-                      const ssidw = encryptSHA256(extrastr);
-                      await saveSession(member, ssidw, navigate);
-                    }
-                    await AsyncStorage.removeItem('userData');
-                    await AsyncStorage.removeItem('userSessionToken');
-                    await AsyncStorage.setItem('userEmail', userData.email ?? pendingData.email);
-                    await AsyncStorage.setItem('userData', JSON.stringify(userData));
-                    await AsyncStorage.setItem('userSessionToken', extrastr || '');
-                    await AsyncStorage.setItem('isLoggedIn', 'true');
-                    await AsyncStorage.setItem('rememberMe', 'true');
-                    await AsyncStorage.setItem('loginType', 'google');
-                    reset(ROUTES.map);
-                    break;
-                  }
-                } catch (_) {
+                  const result = await getGoogleIdToken();
+                  if (result) {
+                    if (result.email && signupEmailLower && result.email !== signupEmailLower) {
 
+                      await showAlert(
+                        t('screens.verificationCode.gmailGoogleLogin.emailMismatchTitle') || '이메일 불일치',
+                        t('screens.verificationCode.gmailGoogleLogin.emailMismatchMessage', { email: pendingData.email })
+                          || `가입 시 입력하신 이메일 (${pendingData.email}) 과 구글 로그인에 사용하신 이메일이 다릅니다.\n\n연동 없이 계속 진행합니다.`,
+                        [{ text: t('screens.verificationCode.gmailGoogleLogin.emailMismatchButton') || '확인' }],
+                      );
+                    } else {
+                      const loginResponse = await loginWithGoogleIdToken(result.idToken, navigate);
+                      if (loginResponse.status === 'success' && loginResponse.data?.[0]) {
+                        const userData = loginResponse.data[0];
+                        const extrastr = userData.extrastr;
+                        const member = userData.member;
+                        if (extrastr && member) {
+                          const ssidw = encryptSHA256(extrastr);
+                          await saveSession(member, ssidw, navigate);
+                        }
+                        await AsyncStorage.removeItem('userData');
+                        await AsyncStorage.removeItem('userSessionToken');
+                        await AsyncStorage.setItem('userEmail', userData.email ?? pendingData.email);
+                        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+                        await AsyncStorage.setItem('userSessionToken', extrastr || '');
+                        await AsyncStorage.setItem('isLoggedIn', 'true');
+                        await AsyncStorage.setItem('rememberMe', 'true');
+                        await AsyncStorage.setItem('loginType', 'google');
+                        reset(ROUTES.map);
+                        googleLinkedOk = true;
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.warn('[회원가입] Gmail 구글 연동 실패:', e);
                 }
-                await showAlert(
-                  t('screens.verificationCode.gmailGoogleLogin.title') || '구글 로그인 안내',
-                  t('screens.verificationCode.gmailGoogleLogin.message') || 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
-                  [{ text: t('screens.verificationCode.gmailGoogleLogin.button') || '구글 로그인', onPress: () => {} }],
-                );
               }
-            } else {
+            }
+
+            if (!googleLinkedOk) {
 
               await showAlert(
                 t('screens.signup.success.title') || '회원가입 완료',

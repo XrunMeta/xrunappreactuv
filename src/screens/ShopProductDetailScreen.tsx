@@ -352,13 +352,14 @@ export const ShopProductDetailScreen = () => {
                             const is404 = code === 404 || /Goods not found|price not configured|등록되지|가격이 설정/i.test(msg);
                             const isE0010 = /E0010|비즈머니.*부족/i.test(msg);
                             const isEnglish = /^[\x00-\x7F\s]+$/.test(msg);
-                            const userMsg = is402 || isE0010
+                            const baseMsg = is402 || isE0010
                                 ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                                 : is404
                                     ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                     : isEnglish
                                         ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.'
                                         : msg;
+                            const userMsg = `${baseMsg}\n\n[code=${code ?? '-'}]\n${msg ?? ''}`;
                             console.warn('[Xplay 구매] 실패:', code, msg);
                             showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
                         }
@@ -368,13 +369,14 @@ export const ShopProductDetailScreen = () => {
                         const msg = err?.response?.data?.message ?? err?.message ?? '구매 처리 중 오류가 발생했습니다.';
 
                         const isEnglish = typeof msg === 'string' && /^[\x00-\x7F\s]+$/.test(msg);
-                        const userMsg = status === 402
+                        const baseMsg = status === 402
                             ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                             : status === 404
                                 ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                 : isEnglish
                                     ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
                                     : msg;
+                        const userMsg = `${baseMsg}\n\n[status=${status ?? '-'}]\n${msg ?? ''}`;
                         console.error('[Xplay 구매] 오류:', status, msg);
                         showAlert(t('screens.shopProductDetail.alerts.purchaseFailed'), userMsg, [{ text: t('screens.shopProductDetail.confirm') }]);
                     } finally {

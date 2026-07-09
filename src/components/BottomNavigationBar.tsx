@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { getIosWalletShowStatus, getAndroidWalletShowStatus } from '../services';
@@ -193,8 +194,16 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
     }
 
     const isActive = activeItemId === item.id;
-    const iconSource = item.icon;
     const isXplay = item.id === 'xplay';
+
+    const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
+      xplay:  'game-controller-outline',
+      shop:   'bag-outline',
+      wallet: 'wallet-outline',
+      info:   'person-outline',
+    };
+    const iconName = iconMap[item.id];
+    const iconColor = isActive ? COLORS.buttonPrimary : '#4C4E55';
 
     return (
       <TouchableOpacity
@@ -202,12 +211,8 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
         onPress={() => handleItemPress(item.id)}
         activeOpacity={0.7}>
         <View style={[styles.iconContainer, isXplay && styles.iconContainerXplayNudge]}>
-          {iconSource ? (
-            <Image
-              source={iconSource}
-              resizeMode="contain"
-              style={styles.navIcon}
-            />
+          {iconName ? (
+            <Ionicons name={iconName} size={22} color={iconColor} />
           ) : (
             <View style={[styles.iconPlaceholder, isActive && styles.iconPlaceholderActive]} />
           )}

@@ -54,6 +54,23 @@ function mapPinStatusToAvailable(pin_status?: string): 'available' | 'used' | 'e
   return 'used';
 }
 
+function iakStatusToCategory(status?: string): 'available' | 'used' | 'expired' | 'pending' {
+  if (status === 'pending') return 'pending';
+  if (status === 'success') return 'used';    
+  if (status === 'refunded') return 'used';   
+  if (status === 'failed') return 'expired';  
+  return 'available'; 
+}
+function iakStatusLabel(status?: string): string {
+  const map: Record<string, string> = {
+    'pending':  '처리 중',
+    'success':  '충전 완료',
+    'failed':   '실패',
+    'refunded': '환불됨',
+  };
+  return map[String(status ?? '')] ?? String(status ?? '-');
+}
+
 function pinStatusLabel(pin_status?: string): string {
   const map: Record<string, string> = {
     '01': '발행',
@@ -218,7 +235,8 @@ export const ShopMyItemsScreen = () => {
                             title: t.product_name || t.product_code,
                             image: hasIcon ? { uri: t.icon_url! } : defaultCouponImage,
 
-                            status: t.status === 'pending' ? 'pending' : 'available',
+                            status: iakStatusToCategory(t.status),
+                            statusLabel: iakStatusLabel(t.status),
                             purchaseDate: String(t.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
                             tr_id: t.ref_id,
                             type: 'iak' as const,
@@ -369,7 +387,7 @@ export const ShopMyItemsScreen = () => {
                                 <View style={[styles.statusTag, isAvailable ? styles.statusTagAvailable : isPending ? styles.statusTagPending : styles.statusTagUsed]}>
                                     <Text style={[styles.statusTagText, isAvailable ? styles.statusTagTextAvailable : isPending ? styles.statusTagTextPending : styles.statusTagTextUsed]}>
                                         {}
-                                        {item.type === 'giftishow' && (item as any).statusLabel
+                                        {(item.type === 'giftishow' || item.type === 'iak') && (item as any).statusLabel
                                             ? (item as any).statusLabel
                                             : isIakCompleted
                                                 ? t('screens.shop.completedShort')

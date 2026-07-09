@@ -156,18 +156,27 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
 
   const isInputStep = step === 'enter' || step === 'error' || step === 'confirm';
 
+  const canGoBack = step !== 'verifying' && step !== 'processing';
+
   return (
-    <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onCancel}>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent={false}
+      onRequestClose={canGoBack ? onCancel : () => {}}
+    >
       <View style={styles.overlay}>
         {}
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerBackButton}
-            onPress={onCancel}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
+          {canGoBack && (
+            <TouchableOpacity
+              style={styles.headerBackButton}
+              onPress={onCancel}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+            </TouchableOpacity>
+          )}
         </View>
         {}
         <View style={styles.centerBlock}>

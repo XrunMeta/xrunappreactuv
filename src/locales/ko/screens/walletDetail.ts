@@ -14,7 +14,7 @@ export default {
   shop: '상점',
   other: '기타',
   priceUpdating: '가격 정보 갱신 중',
-  cat_gift_purchase: '기프티콘 구매',
+  cat_gift_purchase: '상품구매',
   cat_refund: '환불',
   cat_attendance: '출석체크',
   cat_xplay_zone1: 'Xplay Zone1',

@@ -15,6 +15,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { updatePhone } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { verifyAppleIdentity, isAppleLoggedIn } from '../services/appleReauth';
 
 export const PhoneEditScreen = () => {
   const { t } = useTranslation();
@@ -24,6 +25,18 @@ export const PhoneEditScreen = () => {
   const [phone, setPhone] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [memberId, setMemberId] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (!(await isAppleLoggedIn())) return;
+      const result = await verifyAppleIdentity();
+      if (!result.ok) {
+        if (canGoBack()) goBack();
+        else reset(ROUTES.myInfoEdit);
+      }
+    })();
+
+  }, []);
 
   useEffect(() => {
     const loadUserInfo = async () => {

@@ -30,6 +30,13 @@ export const ReferralMyGroupScreen = () => {
   const { showAlert } = useAlertDialog();
   const { setSelectedReferralMember } = useAppContext();
   const dataListRef = useRef<DataListRef>(null);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    try { dataListRef.current?.reloadData(); } catch {  }
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
   const [memberId, setMemberId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
   const [totalMembers, setTotalMembers] = useState<number>(0);
@@ -282,6 +289,8 @@ export const ReferralMyGroupScreen = () => {
               }}
               contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
               itemProps={{ hideRank: true }}
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
             />
           )}
         </View>

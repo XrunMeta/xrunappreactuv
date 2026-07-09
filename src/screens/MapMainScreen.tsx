@@ -35,6 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomNavigationBar, MapBottomPanel, SafeView, LevelNotification, WalletKeyPinSetupModal } from '../components';
+import { AppleEmailGuideModal } from '../components/AppleEmailGuideModal';
 import { LoadingText } from '../components/AnimatedDots';
 
 import { CameraMainScreen } from './CameraMainScreen';
@@ -398,6 +399,8 @@ export const MapMainScreen: React.FC = () => {
 
   const [showPinModal, setShowPinModal] = useState(false);
   const [pinModalProps, setPinModalProps] = useState<{ memberId: number; email: string } | null>(null);
+
+  const [showAppleEmailGuide, setShowAppleEmailGuide] = useState(false);
 
   useEffect(() => {
     const loadFailedCampids = async () => {
@@ -3780,12 +3783,30 @@ export const MapMainScreen: React.FC = () => {
           memberId={pinModalProps.memberId}
           email={pinModalProps.email}
           visible={showPinModal}
-          onSuccess={() => {
+          onSuccess={async () => {
             setShowPinModal(false);
             setPinModalProps(null);
+
+            try {
+              const [loginType, guideShown] = await Promise.all([
+                AsyncStorage.getItem('loginType'),
+                AsyncStorage.getItem('appleEmailGuideShown'),
+              ]);
+              if (loginType === 'apple' && guideShown !== 'true') {
+                setShowAppleEmailGuide(true);
+              }
+            } catch (e) {
+              console.warn('[Apple 이메일 안내] 상태 조회 실패:', e);
+            }
           }}
         />
       )}
+
+      {}
+      <AppleEmailGuideModal
+        visible={showAppleEmailGuide}
+        onDismiss={() => setShowAppleEmailGuide(false)}
+      />
 
     </View>
 

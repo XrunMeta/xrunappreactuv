@@ -29,10 +29,15 @@ export default {
     message: 'Gmail 계정은 Google 로그인으로 연동하면 다음부터 간편 로그인할 수 있어요.',
     button: '구글 로그인',
     emailMismatchTitle: '이메일 불일치',
-    emailMismatchMessage: '가입 시 입력하신 이메일 ({{email}}) 과 구글 로그인에 사용하신 이메일이 다릅니다.\n\n같은 이메일로 다시 로그인해주세요. 다른 구글 계정을 선택하셨다면 계정 선택 화면에서 가입 이메일을 골라주세요.',
+    emailMismatchMessage: '가입 시 입력하신 이메일 ({{email}}) 과 구글 로그인에 사용하신 이메일이 다릅니다.\n\n연동 없이 계속 진행합니다.',
     emailMismatchButton: '확인',
   },
+
+  gmailGoogleLink: {
+    askTitle: '구글 계정 연동',
+    askMessage: '가입하신 Gmail 계정을 Google 로그인과 연동하시겠어요?\n연동하면 다음부터 간편하게 로그인할 수 있습니다.',
+    link: '연동하기',
+    skip: '나중에',
+  },
 };
-
-
 

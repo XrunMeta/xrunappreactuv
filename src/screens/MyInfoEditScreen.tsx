@@ -12,6 +12,7 @@ import {
   Platform,
   Dimensions,
   TextInput,
+  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -102,17 +103,11 @@ export const MyInfoEditScreen = () => {
 
   const isIOS = Platform.OS === 'ios';
 
-  const GENDER_OPTIONS: { value: GenderOption; label: string }[] = isIOS
-    ? [
-        { value: 'select', label: t('screens.myInfoEdit.genderSelect') },
-        { value: 'male', label: t('screens.myInfoEdit.genderMale') },
-        { value: 'female', label: t('screens.myInfoEdit.genderFemale') },
-      ]
-    : [
-        { value: 'male', label: t('screens.myInfoEdit.genderMale') },
-        { value: 'female', label: t('screens.myInfoEdit.genderFemale') },
-      ];
-  const AGE_OPTIONS_DISPLAY = isIOS ? AGE_OPTIONS : (['10', '20', '30', '40', '50+'] as const);
+  const GENDER_OPTIONS: { value: GenderOption; label: string }[] = [
+    { value: 'male', label: t('screens.myInfoEdit.genderMale') },
+    { value: 'female', label: t('screens.myInfoEdit.genderFemale') },
+  ];
+  const AGE_OPTIONS_DISPLAY = ['10', '20', '30', '40', '50+'] as const;
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [fullName, setFullName] = useState('');
@@ -129,6 +124,8 @@ export const MyInfoEditScreen = () => {
   const FORM_DATA_KEY = 'myInfoEdit_formData';
 
   const [isSaving, setIsSaving] = useState(false);
+
+  const [appleAuthenticating, setAppleAuthenticating] = useState(false);
   const [memberId, setMemberId] = useState<number | null>(null);
   const [regions, setRegions] = useState<Array<{ description?: string; subcode?: number; rCode?: number; rName?: string }>>([]);
   const [isLoadingRegions, setIsLoadingRegions] = useState(false);
@@ -1150,6 +1147,30 @@ export const MyInfoEditScreen = () => {
   };
 
   const handleChangePassword = async () => {
+
+    const loginType = await AsyncStorage.getItem('loginType');
+    const isAppleLogin = loginType === 'apple';
+    if (isAppleLogin) {
+      setAppleAuthenticating(true);
+      try {
+        const appleLoginResult = await signInWithApple(navigate);
+        if (!appleLoginResult.success || !appleLoginResult.data) {
+          setAppleAuthenticating(false);
+          await showAlert(
+            t('screens.myInfoEdit.alerts.error'),
+            t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+          );
+          return;
+        }
+        setAppleAuthenticating(false);
+        navigate(ROUTES.myInfoChangePassword);
+      } catch (error) {
+        console.error('[정보수정] 애플 인증 오류:', error);
+        setAppleAuthenticating(false);
+        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
+      }
+      return;
+    }
     navigate(ROUTES.myInfoChangePassword);
   };
 
@@ -1305,12 +1326,13 @@ export const MyInfoEditScreen = () => {
     if (isAppleLogin) {
 
       console.log('[정보수정] 애플 로그인 사용자 - 애플 로그인으로 인증 시작');
-
+      setAppleAuthenticating(true);
       try {
         const appleLoginResult = await signInWithApple(navigate);
 
         if (!appleLoginResult.success || !appleLoginResult.data) {
           console.error('[정보수정] 애플 로그인 인증 실패:', appleLoginResult.message);
+          setAppleAuthenticating(false);
           await showAlert(
             t('screens.myInfoEdit.alerts.error'),
             t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
@@ -1319,9 +1341,11 @@ export const MyInfoEditScreen = () => {
         }
 
         console.log('[정보수정] 애플 로그인 인증 성공 - 전화번호 수정 화면으로 이동');
+        setAppleAuthenticating(false);
         navigate(ROUTES.myInfoPhoneEdit);
       } catch (error) {
         console.error('[정보수정] 애플 로그인 인증 오류:', error);
+        setAppleAuthenticating(false);
         await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
       }
     } else {
@@ -1596,7 +1620,6 @@ export const MyInfoEditScreen = () => {
           </View>
         ) : (
           <View style={styles.formFieldContainer}>
-
             <FormField
               label={t('screens.myInfoEdit.firstName')}
               value={fullName}
@@ -1752,26 +1775,16 @@ export const MyInfoEditScreen = () => {
 
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>{t('screens.myInfoEdit.gender')}</Text>
-              <View style={styles.inlineOptions}>
+              {}
+              <View style={[styles.inlineOptions, styles.readOnlyOptions]} pointerEvents="none">
                 {GENDER_OPTIONS.map((option) => {
                   const isSelected = gender === option.value;
-                  if (__DEV__) {
-                    console.log(`[정보수정] 성별 옵션 렌더링: ${option.label} (${option.value})`, {
-                      현재gender: gender,
-                      옵션value: option.value,
-                      선택됨: isSelected,
-                    });
-                  }
                   return (
                     <OptionButton
                       key={option.value}
                       label={option.label}
                       selected={isSelected}
-                      onPress={() => {
-                        console.log('[정보수정] 성별 선택됨:', { 이전: gender, 선택: option.value });
-                        setGender(option.value);
-                      }}
-                      disabled={isSaving}
+                      onPress={() => {}}
                     />
                   );
                 })}
@@ -1780,18 +1793,24 @@ export const MyInfoEditScreen = () => {
 
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>{t('screens.myInfoEdit.age')}</Text>
-              <View style={[styles.inlineOptions, styles.ageOptionsRow]}>
+              {}
+              {}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.ageScrollRow}
+                style={styles.readOnlyOptions}
+              >
                 {AGE_OPTIONS_DISPLAY.map((option) => (
-                  <OptionButton
-                    key={option}
-                    label={option === 'select' ? t('screens.myInfoEdit.ageSelect') : option}
-                    selected={age === option}
-                    onPress={() => setAge(option)}
-                    flex={1}
-                    disabled={isSaving}
-                  />
+                  <View key={option} style={styles.ageScrollItem}>
+                    <OptionButton
+                      label={option === 'select' ? t('screens.myInfoEdit.ageSelect') : option}
+                      selected={age === option}
+                      onPress={() => {}}
+                    />
+                  </View>
                 ))}
-              </View>
+              </ScrollView>
             </View>
           </View>
         )}
@@ -1812,6 +1831,35 @@ export const MyInfoEditScreen = () => {
           )}
         </View>
       </SafeScrollView>
+
+      {}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={appleAuthenticating}
+        onRequestClose={() => {}}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            paddingVertical: 28,
+            paddingHorizontal: 36,
+            borderRadius: 14,
+            alignItems: 'center',
+            minWidth: 200,
+          }}>
+            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
+            <Text style={{ marginTop: 14, fontSize: 15, fontWeight: '600', color: COLORS.text }}>
+              Apple 인증중...
+            </Text>
+          </View>
+        </View>
+      </Modal>
 
       {}
       <Modal
@@ -2073,6 +2121,19 @@ const styles = StyleSheet.create({
   ageOptionsRow: {
     flexWrap: 'nowrap',
     justifyContent: 'space-between',
+  },
+
+  readOnlyOptions: {
+    opacity: 0.55,
+  },
+  ageScrollRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 8,
+  },
+  ageScrollItem: {
+    minWidth: 70,
   },
   ageOptionButton: {
     marginRight: 0,

@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BigNumber from 'bignumber.js';
 import { Header, WalletHeaderCard, WalletFilterDialog, DataList, TransactionListItem, SafeView } from '../components';
+import type { DataListRef } from '../types/pagination';
 import { COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
@@ -240,6 +241,15 @@ export const WalletDetailScreen = () => {
   const [member, setMember] = useState<number | null>(null);
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
+
+  const txnListRef = useRef<DataListRef>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    try { txnListRef.current?.reloadData(); } catch {  }
+
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
 
   const [pinSetupVisible, setPinSetupVisible] = useState(false);
   const [pinSetupCtx, setPinSetupCtx] = useState<{ memberId: number; email: string } | null>(null);
@@ -807,10 +817,13 @@ export const WalletDetailScreen = () => {
 
         <View style={styles.listWrapper}>
           <DataList
+            ref={txnListRef}
             fetchData={getFetchData()}
             ItemComponent={TransactionListItemWrapper}
             pageSize={20}
             keyExtractor={(item, index) => item.id?.toString() || `txn_${index}`}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
             onItemPress={(item: TransactionListItemData) => {
 
               const itemData = item as TransactionListItemData & {
