@@ -23,7 +23,7 @@ interface MyItemData {
     brand: string;
     title: string;
     image: v_07a341;
-    status: 'available' | 'used' | 'pending';
+    status: 'available' | 'used' | 'expired' | 'pending';
     purchaseDate: string;
     tr_id?: string;
 
@@ -43,14 +43,44 @@ interface MyItemData {
     isTransferTicket?: boolean;
 }
 
-function v_52c82e(v_03cc9e): 'available' | 'used' | 'pending' {
-  if (v_03cc9e === '01') return 'available';
-  if (v_03cc9e === '99') return 'pending';
+function v_52c82e(v_03cc9e): 'available' | 'used' | 'expired' | 'pending' {
+  if (!v_03cc9e) return 'used';
+  const v_fa482c = new Set(['01', '06', '15']); 
+  const v_3fc4ce = new Set(['08', '09']); 
+  const v_63e87a = new Set(['99']);
+  if (v_fa482c.has(v_03cc9e)) return 'available';
+  if (v_3fc4ce.has(v_03cc9e)) return 'expired';
+  if (v_63e87a.has(v_03cc9e)) return 'pending';
   return 'used';
 }
 
+function v_a7d899(v_03cc9e): string {
+  const v_8dcb51 = {
+    '01': '발행',
+    '02': '교환',
+    '03': '반품',
+    '04': '관리폐기',
+    '05': '환불',
+    '06': '재발행',
+    '07': '구매취소',
+    '08': '기간만료',
+    '09': '잔액기간만료',
+    '10': '기간만료취소',
+    '11': '환전',
+    '12': '환급',
+    '13': '잔액환급',
+    '14': '잔액기간만료취소',
+    '15': '등록',
+    '16': '등록취소',
+    '17': '바우처(비활성)',
+    '99': '발송대기',
+  };
+  return v_8dcb51[String(v_03cc9e ?? '')] ?? String(v_03cc9e ?? '-');
+}
+
 function v_2d457b(coupon: v_a649c5): boolean {
-  const v_e34f4e = new Set(['07', '12', '16', '22']); 
+
+  const v_e34f4e = new Set(['07', '10', '14', '16']);
   if (v_ddbb49.pin_status && v_e34f4e.has(String(v_ddbb49.pin_status))) return true;
 
   const v_12a839 = v_ddbb49 as any;
@@ -89,11 +119,12 @@ function v_037021(c: v_a649c5): MyItemData {
     title: v_3f4e2e.goods_name ?? '-',
     image: v_7ddb73,
     status: v_52c82e(v_3f4e2e.pin_status),
+    statusLabel: v_a7d899(v_3f4e2e.pin_status),
     purchaseDate: v_b88ffe(v_3f4e2e.purchase_date),
     type: 'giftishow',
     couponImgUrl: v_3f4e2e.coupon_img_url || undefined,
     sortKey: v_45efe3,
-  };
+  } as MyItemData;
 }
 
 function v_e9b0bb(p: v_029bad, v_a56041): MyItemData {
@@ -337,13 +368,18 @@ export const v_8c1d95 = () => {
                                 <Text style={v_d81136.itemBrand}>{v_8c0b26.brand === 'SHOP' ? v_8d41d7('screens.shop.shopBrand') : v_8c0b26.brand}</Text>
                                 <View style={[v_d81136.statusTag, v_2911e0 ? v_d81136.statusTagAvailable : v_6e3315 ? v_d81136.statusTagPending : v_d81136.statusTagUsed]}>
                                     <Text style={[v_d81136.statusTagText, v_2911e0 ? v_d81136.statusTagTextAvailable : v_6e3315 ? v_d81136.statusTagTextPending : v_d81136.statusTagTextUsed]}>
-                                        {v_2ec305
-                                            ? v_8d41d7('screens.shop.completedShort')
-                                            : v_2911e0
-                                                ? v_8d41d7('screens.shop.availableShort')
-                                                : v_6e3315
-                                                    ? v_8d41d7('screens.shop.pendingShort')
-                                                    : v_8d41d7('screens.shop.usedShort')}
+                                        {}
+                                        {v_8c0b26.type === 'giftishow' && (v_8c0b26 as any).statusLabel
+                                            ? (v_8c0b26 as any).statusLabel
+                                            : v_2ec305
+                                                ? v_8d41d7('screens.shop.completedShort')
+                                                : v_2911e0
+                                                    ? v_8d41d7('screens.shop.availableShort')
+                                                    : v_6e3315
+                                                        ? v_8d41d7('screens.shop.pendingShort')
+                                                        : v_8c0b26.status === 'expired'
+                                                            ? (v_8d41d7('screens.shop.expiredShort') || '기간만료')
+                                                            : v_8d41d7('screens.shop.usedShort')}
                                     </Text>
                                 </View>
                             </View>
@@ -458,6 +494,8 @@ export const v_8c1d95 = () => {
                         />
                     </View>
                 )}
+
+                {}
 
                 {}
                 <SafeScrollView
@@ -590,6 +628,46 @@ const v_d81136 = v_472849.create({
         fontSize: v_843035.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#1a2e35',
+    },
+
+    categoryTabsRow: {
+        flexDirection: 'row',
+        marginHorizontal: 16,
+        marginBottom: 12,
+        borderRadius: 10,
+        backgroundColor: '#F5F6F8',
+        padding: 4,
+    },
+    categoryTab: {
+        flex: 1,
+        paddingVertical: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 8,
+    },
+    categoryTabSelected: {
+        backgroundColor: '#ffffff',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    categoryTabLabel: {
+        fontSize: 13,
+        fontFamily: 'Roboto-Medium',
+        color: '#6a7282',
+    },
+    categoryTabLabelSelected: {
+        color: '#101828',
+        fontFamily: 'Roboto-Bold',
+    },
+    categoryTabCount: {
+        fontSize: 12,
+        color: '#9ca3af',
+    },
+    categoryTabCountSelected: {
+        color: '#0296f2',
     },
     itemsList: {
         paddingHorizontal: 16,
