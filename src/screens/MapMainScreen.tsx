@@ -35,6 +35,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 
 import { v_f4e704, v_a77ce6, v_556baf, v_66b9cc, v_197924 } from '../components';
+import { v_e71c5f } from '../components/AppleEmailGuideModal';
 import { v_412fbc } from '../components/AnimatedDots';
 
 import { v_cc3e1f } from './CameraMainScreen';
@@ -398,6 +399,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
   const [v_25fba6, v_f4280a] = v_5ab095(false);
   const [v_00832d, v_b51724] = v_5ab095<{ memberId: number; email: string } | null>(null);
+
+  const [v_7f8989, v_a41f5f] = v_5ab095(false);
 
   v_c4deb2(() => {
     const v_43ed8b = async () => {
@@ -3780,12 +3783,30 @@ export const MapMainScreen: v_a3453e.FC = () => {
           memberId={v_00832d.memberId}
           email={v_00832d.email}
           visible={v_25fba6}
-          onSuccess={() => {
+          onSuccess={async () => {
             v_f4280a(false);
             v_b51724(null);
+
+            try {
+              const [v_861648, v_1e1868] = await Promise.all([
+                v_e84827.getItem('loginType'),
+                v_e84827.getItem('appleEmailGuideShown'),
+              ]);
+              if (v_861648 === 'apple' && v_1e1868 !== 'true') {
+                v_a41f5f(true);
+              }
+            } catch (v_9e86fd) {
+              console.warn('[Apple 이메일 안내] 상태 조회 실패:', v_9e86fd);
+            }
           }}
         />
       )}
+
+      {}
+      <AppleEmailGuideModal
+        visible={v_7f8989}
+        onDismiss={() => v_a41f5f(false)}
+      />
 
     </View>
 

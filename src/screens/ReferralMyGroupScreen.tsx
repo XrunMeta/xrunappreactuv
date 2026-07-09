@@ -30,6 +30,13 @@ export const v_58584a = () => {
   const { showAlert: v_889fad } = v_4b1173();
   const { setSelectedReferralMember: v_779227 } = v_700ef9();
   const v_e5fc4b = v_e662ae<v_029581>(null);
+
+  const [v_612e9f, v_575aad] = v_5ab095(false);
+  const v_f616ba = v_de06a3(() => {
+    v_575aad(true);
+    try { v_e5fc4b.current?.reloadData(); } catch {  }
+    setTimeout(() => v_575aad(false), 500);
+  }, []);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);
   const [v_f4fb5e, v_d9bcc7] = v_5ab095<string>('');
   const [v_03be4c, v_e2e8ad] = v_5ab095<number>(0);
@@ -282,6 +289,8 @@ export const v_58584a = () => {
               }}
               contentContainerStyle={{ paddingVertical: 0, paddingBottom: 32 }}
               itemProps={{ hideRank: true }}
+              refreshing={v_612e9f}
+              onRefresh={v_f616ba}
             />
           )}
         </View>

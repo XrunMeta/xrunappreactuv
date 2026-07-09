@@ -352,13 +352,14 @@ export const v_a59951 = () => {
                             const v_ce37ad = v_c99bd2 === 404 || /Goods not found|price not configured|등록되지|가격이 설정/i.test(v_badeaf);
                             const v_a2d859 = /E0010|비즈머니.*부족/i.test(v_badeaf);
                             const v_d6be1a = /^[\x00-\x7F\s]+$/.test(v_badeaf);
-                            const v_43f890 = v_f942f4 || v_a2d859
+                            const v_4d1536 = v_f942f4 || v_a2d859
                                 ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                                 : v_ce37ad
                                     ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                     : v_d6be1a
                                         ? '구매에 실패했습니다. 잠시 후 다시 시도해 주세요.'
                                         : v_badeaf;
+                            const v_43f890 = `${v_4d1536}\n\n[code=${v_c99bd2 ?? '-'}]\n${v_badeaf ?? ''}`;
                             console.warn('[Xplay 구매] 실패:', v_c99bd2, v_badeaf);
                             v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                         }
@@ -368,13 +369,14 @@ export const v_a59951 = () => {
                         const v_badeaf = v_49263d?.response?.data?.message ?? v_49263d?.message ?? '구매 처리 중 오류가 발생했습니다.';
 
                         const v_d6be1a = typeof v_badeaf === 'string' && /^[\x00-\x7F\s]+$/.test(v_badeaf);
-                        const v_43f890 = v_d308b5 === 402
+                        const v_4d1536 = v_d308b5 === 402
                             ? '서비스 점검 중입니다. 잠시 후 다시 시도해 주세요.'
                             : v_d308b5 === 404
                                 ? '해당 상품이 등록되지 않았거나 XRUN 금액이 설정되지 않았습니다. 관리자에게 문의해 주세요.'
                                 : v_d6be1a
                                     ? '구매 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
                                     : v_badeaf;
+                        const v_43f890 = `${v_4d1536}\n\n[status=${v_d308b5 ?? '-'}]\n${v_badeaf ?? ''}`;
                         console.error('[Xplay 구매] 오류:', v_d308b5, v_badeaf);
                         v_889fad(v_8d41d7('screens.shopProductDetail.alerts.purchaseFailed'), v_43f890, [{ text: v_8d41d7('screens.shopProductDetail.confirm') }]);
                     } finally {

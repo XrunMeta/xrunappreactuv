@@ -12,6 +12,7 @@ import {
   v_326be8,
   v_700696,
   v_79c4f2,
+  v_03e392,
 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
@@ -102,17 +103,11 @@ export const v_cdb169 = () => {
 
   const v_df691e = v_326be8.OS === 'ios';
 
-  const v_798085 = v_df691e
-    ? [
-        { value: 'select', label: v_8d41d7('screens.myInfoEdit.genderSelect') },
-        { value: 'male', label: v_8d41d7('screens.myInfoEdit.genderMale') },
-        { value: 'female', label: v_8d41d7('screens.myInfoEdit.genderFemale') },
-      ]
-    : [
-        { value: 'male', label: v_8d41d7('screens.myInfoEdit.genderMale') },
-        { value: 'female', label: v_8d41d7('screens.myInfoEdit.genderFemale') },
-      ];
-  const v_8b5eb1 = v_df691e ? v_0c96f7 : (['10', '20', '30', '40', '50+'] as const);
+  const v_798085 = [
+    { value: 'male', label: v_8d41d7('screens.myInfoEdit.genderMale') },
+    { value: 'female', label: v_8d41d7('screens.myInfoEdit.genderFemale') },
+  ];
+  const v_8b5eb1 = ['10', '20', '30', '40', '50+'] as const;
   const [v_a32a50, v_4944f5] = v_5ab095('');
   const [v_328bb4, v_b7613d] = v_5ab095('');
   const [v_05b02f, v_ef747e] = v_5ab095('');
@@ -129,6 +124,8 @@ export const v_cdb169 = () => {
   const v_c7a4de = 'myInfoEdit_formData';
 
   const [v_e495db, v_433822] = v_5ab095(false);
+
+  const [v_952c00, v_824110] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const [v_e94fdf, v_59ad99] = v_5ab095<Array<{ description?: string; subcode?: number; rCode?: number; rName?: string }>>([]);
   const [v_0908db, v_1c41ce] = v_5ab095(false);
@@ -1150,6 +1147,30 @@ export const v_cdb169 = () => {
   };
 
   const v_c09605 = async () => {
+
+    const v_861648 = await v_e84827.getItem('loginType');
+    const v_1fa4eb = v_861648 === 'apple';
+    if (v_1fa4eb) {
+      v_824110(true);
+      try {
+        const v_25c481 = await v_7af6c9(v_9b57fc);
+        if (!v_25c481.success || !v_25c481.data) {
+          v_824110(false);
+          await v_889fad(
+            v_8d41d7('screens.myInfoEdit.alerts.error'),
+            v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+          );
+          return;
+        }
+        v_824110(false);
+        v_9b57fc(v_ce4741.myInfoChangePassword);
+      } catch (v_5e9bfe) {
+        console.error('[정보수정] 애플 인증 오류:', v_5e9bfe);
+        v_824110(false);
+        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
+      }
+      return;
+    }
     v_9b57fc(v_ce4741.myInfoChangePassword);
   };
 
@@ -1305,12 +1326,13 @@ export const v_cdb169 = () => {
     if (v_1fa4eb) {
 
       console.log('[정보수정] 애플 로그인 사용자 - 애플 로그인으로 인증 시작');
-
+      v_824110(true);
       try {
         const v_25c481 = await v_7af6c9(v_9b57fc);
 
         if (!v_25c481.success || !v_25c481.data) {
           console.error('[정보수정] 애플 로그인 인증 실패:', v_25c481.message);
+          v_824110(false);
           await v_889fad(
             v_8d41d7('screens.myInfoEdit.alerts.error'),
             v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
@@ -1319,9 +1341,11 @@ export const v_cdb169 = () => {
         }
 
         console.log('[정보수정] 애플 로그인 인증 성공 - 전화번호 수정 화면으로 이동');
+        v_824110(false);
         v_9b57fc(v_ce4741.myInfoPhoneEdit);
       } catch (v_5e9bfe) {
         console.error('[정보수정] 애플 로그인 인증 오류:', v_5e9bfe);
+        v_824110(false);
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
       }
     } else {
@@ -1596,7 +1620,6 @@ export const v_cdb169 = () => {
           </View>
         ) : (
           <View style={v_d81136.formFieldContainer}>
-
             <FormField
               label={v_8d41d7('screens.myInfoEdit.firstName')}
               value={v_05b02f}
@@ -1752,26 +1775,16 @@ export const v_cdb169 = () => {
 
             <View style={v_d81136.fieldContainer}>
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.gender')}</Text>
-              <View style={v_d81136.inlineOptions}>
+              {}
+              <View style={[v_d81136.inlineOptions, v_d81136.readOnlyOptions]} pointerEvents="none">
                 {v_798085.map((v_0bd920) => {
                   const v_599a41 = v_c3eac4 === v_0bd920.value;
-                  if (__DEV__) {
-                    console.log(`[정보수정] 성별 옵션 렌더링: ${v_0bd920.label} (${v_0bd920.value})`, {
-                      현재gender: v_c3eac4,
-                      옵션value: v_0bd920.value,
-                      선택됨: v_599a41,
-                    });
-                  }
                   return (
                     <OptionButton
                       key={v_0bd920.value}
                       label={v_0bd920.label}
                       selected={v_599a41}
-                      onPress={() => {
-                        console.log('[정보수정] 성별 선택됨:', { 이전: v_c3eac4, 선택: v_0bd920.value });
-                        v_bdc43c(v_0bd920.value);
-                      }}
-                      disabled={v_e495db}
+                      onPress={() => {}}
                     />
                   );
                 })}
@@ -1780,18 +1793,24 @@ export const v_cdb169 = () => {
 
             <View style={v_d81136.fieldContainer}>
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.age')}</Text>
-              <View style={[v_d81136.inlineOptions, v_d81136.ageOptionsRow]}>
+              {}
+              {}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={v_d81136.ageScrollRow}
+                style={v_d81136.readOnlyOptions}
+              >
                 {v_8b5eb1.map((v_0bd920) => (
-                  <OptionButton
-                    key={v_0bd920}
-                    label={v_0bd920 === 'select' ? v_8d41d7('screens.myInfoEdit.ageSelect') : v_0bd920}
-                    selected={v_2694bd === v_0bd920}
-                    onPress={() => v_6e5c76(v_0bd920)}
-                    flex={1}
-                    disabled={v_e495db}
-                  />
+                  <View key={v_0bd920} style={v_d81136.ageScrollItem}>
+                    <OptionButton
+                      label={v_0bd920 === 'select' ? v_8d41d7('screens.myInfoEdit.ageSelect') : v_0bd920}
+                      selected={v_2694bd === v_0bd920}
+                      onPress={() => {}}
+                    />
+                  </View>
                 ))}
-              </View>
+              </ScrollView>
             </View>
           </View>
         )}
@@ -1812,6 +1831,35 @@ export const v_cdb169 = () => {
           )}
         </View>
       </SafeScrollView>
+
+      {}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={v_952c00}
+        onRequestClose={() => {}}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            paddingVertical: 28,
+            paddingHorizontal: 36,
+            borderRadius: 14,
+            alignItems: 'center',
+            minWidth: 200,
+          }}>
+            <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
+            <Text style={{ marginTop: 14, fontSize: 15, fontWeight: '600', color: v_1bfbd0.text }}>
+              Apple 인증중...
+            </Text>
+          </View>
+        </View>
+      </Modal>
 
       {}
       <Modal
@@ -2073,6 +2121,19 @@ const v_d81136 = v_472849.create({
   ageOptionsRow: {
     flexWrap: 'nowrap',
     justifyContent: 'space-between',
+  },
+
+  readOnlyOptions: {
+    opacity: 0.55,
+  },
+  ageScrollRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 8,
+  },
+  ageScrollItem: {
+    minWidth: 70,
   },
   ageOptionButton: {
     marginRight: 0,

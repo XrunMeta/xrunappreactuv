@@ -47,8 +47,8 @@ export default {
   },
   gasInsufficient: {
     title: '가스비 부족',
-    messageTransfer: '지갑에 송금 수수료(가스비)가 부족해 송금을 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
-    messagePurchase: '지갑에 결제 수수료(가스비)가 부족해 구매를 진행할 수 없어요.\n\n폴리곤 네트워크 가스 토큰(POL) 을 충전한 뒤 다시 시도해주세요.',
+    messageTransfer: '전송료(POL)가 부족합니다.\n폴리곤 네트워크 가스 토큰(POL)을 충전한 뒤 다시 시도해주세요.',
+    messagePurchase: '전송료(POL)가 부족합니다.\n폴리곤 네트워크 가스 토큰(POL)을 충전한 뒤 다시 시도해주세요.',
   },
 };
 

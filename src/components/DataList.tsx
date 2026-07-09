@@ -184,7 +184,15 @@ const v_2219b3 = <T extends Record<string, any>>(
       showsVerticalScrollIndicator={false}
       refreshControl={
         v_d5345f ? (
-          <RefreshControl refreshing={!!v_612e9f} onRefresh={v_d5345f} />
+          <RefreshControl
+            refreshing={!!v_612e9f}
+            onRefresh={v_d5345f}
+            tintColor={v_1bfbd0.primary}
+            colors={[v_1bfbd0.primary]}
+            progressBackgroundColor="#ffffff"
+            title="새로고침 중..."
+            titleColor={v_1bfbd0.text}
+          />
         ) : undefined
       }
       onScroll={({ nativeEvent: v_76b943 }) => {

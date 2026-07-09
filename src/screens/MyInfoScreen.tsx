@@ -14,6 +14,7 @@ import { v_729608, v_4c7b5d } from '../components';
 import { v_1bfbd0, v_a61db3, v_4922a9, v_843035, v_9b1a04 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_a7ab3c, v_d7d5a2, v_ab08d0 } from '../services';
+import { v_db8d16, v_9b617e } from '../services/appleReauth';
 import { v_21ef1f } from '../services/adison';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
@@ -107,6 +108,18 @@ export const v_03a231 = () => {
     ],
     [v_8d41d7],
   );
+
+  v_c4deb2(() => {
+    (async () => {
+      if (!(await v_9b617e())) return;
+      const v_43c42e = await v_db8d16();
+      if (!v_43c42e.ok) {
+
+        if (v_7e32fb()) v_c7ac57();
+      }
+    })();
+
+  }, []);
 
   v_c4deb2(() => {
     const v_ea3fa6 = async () => {

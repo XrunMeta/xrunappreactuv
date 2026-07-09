@@ -2,6 +2,7 @@ import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_3094a2, v_19b633, v_4623af, v_472849, v_cf9c33, v_326be8, v_e45a99 } from 'rcmrninabrnb';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_85f2c8, v_3ca33e } from '../services';
@@ -193,8 +194,16 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
     }
 
     const v_26dce6 = v_8ccd46 === v_8c0b26.id;
-    const v_c1dd95 = v_8c0b26.icon;
     const v_2457bf = v_8c0b26.id === 'xplay';
+
+    const iconMap: Record<string, keyof typeof v_25515d.glyphMap> = {
+      xplay:  'game-controller-outline',
+      shop:   'bag-outline',
+      wallet: 'wallet-outline',
+      info:   'person-outline',
+    };
+    const v_c288e9 = v_4eff08[v_8c0b26.id];
+    const v_ef160b = v_26dce6 ? v_1bfbd0.buttonPrimary : '#4C4E55';
 
     return (
       <TouchableOpacity
@@ -202,12 +211,8 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
         onPress={() => v_8e442f(v_8c0b26.id)}
         activeOpacity={0.7}>
         <View style={[v_d81136.iconContainer, v_2457bf && v_d81136.iconContainerXplayNudge]}>
-          {v_c1dd95 ? (
-            <Image
-              source={v_c1dd95}
-              resizeMode="contain"
-              style={v_d81136.navIcon}
-            />
+          {v_c288e9 ? (
+            <Ionicons name={v_c288e9} size={22} color={v_ef160b} />
           ) : (
             <View style={[v_d81136.iconPlaceholder, v_26dce6 && v_d81136.iconPlaceholderActive]} />
           )}

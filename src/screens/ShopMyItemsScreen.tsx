@@ -54,6 +54,23 @@ function v_52c82e(v_03cc9e): 'available' | 'used' | 'expired' | 'pending' {
   return 'used';
 }
 
+function v_0985ef(v_d308b5): 'available' | 'used' | 'expired' | 'pending' {
+  if (v_d308b5 === 'pending') return 'pending';
+  if (v_d308b5 === 'success') return 'used';    
+  if (v_d308b5 === 'refunded') return 'used';   
+  if (v_d308b5 === 'failed') return 'expired';  
+  return 'available'; 
+}
+function v_86df31(v_d308b5): string {
+  const v_8dcb51 = {
+    'pending':  '처리 중',
+    'success':  '충전 완료',
+    'failed':   '실패',
+    'refunded': '환불됨',
+  };
+  return v_8dcb51[String(v_d308b5 ?? '')] ?? String(v_d308b5 ?? '-');
+}
+
 function v_a7d899(v_03cc9e): string {
   const v_8dcb51 = {
     '01': '발행',
@@ -218,7 +235,8 @@ export const v_8c1d95 = () => {
                             title: v_8d41d7.product_name || v_8d41d7.product_code,
                             image: v_ee07b8 ? { uri: v_8d41d7.icon_url! } : v_818aa7,
 
-                            status: v_8d41d7.status === 'pending' ? 'pending' : 'available',
+                            status: v_0985ef(v_8d41d7.status),
+                            statusLabel: v_86df31(v_8d41d7.status),
                             purchaseDate: String(v_8d41d7.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
                             tr_id: v_8d41d7.ref_id,
                             type: 'iak' as const,
@@ -369,7 +387,7 @@ export const v_8c1d95 = () => {
                                 <View style={[v_d81136.statusTag, v_2911e0 ? v_d81136.statusTagAvailable : v_6e3315 ? v_d81136.statusTagPending : v_d81136.statusTagUsed]}>
                                     <Text style={[v_d81136.statusTagText, v_2911e0 ? v_d81136.statusTagTextAvailable : v_6e3315 ? v_d81136.statusTagTextPending : v_d81136.statusTagTextUsed]}>
                                         {}
-                                        {v_8c0b26.type === 'giftishow' && (v_8c0b26 as any).statusLabel
+                                        {(v_8c0b26.type === 'giftishow' || v_8c0b26.type === 'iak') && (v_8c0b26 as any).statusLabel
                                             ? (v_8c0b26 as any).statusLabel
                                             : v_2ec305
                                                 ? v_8d41d7('screens.shop.completedShort')

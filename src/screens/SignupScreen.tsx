@@ -1770,5 +1770,52 @@ const v_d81136 = v_472849.create({
     alignItems: 'center',
     paddingVertical: 40,
   },
+
+  appleGuideOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 28,
+  },
+  appleGuideCard: {
+    width: '100%',
+    maxWidth: 380,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    paddingHorizontal: 24,
+    paddingTop: 26,
+    paddingBottom: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  appleGuideTitle: {
+    fontSize: v_843035.size.large,
+    fontFamily: 'Roboto-Bold',
+    color: '#1f2937',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  appleGuideBody: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Regular',
+    color: '#374151',
+    lineHeight: 22,
+    marginBottom: 20,
+  },
+  appleGuideButton: {
+    backgroundColor: v_1bfbd0.buttonPrimary,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  appleGuideButtonText: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Bold',
+    color: '#ffffff',
+  },
 });
 

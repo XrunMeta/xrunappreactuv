@@ -1,5 +1,5 @@
 import v_a3453e, { v_df9f57, v_5ab095, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb, v_4623af, v_cf9c33 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_122070, v_39a996, v_19b633, v_9cabcb, v_4623af, v_cf9c33, v_6c4f62 } from 'rcmrninabrnb';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
@@ -403,6 +403,12 @@ export const v_08aac3 = () => {
               keyExtractor={(v_8c0b26) => v_8c0b26.id}
               onEndReached={v_e15c3b}
               onEndReachedThreshold={0.5}
+              refreshControl={
+                <RefreshControl
+                  refreshing={false}
+                  onRefresh={() => { if (v_717992) v_5ee940(v_717992); }}
+                />
+              }
               ListFooterComponent={
                 v_a78eba ? (
                   <View style={v_d81136.loadingMoreContainer}>
