@@ -22,6 +22,7 @@ import { v_1bfbd0, v_a61db3, v_9b1a04, v_bae512, v_843035, v_202d44, v_789afd, v
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_db8d16, v_9b617e } from '../services/appleReauth';
 import {
   v_a7ab3c,
   v_152d53,
@@ -95,6 +96,18 @@ export const v_cdb169 = () => {
     setVerificationEmail: v_b572c3,
     setVerificationSuccessRoute: v_8f89f3,
   } = v_700ef9();
+
+  v_c4deb2(() => {
+    (async () => {
+      if (!(await v_9b617e())) return;
+      const v_43c42e = await v_db8d16();
+      if (!v_43c42e.ok) {
+        if (v_7e32fb) v_c7ac57();
+        else v_487a25(v_ce4741.myInfo);
+      }
+    })();
+
+  }, []);
 
   const v_00d52a = v_a3453e.useRef(false);
   const v_2ca208 = v_a3453e.useRef(false);
