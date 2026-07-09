@@ -182,6 +182,8 @@ const DataListComponent = <T extends Record<string, any>>(
         contentContainerStyle,
       ]}
       showsVerticalScrollIndicator={false}
+      alwaysBounceVertical={true}
+      bounces={true}
       refreshControl={
         onRefresh ? (
           <RefreshControl

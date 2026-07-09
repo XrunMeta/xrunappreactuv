@@ -115,7 +115,7 @@ export const MyInfoScreen = () => {
       const result = await verifyAppleIdentity();
       if (!result.ok) {
 
-        if (canGoBack()) goBack();
+        if (canGoBack) goBack();
       }
     })();
 

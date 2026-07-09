@@ -22,6 +22,7 @@ import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES, FONTS, COUNTRY_DIAL_CODES, G
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { verifyAppleIdentity, isAppleLoggedIn } from '../services/appleReauth';
 import {
   getMyPageUserInfo,
   updateName,
@@ -95,6 +96,18 @@ export const MyInfoEditScreen = () => {
     setVerificationEmail,
     setVerificationSuccessRoute,
   } = useAppContext();
+
+  useEffect(() => {
+    (async () => {
+      if (!(await isAppleLoggedIn())) return;
+      const result = await verifyAppleIdentity();
+      if (!result.ok) {
+        if (canGoBack) goBack();
+        else reset(ROUTES.myInfo);
+      }
+    })();
+
+  }, []);
 
   const hasLoadedUserInfoRef = React.useRef(false);
   const isMountedRef = React.useRef(false);

@@ -502,6 +502,22 @@ export const MapMainScreen: React.FC = () => {
             try {
               await fetchAndSaveWallets();
               console.log('[MapMain] AT 없음 — fetchAndSaveWallets 로 vault 자동 채움');
+
+              const refreshedEntries = await findEntriesForUser(emailRaw, memberId);
+              const refreshedNeed = needPinSetup(refreshedEntries.eth) || needPinSetup(refreshedEntries.pol);
+              if (refreshedNeed && !cancelled) {
+
+                const tutorialDone = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+                if (tutorialDone !== 'true') {
+                  navigate(ROUTES.walletKeyTutorial);
+                  return;
+                }
+                setPinModalProps((prev) => {
+                  if (prev && prev.memberId === memberId && prev.email === normEmail) return prev;
+                  return { memberId, email: normEmail };
+                });
+                setShowPinModal(true);
+              }
             } catch (e) {
               console.warn('[MapMain] fetchAndSaveWallets 실패:', e);
             }

@@ -31,7 +31,7 @@ export const PhoneEditScreen = () => {
       if (!(await isAppleLoggedIn())) return;
       const result = await verifyAppleIdentity();
       if (!result.ok) {
-        if (canGoBack()) goBack();
+        if (canGoBack) goBack();
         else reset(ROUTES.myInfoEdit);
       }
     })();
