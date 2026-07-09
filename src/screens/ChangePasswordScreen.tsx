@@ -23,7 +23,7 @@ export const v_18d397 = () => {
   v_c4deb2(() => {
     (async () => {
       if (!(await v_9b617e())) return;
-      const v_43c42e = await v_db8d16();
+      const v_43c42e = await v_db8d16('changePassword');
       if (!v_43c42e.ok) v_c7ac57();
     })();
 

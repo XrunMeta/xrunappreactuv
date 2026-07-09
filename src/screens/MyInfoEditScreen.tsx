@@ -100,7 +100,7 @@ export const v_cdb169 = () => {
   v_c4deb2(() => {
     (async () => {
       if (!(await v_9b617e())) return;
-      const v_43c42e = await v_db8d16();
+      const v_43c42e = await v_db8d16('myInfoEdit');
       if (!v_43c42e.ok) {
         if (v_7e32fb) v_c7ac57();
         else v_487a25(v_ce4741.myInfo);
