@@ -283,17 +283,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
         }
 
         if (v_0ba044 === 'true') return;
-        let v_b4e012 = await v_e84827.getItem('userEmail');
-        if (!v_b4e012) {
-          try {
-            const v_f21c33 = await v_e84827.getItem('userData');
-            if (v_f21c33) v_b4e012 = (JSON.parse(v_f21c33) as { email?: string })?.email ?? null;
-          } catch {  }
-        }
-        if (!v_b4e012) return;
-        const v_7cbea7 = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
-        const v_dabeaa = v_b4e012.toLowerCase().trim();
-        if (!v_7cbea7.includes(v_dabeaa)) return;
         v_1320ed(v_ce4741.walletKeyTutorial);
       } catch (v_9e86fd) {
         console.warn('[MapMain] 튜토리얼 가드 확인 실패:', v_9e86fd);
