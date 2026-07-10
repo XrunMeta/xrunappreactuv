@@ -725,6 +725,13 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
 
       v_74a79c.headers.Authorization = await v_23dd22();
 
+      try {
+        const v_087631 = require('iokyqncutdfy');
+        v_74a79c.headers['X-OTA-Update-Id'] = String(v_087631.updateId ?? 'embedded');
+        v_74a79c.headers['X-OTA-Runtime'] = String(v_087631.runtimeVersion ?? '?');
+        v_74a79c.headers['X-OTA-Channel'] = String((v_087631 as any).channel ?? '?');
+      } catch {  }
+
       const v_288349 = [
         /\/callbackNasmob\b/,
         /\/callbackPointClick\b/,

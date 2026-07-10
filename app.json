@@ -76,7 +76,7 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "54",
+      "buildNumber": "55",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
