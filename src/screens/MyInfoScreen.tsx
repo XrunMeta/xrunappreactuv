@@ -110,6 +110,10 @@ export const MyInfoScreen = () => {
   );
 
   useEffect(() => {
+    console.log('[MyInfoScreen] OTA_MARKER v2026-07-10-A — Apple 재인증은 정보수정 클릭 시에만');
+  }, []);
+
+  useEffect(() => {
     const loadUserInfo = async () => {
       try {
 
