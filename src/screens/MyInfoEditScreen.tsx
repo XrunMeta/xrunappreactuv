@@ -752,22 +752,29 @@ export const v_cdb169 = () => {
 
             const v_861648 = await v_e84827.getItem('loginType');
             if (v_861648 === 'apple') {
-              if (v_326be8.OS === 'ios') {
 
-                v_2d4718.runAfterInteractions(() => {
-                  setTimeout(() => {
-                    v_889fad(
-                      v_8d41d7('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
-                      v_8d41d7('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
-                    );
-                  }, 300);
-                });
-              } else {
+              const v_83e91a = await v_e84827.getItem('appleEditInfoAlertShownAt');
+              const v_5c2f9f = Date.now();
+              const v_766b61 = v_83e91a && (v_5c2f9f - Number(v_83e91a)) < 10 * 60 * 1000;
+              if (!v_766b61) {
+                const v_464897 = async () => {
+                  await v_889fad(
+                    v_8d41d7('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                    v_8d41d7('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+                  );
+                  await v_e84827.setItem('appleEditInfoAlertShownAt', String(Date.now()));
+                };
+                if (v_326be8.OS === 'ios') {
 
-                await v_889fad(
-                  v_8d41d7('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
-                  v_8d41d7('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
-                );
+                  v_2d4718.runAfterInteractions(() => {
+                    setTimeout(() => {
+                      v_464897();
+                    }, 300);
+                  });
+                } else {
+
+                  await v_464897();
+                }
               }
             }
           } else {
