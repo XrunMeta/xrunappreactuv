@@ -1149,21 +1149,6 @@ export const v_cdb169 = () => {
 
   const v_c09605 = async () => {
 
-    const v_861648 = await v_e84827.getItem('loginType');
-    const v_1fa4eb = v_861648 === 'apple';
-    if (v_1fa4eb) {
-      const v_43c42e = await v_db8d16('changePassword');
-      if (!v_43c42e.ok) {
-        if (v_43c42e.cancelled) return;  
-        await v_889fad(
-          v_8d41d7('screens.myInfoEdit.alerts.error'),
-          v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
-        );
-        return;
-      }
-      v_9b57fc(v_ce4741.myInfoChangePassword);
-      return;
-    }
     v_9b57fc(v_ce4741.myInfoChangePassword);
   };
 
