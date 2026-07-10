@@ -22,7 +22,6 @@ import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES, FONTS, COUNTRY_DIAL_CODES, G
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { verifyAppleIdentity } from '../services/appleReauth';
 import {
   getMyPageUserInfo,
   updateName,
@@ -1155,12 +1154,6 @@ export const MyInfoEditScreen = () => {
   };
 
   const handleChangePassword = async () => {
-
-    const loginType = await AsyncStorage.getItem('loginType');
-    if (loginType === 'apple') {
-      const result = await verifyAppleIdentity('changePassword');
-      if (!result.ok) return;  
-    }
     navigate(ROUTES.myInfoChangePassword);
   };
 
@@ -1314,19 +1307,6 @@ export const MyInfoEditScreen = () => {
     const isAppleLogin = loginType === 'apple';
 
     if (isAppleLogin) {
-
-      console.log('[정보수정] 애플 로그인 사용자 - Apple 재인증 시작');
-      const result = await verifyAppleIdentity('phoneEdit');
-      if (!result.ok) {
-        if (result.cancelled) return;
-        console.error('[정보수정] Apple 재인증 실패:', result.reason);
-        await showAlert(
-          t('screens.myInfoEdit.alerts.error'),
-          t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
-        );
-        return;
-      }
-      console.log('[정보수정] Apple 재인증 성공 - 전화번호 수정 화면으로 이동');
       navigate(ROUTES.myInfoPhoneEdit);
     } else {
       if (!email) {
