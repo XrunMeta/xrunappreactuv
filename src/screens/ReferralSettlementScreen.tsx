@@ -12,6 +12,7 @@ import type { v_cc1705, v_55701f } from '../services';
 import { v_ca58e0, v_7ac54c } from '../services/referralSettlementCache';
 import { v_5f9ea4 } from '../types';
 import { v_35c0e0, v_d7e45e, v_b9db3d, v_a3bbf0 } from '../utils';
+import { v_2396c3 } from '../utils/formatAmount';
 import { v_4b1173 } from '../context/AlertDialogContext';
 
 interface TransformedSettlementData {
@@ -84,7 +85,7 @@ const v_325ac3 = (
         id: v_224318,
         type: v_8c0b26.email || '',
         description: v_6856a9,
-        amount: `+${parseFloat(String(v_8c0b26.amountasxrun)).toFixed(2)} XRUN`,
+        amount: `+${v_2396c3(v_8c0b26.amountasxrun, 2)} XRUN`,
         date: v_16897e(v_8c0b26.datetime),
         transaction: v_8c0b26.transaction,
       };
@@ -236,7 +237,7 @@ export const v_08aac3 = () => {
           (v_dce0a8, item: v_cc1705) => v_dce0a8 + (Number(v_8c0b26.xrun_amount) || 0),
           0
         );
-        const v_e0fe28 = v_a35cbd.toFixed(2);
+        const v_e0fe28 = v_2396c3(v_a35cbd, 2);
         v_54eab4(`${v_e0fe28} XRUN`);
 
         let v_41185e = '';

@@ -11,6 +11,7 @@ import { v_f3de6d } from '../utils/napApiUtils';
 import { v_573fcf } from '../utils/env';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_cba33f } from '../utils';
+import { v_2396c3 } from '../utils/formatAmount';
 import { v_566465 } from '../services/nasmediaAd';
 
 interface PangleAd {
@@ -185,7 +186,7 @@ export const v_4a5627 = () => {
                   </Text>
                   <View style={v_d81136.adReward}>
                     <Text style={v_d81136.adRewardText}>
-                      {v_8d41d7('screens.pangleList.reward')}: {v_ddcfed.xrunPrice?.toFixed(4) || v_ddcfed.coins || '0'} XRUN
+                      {v_8d41d7('screens.pangleList.reward')}: {v_2396c3(v_ddcfed.xrunPrice, 4) || v_ddcfed.coins || '0'} XRUN
                     </Text>
                   </View>
                   {v_ddcfed.joindesc && (
