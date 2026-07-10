@@ -29,6 +29,7 @@ import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
+import { fmtBalance } from '../utils/formatAmount';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
   fetchWalletData,
@@ -265,14 +266,7 @@ export const WalletScreen = () => {
           symbol: item.symbol,
           name: item.currencyname,
           subCurrencyName: item.subCurrencyName,
-          amount: (() => {
-            const v = new BigNumber(item.Wamount || item.amount || '0')
-
-            if (v.isZero()) return '0'
-            if (v.abs().lt(0.01)) return v.toFixed(6)
-            if (v.abs().lt(1)) return v.toFixed(4)
-            return v.toFixed(2)
-          })(),
+          amount: fmtBalance(item.Wamount || item.amount || '0'),
           icon: item.file || '',
           currency: item.currency,
           isCustom: false,
@@ -305,13 +299,7 @@ export const WalletScreen = () => {
             id: token.currency,
             symbol: token.symbol,
             name: token.name,
-            amount: (() => {
-              const v = new BigNumber(token.amount || '0')
-              if (v.isZero()) return '0'
-              if (v.abs().lt(0.01)) return v.toFixed(6)
-              if (v.abs().lt(1)) return v.toFixed(4)
-              return v.toFixed(2)
-            })(),
+            amount: fmtBalance(token.amount || '0'),
             icon: matchingWalletData
               ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`
               : 'https://via.placeholder.com/24',
@@ -331,13 +319,7 @@ export const WalletScreen = () => {
         id: 19,
         symbol: 'XRUN',
         name: 'AD XRUN',
-        amount: (() => {
-          const v = new BigNumber(adXrunAmount || 0)
-          if (v.isZero()) return '0'
-          if (v.abs().lt(0.01)) return v.toFixed(6)
-          if (v.abs().lt(1)) return v.toFixed(4)
-          return v.toFixed(2)
-        })(),
+        amount: fmtBalance(adXrunAmount || 0),
         icon: require('../../assets/ad-round-logo.png'),
         currency: 19,
         isCustom: false,
@@ -352,13 +334,7 @@ export const WalletScreen = () => {
         id: 1900,
         symbol: 'XRUN',
         name: 'REFERAL XRUN',
-        amount: (() => {
-          const v = new BigNumber(referralAmount || 0)
-          if (v.isZero()) return '0'
-          if (v.abs().lt(0.01)) return v.toFixed(6)
-          if (v.abs().lt(1)) return v.toFixed(4)
-          return v.toFixed(2)
-        })(),
+        amount: fmtBalance(referralAmount || 0),
         icon: '__RF__' as any,
         currency: 1900,
         isCustom: false,

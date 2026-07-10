@@ -11,6 +11,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { formatCurrency, showToast, getColdStartResult, shareReferralLink } from '../utils';
+import { fmtAmount } from '../utils/formatAmount';
 import { getToastBody } from '../services/nasmediaAd';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import {
@@ -170,7 +171,7 @@ export const AdWalletScreen = () => {
 
         setTimeout(() => {
           const totalXrun = pendingBannerRef.current.totalXrun;
-          const amountasxrun = `${totalXrun.toFixed(2)} XRUN`;
+          const amountasxrun = `${fmtAmount(totalXrun, 2)} XRUN`;
           let krwamount = '0 KRW';
           if (gopaxPrice && totalXrun > 0) {
             const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
@@ -185,7 +186,7 @@ export const AdWalletScreen = () => {
       if (tab === 'quest') {
         setTimeout(() => {
           const totalXrun = questBannerRef.current.totalXrun;
-          const amountasxrun = `${totalXrun.toFixed(2)} XRUN`;
+          const amountasxrun = `${fmtAmount(totalXrun, 2)} XRUN`;
           let krwamount = '0 KRW';
           if (gopaxPrice && totalXrun > 0) {
             const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
@@ -207,7 +208,7 @@ export const AdWalletScreen = () => {
           const transaction = responseData.transactions[0];
 
           const amountAsXrunNum = parseFloat(transaction.amountasxrun || '0');
-          const amountasxrun = `${amountAsXrunNum.toFixed(2)} XRUN`;
+          const amountasxrun = `${fmtAmount(amountAsXrunNum, 2)} XRUN`;
 
           let krwamount = '0 KRW';
           if (gopaxPrice && transaction.amountasxrun) {
@@ -383,7 +384,7 @@ export const AdWalletScreen = () => {
       const amountNum = parseFloat(amountValue);
       const flooredAmount = Math.floor(amountNum * 100) / 100;
 
-      const expectedAdRevenue = `${parseFloat(flooredAmount.toFixed(2))} XRUN`;
+      const expectedAdRevenue = `${fmtAmount(flooredAmount, 2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
       const itemId = item.transaction || item.id;
@@ -431,7 +432,7 @@ export const AdWalletScreen = () => {
           원본타입: typeof originalRewardValue,
           변환후값: rewardAmount,
           변환후타입: typeof rewardAmount,
-          최종표시값: `${flooredForLog.toFixed(2)} XRUN`,
+          최종표시값: `${fmtAmount(flooredForLog, 2)} XRUN`,
         });
       }
 
@@ -444,7 +445,7 @@ export const AdWalletScreen = () => {
           원본타입: typeof originalRewardValue,
           변환후값: rewardAmount,
           변환후타입: typeof rewardAmount,
-          최종표시값: `${flooredForLog.toFixed(2)} XRUN`,
+          최종표시값: `${fmtAmount(flooredForLog, 2)} XRUN`,
         });
       }
 
@@ -458,7 +459,7 @@ export const AdWalletScreen = () => {
 
       const flooredAmount = Math.floor(displayRewardAmount * 100) / 100;
 
-      const expectedAdRevenue = `${parseFloat(flooredAmount.toFixed(2))} XRUN`;
+      const expectedAdRevenue = `${fmtAmount(flooredAmount, 2)} XRUN`;
       const adRevenueSettlement = '- XRUN';
 
       const isReviewStatus = item.event_status === 'review';

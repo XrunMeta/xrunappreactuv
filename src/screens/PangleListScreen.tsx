@@ -11,6 +11,7 @@ import { collectDeviceInfo } from '../utils/napApiUtils';
 import { getEnvValue } from '../utils/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showToast } from '../utils';
+import { fmtAmount } from '../utils/formatAmount';
 import { getToastBody } from '../services/nasmediaAd';
 
 interface PangleAd {
@@ -185,7 +186,7 @@ export const PangleListScreen = () => {
                   </Text>
                   <View style={styles.adReward}>
                     <Text style={styles.adRewardText}>
-                      {t('screens.pangleList.reward')}: {ad.xrunPrice?.toFixed(4) || ad.coins || '0'} XRUN
+                      {t('screens.pangleList.reward')}: {fmtAmount(ad.xrunPrice, 4) || ad.coins || '0'} XRUN
                     </Text>
                   </View>
                   {ad.joindesc && (

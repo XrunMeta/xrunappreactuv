@@ -12,6 +12,7 @@ import type { ReferralIncomeItem, GetReferralIncomeResponse } from '../services'
 import { getCachedReferralSettlement, getInflightReferralSettlement } from '../services/referralSettlementCache';
 import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
+import { fmtAmount } from '../utils/formatAmount';
 import { useAlertDialog } from '../context/AlertDialogContext';
 
 interface TransformedSettlementData {
@@ -84,7 +85,7 @@ const transformSettlementData = (
         id: finalId,
         type: item.email || '',
         description,
-        amount: `+${parseFloat(String(item.amountasxrun)).toFixed(2)} XRUN`,
+        amount: `+${fmtAmount(item.amountasxrun, 2)} XRUN`,
         date: formatDateTime(item.datetime),
         transaction: item.transaction,
       };
@@ -236,7 +237,7 @@ export const ReferralSettlementScreen = () => {
           (sum: number, item: ReferralIncomeItem) => sum + (Number(item.xrun_amount) || 0),
           0
         );
-        const formattedAmount = totalAmountNum.toFixed(2);
+        const formattedAmount = fmtAmount(totalAmountNum, 2);
         setTotalRevenue(`${formattedAmount} XRUN`);
 
         let formattedWon = '';
