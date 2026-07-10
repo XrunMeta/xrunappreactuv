@@ -32,7 +32,6 @@ import {
   v_60f557,
   v_11e39e,
   v_4296b8,
-  v_7af6c9,
   v_8025d1,
 } from '../services';
 import { v_151d5f, v_5c7129, v_107459 } from '../utils/countryUtils';
@@ -124,8 +123,6 @@ export const v_cdb169 = () => {
   const v_c7a4de = 'myInfoEdit_formData';
 
   const [v_e495db, v_433822] = v_5ab095(false);
-
-  const [v_952c00, v_824110] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const [v_e94fdf, v_59ad99] = v_5ab095<Array<{ description?: string; subcode?: number; rCode?: number; rName?: string }>>([]);
   const [v_0908db, v_1c41ce] = v_5ab095(false);
@@ -1791,35 +1788,6 @@ export const v_cdb169 = () => {
           )}
         </View>
       </SafeScrollView>
-
-      {}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={v_952c00}
-        onRequestClose={() => {}}
-      >
-        <View style={{
-          flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.55)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-          <View style={{
-            backgroundColor: '#fff',
-            paddingVertical: 28,
-            paddingHorizontal: 36,
-            borderRadius: 14,
-            alignItems: 'center',
-            minWidth: 200,
-          }}>
-            <ActivityIndicator size="large" color={v_1bfbd0.buttonPrimary} />
-            <Text style={{ marginTop: 14, fontSize: 15, fontWeight: '600', color: v_1bfbd0.text }}>
-              Apple 인증중...
-            </Text>
-          </View>
-        </View>
-      </Modal>
 
       {}
       <Modal
