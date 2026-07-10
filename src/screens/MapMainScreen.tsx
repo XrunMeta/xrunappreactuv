@@ -427,23 +427,6 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const [v_7f8989, v_a41f5f] = v_5ab095(false);
 
   v_c4deb2(() => {
-    (async () => {
-      try {
-        const [v_861648, v_1e1868] = await Promise.all([
-          v_e84827.getItem('loginType'),
-          v_e84827.getItem('appleEmailGuideShown'),
-        ]);
-        if (v_861648 === 'apple' && v_1e1868 !== 'true') {
-
-          setTimeout(() => v_a41f5f(true), 3000);
-        }
-      } catch (v_9e86fd) {
-        console.warn('[Apple 이메일 안내] 상태 조회 실패:', v_9e86fd);
-      }
-    })();
-  }, []);
-
-  v_c4deb2(() => {
     const v_43ed8b = async () => {
       try {
         const v_5885b8 = await v_e84827.getItem('failedPreFetchCampids');
