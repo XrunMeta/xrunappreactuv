@@ -32,7 +32,6 @@ import {
   getCountries,
   getRegionsByCountry,
   updateRegion,
-  signInWithApple,
   sendEmailVerificationCode,
 } from '../services';
 import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
@@ -124,8 +123,6 @@ export const MyInfoEditScreen = () => {
   const FORM_DATA_KEY = 'myInfoEdit_formData';
 
   const [isSaving, setIsSaving] = useState(false);
-
-  const [appleAuthenticating, setAppleAuthenticating] = useState(false);
   const [memberId, setMemberId] = useState<number | null>(null);
   const [regions, setRegions] = useState<Array<{ description?: string; subcode?: number; rCode?: number; rName?: string }>>([]);
   const [isLoadingRegions, setIsLoadingRegions] = useState(false);
@@ -1791,35 +1788,6 @@ export const MyInfoEditScreen = () => {
           )}
         </View>
       </SafeScrollView>
-
-      {}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={appleAuthenticating}
-        onRequestClose={() => {}}
-      >
-        <View style={{
-          flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.55)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-          <View style={{
-            backgroundColor: '#fff',
-            paddingVertical: 28,
-            paddingHorizontal: 36,
-            borderRadius: 14,
-            alignItems: 'center',
-            minWidth: 200,
-          }}>
-            <ActivityIndicator size="large" color={COLORS.buttonPrimary} />
-            <Text style={{ marginTop: 14, fontSize: 15, fontWeight: '600', color: COLORS.text }}>
-              Apple 인증중...
-            </Text>
-          </View>
-        </View>
-      </Modal>
 
       {}
       <Modal
