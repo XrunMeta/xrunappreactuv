@@ -1149,6 +1149,11 @@ export const MyInfoEditScreen = () => {
 
   const handleChangePassword = async () => {
 
+    const loginType = await AsyncStorage.getItem('loginType');
+    if (loginType === 'apple') {
+      const result = await verifyAppleIdentity('changePassword');
+      if (!result.ok) return;  
+    }
     navigate(ROUTES.myInfoChangePassword);
   };
 

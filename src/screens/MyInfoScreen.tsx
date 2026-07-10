@@ -14,6 +14,7 @@ import { Header, TaboolaBanner } from '../components';
 import { COLORS, COMMON_STYLES, LANG, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { getMyPageUserInfo, logout, getNotificationList } from '../services';
+import { verifyAppleIdentity } from '../services/appleReauth';
 import { unbindAdisonUid } from '../services/adison';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
@@ -218,7 +219,9 @@ export const MyInfoScreen = () => {
         const isAppleLogin = loginType === 'apple';
 
         if (isAppleLogin) {
-          console.log('[내 정보] 애플 로그인 → 정보 수정 화면으로 직접 이동');
+
+          const result = await verifyAppleIdentity('myInfoEdit');
+          if (!result.ok) return;  
           navigate(ROUTES.myInfoEdit);
         } else {
           console.log('[내 정보] 일반 로그인 → 이메일 인증 화면으로 이동');
