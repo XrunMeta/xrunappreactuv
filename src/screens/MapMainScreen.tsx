@@ -250,7 +250,31 @@ export const MapMainScreen: v_a3453e.FC = () => {
           }
         }
         const v_483de2 = await v_e84827.getItem(v_019a30);
-        const v_0ba044 = await v_e84827.getItem(v_4e5f7b);
+        let v_0ba044 = await v_e84827.getItem(v_4e5f7b);
+
+        if (v_0ba044 !== 'true') {
+          try {
+            const v_6d209b = await v_e84827.getItem('jwt');
+            if (v_6d209b) {
+              const v_ce8fee = v_9bbbdc(v_6d209b);
+              if (v_ce8fee) {
+                const v_c01615 = v_755eb9();
+                const v_68f0aa = await v_23dd22();
+                const v_d99f16 = await fetch(`${v_c01615}/wallet-tutorial/status?member=${v_ce8fee}`, {
+                  headers: { Authorization: v_68f0aa },
+                });
+                if (v_d99f16.ok) {
+                  const v_9e0bc2 = await v_d99f16.json().catch(() => null);
+                  const v_a3505b = v_9e0bc2?.data?.[0]?.at;
+                  if (v_a3505b != null) {
+                    await v_e84827.setItem(v_4e5f7b, 'true');
+                    v_0ba044 = 'true';
+                  }
+                }
+              }
+            }
+          } catch {  }
+        }
 
         if (v_235370(v_483de2, v_0ba044)) {
           await v_e84827.removeItem(v_019a30);
