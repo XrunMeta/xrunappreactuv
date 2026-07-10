@@ -108,9 +108,16 @@ export const WalletKeyTutorialScreen: React.FC<{ mode: Mode }> = ({ mode }) => {
     }
 
     logEvent(XRUN_EVENTS.TUTORIAL_COMPLETE, { mode });
-    recordWalletTutorialComplete().catch((e) =>
-      console.warn('[WalletKeyTutorial] DB 기록 실패 (로컬만 저장됨):', e),
-    );
+
+    try {
+      await Promise.race([
+        recordWalletTutorialComplete(),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
+      ]);
+      console.log('[WalletKeyTutorial] 서버 DB 기록 완료');
+    } catch (e) {
+      console.warn('[WalletKeyTutorial] DB 기록 실패 (로컬만 저장됨):', e);
+    }
     reset(ROUTES.map);
   }, [reset]);
 
