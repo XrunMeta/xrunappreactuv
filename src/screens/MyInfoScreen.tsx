@@ -303,6 +303,10 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('googleSignupRequired');
               await AsyncStorage.removeItem('googleSignupEmail');
 
+              await AsyncStorage.removeItem('loginType');
+              await AsyncStorage.removeItem('appleEmailGuideShown');
+              await AsyncStorage.removeItem('appleEditInfoAlertShownAt');
+
               reset(ROUTES.login);
             } catch (error) {
               console.error('[로그아웃] 로그아웃 처리 중 오류:', error);
