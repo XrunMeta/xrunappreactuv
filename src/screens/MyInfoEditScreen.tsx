@@ -1149,21 +1149,6 @@ export const MyInfoEditScreen = () => {
 
   const handleChangePassword = async () => {
 
-    const loginType = await AsyncStorage.getItem('loginType');
-    const isAppleLogin = loginType === 'apple';
-    if (isAppleLogin) {
-      const result = await verifyAppleIdentity('changePassword');
-      if (!result.ok) {
-        if (result.cancelled) return;  
-        await showAlert(
-          t('screens.myInfoEdit.alerts.error'),
-          t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
-        );
-        return;
-      }
-      navigate(ROUTES.myInfoChangePassword);
-      return;
-    }
     navigate(ROUTES.myInfoChangePassword);
   };
 
