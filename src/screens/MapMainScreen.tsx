@@ -463,6 +463,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
               if (v_a3505b == null) {
 
                 await v_e84827.removeItem(v_4e5f7b);
+              } else {
+
+                await v_e84827.setItem(v_4e5f7b, 'true');
               }
             }
           } catch {  }

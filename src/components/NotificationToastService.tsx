@@ -1,9 +1,8 @@
 import v_a3453e, { v_c4deb2, v_e662ae } from 'bapkr';
-import { v_6b5698, v_c3551b } from 'rcmrninabrnb';
+import { v_6b5698, v_c3551b, v_326be8, v_405151 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_ab08d0 } from '../services';
-import { v_cba33f } from '../utils';
 
 export const NotificationToastService: v_a3453e.FC = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -51,7 +50,11 @@ export const NotificationToastService: v_a3453e.FC = () => {
         const v_4d1536 = v_3b27d9 === 9304
           ? v_8d41d7('screens.myInfoNotify.toast.inquiryReplyArrived')
           : (v_1300ee.title || v_8d41d7('screens.myInfoNotify.toast.newNotification'));
-        v_cba33f(`${v_4d1536}${v_c92005}`);
+
+        if (v_326be8.OS === 'android') {
+          v_405151.show(`${v_4d1536}${v_c92005}`, v_405151.SHORT);
+        }
+
       }
 
       const v_bdd083 = Math.max(...v_715061.map((v_f4e98d) => v_ffe9e6(v_f4e98d.datetime)));
