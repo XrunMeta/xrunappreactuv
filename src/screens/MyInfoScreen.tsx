@@ -110,6 +110,10 @@ export const v_03a231 = () => {
   );
 
   v_c4deb2(() => {
+    console.log('[MyInfoScreen] OTA_MARKER v2026-07-10-A — Apple 재인증은 정보수정 클릭 시에만');
+  }, []);
+
+  v_c4deb2(() => {
     const v_ea3fa6 = async () => {
       try {
 
