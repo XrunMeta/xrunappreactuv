@@ -725,6 +725,13 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
 
       config.headers.Authorization = await getAuthHeader();
 
+      try {
+        const Updates = require('expo-updates');
+        config.headers['X-OTA-Update-Id'] = String(Updates.updateId ?? 'embedded');
+        config.headers['X-OTA-Runtime'] = String(Updates.runtimeVersion ?? '?');
+        config.headers['X-OTA-Channel'] = String((Updates as any).channel ?? '?');
+      } catch {  }
+
       const adEndpointPatterns = [
         /\/callbackNasmob\b/,
         /\/callbackPointClick\b/,
