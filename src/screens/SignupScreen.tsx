@@ -1011,6 +1011,21 @@ export const v_f40fc5 = () => {
             await v_e84827.setItem('refreshToken', v_dfaee3);
           }
 
+          const v_60ca11 = (v_25c481.data as any)?.jwt;
+          if (typeof v_60ca11 === 'string' && v_60ca11.split('.').length === 3) {
+            await v_e84827.setItem('jwt', v_60ca11);
+            console.log('[애플 회원가입] jwt 저장 완료');
+            try {
+              const { fetchAndSaveWallets: v_5ed938 } = await import('../services');
+              await v_5ed938();
+              console.log('[애플 회원가입] fetchAndSaveWallets 완료');
+            } catch (v_9e86fd) {
+              console.warn('[애플 회원가입] fetchAndSaveWallets 실패:', v_9e86fd?.message);
+            }
+          } else {
+            console.warn('[애플 회원가입] jwt 없음 - 지갑 초기화 skip');
+          }
+
           console.log('[회원가입] 애플 자동 로그인 완료 - 맵 페이지로 이동');
 
           v_e33ec0(false);
