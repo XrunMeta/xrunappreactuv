@@ -587,6 +587,8 @@ export const LoginScreen = () => {
       await AsyncStorage.setItem('userSessionToken', accessToken || '');
       await AsyncStorage.setItem('isLoggedIn', 'true');
 
+      await AsyncStorage.setItem('loginType', 'google');
+
       await AsyncStorage.setItem('rememberMe', 'true');
       console.log('[구글 로그인] 로그인 상태 유지 저장 완료');
 
