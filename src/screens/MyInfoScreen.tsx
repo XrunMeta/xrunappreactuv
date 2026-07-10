@@ -300,7 +300,7 @@ export const MyInfoScreen = () => {
               await AsyncStorage.removeItem('googleSignupEmail');
 
               await AsyncStorage.removeItem('loginType');
-              await AsyncStorage.removeItem('appleEmailGuideShown');
+
               await AsyncStorage.removeItem('appleEditInfoAlertShownAt');
 
               reset(ROUTES.login);
