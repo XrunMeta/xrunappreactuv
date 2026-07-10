@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, Platform, ToastAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { getNotificationList } from '../services';
-import { showToast } from '../utils';
 
 export const NotificationToastService: React.FC = () => {
   const { t } = useTranslation();
@@ -51,7 +50,11 @@ export const NotificationToastService: React.FC = () => {
         const baseMsg = type === 9304
           ? t('screens.myInfoNotify.toast.inquiryReplyArrived')
           : (latest.title || t('screens.myInfoNotify.toast.newNotification'));
-        showToast(`${baseMsg}${more}`);
+
+        if (Platform.OS === 'android') {
+          ToastAndroid.show(`${baseMsg}${more}`, ToastAndroid.SHORT);
+        }
+
       }
 
       const maxMs = Math.max(...untoasted.map((n: any) => toUtcMs(n.datetime)));

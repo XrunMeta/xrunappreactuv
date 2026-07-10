@@ -463,6 +463,9 @@ export const MapMainScreen: React.FC = () => {
               if (serverAt == null) {
 
                 await AsyncStorage.removeItem(TUTORIAL_COMPLETED_KEY);
+              } else {
+
+                await AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
               }
             }
           } catch {  }
