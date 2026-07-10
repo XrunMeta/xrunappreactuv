@@ -250,7 +250,31 @@ export const MapMainScreen: React.FC = () => {
           }
         }
         const pending = await AsyncStorage.getItem(TUTORIAL_PENDING_KEY);
-        const completed = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+        let completed = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
+
+        if (completed !== 'true') {
+          try {
+            const jwtStored = await AsyncStorage.getItem('jwt');
+            if (jwtStored) {
+              const memberFromJwt = jwtPayloadSub(jwtStored);
+              if (memberFromJwt) {
+                const baseUrl = getApiBaseUrl();
+                const auth = await getAuthHeader();
+                const statusRes = await fetch(`${baseUrl}/wallet-tutorial/status?member=${memberFromJwt}`, {
+                  headers: { Authorization: auth },
+                });
+                if (statusRes.ok) {
+                  const statusJson = await statusRes.json().catch(() => null);
+                  const serverAt = statusJson?.data?.[0]?.at;
+                  if (serverAt != null) {
+                    await AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+                    completed = 'true';
+                  }
+                }
+              }
+            }
+          } catch {  }
+        }
 
         if (shouldShowTutorial(pending, completed)) {
           await AsyncStorage.removeItem(TUTORIAL_PENDING_KEY);
