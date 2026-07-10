@@ -752,22 +752,29 @@ export const MyInfoEditScreen = () => {
 
             const loginType = await AsyncStorage.getItem('loginType');
             if (loginType === 'apple') {
-              if (Platform.OS === 'ios') {
 
-                InteractionManager.runAfterInteractions(() => {
-                  setTimeout(() => {
-                    showAlert(
-                      t('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
-                      t('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
-                    );
-                  }, 300);
-                });
-              } else {
+              const lastShownAt = await AsyncStorage.getItem('appleEditInfoAlertShownAt');
+              const now = Date.now();
+              const shouldSkip = lastShownAt && (now - Number(lastShownAt)) < 10 * 60 * 1000;
+              if (!shouldSkip) {
+                const showAndMark = async () => {
+                  await showAlert(
+                    t('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
+                    t('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
+                  );
+                  await AsyncStorage.setItem('appleEditInfoAlertShownAt', String(Date.now()));
+                };
+                if (Platform.OS === 'ios') {
 
-                await showAlert(
-                  t('screens.myInfoEdit.alerts.appleLoginInfo') || '알림',
-                  t('screens.myInfoEdit.alerts.appleLoginMessage') || '애플 로그인 시 비밀번호, 전화번호 수정은 필수입니다.'
-                );
+                  InteractionManager.runAfterInteractions(() => {
+                    setTimeout(() => {
+                      showAndMark();
+                    }, 300);
+                  });
+                } else {
+
+                  await showAndMark();
+                }
               }
             }
           } else {
