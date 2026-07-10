@@ -15,7 +15,6 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_53d723 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_db8d16, v_9b617e } from '../services/appleReauth';
 
 export const v_e14579 = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -25,18 +24,6 @@ export const v_e14579 = () => {
   const [v_d74a81, v_fcce73] = v_5ab095('');
   const [v_e495db, v_433822] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
-
-  v_c4deb2(() => {
-    (async () => {
-      if (!(await v_9b617e())) return;
-      const v_43c42e = await v_db8d16('phoneEdit');
-      if (!v_43c42e.ok) {
-        if (v_7e32fb) v_c7ac57();
-        else v_487a25(v_ce4741.myInfoEdit);
-      }
-    })();
-
-  }, []);
 
   v_c4deb2(() => {
     const v_ea3fa6 = async () => {

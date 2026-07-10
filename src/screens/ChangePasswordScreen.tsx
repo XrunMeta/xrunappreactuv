@@ -1,4 +1,4 @@
-import v_a3453e, { v_5ab095, v_c4deb2 } from 'bapkr';
+import v_a3453e, { v_5ab095 } from 'bapkr';
 import { v_3094a2, v_472849, v_19b633, v_4623af } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
@@ -8,7 +8,6 @@ import { v_1bfbd0, v_a61db3, v_843035, v_bae512 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_b954f5 } from '../services';
-import { v_db8d16, v_9b617e } from '../services/appleReauth';
 
 export const v_18d397 = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -19,15 +18,6 @@ export const v_18d397 = () => {
   const [v_cad69a, v_f9607d] = v_5ab095(true);
   const [v_9e430e, v_59222b] = v_5ab095(true);
   const [v_88dca2, v_e33ec0] = v_5ab095(false);
-
-  v_c4deb2(() => {
-    (async () => {
-      if (!(await v_9b617e())) return;
-      const v_43c42e = await v_db8d16('changePassword');
-      if (!v_43c42e.ok) v_c7ac57();
-    })();
-
-  }, []);
 
   const v_02dd63 = (v_3b402b) => v_3b402b.replace(/[^\x21-\x7E]/g, '');
 

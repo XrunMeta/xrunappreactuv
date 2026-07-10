@@ -22,7 +22,7 @@ import { v_1bfbd0, v_a61db3, v_9b1a04, v_bae512, v_843035, v_202d44, v_789afd, v
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_db8d16, v_9b617e } from '../services/appleReauth';
+import { v_db8d16 } from '../services/appleReauth';
 import {
   v_a7ab3c,
   v_152d53,
@@ -96,18 +96,6 @@ export const v_cdb169 = () => {
     setVerificationEmail: v_b572c3,
     setVerificationSuccessRoute: v_8f89f3,
   } = v_700ef9();
-
-  v_c4deb2(() => {
-    (async () => {
-      if (!(await v_9b617e())) return;
-      const v_43c42e = await v_db8d16('myInfoEdit');
-      if (!v_43c42e.ok) {
-        if (v_7e32fb) v_c7ac57();
-        else v_487a25(v_ce4741.myInfo);
-      }
-    })();
-
-  }, []);
 
   const v_00d52a = v_a3453e.useRef(false);
   const v_2ca208 = v_a3453e.useRef(false);
@@ -1164,24 +1152,16 @@ export const v_cdb169 = () => {
     const v_861648 = await v_e84827.getItem('loginType');
     const v_1fa4eb = v_861648 === 'apple';
     if (v_1fa4eb) {
-      v_824110(true);
-      try {
-        const v_25c481 = await v_7af6c9(v_9b57fc);
-        if (!v_25c481.success || !v_25c481.data) {
-          v_824110(false);
-          await v_889fad(
-            v_8d41d7('screens.myInfoEdit.alerts.error'),
-            v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
-          );
-          return;
-        }
-        v_824110(false);
-        v_9b57fc(v_ce4741.myInfoChangePassword);
-      } catch (v_5e9bfe) {
-        console.error('[정보수정] 애플 인증 오류:', v_5e9bfe);
-        v_824110(false);
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
+      const v_43c42e = await v_db8d16('changePassword');
+      if (!v_43c42e.ok) {
+        if (v_43c42e.cancelled) return;  
+        await v_889fad(
+          v_8d41d7('screens.myInfoEdit.alerts.error'),
+          v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+        );
+        return;
       }
+      v_9b57fc(v_ce4741.myInfoChangePassword);
       return;
     }
     v_9b57fc(v_ce4741.myInfoChangePassword);
@@ -1338,29 +1318,19 @@ export const v_cdb169 = () => {
 
     if (v_1fa4eb) {
 
-      console.log('[정보수정] 애플 로그인 사용자 - 애플 로그인으로 인증 시작');
-      v_824110(true);
-      try {
-        const v_25c481 = await v_7af6c9(v_9b57fc);
-
-        if (!v_25c481.success || !v_25c481.data) {
-          console.error('[정보수정] 애플 로그인 인증 실패:', v_25c481.message);
-          v_824110(false);
-          await v_889fad(
-            v_8d41d7('screens.myInfoEdit.alerts.error'),
-            v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
-          );
-          return;
-        }
-
-        console.log('[정보수정] 애플 로그인 인증 성공 - 전화번호 수정 화면으로 이동');
-        v_824110(false);
-        v_9b57fc(v_ce4741.myInfoPhoneEdit);
-      } catch (v_5e9bfe) {
-        console.error('[정보수정] 애플 로그인 인증 오류:', v_5e9bfe);
-        v_824110(false);
-        await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.verificationError'));
+      console.log('[정보수정] 애플 로그인 사용자 - Apple 재인증 시작');
+      const v_43c42e = await v_db8d16('phoneEdit');
+      if (!v_43c42e.ok) {
+        if (v_43c42e.cancelled) return;
+        console.error('[정보수정] Apple 재인증 실패:', v_43c42e.reason);
+        await v_889fad(
+          v_8d41d7('screens.myInfoEdit.alerts.error'),
+          v_8d41d7('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+        );
+        return;
       }
+      console.log('[정보수정] Apple 재인증 성공 - 전화번호 수정 화면으로 이동');
+      v_9b57fc(v_ce4741.myInfoPhoneEdit);
     } else {
       if (!v_e0c7e8) {
         await v_889fad(v_8d41d7('screens.myInfoEdit.alerts.error'), v_8d41d7('screens.myInfoEdit.alerts.emailNotFound'));
