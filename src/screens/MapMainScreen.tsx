@@ -427,23 +427,6 @@ export const MapMainScreen: React.FC = () => {
   const [showAppleEmailGuide, setShowAppleEmailGuide] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const [loginType, guideShown] = await Promise.all([
-          AsyncStorage.getItem('loginType'),
-          AsyncStorage.getItem('appleEmailGuideShown'),
-        ]);
-        if (loginType === 'apple' && guideShown !== 'true') {
-
-          setTimeout(() => setShowAppleEmailGuide(true), 3000);
-        }
-      } catch (e) {
-        console.warn('[Apple 이메일 안내] 상태 조회 실패:', e);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
     const loadFailedCampids = async () => {
       try {
         const stored = await AsyncStorage.getItem('failedPreFetchCampids');
