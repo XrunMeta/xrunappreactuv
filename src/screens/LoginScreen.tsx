@@ -587,6 +587,8 @@ export const v_f4f851 = () => {
       await v_e84827.setItem('userSessionToken', v_2ca7e0 || '');
       await v_e84827.setItem('isLoggedIn', 'true');
 
+      await v_e84827.setItem('loginType', 'google');
+
       await v_e84827.setItem('rememberMe', 'true');
       console.log('[구글 로그인] 로그인 상태 유지 저장 완료');
 
