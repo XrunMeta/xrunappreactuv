@@ -283,17 +283,6 @@ export const MapMainScreen: React.FC = () => {
         }
 
         if (completed === 'true') return;
-        let emailRaw = await AsyncStorage.getItem('userEmail');
-        if (!emailRaw) {
-          try {
-            const ud = await AsyncStorage.getItem('userData');
-            if (ud) emailRaw = (JSON.parse(ud) as { email?: string })?.email ?? null;
-          } catch {  }
-        }
-        if (!emailRaw) return;
-        const PIN_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
-        const normEmail = emailRaw.toLowerCase().trim();
-        if (!PIN_DEV_EMAILS.includes(normEmail)) return;
         resetNav(ROUTES.walletKeyTutorial);
       } catch (e) {
         console.warn('[MapMain] 튜토리얼 가드 확인 실패:', e);

@@ -155,7 +155,6 @@ export const ShopScreen = () => {
     const [shopCountry, setShopCountry] = useState<'KR' | 'ID' | null>(null);  
     const [gpsDenied, setGpsDenied] = useState<boolean>(false);
 
-    const SHOP_DEV_EMAILS = ['oth-test@example.invalid', 'oth-staff@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
     const [isDevAccount, setIsDevAccount] = useState<boolean>(false);
     const [forceCountry, setForceCountry] = useState<'AUTO' | 'KR' | 'ID'>('AUTO');
     const { navigate } = useAppNavigation();
@@ -281,21 +280,6 @@ export const ShopScreen = () => {
     }, []);
 
     useEffect(() => {
-        (async () => {
-            try {
-                const ud = await AsyncStorage.getItem('userData');
-                const email = ud ? (JSON.parse(ud)?.email ?? '').toLowerCase().trim() : '';
-                if (email && SHOP_DEV_EMAILS.includes(email)) {
-                    setIsDevAccount(true);
-                    const saved = await AsyncStorage.getItem('devShopForceCountry');
-                    if (saved === 'KR' || saved === 'ID') {
-                        setForceCountry(saved);
-
-                        setShopCountry(saved);
-                    }
-                }
-            } catch {  }
-        })();
 
     }, []);
 

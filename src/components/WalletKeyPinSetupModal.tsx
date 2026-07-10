@@ -121,19 +121,15 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
 
       await setupPinForUser(allWalletsForSetup, pin, email, memberId);
 
-      const PIN_SYNC_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
-      const normEmail = (email ?? '').toLowerCase().trim();
-      if (PIN_SYNC_DEV_EMAILS.includes(normEmail)) {
-        upsertWalletPin(memberId, pin).catch(() => {  });
+      upsertWalletPin(memberId, pin).catch(() => {  });
 
-        deleteServerSavedstring().then((r) => {
-          if (r.ok) {
-            console.log('[WalletKeyPinSetupModal] 서버 비밀키 삭제 완료:', r.updated);
-          } else {
-            console.warn('[WalletKeyPinSetupModal] 서버 비밀키 삭제 실패 (PIN 설정은 성공):', r.error);
-          }
-        });
-      }
+      deleteServerSavedstring().then((r) => {
+        if (r.ok) {
+          console.log('[WalletKeyPinSetupModal] 서버 비밀키 삭제 완료:', r.updated);
+        } else {
+          console.warn('[WalletKeyPinSetupModal] 서버 비밀키 삭제 실패 (PIN 설정은 성공):', r.error);
+        }
+      });
 
       setPin('');
       setConfirmPin('');

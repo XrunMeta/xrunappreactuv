@@ -265,7 +265,14 @@ export const WalletScreen = () => {
           symbol: item.symbol,
           name: item.currencyname,
           subCurrencyName: item.subCurrencyName,
-          amount: new BigNumber(item.Wamount || item.amount || '0').toFixed(2),
+          amount: (() => {
+            const v = new BigNumber(item.Wamount || item.amount || '0')
+
+            if (v.isZero()) return '0'
+            if (v.abs().lt(0.01)) return v.toFixed(6)
+            if (v.abs().lt(1)) return v.toFixed(4)
+            return v.toFixed(2)
+          })(),
           icon: item.file || '',
           currency: item.currency,
           isCustom: false,
@@ -298,7 +305,13 @@ export const WalletScreen = () => {
             id: token.currency,
             symbol: token.symbol,
             name: token.name,
-            amount: new BigNumber(token.amount || '0').toFixed(2),
+            amount: (() => {
+              const v = new BigNumber(token.amount || '0')
+              if (v.isZero()) return '0'
+              if (v.abs().lt(0.01)) return v.toFixed(6)
+              if (v.abs().lt(1)) return v.toFixed(4)
+              return v.toFixed(2)
+            })(),
             icon: matchingWalletData
               ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`
               : 'https://via.placeholder.com/24',
@@ -318,7 +331,13 @@ export const WalletScreen = () => {
         id: 19,
         symbol: 'XRUN',
         name: 'AD XRUN',
-        amount: new BigNumber(adXrunAmount || 0).toFixed(2),
+        amount: (() => {
+          const v = new BigNumber(adXrunAmount || 0)
+          if (v.isZero()) return '0'
+          if (v.abs().lt(0.01)) return v.toFixed(6)
+          if (v.abs().lt(1)) return v.toFixed(4)
+          return v.toFixed(2)
+        })(),
         icon: require('../../assets/ad-round-logo.png'),
         currency: 19,
         isCustom: false,
@@ -333,7 +352,13 @@ export const WalletScreen = () => {
         id: 1900,
         symbol: 'XRUN',
         name: 'REFERAL XRUN',
-        amount: new BigNumber(referralAmount || 0).toFixed(2),
+        amount: (() => {
+          const v = new BigNumber(referralAmount || 0)
+          if (v.isZero()) return '0'
+          if (v.abs().lt(0.01)) return v.toFixed(6)
+          if (v.abs().lt(1)) return v.toFixed(4)
+          return v.toFixed(2)
+        })(),
         icon: '__RF__' as any,
         currency: 1900,
         isCustom: false,
