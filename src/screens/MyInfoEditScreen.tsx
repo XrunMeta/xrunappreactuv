@@ -22,7 +22,7 @@ import { COLORS, COMMON_STYLES, SIZES, FORM_STYLES, FONTS, COUNTRY_DIAL_CODES, G
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { verifyAppleIdentity, isAppleLoggedIn } from '../services/appleReauth';
+import { verifyAppleIdentity } from '../services/appleReauth';
 import {
   getMyPageUserInfo,
   updateName,
@@ -96,18 +96,6 @@ export const MyInfoEditScreen = () => {
     setVerificationEmail,
     setVerificationSuccessRoute,
   } = useAppContext();
-
-  useEffect(() => {
-    (async () => {
-      if (!(await isAppleLoggedIn())) return;
-      const result = await verifyAppleIdentity('myInfoEdit');
-      if (!result.ok) {
-        if (canGoBack) goBack();
-        else reset(ROUTES.myInfo);
-      }
-    })();
-
-  }, []);
 
   const hasLoadedUserInfoRef = React.useRef(false);
   const isMountedRef = React.useRef(false);
@@ -1164,24 +1152,16 @@ export const MyInfoEditScreen = () => {
     const loginType = await AsyncStorage.getItem('loginType');
     const isAppleLogin = loginType === 'apple';
     if (isAppleLogin) {
-      setAppleAuthenticating(true);
-      try {
-        const appleLoginResult = await signInWithApple(navigate);
-        if (!appleLoginResult.success || !appleLoginResult.data) {
-          setAppleAuthenticating(false);
-          await showAlert(
-            t('screens.myInfoEdit.alerts.error'),
-            t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
-          );
-          return;
-        }
-        setAppleAuthenticating(false);
-        navigate(ROUTES.myInfoChangePassword);
-      } catch (error) {
-        console.error('[정보수정] 애플 인증 오류:', error);
-        setAppleAuthenticating(false);
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
+      const result = await verifyAppleIdentity('changePassword');
+      if (!result.ok) {
+        if (result.cancelled) return;  
+        await showAlert(
+          t('screens.myInfoEdit.alerts.error'),
+          t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+        );
+        return;
       }
+      navigate(ROUTES.myInfoChangePassword);
       return;
     }
     navigate(ROUTES.myInfoChangePassword);
@@ -1338,29 +1318,19 @@ export const MyInfoEditScreen = () => {
 
     if (isAppleLogin) {
 
-      console.log('[정보수정] 애플 로그인 사용자 - 애플 로그인으로 인증 시작');
-      setAppleAuthenticating(true);
-      try {
-        const appleLoginResult = await signInWithApple(navigate);
-
-        if (!appleLoginResult.success || !appleLoginResult.data) {
-          console.error('[정보수정] 애플 로그인 인증 실패:', appleLoginResult.message);
-          setAppleAuthenticating(false);
-          await showAlert(
-            t('screens.myInfoEdit.alerts.error'),
-            t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
-          );
-          return;
-        }
-
-        console.log('[정보수정] 애플 로그인 인증 성공 - 전화번호 수정 화면으로 이동');
-        setAppleAuthenticating(false);
-        navigate(ROUTES.myInfoPhoneEdit);
-      } catch (error) {
-        console.error('[정보수정] 애플 로그인 인증 오류:', error);
-        setAppleAuthenticating(false);
-        await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.verificationError'));
+      console.log('[정보수정] 애플 로그인 사용자 - Apple 재인증 시작');
+      const result = await verifyAppleIdentity('phoneEdit');
+      if (!result.ok) {
+        if (result.cancelled) return;
+        console.error('[정보수정] Apple 재인증 실패:', result.reason);
+        await showAlert(
+          t('screens.myInfoEdit.alerts.error'),
+          t('screens.myInfoEdit.alerts.verificationError') || '인증에 실패했습니다. 다시 시도해주세요.',
+        );
+        return;
       }
+      console.log('[정보수정] Apple 재인증 성공 - 전화번호 수정 화면으로 이동');
+      navigate(ROUTES.myInfoPhoneEdit);
     } else {
       if (!email) {
         await showAlert(t('screens.myInfoEdit.alerts.error'), t('screens.myInfoEdit.alerts.emailNotFound'));
