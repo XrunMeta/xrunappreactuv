@@ -300,7 +300,7 @@ export const v_03a231 = () => {
               await v_e84827.removeItem('googleSignupEmail');
 
               await v_e84827.removeItem('loginType');
-              await v_e84827.removeItem('appleEmailGuideShown');
+
               await v_e84827.removeItem('appleEditInfoAlertShownAt');
 
               v_487a25(v_ce4741.login);
