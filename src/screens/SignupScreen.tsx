@@ -1011,6 +1011,21 @@ export const SignupScreen = () => {
             await AsyncStorage.setItem('refreshToken', refreshToken);
           }
 
+          const responseJwt = (appleLoginResult.data as any)?.jwt;
+          if (typeof responseJwt === 'string' && responseJwt.split('.').length === 3) {
+            await AsyncStorage.setItem('jwt', responseJwt);
+            console.log('[애플 회원가입] jwt 저장 완료');
+            try {
+              const { fetchAndSaveWallets } = await import('../services');
+              await fetchAndSaveWallets();
+              console.log('[애플 회원가입] fetchAndSaveWallets 완료');
+            } catch (e: any) {
+              console.warn('[애플 회원가입] fetchAndSaveWallets 실패:', e?.message);
+            }
+          } else {
+            console.warn('[애플 회원가입] jwt 없음 - 지갑 초기화 skip');
+          }
+
           console.log('[회원가입] 애플 자동 로그인 완료 - 맵 페이지로 이동');
 
           setIsSubmitting(false);
