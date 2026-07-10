@@ -1149,6 +1149,11 @@ export const v_cdb169 = () => {
 
   const v_c09605 = async () => {
 
+    const v_861648 = await v_e84827.getItem('loginType');
+    if (v_861648 === 'apple') {
+      const v_43c42e = await v_db8d16('changePassword');
+      if (!v_43c42e.ok) return;  
+    }
     v_9b57fc(v_ce4741.myInfoChangePassword);
   };
 
