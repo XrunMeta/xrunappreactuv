@@ -49,7 +49,7 @@ import { v_f71847 } from '../types';
 
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9, v_23dd22 } from '../services';
 import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
-import { v_ecc3ca, v_5ed938, v_6acfff } from '../services';
+import { v_ecc3ca, v_5ed938, v_6acfff, v_e3b9c1 } from '../services';
 import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
@@ -490,6 +490,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
             return;
           }
 
+          const v_dc391f = v_326be8.OS === 'ios' && !(await v_e3b9c1(v_9b57fc).catch(() => true));
+          if (v_dc391f) return;
+
           v_b51724((v_ba2215) => {
             if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_dabeaa) return v_ba2215;
             return { memberId: v_717992, email: v_dabeaa };
@@ -532,6 +535,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
                   v_9b57fc(v_ce4741.walletKeyTutorial);
                   return;
                 }
+
+                const v_dc391f = v_326be8.OS === 'ios' && !(await v_e3b9c1(v_9b57fc).catch(() => true));
+                if (v_dc391f) return;
                 v_b51724((v_ba2215) => {
                   if (v_ba2215 && v_ba2215.memberId === v_717992 && v_ba2215.email === v_dabeaa) return v_ba2215;
                   return { memberId: v_717992, email: v_dabeaa };

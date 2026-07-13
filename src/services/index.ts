@@ -638,6 +638,17 @@ export const v_6acfff = async (v_c65f5d): Promise<boolean> => {
   return true; 
 };
 
+export const v_e3b9c1 = async (v_c65f5d): Promise<boolean> => {
+  try {
+    const v_88781f = await v_de7bac();
+    if (v_88781f?.data && (v_88781f.data as any).iosOnPinSetup !== undefined) {
+      const v_81e2ef = (v_88781f.data as any).iosOnPinSetup;
+      return v_81e2ef === 1 || v_81e2ef === true;
+    }
+  } catch (v_37eab7) {}
+  return true;
+};
+
 export const v_85f2c8 = async (v_c65f5d): Promise<boolean | null> => {
   try {
     const v_88781f = await v_de7bac();
