@@ -22,7 +22,7 @@ export default {
   ageLabel: 'Tuổi',
   ageSelect: 'Chọn',
   optional: 'Tùy chọn',
-  referralEmailLabel: 'Referral Code',
+  referralEmailLabel: 'Mã giới thiệu',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
   terms: {
