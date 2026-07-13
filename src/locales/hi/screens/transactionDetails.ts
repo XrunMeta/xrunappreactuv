@@ -1,7 +1,15 @@
 export default {
-  title: 'Transaction',
+  title: 'लेनदेन',
+  from: 'से',
+  to: 'को',
+  amount: 'राशि',
+  time: 'समय',
+  txHash: 'TX हैश',
+  transactionDetails: 'लेनदेन विवरण',
+  nonce: 'Nonce',
+  gasPrice: 'गैस मूल्य',
+  usedGas: 'उपयोग की गई गैस',
+  maxGas: 'अधिकतम गैस',
+  totalSpent: 'कुल खर्च',
+  blockHeight: 'ब्लॉक ऊंचाई',
 };
-
-
-
-

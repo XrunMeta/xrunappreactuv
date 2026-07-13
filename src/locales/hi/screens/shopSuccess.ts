@@ -1,7 +1,5 @@
 export default {
-  title: 'Shop',
+  title: 'दुकान',
+  paymentComplete: 'भुगतान पूरा हुआ',
+  confirm: 'ठीक है',
 };
-
-
-
-

@@ -1,6 +1,3 @@
 export default {
-  title: '2级',
+  title: '2 层级',
 };
-
-
-

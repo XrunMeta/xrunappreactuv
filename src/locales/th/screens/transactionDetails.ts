@@ -1,7 +1,15 @@
 export default {
-  title: 'Transaction',
+  title: 'ธุรกรรม',
+  from: 'จาก',
+  to: 'ถึง',
+  amount: 'จำนวน',
+  time: 'เวลา',
+  txHash: 'TX Hash',
+  transactionDetails: 'รายละเอียดธุรกรรม',
+  nonce: 'Nonce',
+  gasPrice: 'ราคา Gas',
+  usedGas: 'Gas ที่ใช้',
+  maxGas: 'Gas สูงสุด',
+  totalSpent: 'ใช้จ่ายทั้งหมด',
+  blockHeight: 'ความสูงบล็อก',
 };
-
-
-
-

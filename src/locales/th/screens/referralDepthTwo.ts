@@ -1,7 +1,3 @@
 export default {
-  title: '2 Depth',
+  title: 'ระดับ 2',
 };
-
-
-
-

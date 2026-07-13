@@ -1,6 +1,15 @@
 export default {
   title: '取引',
+  from: '送信元',
+  to: '送信先',
+  amount: '金額',
+  time: '時刻',
+  txHash: 'TXハッシュ',
+  transactionDetails: '取引詳細',
+  nonce: 'Nonce',
+  gasPrice: 'ガス価格',
+  usedGas: '使用ガス',
+  maxGas: '最大ガス',
+  totalSpent: '合計消費',
+  blockHeight: 'ブロック高さ',
 };
-
-
-

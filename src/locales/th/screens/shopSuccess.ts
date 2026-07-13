@@ -1,7 +1,5 @@
 export default {
-  title: 'Shop',
+  title: 'ร้านค้า',
+  paymentComplete: 'ชำระเงินสำเร็จ',
+  confirm: 'ตกลง',
 };
-
-
-
-
