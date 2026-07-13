@@ -483,7 +483,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
             }
           } catch {  }
           const v_86a649 = await v_e84827.getItem(v_4e5f7b);
-          if (v_86a649 !== 'true') {
+
+          const v_75d2e0 = v_326be8.OS === 'ios' && !(await v_6acfff(v_9b57fc).catch(() => true));
+          if (v_86a649 !== 'true' && !v_75d2e0) {
             v_9b57fc(v_ce4741.walletKeyTutorial);
             return;
           }
@@ -524,7 +526,9 @@ export const MapMainScreen: v_a3453e.FC = () => {
               if (v_75b0ce && !v_2008a4) {
 
                 const v_86a649 = await v_e84827.getItem(v_4e5f7b);
-                if (v_86a649 !== 'true') {
+
+                const v_75d2e0 = v_326be8.OS === 'ios' && !(await v_6acfff(v_9b57fc).catch(() => true));
+                if (v_86a649 !== 'true' && !v_75d2e0) {
                   v_9b57fc(v_ce4741.walletKeyTutorial);
                   return;
                 }
