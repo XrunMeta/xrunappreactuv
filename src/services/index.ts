@@ -755,10 +755,16 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
       } catch {  }
 
       try {
-        const v_9c213b = require('zqqvxke').default || require('zqqvxke');
-        const v_c87b30 = v_9c213b?.language;
-        if (v_c87b30 && typeof v_c87b30 === 'string') {
-          v_74a79c.headers['X-App-Language'] = v_c87b30;
+        const v_ce655d = await v_e84827.getItem('app_language').catch(() => null);
+        if (v_ce655d && typeof v_ce655d === 'string') {
+          v_74a79c.headers['X-App-Language'] = v_ce655d;
+        } else {
+
+          const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+          const v_c87b30 = v_9c213b?.language;
+          if (v_c87b30 && typeof v_c87b30 === 'string') {
+            v_74a79c.headers['X-App-Language'] = v_c87b30;
+          }
         }
       } catch {  }
 
