@@ -665,7 +665,7 @@ export const v_a59951 = () => {
         }
         if (v_a1c497 < v_01bee9.price) {
 
-            const v_ff3b79 = (v_01bee9.price - v_a1c497).toFixed(4).replace(/\.?0+$/, '');
+            const v_ff3b79 = (v_01bee9.price - v_a1c497).toFixed(2).replace(/\.?0+$/, '');
             v_889fad(
                 v_8d41d7('screens.shop.iak.notice'),
                 v_8d41d7('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage: v_ff3b79 }),
@@ -810,7 +810,7 @@ export const v_a59951 = () => {
                             <Text style={[v_d81136.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{v_ba7f97}</Text>
                             {}
                             {!v_d0d89e && (
-                                <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 })} XRUN</Text>
+                                <Text style={v_d81136.detailPriceText}>{Number(v_01bee9.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} XRUN</Text>
                             )}
                             {}
                             {v_25cfbb > 9999 && null}
