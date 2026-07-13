@@ -37,6 +37,10 @@ export default {
   paymentComplete: '支付已完成',
   confirm: '确认',
   viewMyGift: '查看我的礼品券',
+  couponIssued: '优惠券已发放!',
+  couponPinLabel: 'PIN',
+  couponValidityPrefix: '有效期至:',
+  couponValiditySuffix: '',
   alerts: {
     notification: '提示',
     couponSendFail: '优惠券发送失败',

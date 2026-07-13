@@ -37,6 +37,10 @@ export default {
   paymentComplete: 'Thanh toán hoàn tất',
   confirm: 'Xác nhận',
   viewMyGift: 'Xem thẻ quà',
+  couponIssued: 'Đã phát hành phiếu!',
+  couponPinLabel: 'PIN',
+  couponValidityPrefix: 'Có hiệu lực đến:',
+  couponValiditySuffix: '',
   alerts: {
     notification: 'Thông báo',
     couponSendFail: 'Gửi mã giảm giá thất bại',

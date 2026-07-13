@@ -37,6 +37,10 @@ export default {
   paymentComplete: 'Payment complete',
   confirm: 'Confirm',
   viewMyGift: 'View My Gift Cards',
+  couponIssued: 'Coupon issued!',
+  couponPinLabel: 'PIN',
+  couponValidityPrefix: 'Valid until:',
+  couponValiditySuffix: '',
   alerts: {
     notification: 'Notice',
     couponSendFail: 'Coupon send failed',

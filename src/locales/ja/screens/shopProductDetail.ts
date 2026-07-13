@@ -37,6 +37,10 @@ export default {
   paymentComplete: '決済が完了しました',
   confirm: '確認',
   viewMyGift: 'マイギフト券を見る',
+  couponIssued: 'クーポンが発行されました！',
+  couponPinLabel: 'PIN番号',
+  couponValidityPrefix: '有効期限: ～',
+  couponValiditySuffix: 'まで',
   alerts: {
     notification: 'お知らせ',
     couponSendFail: 'クーポン送信失敗',

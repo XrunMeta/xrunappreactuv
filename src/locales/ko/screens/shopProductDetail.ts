@@ -37,6 +37,10 @@ export default {
   paymentComplete: '결제가 완료되었습니다',
   confirm: '확인',
   viewMyGift: '내 기프티콘 보기',
+  couponIssued: '쿠폰이 발급되었습니다!',
+  couponPinLabel: '핀번호',
+  couponValidityPrefix: '유효기간: ~',
+  couponValiditySuffix: '까지',
   alerts: {
     notification: '알림',
     couponSendFail: '쿠폰 발송 실패',

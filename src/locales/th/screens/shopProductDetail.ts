@@ -37,6 +37,10 @@ export default {
   paymentComplete: 'Payment complete',
   confirm: 'Confirm',
   viewMyGift: 'View My Gift Cards',
+  couponIssued: 'คูปองถูกออกแล้ว!',
+  couponPinLabel: 'PIN',
+  couponValidityPrefix: 'ใช้ได้ถึง:',
+  couponValiditySuffix: '',
   alerts: {
     notification: 'แจ้งเตือน',
     couponSendFail: 'ส่งคูปองล้มเหลว',
