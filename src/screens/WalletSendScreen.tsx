@@ -475,7 +475,7 @@ export const WalletSendScreen = () => {
 
     const canTransfer = await getIsTransferAble().catch(() => true);
     if (!canTransfer) {
-      await showAlert('전송 불가', '관리자에 의해 XRUN 전송이 일시 중지되었습니다.\n잠시 후 다시 시도해주세요.');
+      await showAlert('송금 불가', '관리자에 의해 XRUN 송금이 일시 중지되었습니다.\n잠시 후 다시 시도해주세요.');
       return;
     }
     const cleanAmount = removeCommas(sendAmount);
