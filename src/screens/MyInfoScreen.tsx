@@ -113,45 +113,85 @@ export const MyInfoScreen = () => {
   }, []);
 
   useEffect(() => {
+
+    const forceLogout = async (reason: string) => {
+      console.warn('[마이페이지] 사용자 정보 로드 실패 → 강제 로그아웃:', reason);
+      try {
+        await Promise.all([
+          AsyncStorage.removeItem('isLoggedIn'),
+          AsyncStorage.removeItem('userEmail'),
+          AsyncStorage.removeItem('userData'),
+          AsyncStorage.removeItem('rageProgress'),
+          AsyncStorage.removeItem('userTickets'),
+          AsyncStorage.removeItem('rageProgressLastUpdate'),
+          AsyncStorage.removeItem('userSessionToken'),
+          AsyncStorage.removeItem('jwt'),
+          AsyncStorage.removeItem('appleSignupCompleted'),
+          AsyncStorage.removeItem('appleSignupCompletedEmail'),
+          AsyncStorage.removeItem('appleSignupRequired'),
+          AsyncStorage.removeItem('appleSignupEmail'),
+          AsyncStorage.removeItem('googleSignupRequired'),
+          AsyncStorage.removeItem('googleSignupEmail'),
+          AsyncStorage.removeItem('loginType'),
+          AsyncStorage.removeItem('appleEditInfoAlertShownAt'),
+        ]);
+      } catch (_) {}
+      try { unbindAdisonUid(); } catch (_) {}
+      reset(ROUTES.login);
+    };
+
     const loadUserInfo = async () => {
       try {
-
         const userDataStr = await AsyncStorage.getItem('userData');
-        if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          if (userData == null || typeof userData !== 'object') {
-            setIsLoading(false);
-            return;
-          }
-          const member = userData.member != null ? Number(userData.member) : undefined;
-
-          if (member) {
-            const response = await getMyPageUserInfo(member, navigate);
-            const data = response?.data;
-            const user = data == null ? null : Array.isArray(data) ? data[0] : data;
-
-            if (user != null && typeof user === 'object') {
-              const firstName = user.firstname || '';
-              const lastName = user.lastname || '';
-              const fullName = `${lastName} ${firstName}`.trim() || '사용자';
-
-              setUserInfo({
-                name: fullName,
-                email: user.email || '',
-                member,
-              });
-            }
-          }
+        if (!userDataStr) {
+          await forceLogout('userData 없음');
+          return;
         }
+        let userData: any;
+        try {
+          userData = JSON.parse(userDataStr);
+        } catch (parseErr) {
+          await forceLogout(`userData 파싱 실패: ${parseErr}`);
+          return;
+        }
+        if (userData == null || typeof userData !== 'object') {
+          await forceLogout('userData 형식 오류');
+          return;
+        }
+        const member = userData.member != null ? Number(userData.member) : undefined;
+        if (!member) {
+          await forceLogout('member ID 없음');
+          return;
+        }
+
+        const response = await getMyPageUserInfo(member, navigate);
+        const data = response?.data;
+        const user = data == null ? null : Array.isArray(data) ? data[0] : data;
+
+        if (user == null || typeof user !== 'object' || !user.email) {
+          await forceLogout('사용자 정보 응답 비어있음');
+          return;
+        }
+
+        const firstName = user.firstname || '';
+        const lastName = user.lastname || '';
+        const fullName = `${lastName} ${firstName}`.trim() || '사용자';
+
+        setUserInfo({
+          name: fullName,
+          email: user.email,
+          member,
+        });
       } catch (error) {
         console.error('[마이페이지] 사용자 정보 로드 실패:', error);
+        await forceLogout(`예외: ${error}`);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadUserInfo();
-  }, [navigate]);
+  }, [navigate, reset]);
 
   useEffect(() => {
 
