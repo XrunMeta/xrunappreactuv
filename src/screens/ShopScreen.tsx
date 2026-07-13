@@ -110,7 +110,8 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
         xrunPrice = rawPrice; 
     } else {
         const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
-        xrunPrice = Math.ceil(rawPrice / divisor);
+
+        xrunPrice = Math.round((rawPrice / divisor) * 10000) / 10000;
     }
 
     const resolvedDefault = resolveAssetUri(defaultImageUri);
@@ -514,7 +515,7 @@ export const ShopScreen = () => {
         const shopItem = {
             id: product.id,
             title: product.title,
-            priceLabel: `${product.price.toLocaleString()}`,
+            priceLabel: `${product.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 })}`,
             image: product.image,
             detailTotal: '',
             brand: product.brand,
@@ -585,7 +586,7 @@ export const ShopScreen = () => {
                     </Text>
                     {}
                     <View style={styles.productFooter}>
-                        <Text style={styles.priceText}>{product.price.toLocaleString()} XRUN</Text>
+                        <Text style={styles.priceText}>{product.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 })} XRUN</Text>
                         {showPurchaseButton && (
                             <TouchableOpacity
                                 style={styles.purchaseButton}

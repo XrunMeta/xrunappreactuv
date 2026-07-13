@@ -810,7 +810,7 @@ export const ShopProductDetailScreen = () => {
                             <Text style={[styles.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{displayTitle}</Text>
                             {}
                             {!isPurchasedView && (
-                                <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString()} XRUN</Text>
+                                <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 })} XRUN</Text>
                             )}
                             {}
                             {descLines > 9999 && null}
