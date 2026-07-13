@@ -1249,6 +1249,8 @@ export const AdWalletScreen = () => {
                     logEvent(XRUN_EVENTS.ATTENDANCE_CHECKED);
                   }).catch(() => {});
 
+                  showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
+
                   if (questListRef.current) {
                     questListRef.current.reloadData();
                   }
@@ -1283,6 +1285,7 @@ export const AdWalletScreen = () => {
                 .then((response) => {
                   if (response.status === 'success') {
 
+                    showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
                     if (questListRef.current) {
                       questListRef.current.reloadData();
                     }
@@ -1314,6 +1317,7 @@ export const AdWalletScreen = () => {
 
             if (response.status === 'success') {
 
+              showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
               if (questListRef.current) {
                 questListRef.current.reloadData();
               }
