@@ -37,6 +37,10 @@ export default {
   paymentComplete: 'भुगतान पूर्ण',
   confirm: 'पुष्टि',
   viewMyGift: 'मेरे गिफ्ट कार्ड देखें',
+  couponIssued: 'कूपन जारी किया गया!',
+  couponPinLabel: 'PIN',
+  couponValidityPrefix: 'तक मान्य:',
+  couponValiditySuffix: '',
   alerts: {
     notification: 'सूचना',
     couponSendFail: 'कूपन भेजने में विफल',

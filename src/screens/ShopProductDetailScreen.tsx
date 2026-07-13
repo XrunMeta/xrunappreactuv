@@ -1145,7 +1145,7 @@ export const v_a59951 = () => {
                             <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={v_d81136.paymentSuccessMessage}>
-                            {v_a71862?.coupon_img_url ? '쿠폰이 발급되었습니다!' : 'XRUN 결제가 완료되었습니다'}
+                            {v_a71862?.coupon_img_url ? v_8d41d7('screens.shopProductDetail.couponIssued') : v_8d41d7('screens.shopProductDetail.paymentComplete')}
                         </Text>
                         {v_a71862?.coupon_img_url ? (
                             <ScrollView style={v_d81136.couponBarcodeScroll} showsVerticalScrollIndicator={false}>
@@ -1155,10 +1155,10 @@ export const v_a59951 = () => {
                                     resizeMode="contain"
                                 />
                                 {v_a71862.pin_no ? (
-                                    <Text style={v_d81136.couponPinNo}>핀번호: {v_a71862.pin_no}</Text>
+                                    <Text style={v_d81136.couponPinNo}>{v_8d41d7('screens.shopProductDetail.couponPinLabel')}: {v_a71862.pin_no}</Text>
                                 ) : null}
                                 {v_a71862.limit_date ? (
-                                    <Text style={v_d81136.couponLimitDate}>유효기간: ~ {v_a71862.limit_date}까지</Text>
+                                    <Text style={v_d81136.couponLimitDate}>{v_8d41d7('screens.shopProductDetail.couponValidityPrefix')} {v_a71862.limit_date} {v_8d41d7('screens.shopProductDetail.couponValiditySuffix')}</Text>
                                 ) : null}
                             </ScrollView>
                         ) : null}

@@ -37,6 +37,10 @@ export default {
   paymentComplete: 'Pembayaran selesai',
   confirm: 'Konfirmasi',
   viewMyGift: 'Lihat Gift Card',
+  couponIssued: 'Kupon telah diterbitkan!',
+  couponPinLabel: 'PIN',
+  couponValidityPrefix: 'Berlaku hingga:',
+  couponValiditySuffix: '',
   alerts: {
     notification: 'Pemberitahuan',
     couponSendFail: 'Pengiriman kupon gagal',
