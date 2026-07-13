@@ -26,7 +26,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW } from '../services';
+import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW, getIsTransferAble } from '../services';
 import type { WalletKey } from '../services/walletKeyStore';
 import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 
@@ -472,6 +472,12 @@ export const WalletSendScreen = () => {
   };
 
   const handleConfirm = async () => {
+
+    const canTransfer = await getIsTransferAble().catch(() => true);
+    if (!canTransfer) {
+      await showAlert('전송 불가', '관리자에 의해 XRUN 전송이 일시 중지되었습니다.\n잠시 후 다시 시도해주세요.');
+      return;
+    }
     const cleanAmount = removeCommas(sendAmount);
     const trimmedAddress = receiverAddress.trim();
     if (!trimmedAddress) {

@@ -649,6 +649,17 @@ export const getIosPinSetupShowStatus = async (navigation?: any): Promise<boolea
   return true;
 };
 
+export const getIsTransferAble = async (): Promise<boolean> => {
+  try {
+    const server = await checkServerVersion();
+    if (server?.data && (server.data as any).isTransferAble !== undefined) {
+      const v = (server.data as any).isTransferAble;
+      return v === 1 || v === true;
+    }
+  } catch (_) {}
+  return true;
+};
+
 export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean | null> => {
   try {
     const server = await checkServerVersion();

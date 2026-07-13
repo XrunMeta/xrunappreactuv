@@ -84,6 +84,16 @@ export const WalletTransactionProgressScreen = () => {
       try {
         console.log('[WalletTransactionProgress] 전송 프로세스 시작...');
 
+        try {
+          const { getIsTransferAble } = await import('../services');
+          const canTransfer = await getIsTransferAble().catch(() => true);
+          if (!canTransfer) {
+            throw new Error('관리자에 의해 XRUN 전송이 일시 중지되었습니다.');
+          }
+        } catch (transferErr: any) {
+          if (transferErr?.message?.includes('일시 중지')) throw transferErr;
+        }
+
         setStatusMessage(t('screens.walletTransactionProgress.checkingTicket') || 'Checking transfer ticket...');
 
         setStatusMessage(t('screens.walletTransactionProgress.executingTransfer') || 'Executing blockchain transfer...');
