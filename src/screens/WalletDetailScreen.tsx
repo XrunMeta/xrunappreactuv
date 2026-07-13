@@ -18,6 +18,7 @@ import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard, showToast } from '../utils';
+import { fmtBalance } from '../utils/formatAmount';
 import { findEntriesForUser } from '../services/walletKeyStore';
 import { getWalletKeyATStatus } from '../services';
 import { isLocalSendEnabledForUser } from '../services/walletSendLocal';
@@ -220,7 +221,7 @@ const TransactionListItemWrapper: React.FC<TransactionListItemData> = (props) =>
 };
 
 export const WalletDetailScreen = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { navigate, goBack } = useAppNavigation();
   const {
     selectedWalletAsset,
@@ -241,6 +242,8 @@ export const WalletDetailScreen = () => {
   const [member, setMember] = useState<number | null>(null);
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
+
+  const [currencyRates, setCurrencyRates] = useState<Record<string, number>>({});
 
   const txnListRef = useRef<DataListRef>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -297,10 +300,12 @@ export const WalletDetailScreen = () => {
       try {
         const result = await getXRUNGopaxPrice();
         const price = result?.data?.gopaxPrice || null;
+        const rates = (result?.data as any)?.rates || {};
         if (price) {
           setGopaxPrice(price);
+          setCurrencyRates(rates);
           await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
-          console.log('[WalletDetail] 고팍스 XRUN 가격 로드:', price);
+          console.log('[WalletDetail] 고팍스 XRUN 가격 로드:', price, 'rates:', rates);
         }
       } catch (error) {
         console.error('[WalletDetail] 고팍스 XRUN 가격 API 오류, fallback:', error);
@@ -309,6 +314,7 @@ export const WalletDetailScreen = () => {
           if (priceDataStr) {
             const priceData = JSON.parse(priceDataStr);
             setGopaxPrice(priceData?.data?.gopaxPrice || null);
+            setCurrencyRates(priceData?.data?.rates || {});
           }
         } catch {}
       }
@@ -715,39 +721,48 @@ export const WalletDetailScreen = () => {
   }, [t, showAlert, navigate]);
 
   const formattedBalance = useMemo(() => {
-
     if (!selectedWalletAsset?.amount) return '0';
     const amount = selectedWalletAsset?.amount;
-    console.log('[WalletDetailScreen] amount', amount);
-    return `${amount} ${selectedWalletAsset.symbol || ''}`;
+    return `${fmtBalance(amount)} ${selectedWalletAsset.symbol || ''}`;
   }, [selectedWalletAsset]);
 
   const krwValue = useMemo(() => {
-
     if (!selectedWalletAsset || (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19)) {
       return null;
     }
-
     if (!gopaxPrice) {
       return t('screens.walletDetail.priceUpdating');
     }
 
     try {
-
       const balanceAmount = new BigNumber(selectedWalletAsset.amount || '0');
-      const krwAmount = balanceAmount.multipliedBy(gopaxPrice);
+      const krwAmount = balanceAmount.multipliedBy(gopaxPrice); 
+      const lang = (i18n.language || 'ko').toLowerCase();
+      const kr = Number(currencyRates.KR || 0);
+      const idr = Number(currencyRates.IDR || 0);
 
-      const formatted = krwAmount.toFixed(0);
-      const parts = formatted.split('.');
-      const integerPart = parts[0];
-      const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      const usdAmount = kr > 0 ? krwAmount.dividedBy(kr) : new BigNumber(0);
 
-      return `KRW ${formattedInteger}`;
+      const fmt = (v: BigNumber, decimals: number) => {
+        const s = v.toFixed(decimals);
+        const [i, d] = s.split('.');
+        return i.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (d ? '.' + d : '');
+      };
+
+      if (lang.startsWith('ko')) {
+        return `KRW ${fmt(krwAmount, 0)}`;
+      } else if (lang.startsWith('id')) {
+
+        const idrAmount = usdAmount.multipliedBy(idr);
+        return `IDR ${fmt(idrAmount, 0)}`;
+      } else {
+        return `USD ${fmt(usdAmount, 2)}`;
+      }
     } catch (error) {
-      console.error('[WalletDetail] KRW 금액 계산 오류:', error);
+      console.error('[WalletDetail] 통화 환산 오류:', error);
       return t('screens.walletDetail.priceUpdating');
     }
-  }, [selectedWalletAsset, gopaxPrice, t]);
+  }, [selectedWalletAsset, gopaxPrice, currencyRates, t, i18n.language]);
 
   const shortenedAddress = useMemo(() => {
     return publicAddress || '';
