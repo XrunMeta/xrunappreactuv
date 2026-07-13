@@ -6,7 +6,7 @@ export default {
   receive: '받기',
   send: '보내기',
   received: '받음',
-  transfer: '전송',
+  transfer: '송금',
   conversion: '전환',
   exchange: '교환',
   exComplete: '교환 완료',
