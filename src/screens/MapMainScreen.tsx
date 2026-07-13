@@ -49,7 +49,7 @@ import { SpotData } from '../types';
 
 import { fetchMapMarkerData, gatewayNodeJS, fetchVirtualCoin, getCoinNasPrice, getTopAd5, getStoredTopAd5, validateTopAd5Urls, getNasmobAds, getPockAds, removeAdFromTopAd5, getCompletedAdsSet, getApiBaseUrl, getAuthHeader } from '../services';
 import { jwtPayloadSub, findEntriesForUser } from '../services/walletKeyStore';
-import { getWalletKeyATStatus, fetchAndSaveWallets, getIosGuideShowStatus } from '../services';
+import { getWalletKeyATStatus, fetchAndSaveWallets, getIosGuideShowStatus, getIosPinSetupShowStatus } from '../services';
 import { preloadTaboolaHTML } from '../services/taboola';
 
 import { cashingimages } from '../utils/imageCache';
@@ -490,6 +490,9 @@ export const MapMainScreen: React.FC = () => {
             return;
           }
 
+          const iosSkipPin = Platform.OS === 'ios' && !(await getIosPinSetupShowStatus(navigate).catch(() => true));
+          if (iosSkipPin) return;
+
           setPinModalProps((prev) => {
             if (prev && prev.memberId === memberId && prev.email === normEmail) return prev;
             return { memberId, email: normEmail };
@@ -532,6 +535,9 @@ export const MapMainScreen: React.FC = () => {
                   navigate(ROUTES.walletKeyTutorial);
                   return;
                 }
+
+                const iosSkipPin = Platform.OS === 'ios' && !(await getIosPinSetupShowStatus(navigate).catch(() => true));
+                if (iosSkipPin) return;
                 setPinModalProps((prev) => {
                   if (prev && prev.memberId === memberId && prev.email === normEmail) return prev;
                   return { memberId, email: normEmail };

@@ -638,6 +638,17 @@ export const getIosGuideShowStatus = async (navigation?: any): Promise<boolean> 
   return true; 
 };
 
+export const getIosPinSetupShowStatus = async (navigation?: any): Promise<boolean> => {
+  try {
+    const server = await checkServerVersion();
+    if (server?.data && (server.data as any).iosOnPinSetup !== undefined) {
+      const v = (server.data as any).iosOnPinSetup;
+      return v === 1 || v === true;
+    }
+  } catch (_) {}
+  return true;
+};
+
 export const getIosWalletShowStatus = async (navigation?: any): Promise<boolean | null> => {
   try {
     const server = await checkServerVersion();

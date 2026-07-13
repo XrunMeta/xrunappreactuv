@@ -23,6 +23,7 @@ interface ServerCheckResponse {
     version: number; 
     version_ios: number; 
     iosOnGuide?: number; 
+    iosOnPinSetup?: number; 
   };
 }
 
