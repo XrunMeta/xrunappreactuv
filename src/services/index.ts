@@ -754,6 +754,14 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
         v_74a79c.headers['X-OTA-Channel'] = String((v_087631 as any).channel ?? '?');
       } catch {  }
 
+      try {
+        const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+        const v_c87b30 = v_9c213b?.language;
+        if (v_c87b30 && typeof v_c87b30 === 'string') {
+          v_74a79c.headers['X-App-Language'] = v_c87b30;
+        }
+      } catch {  }
+
       const v_288349 = [
         /\/callbackNasmob\b/,
         /\/callbackPointClick\b/,
