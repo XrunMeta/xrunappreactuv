@@ -665,7 +665,7 @@ export const ShopProductDetailScreen = () => {
         }
         if (xrunBalanceState < product.price) {
 
-            const shortage = (product.price - xrunBalanceState).toFixed(4).replace(/\.?0+$/, '');
+            const shortage = (product.price - xrunBalanceState).toFixed(2).replace(/\.?0+$/, '');
             showAlert(
                 t('screens.shop.iak.notice'),
                 t('screens.shopProductDetail.alerts.insufficientWithShortage', { shortage }),
@@ -810,7 +810,7 @@ export const ShopProductDetailScreen = () => {
                             <Text style={[styles.title, { textAlign: 'left', alignSelf: 'stretch' }]}>{displayTitle}</Text>
                             {}
                             {!isPurchasedView && (
-                                <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 })} XRUN</Text>
+                                <Text style={styles.detailPriceText}>{Number(product.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} XRUN</Text>
                             )}
                             {}
                             {descLines > 9999 && null}
