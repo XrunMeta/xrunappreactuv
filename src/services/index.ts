@@ -754,6 +754,14 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
         config.headers['X-OTA-Channel'] = String((Updates as any).channel ?? '?');
       } catch {  }
 
+      try {
+        const i18n = require('i18next').default || require('i18next');
+        const lng = i18n?.language;
+        if (lng && typeof lng === 'string') {
+          config.headers['X-App-Language'] = lng;
+        }
+      } catch {  }
+
       const adEndpointPatterns = [
         /\/callbackNasmob\b/,
         /\/callbackPointClick\b/,
