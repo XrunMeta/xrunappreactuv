@@ -25,7 +25,7 @@ import {
   type VaultEntry,
   type WalletNetwork,
 } from '../services/walletKeyStore';
-import { markWalletKeyAT, upsertWalletPin, deleteServerSavedstring } from '../services';
+import { markWalletKeyAT, upsertWalletPin, deleteServerSavedstring, getIosPinSetupShowStatus } from '../services';
 
 interface Props {
   memberId: number;
@@ -47,6 +47,21 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+
+  const [iosPinAllowed, setIosPinAllowed] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!visible) return;
+    if (Platform.OS !== 'ios') { setIosPinAllowed(true); return; }
+    (async () => {
+      const allowed = await getIosPinSetupShowStatus().catch(() => true);
+      setIosPinAllowed(allowed);
+      if (!allowed) {
+        console.log('[WalletKeyPinSetupModal] iOS PIN 설정 비활성 — 모달 auto-close');
+
+      }
+    })();
+  }, [visible]);
 
   useEffect(() => {
     if (visible) {
@@ -204,6 +219,8 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
 
   const currentPin = step === 'confirm' ? confirmPin : pin;
   const isInputStep = step === 'enter' || step === 'confirm';
+
+  if (!iosPinAllowed) return null;
 
   return (
     <Modal visible={visible} animationType="fade" transparent={false}>
