@@ -755,10 +755,16 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
       } catch {  }
 
       try {
-        const i18n = require('i18next').default || require('i18next');
-        const lng = i18n?.language;
-        if (lng && typeof lng === 'string') {
-          config.headers['X-App-Language'] = lng;
+        const storedLang = await AsyncStorage.getItem('app_language').catch(() => null);
+        if (storedLang && typeof storedLang === 'string') {
+          config.headers['X-App-Language'] = storedLang;
+        } else {
+
+          const i18n = require('i18next').default || require('i18next');
+          const lng = i18n?.language;
+          if (lng && typeof lng === 'string') {
+            config.headers['X-App-Language'] = lng;
+          }
         }
       } catch {  }
 
