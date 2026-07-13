@@ -1,6 +1,15 @@
 export default {
   title: 'Transaksi',
+  from: 'Dari',
+  to: 'Kepada',
+  amount: 'Jumlah',
+  time: 'Waktu',
+  txHash: 'Hash TX',
+  transactionDetails: 'Detail Transaksi',
+  nonce: 'Nonce',
+  gasPrice: 'Harga Gas',
+  usedGas: 'Gas Terpakai',
+  maxGas: 'Gas Maks',
+  totalSpent: 'Total Dikeluarkan',
+  blockHeight: 'Ketinggian Blok',
 };
-
-
-

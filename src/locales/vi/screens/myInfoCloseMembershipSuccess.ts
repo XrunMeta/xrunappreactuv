@@ -1,6 +1,6 @@
 export default {
-  title: 'Rút tư cách thành viên',
-  message: 'Rút tư cách thành viên đã hoàn tất',
-  subMessage: 'Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.\nChúng tôi sẽ trở lại với dịch vụ tốt hơn.',
-  confirmButton: 'Xác nhận',
+  title: 'Hủy tài khoản',
+  message: 'Tài khoản của bạn đã được đóng thành công',
+  subMessage: 'Cảm ơn bạn đã sử dụng dịch vụ.\nChúng tôi sẽ trở lại với dịch vụ tốt hơn.',
+  confirmButton: 'OK',
 };

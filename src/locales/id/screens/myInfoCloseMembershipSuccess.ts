@@ -1,6 +1,6 @@
 export default {
-  title: 'Penutupan Keanggotaan',
-  message: 'Penutupan keanggotaan telah selesai',
+  title: 'Penghapusan Akun',
+  message: 'Akun Anda telah berhasil dihapus',
   subMessage: 'Terima kasih telah menggunakan layanan kami.\nKami akan kembali dengan layanan yang lebih baik.',
-  confirmButton: 'Konfirmasi',
+  confirmButton: 'OK',
 };

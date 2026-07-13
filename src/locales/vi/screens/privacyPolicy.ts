@@ -1,7 +1,3 @@
 export default {
-  title: 'Chính sách bảo mật',
+  title: 'Chính sách Bảo mật',
 };
-
-
-
-

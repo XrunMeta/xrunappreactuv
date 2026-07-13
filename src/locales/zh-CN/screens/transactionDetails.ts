@@ -1,6 +1,15 @@
 export default {
   title: '交易',
+  from: '发送方',
+  to: '接收方',
+  amount: '金额',
+  time: '时间',
+  txHash: '交易哈希',
+  transactionDetails: '交易详情',
+  nonce: 'Nonce',
+  gasPrice: 'Gas 价格',
+  usedGas: '已用 Gas',
+  maxGas: '最大 Gas',
+  totalSpent: '总花费',
+  blockHeight: '区块高度',
 };
-
-
-

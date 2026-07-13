@@ -1,7 +1,15 @@
 export default {
-  title: 'Transaction',
+  title: 'Giao dịch',
+  from: 'Từ',
+  to: 'Đến',
+  amount: 'Số tiền',
+  time: 'Thời gian',
+  txHash: 'TX Hash',
+  transactionDetails: 'Chi tiết giao dịch',
+  nonce: 'Nonce',
+  gasPrice: 'Giá Gas',
+  usedGas: 'Gas đã dùng',
+  maxGas: 'Gas tối đa',
+  totalSpent: 'Tổng đã chi',
+  blockHeight: 'Độ cao khối',
 };
-
-
-
-
