@@ -1250,6 +1250,7 @@ export const AdWalletScreen = () => {
                   }).catch(() => {});
 
                   showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
+                  AsyncStorage.setItem('lastToastedNotificationTime', new Date().toISOString()).catch(() => {});
 
                   if (questListRef.current) {
                     questListRef.current.reloadData();
@@ -1286,6 +1287,7 @@ export const AdWalletScreen = () => {
                   if (response.status === 'success') {
 
                     showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
+                    AsyncStorage.setItem('lastToastedNotificationTime', new Date().toISOString()).catch(() => {});
                     if (questListRef.current) {
                       questListRef.current.reloadData();
                     }
@@ -1318,6 +1320,7 @@ export const AdWalletScreen = () => {
             if (response.status === 'success') {
 
               showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
+              AsyncStorage.setItem('lastToastedNotificationTime', new Date().toISOString()).catch(() => {});
               if (questListRef.current) {
                 questListRef.current.reloadData();
               }
