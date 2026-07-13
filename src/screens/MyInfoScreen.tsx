@@ -113,45 +113,85 @@ export const v_03a231 = () => {
   }, []);
 
   v_c4deb2(() => {
+
+    const v_3680c8 = async (v_58ca36) => {
+      console.warn('[마이페이지] 사용자 정보 로드 실패 → 강제 로그아웃:', v_58ca36);
+      try {
+        await Promise.all([
+          v_e84827.removeItem('isLoggedIn'),
+          v_e84827.removeItem('userEmail'),
+          v_e84827.removeItem('userData'),
+          v_e84827.removeItem('rageProgress'),
+          v_e84827.removeItem('userTickets'),
+          v_e84827.removeItem('rageProgressLastUpdate'),
+          v_e84827.removeItem('userSessionToken'),
+          v_e84827.removeItem('jwt'),
+          v_e84827.removeItem('appleSignupCompleted'),
+          v_e84827.removeItem('appleSignupCompletedEmail'),
+          v_e84827.removeItem('appleSignupRequired'),
+          v_e84827.removeItem('appleSignupEmail'),
+          v_e84827.removeItem('googleSignupRequired'),
+          v_e84827.removeItem('googleSignupEmail'),
+          v_e84827.removeItem('loginType'),
+          v_e84827.removeItem('appleEditInfoAlertShownAt'),
+        ]);
+      } catch (v_37eab7) {}
+      try { v_21ef1f(); } catch (v_37eab7) {}
+      v_487a25(v_ce4741.login);
+    };
+
     const v_ea3fa6 = async () => {
       try {
-
         const v_f24fd5 = await v_e84827.getItem('userData');
-        if (v_f24fd5) {
-          const v_ef7306 = JSON.parse(v_f24fd5);
-          if (v_ef7306 == null || typeof v_ef7306 !== 'object') {
-            v_deef62(false);
-            return;
-          }
-          const v_660822 = v_ef7306.member != null ? Number(v_ef7306.member) : undefined;
-
-          if (v_660822) {
-            const v_3393e3 = await v_a7ab3c(v_660822, v_9b57fc);
-            const v_9390e8 = v_3393e3?.data;
-            const v_625c74 = v_9390e8 == null ? null : Array.isArray(v_9390e8) ? v_9390e8[0] : v_9390e8;
-
-            if (v_625c74 != null && typeof v_625c74 === 'object') {
-              const v_a32a50 = v_625c74.firstname || '';
-              const v_328bb4 = v_625c74.lastname || '';
-              const v_05b02f = `${v_328bb4} ${v_a32a50}`.trim() || '사용자';
-
-              v_a61751({
-                name: v_05b02f,
-                email: v_625c74.email || '',
-                member: v_660822,
-              });
-            }
-          }
+        if (!v_f24fd5) {
+          await v_3680c8('userData 없음');
+          return;
         }
+        let v_ef7306;
+        try {
+          v_ef7306 = JSON.parse(v_f24fd5);
+        } catch (v_dbd2f7) {
+          await v_3680c8(`userData 파싱 실패: ${v_dbd2f7}`);
+          return;
+        }
+        if (v_ef7306 == null || typeof v_ef7306 !== 'object') {
+          await v_3680c8('userData 형식 오류');
+          return;
+        }
+        const v_660822 = v_ef7306.member != null ? Number(v_ef7306.member) : undefined;
+        if (!v_660822) {
+          await v_3680c8('member ID 없음');
+          return;
+        }
+
+        const v_3393e3 = await v_a7ab3c(v_660822, v_9b57fc);
+        const v_9390e8 = v_3393e3?.data;
+        const v_625c74 = v_9390e8 == null ? null : Array.isArray(v_9390e8) ? v_9390e8[0] : v_9390e8;
+
+        if (v_625c74 == null || typeof v_625c74 !== 'object' || !v_625c74.email) {
+          await v_3680c8('사용자 정보 응답 비어있음');
+          return;
+        }
+
+        const v_a32a50 = v_625c74.firstname || '';
+        const v_328bb4 = v_625c74.lastname || '';
+        const v_05b02f = `${v_328bb4} ${v_a32a50}`.trim() || '사용자';
+
+        v_a61751({
+          name: v_05b02f,
+          email: v_625c74.email,
+          member: v_660822,
+        });
       } catch (v_5e9bfe) {
         console.error('[마이페이지] 사용자 정보 로드 실패:', v_5e9bfe);
+        await v_3680c8(`예외: ${v_5e9bfe}`);
       } finally {
         v_deef62(false);
       }
     };
 
     v_ea3fa6();
-  }, [v_9b57fc]);
+  }, [v_9b57fc, v_487a25]);
 
   v_c4deb2(() => {
 
