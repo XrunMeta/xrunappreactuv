@@ -22,7 +22,7 @@ export default {
   ageLabel: 'Usia',
   ageSelect: 'Pilih',
   optional: 'Opsional',
-  referralEmailLabel: 'Referral Code',
+  referralEmailLabel: 'Kode Referral',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
   terms: {

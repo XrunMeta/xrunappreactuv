@@ -22,7 +22,7 @@ export default {
   ageLabel: '年齢',
   ageSelect: '選択',
   optional: '任意',
-  referralEmailLabel: 'Referral Code',
+  referralEmailLabel: '紹介コード',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: 'に同意します。',
   terms: {

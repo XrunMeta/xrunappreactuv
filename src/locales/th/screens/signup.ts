@@ -22,7 +22,7 @@ export default {
   ageLabel: 'อายุ',
   ageSelect: 'เลือก',
   optional: 'ไม่บังคับ',
-  referralEmailLabel: 'Referral Code',
+  referralEmailLabel: 'รหัสแนะนำ',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
   terms: {

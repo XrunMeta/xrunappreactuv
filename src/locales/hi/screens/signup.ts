@@ -22,7 +22,7 @@ export default {
   ageLabel: 'उम्र',
   ageSelect: 'चुनें',
   optional: 'वैकल्पिक',
-  referralEmailLabel: 'Referral Code',
+  referralEmailLabel: 'रेफरल कोड',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
   terms: {
