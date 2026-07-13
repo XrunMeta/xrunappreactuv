@@ -836,11 +836,7 @@ export const WalletScreen = () => {
         ...asset,
         title: asset.symbol,
         subtitle: asset.subCurrencyName || asset.name,
-        amount: new BigNumber(asset.amount || '0').toFormat(2, {
-          decimalSeparator: '.',
-          groupSeparator: ',',
-          groupSize: 3,
-        }),
+        amount: fmtBalance(asset.amount || '0'),
         suffix: asset.symbol,
         iconSource,
 
