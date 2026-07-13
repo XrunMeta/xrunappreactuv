@@ -483,7 +483,9 @@ export const MapMainScreen: React.FC = () => {
             }
           } catch {  }
           const tutorialDone = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
-          if (tutorialDone !== 'true') {
+
+          const iosSkipGuide = Platform.OS === 'ios' && !(await getIosGuideShowStatus(navigate).catch(() => true));
+          if (tutorialDone !== 'true' && !iosSkipGuide) {
             navigate(ROUTES.walletKeyTutorial);
             return;
           }
@@ -524,7 +526,9 @@ export const MapMainScreen: React.FC = () => {
               if (refreshedNeed && !cancelled) {
 
                 const tutorialDone = await AsyncStorage.getItem(TUTORIAL_COMPLETED_KEY);
-                if (tutorialDone !== 'true') {
+
+                const iosSkipGuide = Platform.OS === 'ios' && !(await getIosGuideShowStatus(navigate).catch(() => true));
+                if (tutorialDone !== 'true' && !iosSkipGuide) {
                   navigate(ROUTES.walletKeyTutorial);
                   return;
                 }
