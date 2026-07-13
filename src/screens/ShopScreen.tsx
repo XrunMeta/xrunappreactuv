@@ -110,7 +110,8 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
         v_7be02f = v_56d99d; 
     } else {
         const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
-        v_7be02f = Math.ceil(v_56d99d / v_b7ffba);
+
+        v_7be02f = Math.round((v_56d99d / v_b7ffba) * 10000) / 10000;
     }
 
     const v_364071 = v_e233cd(v_b0e133);
@@ -514,7 +515,7 @@ export const v_10886b = () => {
         const v_983c87 = {
             id: v_01bee9.id,
             title: v_01bee9.title,
-            priceLabel: `${v_01bee9.price.toLocaleString()}`,
+            priceLabel: `${v_01bee9.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 })}`,
             image: v_01bee9.image,
             detailTotal: '',
             brand: v_01bee9.brand,
@@ -585,7 +586,7 @@ export const v_10886b = () => {
                     </Text>
                     {}
                     <View style={v_d81136.productFooter}>
-                        <Text style={v_d81136.priceText}>{v_01bee9.price.toLocaleString()} XRUN</Text>
+                        <Text style={v_d81136.priceText}>{v_01bee9.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 })} XRUN</Text>
                         {v_80e8c0 && (
                             <TouchableOpacity
                                 style={v_d81136.purchaseButton}
