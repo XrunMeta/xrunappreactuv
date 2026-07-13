@@ -164,7 +164,9 @@ const ScreenHost = () => {
         import('./src/services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
           logEvent(XRUN_EVENTS.NOTIFICATION_OPENED, { type: type || 'unknown' });
         }).catch(() => {});
-        if (type === 'inquiry_reply') {
+
+        const category = String(data.category ?? '');
+        if (type === 'inquiry_reply' || category === 'inquiry_reply') {
           navigate(ROUTES.myInfoNotify);
           return;
         }
