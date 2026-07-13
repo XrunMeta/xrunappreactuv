@@ -164,7 +164,9 @@ const v_c0dbdf = () => {
         import('./src/services/analytics').then(({ logEvent: v_ae251a, XRUN_EVENTS: v_a9f6da }) => {
           v_ae251a(v_a9f6da.NOTIFICATION_OPENED, { type: v_3b27d9 || 'unknown' });
         }).catch(() => {});
-        if (v_3b27d9 === 'inquiry_reply') {
+
+        const v_8b9cd4 = String(v_9390e8.category ?? '');
+        if (v_3b27d9 === 'inquiry_reply' || v_8b9cd4 === 'inquiry_reply') {
           v_9b57fc(v_ce4741.myInfoNotify);
           return;
         }
