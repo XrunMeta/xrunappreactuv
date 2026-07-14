@@ -114,7 +114,9 @@ export const v_03a231 = () => {
 
   v_c4deb2(() => {
 
+    let v_6ee6f3 = false;
     const v_3680c8 = async (v_58ca36) => {
+      v_6ee6f3 = true;
       console.warn('[마이페이지] 사용자 정보 로드 실패 → 강제 로그아웃:', v_58ca36);
       try {
         await Promise.all([
@@ -186,7 +188,8 @@ export const v_03a231 = () => {
         console.error('[마이페이지] 사용자 정보 로드 실패:', v_5e9bfe);
         await v_3680c8(`예외: ${v_5e9bfe}`);
       } finally {
-        v_deef62(false);
+
+        if (!v_6ee6f3) v_deef62(false);
       }
     };
 
@@ -434,15 +437,16 @@ export const v_03a231 = () => {
             <Ionicons name="person-outline" size={28} color="#666666" />
           </View>
           <View style={v_d81136.profileInfo}>
-            {v_cd31a8 ? (
+            {}
+            {v_cd31a8 || !v_bb789b?.email ? (
               <ActivityIndicator size="small" color={v_1bfbd0.headerText} />
             ) : (
               <>
                 <Text style={v_d81136.profileName}>
-                  {v_bb789b?.name || '사용자'}
+                  {v_bb789b.name || '사용자'}
                 </Text>
                 <Text style={v_d81136.profileEmail}>
-                  {v_bb789b?.email || ''}
+                  {v_bb789b.email}
                 </Text>
               </>
             )}
