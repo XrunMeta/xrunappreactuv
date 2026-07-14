@@ -30,6 +30,7 @@ export default {
   purchaseConfirmMessage: '{{title}}을(를) 구매하시겠습니까?',
   purchaseDateLabel: '구매일',
   useButton: '사용하기 >',
+  viewCouponImage: '쿠폰 이미지 >',
   cancel: '취소',
 
   iak: {

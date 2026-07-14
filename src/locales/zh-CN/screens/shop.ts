@@ -26,6 +26,7 @@ export default {
   purchaseConfirmMessage: '是否购买{{title}}？',
   purchaseDateLabel: '购买日',
   useButton: '使用 >',
+  viewCouponImage: '优惠券图片 >',
   cancel: '取消',
   iak: {
     gpsBanner: '允许位置权限以查看您所在地区的商品。点击允许',

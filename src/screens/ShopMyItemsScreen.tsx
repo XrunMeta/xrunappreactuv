@@ -445,6 +445,15 @@ export const ShopMyItemsScreen = () => {
                         >
                             <Text style={styles.useButtonText}>{t('screens.shop.useButton')}</Text>
                         </TouchableOpacity>
+                    ) : (item.type === 'giftishow' && item.couponImgUrl) ? (
+
+                        <TouchableOpacity
+                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
+                            onPress={() => handleUseItem(item)}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.viewCouponImage')}</Text>
+                        </TouchableOpacity>
                     ) : null}
                 </View>
             </View>
