@@ -26,6 +26,7 @@ export default {
   purchaseConfirmMessage: 'Apakah Anda ingin membeli {{title}}?',
   purchaseDateLabel: 'Tanggal pembelian',
   useButton: 'Gunakan >',
+  viewCouponImage: 'Gambar Kupon >',
   cancel: 'Batal',
   iak: {
     gpsBanner: 'Izinkan lokasi untuk melihat produk yang tersedia di wilayah Anda. Ketuk untuk mengizinkan',

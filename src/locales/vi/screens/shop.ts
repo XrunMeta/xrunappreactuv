@@ -26,6 +26,7 @@ export default {
   purchaseConfirmMessage: 'Bạn có muốn mua {{title}}?',
   purchaseDateLabel: 'Ngày mua',
   useButton: 'Sử dụng >',
+  viewCouponImage: 'Hình phiếu >',
   cancel: 'Hủy',
   iak: {
     gpsBanner: 'Cho phép quyền vị trí để xem sản phẩm có sẵn ở khu vực của bạn. Nhấn để cho phép',

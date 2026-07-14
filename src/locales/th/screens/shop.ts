@@ -26,6 +26,7 @@ export default {
   purchaseConfirmMessage: 'คุณต้องการซื้อ {{title}}?',
   purchaseDateLabel: 'วันที่ซื้อ',
   useButton: 'ใช้ >',
+  viewCouponImage: 'ภาพคูปอง >',
   cancel: 'ยกเลิก',
   iak: {
     gpsBanner: 'อนุญาตการเข้าถึงตำแหน่งเพื่อดูสินค้าในพื้นที่ของคุณ แตะเพื่ออนุญาต',
