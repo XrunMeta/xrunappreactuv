@@ -73,7 +73,7 @@ function v_86df31(v_d308b5): string {
 
 function v_a7d899(v_03cc9e): string {
   const v_8dcb51 = {
-    '01': '발행',
+    '01': '사용가능',
     '02': '사용완료',
     '03': '반품',
     '04': '관리폐기',
