@@ -444,8 +444,11 @@ export const WalletDetailScreen = () => {
           if (onchainCategory && onchainCategory.trim()) {
             const trimmed = onchainCategory.trim();
             if (trimmed.startsWith('cat:')) {
-              const key = trimmed.slice(4);
-              actionType = t(`screens.walletDetail.cat_${key}`);
+
+              const [rawKey, mmStr] = trimmed.slice(4).split('|');
+              const label = t(`screens.walletDetail.cat_${rawKey}`);
+              const monthNum = mmStr ? Number(mmStr) : 0;
+              actionType = monthNum > 0 ? `${monthNum}월 ${label}` : label;
             } else {
               actionType = trimmed;
             }
@@ -810,6 +813,8 @@ export const WalletDetailScreen = () => {
 
         <View style={styles.listWrapper}>
           <DataList
+
+            key={`${member ?? 'nomember'}-${selectedWalletAsset?.currency ?? 'noasset'}-${publicAddress || 'noaddr'}-${selectedType}`}
             ref={txnListRef}
             fetchData={stableFetchData}
             ItemComponent={TransactionListItemWrapper}
