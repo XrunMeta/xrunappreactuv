@@ -353,24 +353,7 @@ export const WalletDetailScreen = () => {
 
       const currentCacheKey = `${member}-${selectedWalletAsset.currency}-${selectedType}`;
 
-      if (params.page === 1 && cachedTransactionData && cacheKey === currentCacheKey) {
-        console.log('[WalletDetail] 캐시된 데이터 사용:', {
-          cacheKey,
-          currentCacheKey,
-          cachedDataLength: cachedTransactionData.length,
-        });
-
-        const startIndex = (params.page - 1) * params.pageSize;
-        const endIndex = startIndex + params.pageSize;
-        const paginatedData = cachedTransactionData.slice(startIndex, endIndex);
-        const hasMore = endIndex < cachedTransactionData.length;
-
-        return {
-          data: paginatedData,
-          total: cachedTransactionData.length,
-          hasMore,
-        };
-      }
+      void cachedTransactionData; void cacheKey; void currentCacheKey;
 
       try {
         const response = await fetchEtherscanTransactions(
@@ -397,18 +380,21 @@ export const WalletDetailScreen = () => {
 
         const XRUN_POLYGON_CONTRACT = '0xda7cdea482b4e5f3d5b41aa286811d111f066b6b';
         const XRUN_ETHEREUM_CONTRACT = '0x5833dbb0749887174b254ba4a5df747ff523a905';
-        const expectedContract =
-          selectedWalletAsset.currency === 18
+
+        const isNativeCoin = selectedWalletAsset.currency === 16 || selectedWalletAsset.currency === 2;
+        const expectedContract = isNativeCoin
+          ? undefined
+          : selectedWalletAsset.currency === 18
             ? XRUN_POLYGON_CONTRACT.toLowerCase()
             : selectedWalletAsset.currency === 1
               ? XRUN_ETHEREUM_CONTRACT.toLowerCase()
               : (selectedWalletAsset as any).contractAddress?.toLowerCase?.();
         const expectedSymbol = (selectedWalletAsset.symbol || '').toUpperCase();
         response.data = response.data.filter((item: any) => {
+          if (isNativeCoin) return true;  
           const c = (item.contractAddress || '').toLowerCase();
           const s = (item.tokenSymbol || '').toUpperCase();
           if (expectedContract) return c === expectedContract;
-
           return !s || s === expectedSymbol;
         });
 
@@ -535,31 +521,17 @@ export const WalletDetailScreen = () => {
 
         const hasMore = dateFilteredItems.length >= params.pageSize;
 
-        if (params.page === 1) {
-          setCachedTransactionData(dateFilteredItems);
-          setCacheKey(currentCacheKey);
-          console.log('[WalletDetail] 데이터 캐시에 저장:', {
-            cacheKey: currentCacheKey,
-            dataLength: dateFilteredItems.length,
-          });
-        }
-
-        const startIndex = (params.page - 1) * params.pageSize;
-        const endIndex = startIndex + params.pageSize;
-        const paginatedData = dateFilteredItems.slice(startIndex, endIndex);
-        const paginatedHasMore = endIndex < dateFilteredItems.length;
-
         return {
-          data: paginatedData,
+          data: dateFilteredItems,
           total: dateFilteredItems.length,
-          hasMore: paginatedHasMore,
+          hasMore,
         };
       } catch (error) {
         console.error('[WalletDetail] API 호출 오류:', error);
         return { data: [], total: 0, hasMore: false };
       }
     };
-  }, [member, selectedWalletAsset, publicAddress, selectedType, t, cachedTransactionData, cacheKey]);
+  }, [member, selectedWalletAsset, publicAddress, selectedType, t]);
 
   const createSendFetchFunction = useCallback(() => {
     return async (params: PaginationParams): Promise<PaginationResponse<TransactionListItemData>> => {
@@ -597,19 +569,25 @@ export const WalletDetailScreen = () => {
     };
   }, [createFetchFunction]);
 
-  const getFetchData = useCallback(() => {
-    console.log('[WalletDetailScreen] selectedType', selectedType);
+  const fetchDataRef = useRef<((p: PaginationParams) => Promise<PaginationResponse<TransactionListItemData>>) | null>(null)
+  fetchDataRef.current = (() => {
     switch (selectedType) {
-      case 'all':
-        return createFetchFunction();
-      case 'send':
-        return createSendFetchFunction();
-      case 'receive':
-        return createReceiveFetchFunction();
-      default:
-        return createFetchFunction();
+      case 'all': return createFetchFunction();
+      case 'send': return createSendFetchFunction();
+      case 'receive': return createReceiveFetchFunction();
+      default: return createFetchFunction();
     }
-  }, [selectedType, createFetchFunction, createSendFetchFunction, createReceiveFetchFunction]);
+  })()
+  const stableFetchData = useMemo(() => {
+    return (p: PaginationParams) => fetchDataRef.current!(p)
+  }, [])
+
+  useEffect(() => {
+    if (!member || !publicAddress || !selectedWalletAsset) return
+    if (txnListRef.current) {
+      try { txnListRef.current.reloadData() } catch {  }
+    }
+  }, [selectedType, member, publicAddress, selectedWalletAsset?.currency])
 
   const handleAction = useCallback(
     async (type: 'scan' | 'receive' | 'send') => {
@@ -833,7 +811,7 @@ export const WalletDetailScreen = () => {
         <View style={styles.listWrapper}>
           <DataList
             ref={txnListRef}
-            fetchData={getFetchData()}
+            fetchData={stableFetchData}
             ItemComponent={TransactionListItemWrapper}
             pageSize={20}
             keyExtractor={(item, index) => item.id?.toString() || `txn_${index}`}

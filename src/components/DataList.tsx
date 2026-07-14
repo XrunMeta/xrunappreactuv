@@ -100,7 +100,8 @@ const DataListComponent = <T extends Record<string, any>>(
         setData((prevData) => [...prevData, ...response.data]);
       }
 
-      setHasMore(response.hasMore);
+      const safeHasMore = response.data.length > 0 && response.hasMore;
+      setHasMore(safeHasMore);
       setCurrentPage(page);
     } catch (err) {
 
