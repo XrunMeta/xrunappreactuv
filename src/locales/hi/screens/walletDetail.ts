@@ -24,11 +24,9 @@ export default {
   cat_ar_settle_nas: 'AR विज्ञापन निपटान 2',
   cat_ar_settle_pangle: 'AR विज्ञापन निपटान 3',
   cat_referral_settle: 'रेफरल निपटान',
+  cat_monthly_settle: 'महीना {n} निपटान',  
   cat_recommender_reward: 'रेफरर पुरस्कार',
   cat_signup_reward: 'साइन-अप पुरस्कार',
   cat_afterlife: 'Afterlife',
 };
-
-
-
 

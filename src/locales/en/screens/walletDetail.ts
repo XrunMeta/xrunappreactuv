@@ -24,10 +24,9 @@ export default {
   cat_ar_settle_nas: 'AR Ad Settlement 2',
   cat_ar_settle_pangle: 'AR Ad Settlement 3',
   cat_referral_settle: 'Referral Settlement',
+  cat_monthly_settle: 'Month {n} Settlement',  
   cat_recommender_reward: 'Recommender Reward',
   cat_signup_reward: 'Signup Reward',
   cat_afterlife: 'Afterlife',
 };
-
-
 

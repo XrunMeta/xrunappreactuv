@@ -446,9 +446,8 @@ export const WalletDetailScreen = () => {
             if (trimmed.startsWith('cat:')) {
 
               const [rawKey, mmStr] = trimmed.slice(4).split('|');
-              const label = t(`screens.walletDetail.cat_${rawKey}`);
               const monthNum = mmStr ? Number(mmStr) : 0;
-              actionType = monthNum > 0 ? `${monthNum}월 ${label}` : label;
+              actionType = t(`screens.walletDetail.cat_${rawKey}`, { n: monthNum });
             } else {
               actionType = trimmed;
             }
