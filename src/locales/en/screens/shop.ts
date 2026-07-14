@@ -26,6 +26,7 @@ export default {
   purchaseConfirmMessage: 'Do you want to purchase {{title}}?',
   purchaseDateLabel: 'Purchase date',
   useButton: 'Use >',
+  viewCouponImage: 'Coupon Image >',
   cancel: 'Cancel',
   iak: {
     gpsBanner: 'Allow location permission to see products available in your area. Tap to allow',
