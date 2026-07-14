@@ -73,7 +73,7 @@ function iakStatusLabel(status?: string): string {
 
 function pinStatusLabel(pin_status?: string): string {
   const map: Record<string, string> = {
-    '01': '발행',
+    '01': '사용가능',
     '02': '사용완료',
     '03': '반품',
     '04': '관리폐기',
