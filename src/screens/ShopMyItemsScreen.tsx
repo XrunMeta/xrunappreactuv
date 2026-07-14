@@ -445,6 +445,15 @@ export const v_8c1d95 = () => {
                         >
                             <Text style={v_d81136.useButtonText}>{v_8d41d7('screens.shop.useButton')}</Text>
                         </TouchableOpacity>
+                    ) : (v_8c0b26.type === 'giftishow' && v_8c0b26.couponImgUrl) ? (
+
+                        <TouchableOpacity
+                            style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
+                            onPress={() => v_09c55b(v_8c0b26)}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>{v_8d41d7('screens.shop.viewCouponImage')}</Text>
+                        </TouchableOpacity>
                     ) : null}
                 </View>
             </View>

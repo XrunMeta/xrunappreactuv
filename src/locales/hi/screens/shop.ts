@@ -26,6 +26,7 @@ export default {
   purchaseConfirmMessage: 'क्या आप {{title}} खरीदना चाहते हैं?',
   purchaseDateLabel: 'खरीद की तारीख',
   useButton: 'उपयोग करें >',
+  viewCouponImage: 'कूपन छवि >',
   cancel: 'रद्द करें',
   iak: {
     gpsBanner: 'अपने क्षेत्र में उपलब्ध उत्पाद देखने के लिए स्थान अनुमति दें। अनुमति देने के लिए टैप करें',

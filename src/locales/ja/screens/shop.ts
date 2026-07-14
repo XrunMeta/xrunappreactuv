@@ -33,6 +33,7 @@ export default {
   purchaseConfirmMessage: '{{title}}を購入しますか？',
   purchaseDateLabel: '購入日',
   useButton: '使用する >',
+  viewCouponImage: 'クーポン画像 >',
   cancel: 'キャンセル',
   iak: {
     gpsBanner: '位置情報を許可すると、地域に合った商品が表示されます。タップして許可',
