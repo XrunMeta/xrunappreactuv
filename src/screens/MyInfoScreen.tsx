@@ -114,7 +114,9 @@ export const MyInfoScreen = () => {
 
   useEffect(() => {
 
+    let redirecting = false;
     const forceLogout = async (reason: string) => {
+      redirecting = true;
       console.warn('[마이페이지] 사용자 정보 로드 실패 → 강제 로그아웃:', reason);
       try {
         await Promise.all([
@@ -186,7 +188,8 @@ export const MyInfoScreen = () => {
         console.error('[마이페이지] 사용자 정보 로드 실패:', error);
         await forceLogout(`예외: ${error}`);
       } finally {
-        setIsLoading(false);
+
+        if (!redirecting) setIsLoading(false);
       }
     };
 
@@ -434,15 +437,16 @@ export const MyInfoScreen = () => {
             <Ionicons name="person-outline" size={28} color="#666666" />
           </View>
           <View style={styles.profileInfo}>
-            {isLoading ? (
+            {}
+            {isLoading || !userInfo?.email ? (
               <ActivityIndicator size="small" color={COLORS.headerText} />
             ) : (
               <>
                 <Text style={styles.profileName}>
-                  {userInfo?.name || '사용자'}
+                  {userInfo.name || '사용자'}
                 </Text>
                 <Text style={styles.profileEmail}>
-                  {userInfo?.email || ''}
+                  {userInfo.email}
                 </Text>
               </>
             )}
