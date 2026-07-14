@@ -100,7 +100,8 @@ const v_2219b3 = <T extends Record<string, any>>(
         v_d57c80((v_f1d8d1) => [...v_f1d8d1, ...v_3393e3.data]);
       }
 
-      v_1454f0(v_3393e3.hasMore);
+      const v_8e52ce = v_3393e3.data.length > 0 && v_3393e3.hasMore;
+      v_1454f0(v_8e52ce);
       v_be9dba(v_2365e9);
     } catch (v_49263d) {
 
