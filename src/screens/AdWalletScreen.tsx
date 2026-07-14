@@ -73,6 +73,33 @@ export const AdWalletScreen = () => {
   });
   const [topBannersLoading, setTopBannersLoading] = useState(false);
   const [gopaxPrice, setGopaxPrice] = useState<number | null>(null);
+
+  const [currencyRates, setCurrencyRates] = useState<{ KR?: number; IDR?: number; US?: number }>({});
+
+  const formatLocalCurrency = useCallback((xrunAmount: number): string => {
+    if (!gopaxPrice || xrunAmount <= 0) {
+      const lang = (i18n.language || 'ko').toLowerCase();
+      return lang.startsWith('ko') ? '0 KRW' : lang.startsWith('id') ? '0 IDR' : '0 USD';
+    }
+    const lang = (i18n.language || 'ko').toLowerCase();
+    const krwAmount = new BigNumber(xrunAmount).multipliedBy(gopaxPrice);
+    const fmt = (v: BigNumber, decimals: number) => {
+      const s = v.toFixed(decimals);
+      const [i, d] = s.split('.');
+      return i.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (d ? '.' + d : '');
+    };
+    if (lang.startsWith('ko')) {
+      return `KRW ${fmt(krwAmount, 0)}`;
+    }
+    const kr = Number(currencyRates.KR || 0);
+    const usdAmount = kr > 0 ? krwAmount.dividedBy(kr) : new BigNumber(0);
+    if (lang.startsWith('id')) {
+      const idr = Number(currencyRates.IDR || 0);
+      const idrAmount = usdAmount.multipliedBy(idr);
+      return `IDR ${fmt(idrAmount, 0)}`;
+    }
+    return `USD ${fmt(usdAmount, 2)}`;
+  }, [gopaxPrice, currencyRates, i18n.language]);
   const [isJoiningQuest, setIsJoiningQuest] = useState(false);
   const [isColdStart, setIsColdStart] = useState<boolean | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -139,11 +166,13 @@ export const AdWalletScreen = () => {
       try {
         const result = await getXRUNGopaxPrice();
         const price = result?.data?.gopaxPrice || null;
+        const rates = result?.data?.rates || {};
         if (price) {
           setGopaxPrice(price);
+          setCurrencyRates(rates);
 
           await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
-          console.log('[AdWallet] 고팍스 XRUN 가격 로드:', price);
+          console.log('[AdWallet] 고팍스 XRUN 가격 로드:', price, 'rates:', rates);
         }
       } catch (error) {
         console.error('[AdWallet] 고팍스 XRUN 가격 API 오류, AsyncStorage fallback 시도:', error);
@@ -153,7 +182,9 @@ export const AdWalletScreen = () => {
           if (priceDataStr) {
             const priceData = JSON.parse(priceDataStr);
             const price = priceData?.data?.gopaxPrice || null;
+            const rates = priceData?.data?.rates || {};
             setGopaxPrice(price);
+            setCurrencyRates(rates);
           }
         } catch {}
       }
@@ -172,13 +203,7 @@ export const AdWalletScreen = () => {
         setTimeout(() => {
           const totalXrun = pendingBannerRef.current.totalXrun;
           const amountasxrun = `${fmtAmount(totalXrun, 2)} XRUN`;
-          let krwamount = '0 KRW';
-          if (gopaxPrice && totalXrun > 0) {
-            const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
-            const formatted = krwVal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            krwamount = `KRW ${formatted}`;
-          }
-          setTopBannersData({ krwamount, amountasxrun });
+          setTopBannersData({ krwamount: formatLocalCurrency(totalXrun), amountasxrun });
         }, 500);
         return;
       }
@@ -187,13 +212,7 @@ export const AdWalletScreen = () => {
         setTimeout(() => {
           const totalXrun = questBannerRef.current.totalXrun;
           const amountasxrun = `${fmtAmount(totalXrun, 2)} XRUN`;
-          let krwamount = '0 KRW';
-          if (gopaxPrice && totalXrun > 0) {
-            const krwVal = new BigNumber(totalXrun).multipliedBy(gopaxPrice);
-            const formatted = krwVal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            krwamount = `KRW ${formatted}`;
-          }
-          setTopBannersData({ krwamount, amountasxrun });
+          setTopBannersData({ krwamount: formatLocalCurrency(totalXrun), amountasxrun });
         }, 500);
         return;
       }
@@ -210,44 +229,21 @@ export const AdWalletScreen = () => {
           const amountAsXrunNum = parseFloat(transaction.amountasxrun || '0');
           const amountasxrun = `${fmtAmount(amountAsXrunNum, 2)} XRUN`;
 
-          let krwamount = '0 KRW';
-          if (gopaxPrice && transaction.amountasxrun) {
-            try {
-              const balanceAmount = new BigNumber(transaction.amountasxrun || '0');
-              const krwAmount = balanceAmount.multipliedBy(gopaxPrice);
-
-              const formatted = krwAmount.toFixed(0);
-              const parts = formatted.split('.');
-              const integerPart = parts[0];
-              const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-              krwamount = `KRW ${formattedInteger}`;
-            } catch (error) {
-              console.error('[AdWallet] KRW 금액 계산 오류:', error);
-
-              const krwAmountValue = parseFloat(transaction.krwamount || '0');
-              krwamount = formatCurrency(krwAmountValue, 'KRW');
-            }
-          } else {
-
-            const krwAmountValue = parseFloat(transaction.krwamount || '0');
-            krwamount = formatCurrency(krwAmountValue, 'KRW');
-          }
-
+          const xrunNum = parseFloat(transaction.amountasxrun || '0');
           setTopBannersData({
-            krwamount,
+            krwamount: formatLocalCurrency(xrunNum),
             amountasxrun,
           });
         } else {
           setTopBannersData({
-            krwamount: '0 KRW',
+            krwamount: formatLocalCurrency(0),
             amountasxrun: '0 XRUN',
           });
         }
       } catch (error: any) {
         console.error('Failed to fetch top banners:', error);
         setTopBannersData({
-          krwamount: '0 KRW',
+          krwamount: formatLocalCurrency(0),
           amountasxrun: '0 XRUN',
         });
       } finally {
