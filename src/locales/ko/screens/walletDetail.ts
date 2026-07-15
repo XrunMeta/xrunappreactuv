@@ -24,7 +24,7 @@ export default {
   cat_ar_settle_nas: 'AR광고 정산2',
   cat_ar_settle_pangle: 'AR 광고정산3',
   cat_referral_settle: '레퍼럴 정산',
-  cat_monthly_settle: '{n}월 정산',  
+  cat_monthly_settle: '{{n}}월 정산',  
   cat_recommender_reward: '추천인 보상',
   cat_signup_reward: '신규가입 보상',
   cat_afterlife: '애프터라이프',
