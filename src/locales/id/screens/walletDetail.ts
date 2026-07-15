@@ -24,7 +24,7 @@ export default {
   cat_ar_settle_nas: 'Penyelesaian AR 2',
   cat_ar_settle_pangle: 'Penyelesaian AR 3',
   cat_referral_settle: 'Penyelesaian referral',
-  cat_monthly_settle: 'Penyelesaian Bulan {n}',  
+  cat_monthly_settle: 'Penyelesaian Bulan {{n}}',  
   cat_recommender_reward: 'Hadiah referrer',
   cat_signup_reward: 'Hadiah pendaftaran',
   cat_afterlife: 'Afterlife',

@@ -24,7 +24,7 @@ export default {
   cat_ar_settle_nas: 'Thanh toán AR 2',
   cat_ar_settle_pangle: 'Thanh toán AR 3',
   cat_referral_settle: 'Thanh toán giới thiệu',
-  cat_monthly_settle: 'Thanh toán tháng {n}',  
+  cat_monthly_settle: 'Thanh toán tháng {{n}}',  
   cat_recommender_reward: 'Thưởng giới thiệu',
   cat_signup_reward: 'Thưởng đăng ký',
   cat_afterlife: 'Afterlife',
