@@ -534,7 +534,8 @@ export const WalletScreen = () => {
             }
           })();
 
-          const xrunWallet = sortedData.find((item) => Number(item.currency) === 1);
+          const xrunWallet = sortedData.find((item) => Number(item.currency) === 18)
+            ?? sortedData.find((item) => Number(item.currency) === 1); 
           console.log('[WalletScreen] xrunWallet 찾기:', xrunWallet ? {
             currency: xrunWallet.currency,
             address: xrunWallet.address,
