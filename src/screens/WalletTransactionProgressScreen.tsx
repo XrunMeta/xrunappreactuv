@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, BackHandler } from 'react-native';
 import { Dialog, SafeScrollView } from '../components';
 import { LoadingText } from '../components/AnimatedDots';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +40,12 @@ export const WalletTransactionProgressScreen = () => {
   const [userEmail, setUserEmail] = useState<string>('');
   const [transferFailedDialogVisible, setTransferFailedDialogVisible] = useState(false);
   const transferExecutedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isProcessing) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => true);
+    return () => sub.remove();
+  }, [isProcessing]);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -275,7 +281,8 @@ export const WalletTransactionProgressScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header title={t('screens.walletTransactionProgress.title')} onBackPress={goBack} showBackButton />
+      {}
+      <Header title={t('screens.walletTransactionProgress.title')} onBackPress={isProcessing ? undefined : goBack} showBackButton={!isProcessing} />
 
       <SafeScrollView
         contentContainerStyle={styles.scrollContent}
