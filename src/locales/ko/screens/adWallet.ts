@@ -31,6 +31,7 @@ export default {
   referralEventRewardCompleted: '추천인 이벤트 보상 완료했습니다.',
   adLoadFailedForReward: '광고를 불러올 수 없습니다. 보상을 진행합니다.',
   adLoadFailedForAttendance: '광고를 불러올 수 없습니다. 출석체크를 진행합니다.',
+  adLoadRetryLater: '광고를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.',
   referralInviteReward: '추천인초대보상',
   completed: '완료',
   referralEvent: '추천인 이벤트',

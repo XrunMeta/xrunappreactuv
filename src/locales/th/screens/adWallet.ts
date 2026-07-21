@@ -31,6 +31,7 @@ export default {
   referralEventRewardCompleted: 'รางวัลกิจกรรมแนะนำเสร็จสมบูรณ์',
   adLoadFailedForReward: 'ไม่สามารถโหลดโฆษณาได้ ดำเนินการกับรางวัล',
   adLoadFailedForAttendance: 'ไม่สามารถโหลดโฆษณาได้ ดำเนินการกับการเช็คอิน',
+  adLoadRetryLater: 'ไม่สามารถโหลดโฆษณาได้ กรุณาลองใหม่ภายหลัง',
   referralInviteReward: 'รางวัลการเชิญแนะนำ',
   completed: 'เสร็จสมบูรณ์',
   referralEvent: 'กิจกรรมแนะนำ',

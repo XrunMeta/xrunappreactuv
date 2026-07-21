@@ -31,6 +31,7 @@ export default {
   referralEventRewardCompleted: 'Phần thưởng sự kiện giới thiệu hoàn tất.',
   adLoadFailedForReward: 'Không thể tải quảng cáo. Tiếp tục với phần thưởng.',
   adLoadFailedForAttendance: 'Không thể tải quảng cáo. Tiếp tục với check-in.',
+  adLoadRetryLater: 'Không thể tải quảng cáo. Vui lòng thử lại sau.',
   referralInviteReward: 'Phần thưởng Mời Giới thiệu',
   completed: 'Hoàn tất',
   referralEvent: 'Sự kiện Giới thiệu',

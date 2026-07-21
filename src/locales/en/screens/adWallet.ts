@@ -31,6 +31,7 @@ export default {
   referralEventRewardCompleted: 'Referral event reward completed.',
   adLoadFailedForReward: 'Unable to load ad. Proceeding with reward.',
   adLoadFailedForAttendance: 'Unable to load ad. Proceeding with attendance check.',
+  adLoadRetryLater: 'Could not load the ad. Please try again later.',
   referralInviteReward: 'Referral Invite Reward',
   completed: 'Completed',
   referralEvent: 'Referral Event',

@@ -32,6 +32,7 @@ export default {
   adLoadFailedForReward: '広告を読み込めません。報酬を進めます。',
   attendanceCheckCompleted: '出席チェックを完了しました。',
   adLoadFailedForAttendance: '広告を読み込めません。出席チェックを進めます。',
+  adLoadRetryLater: '広告を読み込めません。しばらくしてからもう一度お試しください。',
   referralInviteReward: '紹介招待報酬',
   completed: '完了',
   referralEvent: '紹介イベント',
