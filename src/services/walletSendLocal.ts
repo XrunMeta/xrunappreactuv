@@ -178,7 +178,7 @@ export async function sendOnchainLocal(
         };
       }
 
-      const estimatedFee = BigInt(gasPrice) * 130_000n;
+      const estimatedFee = BigInt(gasPrice) * 65_000n;
       if (nativeBal < estimatedFee) {
         const nativeName = currency === 1 ? 'ETH' : 'POL';
         const needFmt = Number(ethers.formatEther(estimatedFee)).toFixed(6);
