@@ -32,6 +32,7 @@ export default {
   adLoadFailedForReward: '无法加载广告。继续处理奖励。',
   attendanceCheckCompleted: '签到已完成。',
   adLoadFailedForAttendance: '无法加载广告。继续处理签到。',
+  adLoadRetryLater: '无法加载广告。请稍后再试。',
   referralInviteReward: '推荐邀请奖励',
   completed: '完成',
   referralEvent: '推荐活动',

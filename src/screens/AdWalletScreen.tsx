@@ -1039,159 +1039,34 @@ export const AdWalletScreen = () => {
                     params: { flow: 'reward', platform: Platform.OS, errMsg, errCode, adUnit: getPangleRewardedAdUnitId() },
                   });
                 }).catch(() => {});
-                showToast(t('screens.adWallet.adLoadFailedForReward'));
-
-                (async () => {
-                  try {
-                    let questId: number;
-                    let recommendationEventId: number | null = null;
-
-                    if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
-                      const match = item.id.match(/recommendation_(\d+)/);
-                      recommendationEventId = match ? parseInt(match[1], 10) : null;
-
-                      if (!recommendationEventId) {
-                        showToast(t('screens.adWallet.invalidReferralEventId'));
-                        setIsJoiningQuest(false);
-                        return;
-                      }
-
-                      questId = `recommendation_${recommendationEventId}` as any;
-                    } else {
-                      questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
-                      if (isNaN(questId) || questId === 0) {
-                        showToast(getToastBody('toast_invalid_quest_id', '유효하지 않은 퀘스트 ID입니다.'));
-                        setIsJoiningQuest(false);
-                        return;
-                      }
-                    }
-
-                    const response = await joinQuest(
-                      {
-                        quest_id: questId,
-                        member,
-                        ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
-                      },
-                      goBack,
-                    );
-
-                    if (response.status === 'success') {
-                      showToast(t('screens.adWallet.referralEventRewardCompleted'));
-                      if (questListRef.current) {
-                        questListRef.current.reloadData();
-                      }
-                    } else {
-                      showToast(response.message || getToastBody('toast_process_fail', '처리에 실패했습니다.'));
-                    }
-                  } catch (error) {
-                    console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
-                    showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
-                  } finally {
-                    setIsJoiningQuest(false);
-                  }
-                })();
+                showToast(t('screens.adWallet.adLoadRetryLater'));
+                setIsJoiningQuest(false);
               }
             );
           } catch (error) {
+
+            const errMsg = (error as any)?.message ?? String(error);
             console.error('[AdWallet] 추천인 이벤트 Pangle 광고 표시 오류:', error);
-
-            try {
-              let questId: number;
-              let recommendationEventId: number | null = null;
-
-              if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
-                const match = item.id.match(/recommendation_(\d+)/);
-                recommendationEventId = match ? parseInt(match[1], 10) : null;
-
-                if (!recommendationEventId) {
-                  showToast(t('screens.adWallet.invalidReferralEventId'));
-                  setIsJoiningQuest(false);
-                  return;
-                }
-
-                questId = `recommendation_${recommendationEventId}` as any;
-              } else {
-                questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
-                if (isNaN(questId) || questId === 0) {
-                  showToast(getToastBody('toast_invalid_quest_id', '유효하지 않은 퀘스트 ID입니다.'));
-                  setIsJoiningQuest(false);
-                  return;
-                }
-              }
-
-              const response = await joinQuest(
-                {
-                  quest_id: questId,
-                  member,
-                  ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
-                },
-                goBack,
-              );
-
-              if (response.status === 'success') {
-                showToast(t('screens.adWallet.referralEventRewardCompleted'));
-                if (questListRef.current) {
-                  questListRef.current.reloadData();
-                }
-              } else {
-                showToast(response.message || getToastBody('toast_process_fail', '처리에 실패했습니다.'));
-              }
-            } catch (questError) {
-              console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', questError);
-              showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
-            } finally {
-              setIsJoiningQuest(false);
-            }
+            import('../services/clickTracker').then(({ trackEvent }) => {
+              trackEvent('pangle_show_error', {
+                category: 'ad_error',
+                params: { flow: 'reward', platform: Platform.OS, errMsg },
+              });
+            }).catch(() => {});
+            showToast(t('screens.adWallet.adLoadRetryLater'));
+            setIsJoiningQuest(false);
           }
         } else {
 
-          try {
-            let questId: number;
-            let recommendationEventId: number | null = null;
-
-            if (typeof item.id === 'string' && item.id.startsWith('recommendation_')) {
-              const match = item.id.match(/recommendation_(\d+)/);
-              recommendationEventId = match ? parseInt(match[1], 10) : null;
-
-              if (!recommendationEventId) {
-                showToast(t('screens.adWallet.invalidReferralEventId'));
-                setIsJoiningQuest(false);
-                return;
-              }
-
-              questId = `recommendation_${recommendationEventId}` as any;
-            } else {
-              questId = typeof item.id === 'string' ? parseInt(item.id, 10) : item.id;
-              if (isNaN(questId) || questId === 0) {
-                showToast(getToastBody('toast_invalid_quest_id', '유효하지 않은 퀘스트 ID입니다.'));
-                setIsJoiningQuest(false);
-                return;
-              }
-            }
-
-            const response = await joinQuest(
-              {
-                quest_id: questId,
-                member,
-                ...(recommendationEventId ? { detail1: 'recommendation' } : {}),
-              },
-              goBack,
-            );
-
-            if (response.status === 'success') {
-              showToast(t('screens.adWallet.referralEventRewardCompleted'));
-              if (questListRef.current) {
-                questListRef.current.reloadData();
-              }
-            } else {
-              showToast(response.message || getToastBody('toast_process_fail', '처리에 실패했습니다.'));
-            }
-          } catch (error) {
-            console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
-            showToast(getToastBody('toast_process_fail', '처리에 실패했습니다. 다시 시도해주세요.'));
-          } finally {
-            setIsJoiningQuest(false);
-          }
+          console.warn('[AdWallet] 추천인 이벤트 Pangle 미준비');
+          import('../services/clickTracker').then(({ trackEvent }) => {
+            trackEvent('pangle_not_ready', {
+              category: 'ad_error',
+              params: { flow: 'reward', platform: Platform.OS },
+            });
+          }).catch(() => {});
+          showToast(t('screens.adWallet.adLoadRetryLater'));
+          setIsJoiningQuest(false);
         }
       } catch (error) {
         console.error('[AdWallet] 추천인 이벤트 보상 처리 오류:', error);
@@ -1285,93 +1160,34 @@ export const AdWalletScreen = () => {
                   params: { flow: 'attendance', platform: Platform.OS, errMsg, errCode, adUnit: getPangleRewardedAdUnitId() },
                 });
               }).catch(() => {});
-              showToast(t('screens.adWallet.adLoadFailedForAttendance'));
-
-              const questId = item.id;
-              joinQuest(
-                {
-                  quest_id: questId,
-                  member,
-                },
-                undefined,
-              )
-                .then((response) => {
-                  if (response.status === 'success') {
-
-                    showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
-                    AsyncStorage.setItem('lastToastedNotificationTime', new Date().toISOString()).catch(() => {});
-                    if (questListRef.current) {
-                      questListRef.current.reloadData();
-                    }
-                  } else {
-                    showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
-                  }
-                })
-                .catch((error) => {
-                  console.error('[AdWallet] 출석 체크 참여 오류:', error);
-                  showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-                })
-                .finally(() => {
-                  setIsJoiningQuest(false);
-                });
+              showToast(t('screens.adWallet.adLoadRetryLater'));
+              setIsJoiningQuest(false);
             }
           );
         } catch (error) {
+
+          const errMsg = (error as any)?.message ?? String(error);
           console.error('[AdWallet] 출석체크 Pangle 광고 표시 오류:', error);
-
-          try {
-            const questId = item.id;
-            const response = await joinQuest(
-              {
-                quest_id: questId,
-                member,
-              },
-              undefined,
-            );
-
-            if (response.status === 'success') {
-
-              showToast(t('screens.adWallet.attendanceCheckCompletedToast') || '출석체크 완료');
-              AsyncStorage.setItem('lastToastedNotificationTime', new Date().toISOString()).catch(() => {});
-              if (questListRef.current) {
-                questListRef.current.reloadData();
-              }
-            } else {
-              showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
-            }
-          } catch (questError) {
-            console.error('[AdWallet] 출석 체크 참여 오류:', questError);
-            showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-          } finally {
-            setIsJoiningQuest(false);
-          }
+          import('../services/clickTracker').then(({ trackEvent }) => {
+            trackEvent('pangle_show_error', {
+              category: 'ad_error',
+              params: { flow: 'attendance', platform: Platform.OS, errMsg },
+            });
+          }).catch(() => {});
+          showToast(t('screens.adWallet.adLoadRetryLater'));
+          setIsJoiningQuest(false);
         }
       } else {
 
-        try {
-          const questId = item.id;
-          const response = await joinQuest(
-            {
-              quest_id: questId,
-              member,
-            },
-            undefined,
-          );
-
-          if (response.status === 'success') {
-
-            if (questListRef.current) {
-              questListRef.current.reloadData();
-            }
-          } else {
-            showToast(response.message || t('screens.adWallet.attendanceCheckRetryToast'));
-          }
-        } catch (error) {
-          console.error('[AdWallet] 출석 체크 참여 오류:', error);
-          showToast(t('screens.adWallet.attendanceCheckRetryToast'));
-        } finally {
-          setIsJoiningQuest(false);
-        }
+        console.warn('[AdWallet] 출석체크 Pangle 미준비');
+        import('../services/clickTracker').then(({ trackEvent }) => {
+          trackEvent('pangle_not_ready', {
+            category: 'ad_error',
+            params: { flow: 'attendance', platform: Platform.OS },
+          });
+        }).catch(() => {});
+        showToast(t('screens.adWallet.adLoadRetryLater'));
+        setIsJoiningQuest(false);
       }
       return;
     }

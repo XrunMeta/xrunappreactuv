@@ -31,6 +31,7 @@ export default {
   referralEventRewardCompleted: 'Hadiah acara referral selesai.',
   adLoadFailedForReward: 'Tidak dapat memuat iklan. Melanjutkan hadiah.',
   adLoadFailedForAttendance: 'Tidak dapat memuat iklan. Melanjutkan check-in.',
+  adLoadRetryLater: 'Tidak dapat memuat iklan. Silakan coba lagi nanti.',
   referralInviteReward: 'Hadiah Undangan Referral',
   completed: 'Selesai',
   referralEvent: 'Acara Referral',

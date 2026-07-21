@@ -31,6 +31,7 @@ export default {
   referralEventRewardCompleted: 'रेफरल इवेंट पुरस्कार पूर्ण।',
   adLoadFailedForReward: 'विज्ञापन लोड करने में असमर्थ। पुरस्कार के साथ आगे बढ़ रहे हैं।',
   adLoadFailedForAttendance: 'विज्ञापन लोड करने में असमर्थ। उपस्थिति जांच के साथ आगे बढ़ रहे हैं।',
+  adLoadRetryLater: 'विज्ञापन लोड नहीं हो सका। कृपया बाद में पुनः प्रयास करें।',
   referralInviteReward: 'रेफरल आमंत्रण पुरस्कार',
   completed: 'पूर्ण',
   referralEvent: 'रेफरल इवेंट',
