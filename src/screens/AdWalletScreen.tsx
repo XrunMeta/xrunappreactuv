@@ -1030,8 +1030,9 @@ export const AdWalletScreen = () => {
               },
               (error) => {
 
-                console.error('[AdWallet] 추천인 이벤트 Pangle 광고 로드 실패:', error);
-                showToast(t('screens.adWallet.adLoadFailedForReward'));
+                const errMsg = (error as any)?.message ?? (error as any)?.errorMsg ?? String(error);
+                console.error('[AdWallet] 추천인 이벤트 Pangle 광고 로드 실패:', error, JSON.stringify(error));
+                showToast(`${t('screens.adWallet.adLoadFailedForReward')}\n[${Platform.OS}] ${errMsg}`);
 
                 (async () => {
                   try {
@@ -1268,8 +1269,9 @@ export const AdWalletScreen = () => {
             },
             (error) => {
 
-              console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error);
-              showToast(t('screens.adWallet.adLoadFailedForAttendance'));
+              const errMsg = (error as any)?.message ?? (error as any)?.errorMsg ?? String(error);
+              console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error, JSON.stringify(error));
+              showToast(`${t('screens.adWallet.adLoadFailedForAttendance')}\n[${Platform.OS}] ${errMsg}`);
 
               const questId = item.id;
               joinQuest(
