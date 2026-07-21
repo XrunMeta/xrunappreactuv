@@ -1031,8 +1031,15 @@ export const AdWalletScreen = () => {
               (error) => {
 
                 const errMsg = (error as any)?.message ?? (error as any)?.errorMsg ?? String(error);
+                const errCode = (error as any)?.code ?? (error as any)?.errorCode ?? '';
                 console.error('[AdWallet] 추천인 이벤트 Pangle 광고 로드 실패:', error, JSON.stringify(error));
-                showToast(`${t('screens.adWallet.adLoadFailedForReward')}\n[${Platform.OS}] ${errMsg}`);
+                import('../services/clickTracker').then(({ trackEvent }) => {
+                  trackEvent('pangle_load_error', {
+                    category: 'ad_error',
+                    params: { flow: 'reward', platform: Platform.OS, errMsg, errCode, adUnit: getPangleRewardedAdUnitId() },
+                  });
+                }).catch(() => {});
+                showToast(t('screens.adWallet.adLoadFailedForReward'));
 
                 (async () => {
                   try {
@@ -1270,8 +1277,15 @@ export const AdWalletScreen = () => {
             (error) => {
 
               const errMsg = (error as any)?.message ?? (error as any)?.errorMsg ?? String(error);
+              const errCode = (error as any)?.code ?? (error as any)?.errorCode ?? '';
               console.error('[AdWallet] 출석체크 Pangle 광고 로드 실패:', error, JSON.stringify(error));
-              showToast(`${t('screens.adWallet.adLoadFailedForAttendance')}\n[${Platform.OS}] ${errMsg}`);
+              import('../services/clickTracker').then(({ trackEvent }) => {
+                trackEvent('pangle_load_error', {
+                  category: 'ad_error',
+                  params: { flow: 'attendance', platform: Platform.OS, errMsg, errCode, adUnit: getPangleRewardedAdUnitId() },
+                });
+              }).catch(() => {});
+              showToast(t('screens.adWallet.adLoadFailedForAttendance'));
 
               const questId = item.id;
               joinQuest(
