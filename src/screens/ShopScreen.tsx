@@ -131,6 +131,10 @@ function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, 
     };
 }
 
+const FORCE_COUNTRY_BY_EMAIL: Record<string, 'KR' | 'ID'> = {
+    'oth-user@example.invalid': 'ID',
+};
+
 export const ShopScreen = () => {
     console.log('[ShopScreen] ShopScreen 컴포넌트 렌더링됨');
     const { t } = useTranslation();
@@ -287,6 +291,20 @@ export const ShopScreen = () => {
     const GPS_CACHE_KEY = 'shopGpsCountry';
     const GPS_CACHE_TTL = 30 * 60 * 1000; 
     const detectCountry = useCallback(async () => {
+
+        try {
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (userDataStr) {
+                const email = String(JSON.parse(userDataStr)?.email ?? '').trim().toLowerCase();
+                const forced = FORCE_COUNTRY_BY_EMAIL[email];
+                if (forced) {
+                    setShopCountry(forced);
+                    setGpsDenied(false);
+                    console.log('[ShopScreen] 이메일 강제 국가:', email, '→', forced);
+                    return;
+                }
+            }
+        } catch {}
         if (forceCountry !== 'AUTO') {
             setShopCountry(forceCountry);
             setGpsDenied(false);
