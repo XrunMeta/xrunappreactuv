@@ -42,6 +42,12 @@ export default {
   sessionExpired: {
     message: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
   },
+  etherscanDelay: {
+    message: 'Server riwayat transaksi merespons lambat. Silakan coba lagi sebentar lagi.',
+  },
+  etherscanStale: {
+    message: 'Tidak dapat memuat riwayat transaksi terbaru — menampilkan data sebelumnya.',
+  },
   gasInsufficient: {
     title: 'Biaya Gas Tidak Cukup',
     messageTransfer: 'Saldo biaya jaringan (gas) di dompet Anda tidak cukup untuk melakukan transfer.\n\nSilakan isi ulang token gas jaringan Polygon (POL) dan coba lagi.',

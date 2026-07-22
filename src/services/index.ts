@@ -6155,7 +6155,8 @@ export const v_69bcd0 = async (
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
 
-    return v_3393e3.data;
+    const v_383106 = v_3393e3.headers?.['x-cache'] ?? v_3393e3.headers?.['X-Cache'];
+    return { ...v_3393e3.data, __xCache: v_383106 };
   } catch (v_5e9bfe) {
     console.error('[트랜잭션] Etherscan 거래내역 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {

@@ -48,6 +48,12 @@ export default {
   sessionExpired: {
     message: '세션이 만료되어 다시 로그인 해 주세요',
   },
+  etherscanDelay: {
+    message: '거래내역 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해 주세요',
+  },
+  etherscanStale: {
+    message: '최신 거래내역을 불러오지 못해 이전 내역을 표시 중입니다',
+  },
   gasInsufficient: {
     title: '가스비 부족',
     messageTransfer: '전송료(POL)가 부족합니다.\n폴리곤 네트워크 가스 토큰(POL)을 충전한 뒤 다시 시도해주세요.',
