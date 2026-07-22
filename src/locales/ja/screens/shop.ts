@@ -72,6 +72,8 @@ export default {
     phoneLabelLine: '番号: {{phone}}',
     snInfoLine: 'シリアル: {{sn}}',
     openRedeemLink: '引換リンクを開く',
+    copySerial: 'シリアル コピー',
+    snCopied: 'シリアル番号をコピーしました',
     pendingNote: '処理中 (コールバック待ち)',
     failedNote: '失敗または返金済み',
     successNote: '通信事業者の SMS でも確認可',

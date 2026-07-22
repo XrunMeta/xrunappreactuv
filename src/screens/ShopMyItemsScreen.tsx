@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, ImageSourcePropType, ActivityIndicator, RefreshControl, Linking } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView, SafeView } from '../components';
 import { StatusBar } from 'expo-status-bar';
@@ -298,22 +299,17 @@ export const ShopMyItemsScreen = () => {
     const handleUseItem = (item: MyItemData) => {
 
         if (item.type === 'iak') {
-            const lines: string[] = [];
-            if (item.iakCustomerId) lines.push(t('screens.shop.iak.phoneLabelLine', { phone: item.iakCustomerId }));
-            if (item.iakSn) lines.push(t('screens.shop.iak.snInfoLine', { sn: item.iakSn }));
-            if (item.iakActivationCode) lines.push(`PIN: ${item.iakActivationCode}`);
-            if (item.iakRedeemLink) lines.push(`\n${item.iakRedeemLink}`);
-            const msg = lines.join('\n');
-            const buttons: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }> = [];
+
             if (item.iakRedeemLink) {
-                const link = item.iakRedeemLink;
-                buttons.push({
-                    text: t('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' }),
-                    onPress: () => { Linking.openURL(link).catch(() => {}); },
-                });
+                Linking.openURL(item.iakRedeemLink).catch(() => {});
+                return;
             }
-            buttons.push({ text: t('screens.shop.iak.ok'), style: 'cancel' });
-            showAlert(item.title, msg, buttons);
+            if (item.iakSn) {
+                const snOnly = String(item.iakSn).split('/')[0].trim();
+                Clipboard.setStringAsync(snOnly).catch(() => {});
+                showAlert(item.title, snOnly, [{ text: t('screens.shop.iak.ok') }]);
+                return;
+            }
             return;
         }
         if (item.type === 'xrun') {
@@ -467,17 +463,39 @@ export const ShopMyItemsScreen = () => {
                         </TouchableOpacity>
                     ) : item.type === 'iak' && (item.iakSn || item.iakRedeemLink) ? (
 
-                        <TouchableOpacity
-                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
-                            onPress={() => handleUseItem(item)}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={[styles.useButtonText, { color: '#374151' }]}>
-                                {item.iakRedeemLink
-                                    ? t('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 보기' })
-                                    : t('screens.shop.iak.viewSerial', { defaultValue: '시리얼 보기' })}
-                            </Text>
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                            {item.iakRedeemLink ? (
+                                <TouchableOpacity
+                                    style={[styles.useButton, { flex: 1 }]}
+                                    onPress={() => Linking.openURL(item.iakRedeemLink!).catch(() => {})}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={styles.useButtonText}>
+                                        {t('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' })}
+                                    </Text>
+                                </TouchableOpacity>
+                            ) : null}
+                            {item.iakSn ? (
+                                <TouchableOpacity
+                                    style={[styles.useButton, { flex: 1, backgroundColor: '#E5E7EB' }]}
+                                    onPress={async () => {
+                                        const snOnly = String(item.iakSn ?? '').split('/')[0].trim();
+                                        if (!snOnly) return;
+                                        try { await Clipboard.setStringAsync(snOnly); } catch {}
+                                        showAlert(
+                                            t('screens.shop.iak.snCopied', { defaultValue: '시리얼 번호 복사됨' }),
+                                            snOnly,
+                                            [{ text: t('screens.shop.iak.ok') }],
+                                        );
+                                    }}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={[styles.useButtonText, { color: '#374151' }]}>
+                                        {t('screens.shop.iak.copySerial', { defaultValue: '시리얼 복사' })}
+                                    </Text>
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
                     ) : null}
                 </View>
             </View>
