@@ -43,6 +43,12 @@ export default {
   sessionExpired: {
     message: 'セッションが切れました。もう一度ログインしてください。',
   },
+  etherscanDelay: {
+    message: '取引履歴サーバーの応答が遅れています。しばらくしてから再度お試しください。',
+  },
+  etherscanStale: {
+    message: '最新の取引履歴を読み込めなかったため、以前の履歴を表示しています。',
+  },
   gasInsufficient: {
     title: 'ガス代不足',
     messageTransfer: 'ウォレットに送金手数料(ガス代)が不足しているため、送金できません。\n\nPolygonネットワークのガストークン(POL)をチャージしてから、もう一度お試しください。',

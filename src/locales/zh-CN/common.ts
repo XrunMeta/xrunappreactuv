@@ -42,6 +42,12 @@ export default {
   sessionExpired: {
     message: '会话已过期，请重新登录。',
   },
+  etherscanDelay: {
+    message: '交易记录服务器响应较慢，请稍后重试。',
+  },
+  etherscanStale: {
+    message: '无法加载最新交易记录，正在显示此前的记录。',
+  },
   gasInsufficient: {
     title: 'Gas费不足',
     messageTransfer: '钱包中的网络手续费(Gas费)不足，无法转账。\n\n请充值Polygon网络Gas代币(POL)后再试。',

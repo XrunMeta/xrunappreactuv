@@ -6155,7 +6155,8 @@ export const fetchEtherscanTransactions = async (
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
 
-    return response.data;
+    const xCache = response.headers?.['x-cache'] ?? response.headers?.['X-Cache'];
+    return { ...response.data, __xCache: xCache };
   } catch (error) {
     console.error('[트랜잭션] Etherscan 거래내역 조회 오류:', error);
     if (error instanceof AxiosError) {
