@@ -66,6 +66,7 @@ export default {
     snInfoLine: 'Serial: {{sn}}',
     openRedeemLink: 'Đi tới',
     viewDetail: 'Xem chi tiết',
+    productWord: { voucher: 'Phiếu quà tặng', topup: 'Nạp thẻ', pulsa: 'Pulsa', data: 'Dữ liệu', package: 'Gói', game: 'Trò chơi', esim: 'eSIM' },
     copySerial: 'Sao chép Serial',
     serialLabel: 'Số Serial',
     snCopied: 'Đã sao chép',
