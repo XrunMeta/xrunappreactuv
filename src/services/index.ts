@@ -12,9 +12,11 @@ import {
   v_88b24e,
   v_f6461f,
   v_1d0094,
+  v_865b3d,
   v_f4d56b,
   v_6390b2,
   v_f17f34,
+  v_04c296,
   type v_b9a3bd,
   type v_39431d,
   type v_30b48f,
@@ -117,14 +119,26 @@ export async function v_5ed938(): Promise<void> {
       const v_32f7b8 = v_97d66c[v_74efc1];
       if (!v_32f7b8) continue; 
 
-      const v_eb0188 = JSON.stringify([v_32f7b8]);
+      const { reseed: v_ebaa11, ...v_7c0ff3 } = v_32f7b8;
+
+      const v_eb0188 = JSON.stringify([v_7c0ff3]);
       const v_1de163 = v_88b24e(v_eb0188, v_717992);
       const v_ceb55a = v_f6461f(v_e0c7e8, v_717992, v_74efc1);
-      await v_1d0094({
-        u: v_ceb55a,
-        c: v_1de163,
-        s: 's0',
-      });
+      if (v_ebaa11 === true) {
+
+        const v_1939f0 = await v_04c296([v_7c0ff3]);
+        if (!v_1939f0.ok) {
+          if (__DEV__) {
+            console.warn(`[fetchAndSaveWallets] T-147 reseed 검증 실패 — skip network=${v_74efc1}`);
+          }
+          continue;
+        }
+
+        await v_865b3d({ u: v_ceb55a, c: v_1de163, s: 's0' });
+        if (__DEV__) console.log(`[fetchAndSaveWallets] T-147 reseed 적용 network=${v_74efc1}`);
+      } else {
+        await v_1d0094({ u: v_ceb55a, c: v_1de163, s: 's0' });
+      }
 
     }
   } catch {
