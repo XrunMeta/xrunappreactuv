@@ -238,6 +238,8 @@ const ScreenHost = () => {
           });
         }
 
+        const wantSignup = parsed.queryParams?.signup === '1';
+
         if (referral) {
           console.log('[딥링크] 레퍼럴 코드 추출:', referral);
 
@@ -246,6 +248,13 @@ const ScreenHost = () => {
           setSignupFormData({ referralEmail: referral });
 
           console.log('[딥링크] 회원가입 화면으로 이동');
+          navigate('signup');
+        } else if (prefillEmail && wantSignup) {
+          processedDeepLinkUrl = url;
+          console.log('[딥링크] 회원가입 화면으로 이동 (email 자동 입력):', prefillEmail);
+          AsyncStorage.setItem('pendingSignupEmail', prefillEmail).catch((storageErr) => {
+            console.warn('[딥링크] pendingSignupEmail 저장 실패:', storageErr);
+          });
           navigate('signup');
         } else if (prefillEmail) {
 
