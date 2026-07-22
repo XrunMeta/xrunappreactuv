@@ -1,5 +1,5 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_79c4f2, v_19b633, v_4623af, v_cf9c33, v_07a341, v_39a996, v_6c4f62 } from 'rcmrninabrnb';
+import { v_3094a2, v_472849, v_79c4f2, v_19b633, v_4623af, v_cf9c33, v_07a341, v_39a996, v_6c4f62, v_f2c756 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_570c34, v_556baf } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -46,6 +46,10 @@ interface MyItemData {
     iakSn?: string;
 
     iakCustomerId?: string;
+
+    iakRedeemLink?: string;
+
+    iakActivationCode?: string;
     storage?: string;
     txID?: string;
     item?: number;
@@ -237,6 +241,8 @@ export const v_8c1d95 = () => {
                             type: 'iak' as const,
                             iakSn: v_23805a.iak_sn ?? undefined,
                             iakCustomerId: v_23805a.customer_id,
+                            iakRedeemLink: v_23805a.redeem_link ?? undefined,
+                            iakActivationCode: v_23805a.activation_code ?? undefined,
 
                             sortKey: Number(String(v_23805a.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
                         } as MyItemData;
@@ -295,11 +301,22 @@ export const v_8c1d95 = () => {
             const v_a52412 = [];
             if (v_8c0b26.iakCustomerId) v_a52412.push(v_8d41d7('screens.shop.iak.phoneLabelLine', { phone: v_8c0b26.iakCustomerId }));
             if (v_8c0b26.iakSn) v_a52412.push(v_8d41d7('screens.shop.iak.snInfoLine', { sn: v_8c0b26.iakSn }));
+            if (v_8c0b26.iakActivationCode) v_a52412.push(`PIN: ${v_8c0b26.iakActivationCode}`);
+            if (v_8c0b26.iakRedeemLink) v_a52412.push(`\n${v_8c0b26.iakRedeemLink}`);
             if (v_8c0b26.status === 'pending') v_a52412.push('\n' + v_8d41d7('screens.shop.iak.pendingNote'));
             else if (v_8c0b26.status === 'used') v_a52412.push('\n' + v_8d41d7('screens.shop.iak.failedNote'));
             else v_a52412.push('\n' + v_8d41d7('screens.shop.iak.successNote'));
             const v_badeaf = v_a52412.join('\n');
-            v_889fad(v_8c0b26.title, v_badeaf, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+            const v_3d694a = [];
+            if (v_8c0b26.iakRedeemLink) {
+                const v_8dbe00 = v_8c0b26.iakRedeemLink;
+                v_3d694a.push({
+                    text: v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' }),
+                    onPress: () => { v_f2c756.openURL(v_8dbe00).catch(() => {}); },
+                });
+            }
+            v_3d694a.push({ text: v_8d41d7('screens.shop.iak.ok') });
+            v_889fad(v_8c0b26.title, v_badeaf, v_3d694a);
             return;
         }
         if (v_8c0b26.type === 'xrun') {

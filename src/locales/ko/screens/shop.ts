@@ -70,6 +70,7 @@ export default {
 
     phoneLabelLine: '충전 번호: {{phone}}',
     snInfoLine: '시리얼: {{sn}}',
+    openRedeemLink: '교환 링크 열기',
     pendingNote: '처리 중 (콜백 대기)',
     failedNote: '실패 또는 환불됨',
     successNote: '통신사 SMS 로도 확인 가능',

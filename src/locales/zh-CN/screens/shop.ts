@@ -64,6 +64,7 @@ export default {
     notice: '通知',
     phoneLabelLine: '号码: {{phone}}',
     snInfoLine: '序列: {{sn}}',
+    openRedeemLink: '打开兑换链接',
     pendingNote: '处理中 (等待回调)',
     failedNote: '失败或已退款',
     successNote: '也可通过运营商短信确认',
