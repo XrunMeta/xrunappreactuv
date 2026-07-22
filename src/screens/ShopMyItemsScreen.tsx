@@ -303,9 +303,6 @@ export const ShopMyItemsScreen = () => {
             if (item.iakSn) lines.push(t('screens.shop.iak.snInfoLine', { sn: item.iakSn }));
             if (item.iakActivationCode) lines.push(`PIN: ${item.iakActivationCode}`);
             if (item.iakRedeemLink) lines.push(`\n${item.iakRedeemLink}`);
-            if (item.status === 'pending') lines.push('\n' + t('screens.shop.iak.pendingNote'));
-            else if (item.status === 'used') lines.push('\n' + t('screens.shop.iak.failedNote'));
-            else lines.push('\n' + t('screens.shop.iak.successNote'));
             const msg = lines.join('\n');
             const buttons: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }> = [];
             if (item.iakRedeemLink) {
@@ -315,7 +312,7 @@ export const ShopMyItemsScreen = () => {
                     onPress: () => { Linking.openURL(link).catch(() => {}); },
                 });
             }
-            buttons.push({ text: t('screens.shop.iak.ok') });
+            buttons.push({ text: t('screens.shop.iak.ok'), style: 'cancel' });
             showAlert(item.title, msg, buttons);
             return;
         }
