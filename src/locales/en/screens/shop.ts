@@ -68,6 +68,34 @@ export default {
     failedNote: 'Failed or refunded',
     successNote: 'Also confirmable via carrier SMS',
   },
+  myItemsStatus: {
+    iak: {
+      pending: 'Processing',
+      success: 'Sent',
+      failed: 'Failed',
+      refunded: 'Refunded',
+    },
+    giftishow: {
+      s01: 'Available',
+      s02: 'Used',
+      s03: 'Returned',
+      s04: 'Discarded',
+      s05: 'Refunded',
+      s06: 'Reissued',
+      s07: 'Purchase cancelled',
+      s08: 'Expired',
+      s09: 'Balance expired',
+      s10: 'Expiry cancelled',
+      s11: 'Exchanged',
+      s12: 'Refunded (full)',
+      s13: 'Balance refunded',
+      s14: 'Balance expiry cancelled',
+      s15: 'Registered',
+      s16: 'Registration cancelled',
+      s17: 'Voucher (inactive)',
+      s99: 'Pending dispatch',
+    },
+  },
 };
 
 

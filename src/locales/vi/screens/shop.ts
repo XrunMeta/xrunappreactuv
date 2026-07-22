@@ -68,6 +68,34 @@ export default {
     failedNote: 'Thất bại hoặc đã hoàn tiền',
     successNote: 'Cũng có thể xác nhận qua SMS nhà mạng',
   },
+  myItemsStatus: {
+    iak: {
+      pending: 'Đang xử lý',
+      success: 'Đã gửi',
+      failed: 'Thất bại',
+      refunded: 'Đã hoàn tiền',
+    },
+    giftishow: {
+      s01: 'Có sẵn',
+      s02: 'Đã dùng',
+      s03: 'Trả lại',
+      s04: 'Đã hủy quản trị',
+      s05: 'Hoàn tiền',
+      s06: 'Phát hành lại',
+      s07: 'Hủy mua',
+      s08: 'Hết hạn',
+      s09: 'Số dư hết hạn',
+      s10: 'Hủy hết hạn',
+      s11: 'Đổi tiền',
+      s12: 'Hoàn tiền đầy đủ',
+      s13: 'Hoàn số dư',
+      s14: 'Hủy số dư hết hạn',
+      s15: 'Đã đăng ký',
+      s16: 'Hủy đăng ký',
+      s17: 'Phiếu (không hoạt động)',
+      s99: 'Chờ gửi',
+    },
+  },
 };
 
 
