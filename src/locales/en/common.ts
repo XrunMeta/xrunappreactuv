@@ -40,6 +40,15 @@ export default {
     title: 'Notice',
     viewDetails: 'View Details',
   },
+  sessionExpired: {
+    message: 'Your session has expired. Please log in again.',
+  },
+  etherscanDelay: {
+    message: 'The transaction history server is responding slowly. Please try again shortly.',
+  },
+  etherscanStale: {
+    message: 'Unable to load the latest transaction history — showing previous data.',
+  },
   gasInsufficient: {
     title: 'Insufficient Gas',
     messageTransfer: 'Your wallet does not have enough network fee (gas) to send.\n\nPlease top up Polygon network gas tokens (POL) and try again.',

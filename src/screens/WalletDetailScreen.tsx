@@ -56,6 +56,8 @@ interface EtherscanTransactionsResponse {
   code: number;
   message: string;
   data: EtherscanTransactionItem[];
+
+  __xCache?: string;
 }
 
 const timestampToDate = (timestamp: string): string => {
@@ -254,6 +256,8 @@ export const WalletDetailScreen = () => {
     setTimeout(() => setRefreshing(false), 500);
   }, []);
 
+  const [txnStatusBanner, setTxnStatusBanner] = useState<'delayed' | 'stale' | null>(null);
+
   const [pinSetupVisible, setPinSetupVisible] = useState(false);
   const [pinSetupCtx, setPinSetupCtx] = useState<{ memberId: number; email: string } | null>(null);
   const isNavigatingToSendRef = useRef(false);
@@ -362,6 +366,21 @@ export const WalletDetailScreen = () => {
           params.page,
           params.pageSize,
         ) as EtherscanTransactionsResponse;
+
+        if (params.page === 1) {
+          const isDelayedFallback =
+            response.data.length === 0 &&
+            typeof response.message === 'string' &&
+            (response.message.startsWith('Etherscan unavailable') || response.message.startsWith('API HTTP '));
+          const isStale = response.__xCache === 'stale';
+          if (isDelayedFallback) {
+            setTxnStatusBanner('delayed');
+          } else if (isStale) {
+            setTxnStatusBanner('stale');
+          } else {
+            setTxnStatusBanner(null);
+          }
+        }
 
         console.log('[WalletDetail] Etherscan raw 응답 개수:', response.data.length);
         if (response.data.length > 0) {
@@ -811,6 +830,15 @@ export const WalletDetailScreen = () => {
         </View>
 
         <View style={styles.listWrapper}>
+          {txnStatusBanner && (
+            <View style={styles.txnStatusBanner}>
+              <Text style={styles.txnStatusBannerText}>
+                {txnStatusBanner === 'delayed'
+                  ? t('common.etherscanDelay.message')
+                  : t('common.etherscanStale.message')}
+              </Text>
+            </View>
+          )}
           <DataList
 
             key={`${member ?? 'nomember'}-${selectedWalletAsset?.currency ?? 'noasset'}-${publicAddress || 'noaddr'}-${selectedType}`}
@@ -948,5 +976,19 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 780,
     alignSelf: 'center',
+  },
+
+  txnStatusBanner: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 15,
+    marginBottom: 16,
+  },
+  txnStatusBannerText: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Regular',
+    color: '#374151',
+    lineHeight: 20,
   },
 });
