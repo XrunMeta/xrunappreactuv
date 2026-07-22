@@ -22,8 +22,11 @@ import {
   detectLegacyEntries,
 
   forceReseedEntry,
+
+  classifyWalletsByNetwork,
+  verifyPinAgainstS1Entries,
 } from '../walletKeyStore';
-import type { VaultEntry } from '../walletKeyStore';
+import type { VaultEntry, WalletKey } from '../walletKeyStore';
 import { deleteKek } from '../walletKek';
 
 const SecureStore = require('expo-secure-store');
@@ -449,5 +452,71 @@ describe('T-147 forceReseedEntry', () => {
     await forceReseedEntry({ u: 'u-t147-new', c: 'cipher-x', s: 's0' });
     const vault = await readVault();
     expect(vault.find((x) => x.u === 'u-t147-new')?.c).toBe('cipher-x');
+  });
+});
+
+describe('T-147 A1: classifyWalletsByNetwork reseed priority', () => {
+  const mkWallet = (code: string, reseed?: boolean): WalletKey => ({
+    wallet_code: code,
+    address: `0xaddr-${code}`,
+    private_key: '0x' + '11'.repeat(32),
+    derivation_path: '',
+    ...(reseed !== undefined ? { reseed } : {}),
+  });
+
+  it('같은 network 에 정상 c1 + reseed c2 혼재 시 eth 는 reseed wallet(c2) 채택', async () => {
+    const wallets = [mkWallet('c1'), mkWallet('c2', true)];
+    const { eth } = classifyWalletsByNetwork(wallets);
+    expect(eth?.wallet_code).toBe('c2');
+    expect(eth?.reseed).toBe(true);
+  });
+
+  it('reseed 없으면 기존처럼 첫 매치(c1) 유지', async () => {
+    const wallets = [mkWallet('c1'), mkWallet('c2')];
+    const { eth } = classifyWalletsByNetwork(wallets);
+    expect(eth?.wallet_code).toBe('c1');
+  });
+
+  it('pol 도 동일 — c16 정상 + c18 reseed 혼재 시 c18 채택', async () => {
+    const wallets = [mkWallet('c16'), mkWallet('c18', true)];
+    const { pol } = classifyWalletsByNetwork(wallets);
+    expect(pol?.wallet_code).toBe('c18');
+  });
+});
+
+describe('T-147 A3: verifyPinAgainstS1Entries', () => {
+  it('setup 대상 외 network 에 기존 s1(구 PIN) entry 있으면 — 같은 PIN 이면 ok:true', async () => {
+    const addr = await deriveAddr();
+    const wallets = [{ wallet_code: 'c16', address: addr, private_key: PK, derivation_path: '' }];
+    await setupPinForUser(wallets, '111111', EMAIL, MEMBER); 
+
+    const res = await verifyPinAgainstS1Entries(EMAIL, MEMBER, '111111', ['eth']);
+    expect(res.ok).toBe(true);
+    expect(res.failed).toHaveLength(0);
+  });
+
+  it('다른 PIN 이면 ok:false + failed 에 해당 network 포함 (영구 잠금 방지)', async () => {
+    const addr = await deriveAddr();
+    const wallets = [{ wallet_code: 'c16', address: addr, private_key: PK, derivation_path: '' }];
+    await setupPinForUser(wallets, '111111', EMAIL, MEMBER); 
+
+    const res = await verifyPinAgainstS1Entries(EMAIL, MEMBER, '222222', ['eth']);
+    expect(res.ok).toBe(false);
+    expect(res.failed).toContain('pol');
+  });
+
+  it('exclude 대상 network 는 검사하지 않음 (자기 자신 setup 대상은 skip)', async () => {
+    const addr = await deriveAddr();
+    const wallets = [{ wallet_code: 'c1', address: addr, private_key: PK, derivation_path: '' }];
+    await setupPinForUser(wallets, '111111', EMAIL, MEMBER); 
+
+    const res = await verifyPinAgainstS1Entries(EMAIL, MEMBER, '999999', ['eth']);
+    expect(res.ok).toBe(true);
+  });
+
+  it('s1 entry 자체가 없으면 (신규 사용자) ok:true — 검사 스킵', async () => {
+    const res = await verifyPinAgainstS1Entries(EMAIL, MEMBER, '123456', ['eth']);
+    expect(res.ok).toBe(true);
+    expect(res.failed).toHaveLength(0);
   });
 });

@@ -16,6 +16,7 @@ import {
   upsertAvailability,
   legacyCleanupOnce,
   classifyWalletsByNetwork,
+  verifyAllWallets,
   type WalletKey,
   type WalletUnavailable,
   type WalletAvailabilitySentinel,
@@ -124,6 +125,14 @@ export async function fetchAndSaveWallets(): Promise<void> {
       const cipher = obfuscateWithMember(plaintextJson, memberId);
       const u = userHash(email, memberId, network);
       if (reseed === true) {
+
+        const rv = await verifyAllWallets([wClean]);
+        if (!rv.ok) {
+          if (__DEV__) {
+            console.warn(`[fetchAndSaveWallets] T-147 reseed 검증 실패 — skip network=${network}`);
+          }
+          continue;
+        }
 
         await forceReseedEntry({ u, c: cipher, s: 's0' });
         if (__DEV__) console.log(`[fetchAndSaveWallets] T-147 reseed 적용 network=${network}`);

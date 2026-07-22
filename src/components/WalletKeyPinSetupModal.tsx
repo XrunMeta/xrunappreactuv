@@ -19,6 +19,7 @@ import {
   upsertEntry,
   deobfuscateWithMember,
   verifyAllWallets,
+  verifyPinAgainstS1Entries,
   setupPinForUser,
   type WalletKey,
   type VaultEntry,
@@ -118,6 +119,11 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
         allWalletsForSetup.push(...wallets);
       }
 
+      const pinCheck = await verifyPinAgainstS1Entries(email, memberId, pin, toCommit);
+      if (!pinCheck.ok) {
+        throw new Error(`pin-mismatch-existing:${pinCheck.failed.join(',')}`);
+      }
+
       await setupPinForUser(allWalletsForSetup, pin, email, memberId);
 
       const PIN_SYNC_DEV_EMAILS = ['oth-test@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid', 'oth-user@example.invalid'];
@@ -137,7 +143,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       setPin('');
       setConfirmPin('');
 
-      markWalletKeyAT().catch(() => {  });
+      await markWalletKeyAT().catch(() => {  });
 
       onSuccess();
     } catch (verifyErr) {

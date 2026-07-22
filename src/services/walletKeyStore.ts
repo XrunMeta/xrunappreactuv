@@ -42,9 +42,11 @@ export const NETWORK_MAP: Record<string, WalletNetwork> = {
 export function classifyWalletsByNetwork(
   wallets: WalletKey[],
 ): { eth: WalletKey | null; pol: WalletKey | null } {
-  const eth = wallets.find((w) => NETWORK_MAP[w.wallet_code] === 'eth') ?? null;
-  const pol = wallets.find((w) => NETWORK_MAP[w.wallet_code] === 'pol') ?? null;
-  return { eth, pol };
+  const pick = (network: WalletNetwork): WalletKey | null =>
+    wallets.find((w) => NETWORK_MAP[w.wallet_code] === network && w.reseed === true) ??
+    wallets.find((w) => NETWORK_MAP[w.wallet_code] === network) ??
+    null;
+  return { eth: pick('eth'), pol: pick('pol') };
 }
 
 const VAULT_KEY = '__xs_v1';
@@ -485,6 +487,37 @@ export async function unlockUserWallets(
   cacheSessionUnlock(email, member, pin, allWallets);
 
   return { ok: true, wallets: allWallets };
+}
+
+export async function verifyPinAgainstS1Entries(
+  email: string,
+  member: number,
+  pin: string,
+  excludeNetworks: WalletNetwork[],
+): Promise<{ ok: boolean; failed: WalletNetwork[] }> {
+  const entries = await findEntriesForUser(email, member);
+  const failed: WalletNetwork[] = [];
+  for (const network of ['eth', 'pol'] as WalletNetwork[]) {
+    if (excludeNetworks.includes(network)) continue;
+    const entry = entries[network];
+    if (!entry || entry.s !== 's1') continue; 
+
+    let ok = false;
+    try {
+      const plaintext = await decryptEntry(entry, pin, email, member);
+      if (plaintext) {
+        const wallets = JSON.parse(plaintext);
+        if (Array.isArray(wallets) && wallets.length > 0) {
+          const v = await verifyAllWallets(wallets);
+          ok = v.ok;
+        }
+      }
+    } catch {
+      ok = false;
+    }
+    if (!ok) failed.push(network);
+  }
+  return { ok: failed.length === 0, failed };
 }
 
 const LEGACY_KEYS = ['wallets', 'walletsEncState', 'walletKeyPinHash', 'wallets_stage1_backup'];
