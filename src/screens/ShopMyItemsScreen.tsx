@@ -27,7 +27,7 @@ function normalizeIconUrl(raw?: string | null): string | null {
     if (/^https?:\/\//.test(s)) return s;
     if (s.startsWith('/files/')) {
         const id = s.slice('/files/'.length);
-        return `https://oth-path-gw.example.invalid/oth-path${id}`;
+        return `https://oth-path-gw.example.invalid/files/${id}?raw=1`;
     }
     return null;
 }
