@@ -70,7 +70,7 @@ export default {
 
     phoneLabelLine: '충전 번호: {{phone}}',
     snInfoLine: '시리얼: {{sn}}',
-    openRedeemLink: '교환 링크 열기',
+    openRedeemLink: '바로가기',
     copySerial: '시리얼 복사',
     snCopied: '시리얼 번호가 복사되었습니다',
     pendingNote: '처리 중 (콜백 대기)',
