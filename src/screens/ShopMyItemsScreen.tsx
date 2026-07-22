@@ -303,9 +303,6 @@ export const v_8c1d95 = () => {
             if (v_8c0b26.iakSn) v_a52412.push(v_8d41d7('screens.shop.iak.snInfoLine', { sn: v_8c0b26.iakSn }));
             if (v_8c0b26.iakActivationCode) v_a52412.push(`PIN: ${v_8c0b26.iakActivationCode}`);
             if (v_8c0b26.iakRedeemLink) v_a52412.push(`\n${v_8c0b26.iakRedeemLink}`);
-            if (v_8c0b26.status === 'pending') v_a52412.push('\n' + v_8d41d7('screens.shop.iak.pendingNote'));
-            else if (v_8c0b26.status === 'used') v_a52412.push('\n' + v_8d41d7('screens.shop.iak.failedNote'));
-            else v_a52412.push('\n' + v_8d41d7('screens.shop.iak.successNote'));
             const v_badeaf = v_a52412.join('\n');
             const v_3d694a = [];
             if (v_8c0b26.iakRedeemLink) {
@@ -315,7 +312,7 @@ export const v_8c1d95 = () => {
                     onPress: () => { v_f2c756.openURL(v_8dbe00).catch(() => {}); },
                 });
             }
-            v_3d694a.push({ text: v_8d41d7('screens.shop.iak.ok') });
+            v_3d694a.push({ text: v_8d41d7('screens.shop.iak.ok'), style: 'cancel' });
             v_889fad(v_8c0b26.title, v_badeaf, v_3d694a);
             return;
         }
