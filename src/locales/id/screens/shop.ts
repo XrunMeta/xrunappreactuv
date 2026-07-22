@@ -66,6 +66,7 @@ export default {
     snInfoLine: 'Seri: {{sn}}',
     openRedeemLink: 'Buka',
     viewDetail: 'Lihat Detail',
+    productWord: { voucher: 'Voucher', topup: 'Top-Up', pulsa: 'Pulsa', data: 'Data', package: 'Paket', game: 'Game', esim: 'eSIM' },
     copySerial: 'Salin Seri',
     serialLabel: 'Nomor Seri',
     snCopied: 'Disalin',

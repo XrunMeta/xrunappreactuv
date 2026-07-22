@@ -66,6 +66,7 @@ export default {
     snInfoLine: 'सीरियल: {{sn}}',
     openRedeemLink: 'जाएँ',
     viewDetail: 'विवरण देखें',
+    productWord: { voucher: 'वाउचर', topup: 'टॉप-अप', pulsa: 'पुल्सा', data: 'डेटा', package: 'पैकेज', game: 'गेम', esim: 'eSIM' },
     copySerial: 'सीरियल कॉपी करें',
     serialLabel: 'सीरियल नंबर',
     snCopied: 'कॉपी हो गया',

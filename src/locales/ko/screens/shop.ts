@@ -72,6 +72,7 @@ export default {
     snInfoLine: '시리얼: {{sn}}',
     openRedeemLink: '바로가기',
     viewDetail: '상세 보기',
+    productWord: { voucher: '상품권', topup: '충전', pulsa: '통신 잔액', data: '데이터', package: '패키지', game: '게임', esim: 'eSIM' },
     copySerial: '시리얼 복사',
     serialLabel: '시리얼 번호',
     snCopied: '복사됨',
