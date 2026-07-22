@@ -472,6 +472,13 @@ export const SignupScreen = () => {
     const checkSocialSignupMode = async () => {
       try {
 
+        const pendingSignupEmail = await AsyncStorage.getItem('pendingSignupEmail');
+        if (pendingSignupEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pendingSignupEmail)) {
+          setEmail(pendingSignupEmail);
+          console.log('[회원가입] 딥링크 이메일 자동 입력:', pendingSignupEmail);
+          await AsyncStorage.removeItem('pendingSignupEmail');
+        }
+
         const googleSignupRequired = await AsyncStorage.getItem('googleSignupRequired');
         if (googleSignupRequired === 'true') {
           setIsGoogleSignupMode(true);

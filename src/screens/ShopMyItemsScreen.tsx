@@ -18,6 +18,20 @@ import type { PurchasedItemData } from '../types';
 
 const defaultCouponImage = require('../../assets/sample_cu.png');
 
+const genericFallbackImage = require('../../assets/xrun-round-logo.png');
+
+function normalizeIconUrl(raw?: string | null): string | null {
+    if (!raw || typeof raw !== 'string') return null;
+    const s = raw.trim();
+    if (!s || s === '-') return null;
+    if (/^https?:\/\//.test(s)) return s;
+    if (s.startsWith('/files/')) {
+        const id = s.slice('/files/'.length);
+        return `https://oth-path-gw.example.invalid/oth-path${id}`;
+    }
+    return null;
+}
+
 interface MyItemData {
     id: string;
     brand: string;
@@ -228,12 +242,13 @@ export const ShopMyItemsScreen = () => {
             const iakList: MyItemData[] =
                 iakRes?.status === 'success' && Array.isArray(iakRes.data)
                     ? iakRes.data.map((t) => {
-                        const hasIcon = t.icon_url && t.icon_url !== '-' && /^https?:\/\//.test(t.icon_url);
+
+                        const iconUri = normalizeIconUrl(t.icon_url);
                         return {
                             id: `iak-${t.ref_id}`,
                             brand: 'IAK',
                             title: t.product_name || t.product_code,
-                            image: hasIcon ? { uri: t.icon_url! } : defaultCouponImage,
+                            image: iconUri ? { uri: iconUri } : genericFallbackImage,
 
                             status: iakStatusToCategory(t.status),
                             statusLabel: iakStatusLabel(t.status),
@@ -362,7 +377,9 @@ export const ShopMyItemsScreen = () => {
 
         const isIakCompleted = item.type === 'iak' && isAvailable;
         const isRemoteImage = item.image && typeof item.image === 'object' && 'uri' in (item.image as any);
-        const displayImage = isRemoteImage && failedImageIds.has(item.id) ? defaultCouponImage : item.image;
+
+        const errorFallback = item.type === 'iak' ? genericFallbackImage : defaultCouponImage;
+        const displayImage = isRemoteImage && failedImageIds.has(item.id) ? errorFallback : item.image;
 
         return (
             <View key={item.id} style={styles.itemCard}>
