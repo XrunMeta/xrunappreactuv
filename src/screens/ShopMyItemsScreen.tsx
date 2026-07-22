@@ -27,7 +27,7 @@ function v_427ded(v_479f05): string | null {
     if (/^https?:\/\//.test(v_fd5f43)) return v_fd5f43;
     if (v_fd5f43.startsWith('/files/')) {
         const v_389afb = v_fd5f43.slice('/files/'.length);
-        return `https://oth-path-f0013c.example.invalid/oth-path${v_389afb}`;
+        return `https://oth-path-f0013c.example.invalid/files/${v_389afb}?raw=1`;
     }
     return null;
 }
