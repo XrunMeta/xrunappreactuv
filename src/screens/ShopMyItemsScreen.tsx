@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, ImageSourcePropType, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, ImageSourcePropType, ActivityIndicator, RefreshControl, Linking } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView, SafeView } from '../components';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Header, SegmentedControl, TaboolaBanner } from '../components';
+import { Dialog } from '../components/Dialog';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -46,6 +48,10 @@ interface MyItemData {
     iakSn?: string;
 
     iakCustomerId?: string;
+
+    iakRedeemLink?: string;
+
+    iakActivationCode?: string;
     storage?: string;
     txID?: string;
     item?: number;
@@ -187,6 +193,9 @@ export const ShopMyItemsScreen = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
 
+    const [iakDialogItem, setIakDialogItem] = useState<MyItemData | null>(null);
+    const [iakCopiedTick, setIakCopiedTick] = useState(false);
+
     const loadCoupons = useCallback(async () => {
         try {
             const userDataStr = await AsyncStorage.getItem('userData');
@@ -237,6 +246,8 @@ export const ShopMyItemsScreen = () => {
                             type: 'iak' as const,
                             iakSn: it.iak_sn ?? undefined,
                             iakCustomerId: it.customer_id,
+                            iakRedeemLink: it.redeem_link ?? undefined,
+                            iakActivationCode: it.activation_code ?? undefined,
 
                             sortKey: Number(String(it.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
                         } as MyItemData;
@@ -292,14 +303,9 @@ export const ShopMyItemsScreen = () => {
     const handleUseItem = (item: MyItemData) => {
 
         if (item.type === 'iak') {
-            const lines: string[] = [];
-            if (item.iakCustomerId) lines.push(t('screens.shop.iak.phoneLabelLine', { phone: item.iakCustomerId }));
-            if (item.iakSn) lines.push(t('screens.shop.iak.snInfoLine', { sn: item.iakSn }));
-            if (item.status === 'pending') lines.push('\n' + t('screens.shop.iak.pendingNote'));
-            else if (item.status === 'used') lines.push('\n' + t('screens.shop.iak.failedNote'));
-            else lines.push('\n' + t('screens.shop.iak.successNote'));
-            const msg = lines.join('\n');
-            showAlert(item.title, msg, [{ text: t('screens.shop.iak.ok') }]);
+
+            setIakCopiedTick(false);
+            setIakDialogItem(item);
             return;
         }
         if (item.type === 'xrun') {
@@ -451,6 +457,17 @@ export const ShopMyItemsScreen = () => {
                         >
                             <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.viewCouponImage')}</Text>
                         </TouchableOpacity>
+                    ) : item.type === 'iak' && (item.iakSn || item.iakRedeemLink) ? (
+
+                        <TouchableOpacity
+                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
+                            onPress={() => handleUseItem(item)}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[styles.useButtonText, { color: '#374151' }]}>
+                                {t('screens.shop.iak.viewDetail', { defaultValue: '상세 보기' })}
+                            </Text>
+                        </TouchableOpacity>
                     ) : null}
                 </View>
             </View>
@@ -553,6 +570,69 @@ export const ShopMyItemsScreen = () => {
             <View style={styles.taboolaContainer}>
                 <TaboolaBanner placementType="shop" />
             </View>
+
+            {}
+            <Dialog
+                visible={iakDialogItem !== null}
+                title={iakDialogItem?.title ?? ''}
+                onClose={() => setIakDialogItem(null)}
+                actions={
+                    iakDialogItem?.iakRedeemLink
+                        ? [
+                            {
+                                label: t('screens.shop.iak.ok'),
+                                onPress: () => setIakDialogItem(null),
+                                variant: 'secondary',
+                            },
+                            {
+                                label: t('screens.shop.iak.openRedeemLink', { defaultValue: '바로가기' }),
+                                onPress: () => {
+                                    const link = iakDialogItem?.iakRedeemLink;
+                                    if (link) Linking.openURL(link).catch(() => {});
+                                    setIakDialogItem(null);
+                                },
+                                variant: 'primary',
+                            },
+                        ]
+                        : [
+                            {
+                                label: t('screens.shop.iak.ok'),
+                                onPress: () => setIakDialogItem(null),
+                                variant: 'primary',
+                            },
+                        ]
+                }
+            >
+                <View style={{ paddingVertical: 8 }}>
+                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
+                        {t('screens.shop.iak.serialLabel', { defaultValue: '시리얼 번호' })}
+                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F3F4F6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 }}>
+                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#111827', flex: 1 }} selectable numberOfLines={1} ellipsizeMode="middle">
+                            {iakDialogItem?.iakSn ? String(iakDialogItem.iakSn).split('/')[0].trim() : '-'}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={async () => {
+                                const sn = iakDialogItem?.iakSn ? String(iakDialogItem.iakSn).split('/')[0].trim() : '';
+                                if (!sn) return;
+                                try { await Clipboard.setStringAsync(sn); } catch {}
+                                setIakCopiedTick(true);
+                                setTimeout(() => setIakCopiedTick(false), 1500);
+                            }}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                            style={{ marginLeft: 8, padding: 4 }}
+                            accessibilityLabel={t('screens.shop.iak.copySerial', { defaultValue: '시리얼 복사' })}
+                        >
+                            <Feather name={iakCopiedTick ? 'check' : 'copy'} size={20} color={iakCopiedTick ? '#16a34a' : '#374151'} />
+                        </TouchableOpacity>
+                    </View>
+                    {iakCopiedTick && (
+                        <Text style={{ fontSize: 11, color: '#16a34a', marginTop: 6, textAlign: 'right' }}>
+                            {t('screens.shop.iak.snCopied', { defaultValue: '복사됨' })}
+                        </Text>
+                    )}
+                </View>
+            </Dialog>
         </SafeView>
     );
 };
