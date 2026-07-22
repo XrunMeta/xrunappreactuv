@@ -89,10 +89,12 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
     await new Promise<void>((r) => setTimeout(r, 0));
 
     const targetNetworks: WalletNetwork[] = ['eth', 'pol'];
+
+    let toCommit: WalletNetwork[] = [];
     try {
       const entries = await findEntriesForUser(email, memberId);
 
-      const toCommit = targetNetworks.filter((net) => {
+      toCommit = targetNetworks.filter((net) => {
         const e = entries[net];
         return e && e.s === 's0';
       });
@@ -154,7 +156,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       }
 
       try {
-        for (const network of targetNetworks) {
+        for (const network of toCommit) {
           const cur = await findEntry(email, memberId, network);
           if (cur) {
             const restored: VaultEntry = {
