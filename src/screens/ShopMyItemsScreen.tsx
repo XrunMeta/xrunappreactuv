@@ -18,6 +18,20 @@ import type { v_029bad } from '../types';
 
 const v_818aa7 = require('../../assets/sample_cu.png');
 
+const v_5489b5 = require('../../assets/xrun-round-logo.png');
+
+function v_427ded(v_479f05): string | null {
+    if (!v_479f05 || typeof v_479f05 !== 'string') return null;
+    const v_fd5f43 = v_479f05.trim();
+    if (!v_fd5f43 || v_fd5f43 === '-') return null;
+    if (/^https?:\/\//.test(v_fd5f43)) return v_fd5f43;
+    if (v_fd5f43.startsWith('/files/')) {
+        const v_389afb = v_fd5f43.slice('/files/'.length);
+        return `https://oth-path-f0013c.example.invalid/oth-path${v_389afb}`;
+    }
+    return null;
+}
+
 interface MyItemData {
     id: string;
     brand: string;
@@ -228,12 +242,13 @@ export const v_8c1d95 = () => {
             const v_45e042 =
                 v_078347?.status === 'success' && Array.isArray(v_078347.data)
                     ? v_078347.data.map((v_8d41d7) => {
-                        const v_ee07b8 = v_8d41d7.icon_url && v_8d41d7.icon_url !== '-' && /^https?:\/\//.test(v_8d41d7.icon_url);
+
+                        const v_79b27e = v_427ded(v_8d41d7.icon_url);
                         return {
                             id: `iak-${v_8d41d7.ref_id}`,
                             brand: 'IAK',
                             title: v_8d41d7.product_name || v_8d41d7.product_code,
-                            image: v_ee07b8 ? { uri: v_8d41d7.icon_url! } : v_818aa7,
+                            image: v_79b27e ? { uri: v_79b27e } : v_5489b5,
 
                             status: v_0985ef(v_8d41d7.status),
                             statusLabel: v_86df31(v_8d41d7.status),
@@ -362,7 +377,9 @@ export const v_8c1d95 = () => {
 
         const v_2ec305 = v_8c0b26.type === 'iak' && v_2911e0;
         const v_41844b = v_8c0b26.image && typeof v_8c0b26.image === 'object' && 'uri' in (v_8c0b26.image as any);
-        const v_fafc7f = v_41844b && v_ba33a5.has(v_8c0b26.id) ? v_818aa7 : v_8c0b26.image;
+
+        const v_bc4c22 = v_8c0b26.type === 'iak' ? v_5489b5 : v_818aa7;
+        const v_fafc7f = v_41844b && v_ba33a5.has(v_8c0b26.id) ? v_bc4c22 : v_8c0b26.image;
 
         return (
             <View key={v_8c0b26.id} style={v_d81136.itemCard}>
