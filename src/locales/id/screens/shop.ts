@@ -71,7 +71,7 @@ export default {
   myItemsStatus: {
     iak: {
       pending: 'Memproses',
-      success: 'Top-up selesai',
+      success: 'Terkirim',
       failed: 'Gagal',
       refunded: 'Dikembalikan',
     },

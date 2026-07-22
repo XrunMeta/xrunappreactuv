@@ -71,7 +71,7 @@ export default {
   myItemsStatus: {
     iak: {
       pending: 'Đang xử lý',
-      success: 'Nạp thành công',
+      success: 'Đã gửi',
       failed: 'Thất bại',
       refunded: 'Đã hoàn tiền',
     },

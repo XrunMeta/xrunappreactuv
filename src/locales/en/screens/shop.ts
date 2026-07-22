@@ -71,7 +71,7 @@ export default {
   myItemsStatus: {
     iak: {
       pending: 'Processing',
-      success: 'Top-up complete',
+      success: 'Sent',
       failed: 'Failed',
       refunded: 'Refunded',
     },

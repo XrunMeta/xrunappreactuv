@@ -78,7 +78,7 @@ export default {
   myItemsStatus: {
     iak: {
       pending: '처리 중',
-      success: '충전 완료',
+      success: '발송완료',
       failed: '실패',
       refunded: '환불됨',
     },
