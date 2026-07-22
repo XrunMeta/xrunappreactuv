@@ -7,6 +7,7 @@ import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_b34ce5, v_4c7b5d } from '../components';
+import { v_c2fdd1 } from '../components/Dialog';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
@@ -192,6 +193,9 @@ export const v_8c1d95 = () => {
     const [v_5d756f, v_a563de] = v_5ab095<string>('');
     const [v_ba33a5, v_eb3640] = v_5ab095<Set<string>>(new Set());
 
+    const [v_0b061c, v_33006d] = v_5ab095<MyItemData | null>(null);
+    const [v_bcb12e, v_c3b380] = v_5ab095(false);
+
     const v_605807 = v_de06a3(async () => {
         try {
             const v_f24fd5 = await v_e84827.getItem('userData');
@@ -300,25 +304,8 @@ export const v_8c1d95 = () => {
 
         if (v_8c0b26.type === 'iak') {
 
-            const v_8c604e = v_8c0b26.iakSn ? String(v_8c0b26.iakSn).split('/')[0].trim() : '';
-            const v_badeaf = v_8c604e || '-';
-            const v_3d694a = [];
-
-            v_3d694a.push({
-                text: v_8d41d7('screens.shop.iak.ok'),
-                onPress: async () => {
-                    if (v_8c604e) { try { await v_fba5a0.setStringAsync(v_8c604e); } catch {} }
-                },
-            });
-
-            if (v_8c0b26.iakRedeemLink) {
-                const v_8dbe00 = v_8c0b26.iakRedeemLink;
-                v_3d694a.push({
-                    text: v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '바로가기' }),
-                    onPress: () => { v_f2c756.openURL(v_8dbe00).catch(() => {}); },
-                });
-            }
-            v_889fad(v_8c0b26.title, v_badeaf, v_3d694a);
+            v_c3b380(false);
+            v_33006d(v_8c0b26);
             return;
         }
         if (v_8c0b26.type === 'xrun') {
@@ -583,6 +570,69 @@ export const v_8c1d95 = () => {
             <View style={v_d81136.taboolaContainer}>
                 <TaboolaBanner placementType="shop" />
             </View>
+
+            {}
+            <Dialog
+                visible={v_0b061c !== null}
+                title={v_0b061c?.title ?? ''}
+                onClose={() => v_33006d(null)}
+                actions={
+                    v_0b061c?.iakRedeemLink
+                        ? [
+                            {
+                                label: v_8d41d7('screens.shop.iak.ok'),
+                                onPress: () => v_33006d(null),
+                                variant: 'secondary',
+                            },
+                            {
+                                label: v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '바로가기' }),
+                                onPress: () => {
+                                    const v_8dbe00 = v_0b061c?.iakRedeemLink;
+                                    if (v_8dbe00) v_f2c756.openURL(v_8dbe00).catch(() => {});
+                                    v_33006d(null);
+                                },
+                                variant: 'primary',
+                            },
+                        ]
+                        : [
+                            {
+                                label: v_8d41d7('screens.shop.iak.ok'),
+                                onPress: () => v_33006d(null),
+                                variant: 'primary',
+                            },
+                        ]
+                }
+            >
+                <View style={{ paddingVertical: 8 }}>
+                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>
+                        {v_8d41d7('screens.shop.iak.serialLabel', { defaultValue: '시리얼 번호' })}
+                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F3F4F6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 }}>
+                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#111827', flex: 1 }} selectable numberOfLines={1} ellipsizeMode="middle">
+                            {v_0b061c?.iakSn ? String(v_0b061c.iakSn).split('/')[0].trim() : '-'}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={async () => {
+                                const v_33958e = v_0b061c?.iakSn ? String(v_0b061c.iakSn).split('/')[0].trim() : '';
+                                if (!v_33958e) return;
+                                try { await v_fba5a0.setStringAsync(v_33958e); } catch {}
+                                v_c3b380(true);
+                                setTimeout(() => v_c3b380(false), 1500);
+                            }}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                            style={{ marginLeft: 8, padding: 4 }}
+                            accessibilityLabel={v_8d41d7('screens.shop.iak.copySerial', { defaultValue: '시리얼 복사' })}
+                        >
+                            <Feather name={v_bcb12e ? 'check' : 'copy'} size={20} color={v_bcb12e ? '#16a34a' : '#374151'} />
+                        </TouchableOpacity>
+                    </View>
+                    {v_bcb12e && (
+                        <Text style={{ fontSize: 11, color: '#16a34a', marginTop: 6, textAlign: 'right' }}>
+                            {v_8d41d7('screens.shop.iak.snCopied', { defaultValue: '복사됨' })}
+                        </Text>
+                    )}
+                </View>
+            </Dialog>
         </SafeView>
     );
 };
