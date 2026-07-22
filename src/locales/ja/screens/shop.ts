@@ -71,6 +71,7 @@ export default {
     notice: 'お知らせ',
     phoneLabelLine: '番号: {{phone}}',
     snInfoLine: 'シリアル: {{sn}}',
+    openRedeemLink: '引換リンクを開く',
     pendingNote: '処理中 (コールバック待ち)',
     failedNote: '失敗または返金済み',
     successNote: '通信事業者の SMS でも確認可',

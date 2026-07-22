@@ -64,6 +64,7 @@ export default {
     notice: 'सूचना',
     phoneLabelLine: 'फोन: {{phone}}',
     snInfoLine: 'सीरियल: {{sn}}',
+    openRedeemLink: 'रिडीम लिंक खोलें',
     pendingNote: 'प्रसंस्करण (कॉलबैक की प्रतीक्षा)',
     failedNote: 'विफल या वापस किया गया',
     successNote: 'कैरियर SMS से भी पुष्टि करें',

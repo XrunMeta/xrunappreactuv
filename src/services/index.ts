@@ -5141,6 +5141,8 @@ export interface MyIakTxnItem {
   status: 'pending' | 'success' | 'failed' | 'refunded';
   iak_sn: string | null;
   iak_message: string | null;
+  redeem_link?: string | null;
+  activation_code?: string | null;
   created_at: string;
   callback_at: string | null;
   icon_url?: string | null;  

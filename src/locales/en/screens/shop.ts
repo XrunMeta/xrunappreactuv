@@ -64,6 +64,7 @@ export default {
     notice: 'Notice',
     phoneLabelLine: 'Phone: {{phone}}',
     snInfoLine: 'Serial: {{sn}}',
+    openRedeemLink: 'Open Redeem Link',
     pendingNote: 'Processing (awaiting callback)',
     failedNote: 'Failed or refunded',
     successNote: 'Also confirmable via carrier SMS',

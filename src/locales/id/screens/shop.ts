@@ -64,6 +64,7 @@ export default {
     notice: 'Pemberitahuan',
     phoneLabelLine: 'No. HP: {{phone}}',
     snInfoLine: 'Seri: {{sn}}',
+    openRedeemLink: 'Buka Link Penukaran',
     pendingNote: 'Memproses (menunggu callback)',
     failedNote: 'Gagal atau dikembalikan',
     successNote: 'Juga dapat dikonfirmasi via SMS operator',

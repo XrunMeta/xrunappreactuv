@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, ImageSourcePropType, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, ImageSourcePropType, ActivityIndicator, RefreshControl, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeScrollView, SafeView } from '../components';
 import { StatusBar } from 'expo-status-bar';
@@ -46,6 +46,10 @@ interface MyItemData {
     iakSn?: string;
 
     iakCustomerId?: string;
+
+    iakRedeemLink?: string;
+
+    iakActivationCode?: string;
     storage?: string;
     txID?: string;
     item?: number;
@@ -237,6 +241,8 @@ export const ShopMyItemsScreen = () => {
                             type: 'iak' as const,
                             iakSn: it.iak_sn ?? undefined,
                             iakCustomerId: it.customer_id,
+                            iakRedeemLink: it.redeem_link ?? undefined,
+                            iakActivationCode: it.activation_code ?? undefined,
 
                             sortKey: Number(String(it.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
                         } as MyItemData;
@@ -295,11 +301,22 @@ export const ShopMyItemsScreen = () => {
             const lines: string[] = [];
             if (item.iakCustomerId) lines.push(t('screens.shop.iak.phoneLabelLine', { phone: item.iakCustomerId }));
             if (item.iakSn) lines.push(t('screens.shop.iak.snInfoLine', { sn: item.iakSn }));
+            if (item.iakActivationCode) lines.push(`PIN: ${item.iakActivationCode}`);
+            if (item.iakRedeemLink) lines.push(`\n${item.iakRedeemLink}`);
             if (item.status === 'pending') lines.push('\n' + t('screens.shop.iak.pendingNote'));
             else if (item.status === 'used') lines.push('\n' + t('screens.shop.iak.failedNote'));
             else lines.push('\n' + t('screens.shop.iak.successNote'));
             const msg = lines.join('\n');
-            showAlert(item.title, msg, [{ text: t('screens.shop.iak.ok') }]);
+            const buttons: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }> = [];
+            if (item.iakRedeemLink) {
+                const link = item.iakRedeemLink;
+                buttons.push({
+                    text: t('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' }),
+                    onPress: () => { Linking.openURL(link).catch(() => {}); },
+                });
+            }
+            buttons.push({ text: t('screens.shop.iak.ok') });
+            showAlert(item.title, msg, buttons);
             return;
         }
         if (item.type === 'xrun') {
