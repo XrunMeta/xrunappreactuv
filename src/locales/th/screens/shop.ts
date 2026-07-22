@@ -66,6 +66,7 @@ export default {
     snInfoLine: 'ซีเรียล: {{sn}}',
     openRedeemLink: 'ไปที่',
     viewDetail: 'ดูรายละเอียด',
+    productWord: { voucher: 'บัตรกำนัล', topup: 'เติมเงิน', pulsa: 'พัลซ่า', data: 'ข้อมูล', package: 'แพ็คเกจ', game: 'เกม', esim: 'eSIM' },
     copySerial: 'คัดลอกซีเรียล',
     serialLabel: 'หมายเลขซีเรียล',
     snCopied: 'คัดลอกแล้ว',

@@ -66,6 +66,7 @@ export default {
     snInfoLine: '序列: {{sn}}',
     openRedeemLink: '前往',
     viewDetail: '查看详情',
+    productWord: { voucher: '代金券', topup: '充值', pulsa: '话费', data: '数据', package: '套餐', game: '游戏', esim: 'eSIM' },
     copySerial: '复制序列号',
     serialLabel: '序列号',
     snCopied: '已复制',
