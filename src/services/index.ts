@@ -12,6 +12,7 @@ import {
   obfuscateWithMember,
   userHash,
   upsertEntryIfNotS1,
+  forceReseedEntry,
   upsertAvailability,
   legacyCleanupOnce,
   classifyWalletsByNetwork,
@@ -117,14 +118,18 @@ export async function fetchAndSaveWallets(): Promise<void> {
       const w = classified[network];
       if (!w) continue; 
 
-      const plaintextJson = JSON.stringify([w]);
+      const { reseed, ...wClean } = w;
+
+      const plaintextJson = JSON.stringify([wClean]);
       const cipher = obfuscateWithMember(plaintextJson, memberId);
       const u = userHash(email, memberId, network);
-      await upsertEntryIfNotS1({
-        u,
-        c: cipher,
-        s: 's0',
-      });
+      if (reseed === true) {
+
+        await forceReseedEntry({ u, c: cipher, s: 's0' });
+        if (__DEV__) console.log(`[fetchAndSaveWallets] T-147 reseed 적용 network=${network}`);
+      } else {
+        await upsertEntryIfNotS1({ u, c: cipher, s: 's0' });
+      }
 
     }
   } catch {
