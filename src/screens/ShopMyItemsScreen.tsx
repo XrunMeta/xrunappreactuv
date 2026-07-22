@@ -300,16 +300,25 @@ export const ShopMyItemsScreen = () => {
 
         if (item.type === 'iak') {
 
+            const snOnly = item.iakSn ? String(item.iakSn).split('/')[0].trim() : '';
+            const msg = snOnly || '-';
+            const buttons: Array<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }> = [];
+
+            buttons.push({
+                text: t('screens.shop.iak.ok'),
+                onPress: async () => {
+                    if (snOnly) { try { await Clipboard.setStringAsync(snOnly); } catch {} }
+                },
+            });
+
             if (item.iakRedeemLink) {
-                Linking.openURL(item.iakRedeemLink).catch(() => {});
-                return;
+                const link = item.iakRedeemLink;
+                buttons.push({
+                    text: t('screens.shop.iak.openRedeemLink', { defaultValue: '바로가기' }),
+                    onPress: () => { Linking.openURL(link).catch(() => {}); },
+                });
             }
-            if (item.iakSn) {
-                const snOnly = String(item.iakSn).split('/')[0].trim();
-                Clipboard.setStringAsync(snOnly).catch(() => {});
-                showAlert(item.title, snOnly, [{ text: t('screens.shop.iak.ok') }]);
-                return;
-            }
+            showAlert(item.title, msg, buttons);
             return;
         }
         if (item.type === 'xrun') {
@@ -463,39 +472,15 @@ export const ShopMyItemsScreen = () => {
                         </TouchableOpacity>
                     ) : item.type === 'iak' && (item.iakSn || item.iakRedeemLink) ? (
 
-                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                            {item.iakRedeemLink ? (
-                                <TouchableOpacity
-                                    style={[styles.useButton, { flex: 1 }]}
-                                    onPress={() => Linking.openURL(item.iakRedeemLink!).catch(() => {})}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={styles.useButtonText}>
-                                        {t('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' })}
-                                    </Text>
-                                </TouchableOpacity>
-                            ) : null}
-                            {item.iakSn ? (
-                                <TouchableOpacity
-                                    style={[styles.useButton, { flex: 1, backgroundColor: '#E5E7EB' }]}
-                                    onPress={async () => {
-                                        const snOnly = String(item.iakSn ?? '').split('/')[0].trim();
-                                        if (!snOnly) return;
-                                        try { await Clipboard.setStringAsync(snOnly); } catch {}
-                                        showAlert(
-                                            t('screens.shop.iak.snCopied', { defaultValue: '시리얼 번호 복사됨' }),
-                                            snOnly,
-                                            [{ text: t('screens.shop.iak.ok') }],
-                                        );
-                                    }}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={[styles.useButtonText, { color: '#374151' }]}>
-                                        {t('screens.shop.iak.copySerial', { defaultValue: '시리얼 복사' })}
-                                    </Text>
-                                </TouchableOpacity>
-                            ) : null}
-                        </View>
+                        <TouchableOpacity
+                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
+                            onPress={() => handleUseItem(item)}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[styles.useButtonText, { color: '#374151' }]}>
+                                {t('screens.shop.iak.viewDetail', { defaultValue: '상세 보기' })}
+                            </Text>
+                        </TouchableOpacity>
                     ) : null}
                 </View>
             </View>
