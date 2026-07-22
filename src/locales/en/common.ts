@@ -40,6 +40,9 @@ export default {
     title: 'Notice',
     viewDetails: 'View Details',
   },
+  sessionExpired: {
+    message: 'Your session has expired. Please log in again.',
+  },
   gasInsufficient: {
     title: 'Insufficient Gas',
     messageTransfer: 'Your wallet does not have enough network fee (gas) to send.\n\nPlease top up Polygon network gas tokens (POL) and try again.',

@@ -31,6 +31,7 @@ import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
 import { fmtBalance } from '../utils/formatAmount';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { useSessionGuard } from '../hooks';
 import {
   fetchWalletData,
   fetchOtherChainsStatus,
@@ -164,6 +165,8 @@ export const WalletScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { openAddTokenDialog, setWalletReceiveAddress, setWalletReceiveCurrency, setSelectedWalletAsset } = useAppContext();
   const { showAlert } = useAlertDialog();
+
+  useSessionGuard('wallet');
 
   const [isLoading, setIsLoading] = useState(true);
   const [publicAddress, setPublicAddress] = useState('');

@@ -40,6 +40,9 @@ export default {
     title: 'お知らせ',
     viewDetails: '詳細を見る',
   },
+  sessionExpired: {
+    message: 'セッションが切れました。もう一度ログインしてください。',
+  },
   gasInsufficient: {
     title: 'ガス代不足',
     messageTransfer: 'ウォレットに送金手数料(ガス代)が不足しているため、送金できません。\n\nPolygonネットワークのガストークン(POL)をチャージしてから、もう一度お試しください。',
