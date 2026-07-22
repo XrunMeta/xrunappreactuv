@@ -45,6 +45,9 @@ export default {
     title: '안내',
     viewDetails: '자세히 보기',
   },
+  sessionExpired: {
+    message: '세션이 만료되어 다시 로그인 해 주세요',
+  },
   gasInsufficient: {
     title: '가스비 부족',
     messageTransfer: '전송료(POL)가 부족합니다.\n폴리곤 네트워크 가스 토큰(POL)을 충전한 뒤 다시 시도해주세요.',

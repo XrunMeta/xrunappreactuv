@@ -37,6 +37,9 @@ export default {
     title: 'Thông báo',
     viewDetails: 'Xem chi tiết',
   },
+  sessionExpired: {
+    message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+  },
   gasInsufficient: {
     title: 'Phí Gas không đủ',
     messageTransfer: 'Ví của bạn không đủ phí mạng (gas) để thực hiện chuyển khoản.\n\nVui lòng nạp token gas mạng Polygon (POL) rồi thử lại.',
