@@ -22,6 +22,22 @@ const v_818aa7 = require('../../assets/sample_cu.png');
 
 const v_5489b5 = require('../../assets/xrun-round-logo.png');
 
+function v_9711d5(v_479f05, v_8d41d7): string {
+    if (!v_479f05) return '-';
+    let v_fd5f43 = String(v_479f05);
+    const v_8dcb51 = [
+        [/\bVoucher\b/gi, v_8d41d7('screens.shop.iak.productWord.voucher', { defaultValue: 'Voucher' })],
+        [/\bTop[- ]?Up\b/gi, v_8d41d7('screens.shop.iak.productWord.topup', { defaultValue: 'Top-Up' })],
+        [/\bPulsa\b/gi, v_8d41d7('screens.shop.iak.productWord.pulsa', { defaultValue: 'Pulsa' })],
+        [/\bData\b/gi, v_8d41d7('screens.shop.iak.productWord.data', { defaultValue: 'Data' })],
+        [/\bPaket\b/gi, v_8d41d7('screens.shop.iak.productWord.package', { defaultValue: 'Package' })],
+        [/\bGame\b/gi, v_8d41d7('screens.shop.iak.productWord.game', { defaultValue: 'Game' })],
+        [/\beSIM\b/gi, v_8d41d7('screens.shop.iak.productWord.esim', { defaultValue: 'eSIM' })],
+    ];
+    v_8dcb51.forEach(([v_d95200, v_4a36a4]) => { v_fd5f43 = v_fd5f43.replace(v_d95200, v_4a36a4); });
+    return v_fd5f43;
+}
+
 function v_427ded(v_479f05): string | null {
     if (!v_479f05 || typeof v_479f05 !== 'string') return null;
     const v_fd5f43 = v_479f05.trim();
@@ -236,7 +252,7 @@ export const v_8c1d95 = () => {
                         return {
                             id: `iak-${v_23805a.ref_id}`,
                             brand: 'IAK',
-                            title: v_23805a.product_name || v_23805a.product_code,
+                            title: v_9711d5(v_23805a.product_name || v_23805a.product_code, v_8d41d7),
                             image: v_79b27e ? { uri: v_79b27e } : v_5489b5,
 
                             status: v_0985ef(v_23805a.status),
