@@ -20,6 +20,8 @@ import {
   findEntriesForUser,
 
   detectLegacyEntries,
+
+  forceReseedEntry,
 } from '../walletKeyStore';
 import type { VaultEntry } from '../walletKeyStore';
 import { deleteKek } from '../walletKek';
@@ -431,4 +433,21 @@ it('detectLegacyEntries returns false for current user when only OTHER account h
   expect(await detectLegacyEntries(EMAIL, MEMBER)).toBe(false);
 
   expect(await detectLegacyEntries(EMAIL_B, MEMBER_B)).toBe(true);
+});
+
+describe('T-147 forceReseedEntry', () => {
+  it('s1 entry 를 강제 덮어쓰기 — c 교체, s=s0, 기존 h 제거', async () => {
+    await upsertEntry({ u: 'u-t147', c: 'old-cipher', s: 's1', h: 'old-pin-hash' });
+    await forceReseedEntry({ u: 'u-t147', c: 'new-cipher', s: 's0' });
+    const vault = await readVault();
+    const e = vault.find((x) => x.u === 'u-t147');
+    expect(e?.c).toBe('new-cipher');
+    expect(e?.s).toBe('s0');
+    expect(e?.h).toBeUndefined();
+  });
+  it('entry 없으면 신규 생성', async () => {
+    await forceReseedEntry({ u: 'u-t147-new', c: 'cipher-x', s: 's0' });
+    const vault = await readVault();
+    expect(vault.find((x) => x.u === 'u-t147-new')?.c).toBe('cipher-x');
+  });
 });

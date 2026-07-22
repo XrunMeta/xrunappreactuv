@@ -12,6 +12,7 @@ export interface WalletKey {
   address: string;
   private_key: string;     
   derivation_path: string;
+  reseed?: boolean;         
 }
 
 export type WalletNetwork = 'eth' | 'pol';
@@ -401,6 +402,28 @@ export async function upsertEntryIfNotS1(entry: VaultEntry): Promise<{ applied: 
     }
     await writeVault(vault);
     return { applied: true };
+  });
+}
+
+export async function forceReseedEntry(entry: VaultEntry): Promise<void> {
+  return withVaultLock(async () => {
+    const vault = await readVault();
+    const idx = vault.findIndex((e) => e.u === entry.u);
+    const merged: VaultEntry = {
+      u: entry.u,
+      c: entry.c,
+      s: entry.s,
+      ...(entry.ver !== undefined ? { ver: entry.ver } : {}),
+      ...(entry.iv !== undefined ? { iv: entry.iv } : {}),
+      ...(entry.h !== undefined ? { h: entry.h } : {}),
+      ...randomDecoys(),
+    };
+    if (idx >= 0) {
+      vault[idx] = merged;
+    } else {
+      vault.push(merged);
+    }
+    await writeVault(vault);
   });
 }
 
