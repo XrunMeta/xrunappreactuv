@@ -341,22 +341,28 @@ const ScreenHost = () => {
           console.log('[Install Referrer] utm_source:', utmSource);
           console.log('[Install Referrer] utm_content:', utmContent);
 
-          if (utmSource === 'referral' && utmContent) {
+          const processedReferrer = await AsyncStorage.getItem('processed_install_referrer');
+          const alreadyProcessed = processedReferrer === installReferrer;
+
+          if (utmSource === 'referral' && utmContent && !alreadyProcessed) {
             const referralEmail = decodeURIComponent(utmContent);
             console.log('[Install Referrer] 추천인 이메일:', referralEmail);
-
-            const processedReferrer = await AsyncStorage.getItem('processed_install_referrer');
-            if (processedReferrer === installReferrer) {
-              console.log('[Install Referrer] 이미 처리된 referrer, 건너뛰기');
-              return;
-            }
-
             await AsyncStorage.setItem('processed_install_referrer', installReferrer);
-
             setSignupFormData({ referralEmail });
-
             console.log('[Install Referrer] 회원가입 화면으로 이동');
             navigate('signup');
+          } else if (utmSource === 'afterlife_signup' && utmContent && !alreadyProcessed) {
+
+            const signupEmail = decodeURIComponent(utmContent);
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmail)) {
+              console.log('[Install Referrer] afterlife 회원가입 이메일:', signupEmail);
+              await AsyncStorage.setItem('processed_install_referrer', installReferrer);
+              await AsyncStorage.setItem('pendingSignupEmail', signupEmail);
+              console.log('[Install Referrer] 회원가입 화면으로 이동 (afterlife)');
+              navigate('signup');
+            }
+          } else if (alreadyProcessed) {
+            console.log('[Install Referrer] 이미 처리된 referrer, 건너뛰기');
           }
         }
       } catch (error) {
