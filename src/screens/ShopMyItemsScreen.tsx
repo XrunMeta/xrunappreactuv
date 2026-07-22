@@ -300,16 +300,25 @@ export const v_8c1d95 = () => {
 
         if (v_8c0b26.type === 'iak') {
 
+            const v_8c604e = v_8c0b26.iakSn ? String(v_8c0b26.iakSn).split('/')[0].trim() : '';
+            const v_badeaf = v_8c604e || '-';
+            const v_3d694a = [];
+
+            v_3d694a.push({
+                text: v_8d41d7('screens.shop.iak.ok'),
+                onPress: async () => {
+                    if (v_8c604e) { try { await v_fba5a0.setStringAsync(v_8c604e); } catch {} }
+                },
+            });
+
             if (v_8c0b26.iakRedeemLink) {
-                v_f2c756.openURL(v_8c0b26.iakRedeemLink).catch(() => {});
-                return;
+                const v_8dbe00 = v_8c0b26.iakRedeemLink;
+                v_3d694a.push({
+                    text: v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '바로가기' }),
+                    onPress: () => { v_f2c756.openURL(v_8dbe00).catch(() => {}); },
+                });
             }
-            if (v_8c0b26.iakSn) {
-                const v_8c604e = String(v_8c0b26.iakSn).split('/')[0].trim();
-                v_fba5a0.setStringAsync(v_8c604e).catch(() => {});
-                v_889fad(v_8c0b26.title, v_8c604e, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
-                return;
-            }
+            v_889fad(v_8c0b26.title, v_badeaf, v_3d694a);
             return;
         }
         if (v_8c0b26.type === 'xrun') {
@@ -463,39 +472,15 @@ export const v_8c1d95 = () => {
                         </TouchableOpacity>
                     ) : v_8c0b26.type === 'iak' && (v_8c0b26.iakSn || v_8c0b26.iakRedeemLink) ? (
 
-                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                            {v_8c0b26.iakRedeemLink ? (
-                                <TouchableOpacity
-                                    style={[v_d81136.useButton, { flex: 1 }]}
-                                    onPress={() => v_f2c756.openURL(v_8c0b26.iakRedeemLink!).catch(() => {})}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={v_d81136.useButtonText}>
-                                        {v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' })}
-                                    </Text>
-                                </TouchableOpacity>
-                            ) : null}
-                            {v_8c0b26.iakSn ? (
-                                <TouchableOpacity
-                                    style={[v_d81136.useButton, { flex: 1, backgroundColor: '#E5E7EB' }]}
-                                    onPress={async () => {
-                                        const v_8c604e = String(v_8c0b26.iakSn ?? '').split('/')[0].trim();
-                                        if (!v_8c604e) return;
-                                        try { await v_fba5a0.setStringAsync(v_8c604e); } catch {}
-                                        v_889fad(
-                                            v_8d41d7('screens.shop.iak.snCopied', { defaultValue: '시리얼 번호 복사됨' }),
-                                            v_8c604e,
-                                            [{ text: v_8d41d7('screens.shop.iak.ok') }],
-                                        );
-                                    }}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>
-                                        {v_8d41d7('screens.shop.iak.copySerial', { defaultValue: '시리얼 복사' })}
-                                    </Text>
-                                </TouchableOpacity>
-                            ) : null}
-                        </View>
+                        <TouchableOpacity
+                            style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
+                            onPress={() => v_09c55b(v_8c0b26)}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>
+                                {v_8d41d7('screens.shop.iak.viewDetail', { defaultValue: '상세 보기' })}
+                            </Text>
+                        </TouchableOpacity>
                     ) : null}
                 </View>
             </View>
