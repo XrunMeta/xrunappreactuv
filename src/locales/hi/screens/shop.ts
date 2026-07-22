@@ -71,7 +71,7 @@ export default {
   myItemsStatus: {
     iak: {
       pending: 'प्रोसेस हो रहा है',
-      success: 'टॉप-अप पूर्ण',
+      success: 'भेज दिया गया',
       failed: 'विफल',
       refunded: 'वापस किया गया',
     },
