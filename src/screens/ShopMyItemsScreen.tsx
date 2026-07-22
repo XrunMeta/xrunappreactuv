@@ -468,6 +468,19 @@ export const ShopMyItemsScreen = () => {
                         >
                             <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.viewCouponImage')}</Text>
                         </TouchableOpacity>
+                    ) : item.type === 'iak' && (item.iakSn || item.iakRedeemLink) ? (
+
+                        <TouchableOpacity
+                            style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
+                            onPress={() => handleUseItem(item)}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[styles.useButtonText, { color: '#374151' }]}>
+                                {item.iakRedeemLink
+                                    ? t('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 보기' })
+                                    : t('screens.shop.iak.viewSerial', { defaultValue: '시리얼 보기' })}
+                            </Text>
+                        </TouchableOpacity>
                     ) : null}
                 </View>
             </View>
