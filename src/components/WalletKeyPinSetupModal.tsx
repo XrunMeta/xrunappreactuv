@@ -20,6 +20,7 @@ import {
   upsertEntry,
   deobfuscateWithMember,
   verifyAllWallets,
+  verifyPinAgainstS1Entries,
   setupPinForUser,
   type WalletKey,
   type VaultEntry,
@@ -104,10 +105,12 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
     await new Promise<void>((r) => setTimeout(r, 0));
 
     const targetNetworks: WalletNetwork[] = ['eth', 'pol'];
+
+    let toCommit: WalletNetwork[] = [];
     try {
       const entries = await findEntriesForUser(email, memberId);
 
-      const toCommit = targetNetworks.filter((net) => {
+      toCommit = targetNetworks.filter((net) => {
         const e = entries[net];
         return e && e.s === 's0';
       });
@@ -134,6 +137,11 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
         allWalletsForSetup.push(...wallets);
       }
 
+      const pinCheck = await verifyPinAgainstS1Entries(email, memberId, pin, toCommit);
+      if (!pinCheck.ok) {
+        throw new Error(`pin-mismatch-existing:${pinCheck.failed.join(',')}`);
+      }
+
       await setupPinForUser(allWalletsForSetup, pin, email, memberId);
 
       upsertWalletPin(memberId, pin).catch(() => {  });
@@ -149,7 +157,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       setPin('');
       setConfirmPin('');
 
-      markWalletKeyAT().catch(() => {  });
+      await markWalletKeyAT().catch(() => {  });
 
       import('../services/analytics').then(({ logEvent, XRUN_EVENTS }) => {
         logEvent(XRUN_EVENTS.PIN_SETUP_COMPLETED);
@@ -164,7 +172,7 @@ export const WalletKeyPinSetupModal: React.FC<Props> = ({
       }
 
       try {
-        for (const network of targetNetworks) {
+        for (const network of toCommit) {
           const cur = await findEntry(email, memberId, network);
           if (cur) {
             const restored: VaultEntry = {
