@@ -472,6 +472,13 @@ export const v_f40fc5 = () => {
     const v_b2b2a0 = async () => {
       try {
 
+        const v_992515 = await v_e84827.getItem('pendingSignupEmail');
+        if (v_992515 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v_992515)) {
+          v_fedf34(v_992515);
+          console.log('[회원가입] 딥링크 이메일 자동 입력:', v_992515);
+          await v_e84827.removeItem('pendingSignupEmail');
+        }
+
         const v_ea9ffe = await v_e84827.getItem('googleSignupRequired');
         if (v_ea9ffe === 'true') {
           v_dee9cd(true);

@@ -238,6 +238,8 @@ const v_c0dbdf = () => {
           });
         }
 
+        const v_764189 = v_8decf8.queryParams?.signup === '1';
+
         if (v_fc7051) {
           console.log('[딥링크] 레퍼럴 코드 추출:', v_fc7051);
 
@@ -246,6 +248,13 @@ const v_c0dbdf = () => {
           v_eee6b0({ referralEmail: v_fc7051 });
 
           console.log('[딥링크] 회원가입 화면으로 이동');
+          v_9b57fc('signup');
+        } else if (v_d136d6 && v_764189) {
+          v_308260 = v_f71b56;
+          console.log('[딥링크] 회원가입 화면으로 이동 (email 자동 입력):', v_d136d6);
+          v_e84827.setItem('pendingSignupEmail', v_d136d6).catch((v_a0830e) => {
+            console.warn('[딥링크] pendingSignupEmail 저장 실패:', v_a0830e);
+          });
           v_9b57fc('signup');
         } else if (v_d136d6) {
 
