@@ -65,6 +65,8 @@ export default {
     phoneLabelLine: '号码: {{phone}}',
     snInfoLine: '序列: {{sn}}',
     openRedeemLink: '打开兑换链接',
+    copySerial: '复制序列号',
+    snCopied: '已复制序列号',
     pendingNote: '处理中 (等待回调)',
     failedNote: '失败或已退款',
     successNote: '也可通过运营商短信确认',

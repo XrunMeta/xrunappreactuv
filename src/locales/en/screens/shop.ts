@@ -65,6 +65,8 @@ export default {
     phoneLabelLine: 'Phone: {{phone}}',
     snInfoLine: 'Serial: {{sn}}',
     openRedeemLink: 'Open Redeem Link',
+    copySerial: 'Copy Serial',
+    snCopied: 'Serial number copied',
     pendingNote: 'Processing (awaiting callback)',
     failedNote: 'Failed or refunded',
     successNote: 'Also confirmable via carrier SMS',

@@ -65,6 +65,8 @@ export default {
     phoneLabelLine: 'เบอร์: {{phone}}',
     snInfoLine: 'ซีเรียล: {{sn}}',
     openRedeemLink: 'เปิดลิงก์แลกรับ',
+    copySerial: 'คัดลอกซีเรียล',
+    snCopied: 'คัดลอกหมายเลขซีเรียลแล้ว',
     pendingNote: 'กำลังประมวลผล (รอ callback)',
     failedNote: 'ล้มเหลวหรือคืนเงินแล้ว',
     successNote: 'ยืนยันได้ผ่าน SMS เครือข่าย',

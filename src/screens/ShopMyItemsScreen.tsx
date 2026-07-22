@@ -1,5 +1,6 @@
 import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
 import { v_3094a2, v_472849, v_79c4f2, v_19b633, v_4623af, v_cf9c33, v_07a341, v_39a996, v_6c4f62, v_f2c756 } from 'rcmrninabrnb';
+import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_570c34, v_556baf } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
@@ -298,22 +299,17 @@ export const v_8c1d95 = () => {
     const v_09c55b = (v_8c0b26) => {
 
         if (v_8c0b26.type === 'iak') {
-            const v_a52412 = [];
-            if (v_8c0b26.iakCustomerId) v_a52412.push(v_8d41d7('screens.shop.iak.phoneLabelLine', { phone: v_8c0b26.iakCustomerId }));
-            if (v_8c0b26.iakSn) v_a52412.push(v_8d41d7('screens.shop.iak.snInfoLine', { sn: v_8c0b26.iakSn }));
-            if (v_8c0b26.iakActivationCode) v_a52412.push(`PIN: ${v_8c0b26.iakActivationCode}`);
-            if (v_8c0b26.iakRedeemLink) v_a52412.push(`\n${v_8c0b26.iakRedeemLink}`);
-            const v_badeaf = v_a52412.join('\n');
-            const v_3d694a = [];
+
             if (v_8c0b26.iakRedeemLink) {
-                const v_8dbe00 = v_8c0b26.iakRedeemLink;
-                v_3d694a.push({
-                    text: v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' }),
-                    onPress: () => { v_f2c756.openURL(v_8dbe00).catch(() => {}); },
-                });
+                v_f2c756.openURL(v_8c0b26.iakRedeemLink).catch(() => {});
+                return;
             }
-            v_3d694a.push({ text: v_8d41d7('screens.shop.iak.ok'), style: 'cancel' });
-            v_889fad(v_8c0b26.title, v_badeaf, v_3d694a);
+            if (v_8c0b26.iakSn) {
+                const v_8c604e = String(v_8c0b26.iakSn).split('/')[0].trim();
+                v_fba5a0.setStringAsync(v_8c604e).catch(() => {});
+                v_889fad(v_8c0b26.title, v_8c604e, [{ text: v_8d41d7('screens.shop.iak.ok') }]);
+                return;
+            }
             return;
         }
         if (v_8c0b26.type === 'xrun') {
@@ -467,17 +463,39 @@ export const v_8c1d95 = () => {
                         </TouchableOpacity>
                     ) : v_8c0b26.type === 'iak' && (v_8c0b26.iakSn || v_8c0b26.iakRedeemLink) ? (
 
-                        <TouchableOpacity
-                            style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
-                            onPress={() => v_09c55b(v_8c0b26)}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>
-                                {v_8c0b26.iakRedeemLink
-                                    ? v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 보기' })
-                                    : v_8d41d7('screens.shop.iak.viewSerial', { defaultValue: '시리얼 보기' })}
-                            </Text>
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                            {v_8c0b26.iakRedeemLink ? (
+                                <TouchableOpacity
+                                    style={[v_d81136.useButton, { flex: 1 }]}
+                                    onPress={() => v_f2c756.openURL(v_8c0b26.iakRedeemLink!).catch(() => {})}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={v_d81136.useButtonText}>
+                                        {v_8d41d7('screens.shop.iak.openRedeemLink', { defaultValue: '교환 링크 열기' })}
+                                    </Text>
+                                </TouchableOpacity>
+                            ) : null}
+                            {v_8c0b26.iakSn ? (
+                                <TouchableOpacity
+                                    style={[v_d81136.useButton, { flex: 1, backgroundColor: '#E5E7EB' }]}
+                                    onPress={async () => {
+                                        const v_8c604e = String(v_8c0b26.iakSn ?? '').split('/')[0].trim();
+                                        if (!v_8c604e) return;
+                                        try { await v_fba5a0.setStringAsync(v_8c604e); } catch {}
+                                        v_889fad(
+                                            v_8d41d7('screens.shop.iak.snCopied', { defaultValue: '시리얼 번호 복사됨' }),
+                                            v_8c604e,
+                                            [{ text: v_8d41d7('screens.shop.iak.ok') }],
+                                        );
+                                    }}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>
+                                        {v_8d41d7('screens.shop.iak.copySerial', { defaultValue: '시리얼 복사' })}
+                                    </Text>
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
                     ) : null}
                 </View>
             </View>

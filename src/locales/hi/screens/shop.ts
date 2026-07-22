@@ -65,6 +65,8 @@ export default {
     phoneLabelLine: 'फोन: {{phone}}',
     snInfoLine: 'सीरियल: {{sn}}',
     openRedeemLink: 'रिडीम लिंक खोलें',
+    copySerial: 'सीरियल कॉपी करें',
+    snCopied: 'सीरियल नंबर कॉपी किया गया',
     pendingNote: 'प्रसंस्करण (कॉलबैक की प्रतीक्षा)',
     failedNote: 'विफल या वापस किया गया',
     successNote: 'कैरियर SMS से भी पुष्टि करें',

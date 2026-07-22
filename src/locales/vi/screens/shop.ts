@@ -65,6 +65,8 @@ export default {
     phoneLabelLine: 'Số ĐT: {{phone}}',
     snInfoLine: 'Serial: {{sn}}',
     openRedeemLink: 'Mở Link Đổi Thưởng',
+    copySerial: 'Sao chép Serial',
+    snCopied: 'Đã sao chép số serial',
     pendingNote: 'Đang xử lý (chờ callback)',
     failedNote: 'Thất bại hoặc đã hoàn tiền',
     successNote: 'Cũng có thể xác nhận qua SMS nhà mạng',
