@@ -66,6 +66,7 @@ export default {
     snInfoLine: 'Serial: {{sn}}',
     openRedeemLink: 'Go',
     viewDetail: 'View Details',
+    productWord: { voucher: 'Voucher', topup: 'Top-Up', pulsa: 'Pulsa', data: 'Data', package: 'Package', game: 'Game', esim: 'eSIM' },
     copySerial: 'Copy Serial',
     serialLabel: 'Serial Number',
     snCopied: 'Copied',

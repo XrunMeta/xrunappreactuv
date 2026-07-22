@@ -22,6 +22,22 @@ const defaultCouponImage = require('../../assets/sample_cu.png');
 
 const genericFallbackImage = require('../../assets/xrun-round-logo.png');
 
+function localizeIakProductName(raw: string | undefined, t: (k: string, opts?: any) => string): string {
+    if (!raw) return '-';
+    let s = String(raw);
+    const map: Array<[RegExp, string]> = [
+        [/\bVoucher\b/gi, t('screens.shop.iak.productWord.voucher', { defaultValue: 'Voucher' })],
+        [/\bTop[- ]?Up\b/gi, t('screens.shop.iak.productWord.topup', { defaultValue: 'Top-Up' })],
+        [/\bPulsa\b/gi, t('screens.shop.iak.productWord.pulsa', { defaultValue: 'Pulsa' })],
+        [/\bData\b/gi, t('screens.shop.iak.productWord.data', { defaultValue: 'Data' })],
+        [/\bPaket\b/gi, t('screens.shop.iak.productWord.package', { defaultValue: 'Package' })],
+        [/\bGame\b/gi, t('screens.shop.iak.productWord.game', { defaultValue: 'Game' })],
+        [/\beSIM\b/gi, t('screens.shop.iak.productWord.esim', { defaultValue: 'eSIM' })],
+    ];
+    map.forEach(([re, replacement]) => { s = s.replace(re, replacement); });
+    return s;
+}
+
 function normalizeIconUrl(raw?: string | null): string | null {
     if (!raw || typeof raw !== 'string') return null;
     const s = raw.trim();
@@ -236,7 +252,7 @@ export const ShopMyItemsScreen = () => {
                         return {
                             id: `iak-${it.ref_id}`,
                             brand: 'IAK',
-                            title: it.product_name || it.product_code,
+                            title: localizeIakProductName(it.product_name || it.product_code, t),
                             image: iconUri ? { uri: iconUri } : genericFallbackImage,
 
                             status: iakStatusToCategory(it.status),

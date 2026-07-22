@@ -73,6 +73,7 @@ export default {
     snInfoLine: 'シリアル: {{sn}}',
     openRedeemLink: '移動',
     viewDetail: '詳細を見る',
+    productWord: { voucher: 'バウチャー', topup: 'チャージ', pulsa: 'プルサ', data: 'データ', package: 'パッケージ', game: 'ゲーム', esim: 'eSIM' },
     copySerial: 'シリアル コピー',
     serialLabel: 'シリアル番号',
     snCopied: 'コピーしました',
