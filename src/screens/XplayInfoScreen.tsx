@@ -13,6 +13,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_556baf } from '../components';
 import { v_729608 } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_6e4589 } from '../hooks';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
 import { v_4d25ff } from '../services';
@@ -32,6 +33,8 @@ export const v_305be8 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
   const { t: v_8d41d7 } = v_772971();
+
+  v_6e4589('xplayInfo');
   const [v_19c59c, v_97ae62] = v_5ab095<number | null>(null);
   const [v_747a87, v_3e37d1] = v_5ab095(false);
   const [v_717992, v_9d6aeb] = v_5ab095<string | null>(null);

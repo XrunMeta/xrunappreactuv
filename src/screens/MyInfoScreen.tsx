@@ -18,6 +18,7 @@ import { v_21ef1f } from '../services/adison';
 import { v_700ef9 } from '../context';
 import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_6e4589 } from '../hooks';
 import { v_570c34, v_556baf } from '../components';
 
 type MenuConfig = {
@@ -38,6 +39,8 @@ export const v_03a231 = () => {
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
   const { setVerificationEmail: v_b572c3 } = v_700ef9();
+
+  v_6e4589('myInfo');
   const [v_bb789b, v_a61751] = v_5ab095<{
     name?: string;
     email?: string;
