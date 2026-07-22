@@ -131,6 +131,10 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
     };
 }
 
+const v_eaaecf = {
+    'oth-user@example.invalid': 'ID',
+};
+
 export const v_10886b = () => {
     console.log('[ShopScreen] ShopScreen 컴포넌트 렌더링됨');
     const { t: v_8d41d7 } = v_772971();
@@ -287,6 +291,20 @@ export const v_10886b = () => {
     const v_4bfa33 = 'shopGpsCountry';
     const v_447733 = 30 * 60 * 1000; 
     const v_add9f8 = v_de06a3(async () => {
+
+        try {
+            const v_f24fd5 = await v_e84827.getItem('userData');
+            if (v_f24fd5) {
+                const v_e0c7e8 = String(JSON.parse(v_f24fd5)?.email ?? '').trim().toLowerCase();
+                const v_9bfd73 = v_eaaecf[v_e0c7e8];
+                if (v_9bfd73) {
+                    v_068f20(v_9bfd73);
+                    v_9982dc(false);
+                    console.log('[ShopScreen] 이메일 강제 국가:', v_e0c7e8, '→', v_9bfd73);
+                    return;
+                }
+            }
+        } catch {}
         if (v_01305e !== 'AUTO') {
             v_068f20(v_01305e);
             v_9982dc(false);
