@@ -75,38 +75,17 @@ function v_0985ef(v_d308b5): 'available' | 'used' | 'expired' | 'pending' {
   if (v_d308b5 === 'failed') return 'expired';  
   return 'available'; 
 }
-function v_86df31(v_d308b5): string {
-  const v_8dcb51 = {
-    'pending':  '처리 중',
-    'success':  '충전 완료',
-    'failed':   '실패',
-    'refunded': '환불됨',
-  };
-  return v_8dcb51[String(v_d308b5 ?? '')] ?? String(v_d308b5 ?? '-');
+
+function v_86df31(v_d308b5, v_8d41d7): string {
+  const v_b24339 = String(v_d308b5 ?? '');
+  if (!v_b24339) return '-';
+  return v_8d41d7(`screens.shop.myItemsStatus.iak.${v_b24339}`, { defaultValue: v_b24339 });
 }
 
-function v_a7d899(v_03cc9e): string {
-  const v_8dcb51 = {
-    '01': '사용가능',
-    '02': '사용완료',
-    '03': '반품',
-    '04': '관리폐기',
-    '05': '환불',
-    '06': '재발행',
-    '07': '구매취소',
-    '08': '기간만료',
-    '09': '잔액기간만료',
-    '10': '기간만료취소',
-    '11': '환전',
-    '12': '환급',
-    '13': '잔액환급',
-    '14': '잔액기간만료취소',
-    '15': '등록',
-    '16': '등록취소',
-    '17': '바우처(비활성)',
-    '99': '발송대기',
-  };
-  return v_8dcb51[String(v_03cc9e ?? '')] ?? String(v_03cc9e ?? '-');
+function v_a7d899(v_03cc9e, v_8d41d7): string {
+  const v_c99bd2 = String(v_03cc9e ?? '');
+  if (!v_c99bd2) return '-';
+  return v_8d41d7(`screens.shop.myItemsStatus.giftishow.s${v_c99bd2}`, { defaultValue: v_c99bd2 });
 }
 
 function v_2d457b(coupon: v_a649c5): boolean {
@@ -131,7 +110,7 @@ function v_b88ffe(v_479f05): string {
   return v_479f05;
 }
 
-function v_037021(c: v_a649c5): MyItemData {
+function v_037021(c: v_a649c5, v_8d41d7): MyItemData {
 
   const v_6f7c85 = [v_3f4e2e.image_url, v_3f4e2e.coupon_img_url];
   const v_87b3a3 = v_6f7c85.find((v_ceb55a) => typeof v_ceb55a === 'string' && /^https?:\/\//i.test(v_ceb55a));
@@ -150,7 +129,7 @@ function v_037021(c: v_a649c5): MyItemData {
     title: v_3f4e2e.goods_name ?? '-',
     image: v_7ddb73,
     status: v_52c82e(v_3f4e2e.pin_status),
-    statusLabel: v_a7d899(v_3f4e2e.pin_status),
+    statusLabel: v_a7d899(v_3f4e2e.pin_status, v_8d41d7),
     purchaseDate: v_b88ffe(v_3f4e2e.purchase_date),
     type: 'giftishow',
     couponImgUrl: v_3f4e2e.coupon_img_url || undefined,
@@ -232,7 +211,7 @@ export const v_8c1d95 = () => {
                 v_35dda7?.status === 'success' && Array.isArray(v_35dda7.data)
                     ? v_35dda7.data
                         .filter((v_ddbb49) => !v_2d457b(v_ddbb49))
-                        .map(v_037021)
+                        .map((v_ddbb49) => v_037021(v_ddbb49, v_8d41d7))
                     : [];
             const v_04aa3c =
                 v_38fb16?.status === 'success' && Array.isArray(v_38fb16.data)
@@ -241,24 +220,25 @@ export const v_8c1d95 = () => {
 
             const v_45e042 =
                 v_078347?.status === 'success' && Array.isArray(v_078347.data)
-                    ? v_078347.data.map((v_8d41d7) => {
 
-                        const v_79b27e = v_427ded(v_8d41d7.icon_url);
+                    ? v_078347.data.map((v_23805a) => {
+
+                        const v_79b27e = v_427ded(v_23805a.icon_url);
                         return {
-                            id: `iak-${v_8d41d7.ref_id}`,
+                            id: `iak-${v_23805a.ref_id}`,
                             brand: 'IAK',
-                            title: v_8d41d7.product_name || v_8d41d7.product_code,
+                            title: v_23805a.product_name || v_23805a.product_code,
                             image: v_79b27e ? { uri: v_79b27e } : v_5489b5,
 
-                            status: v_0985ef(v_8d41d7.status),
-                            statusLabel: v_86df31(v_8d41d7.status),
-                            purchaseDate: String(v_8d41d7.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
-                            tr_id: v_8d41d7.ref_id,
+                            status: v_0985ef(v_23805a.status),
+                            statusLabel: v_86df31(v_23805a.status, v_8d41d7),
+                            purchaseDate: String(v_23805a.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
+                            tr_id: v_23805a.ref_id,
                             type: 'iak' as const,
-                            iakSn: v_8d41d7.iak_sn ?? undefined,
-                            iakCustomerId: v_8d41d7.customer_id,
+                            iakSn: v_23805a.iak_sn ?? undefined,
+                            iakCustomerId: v_23805a.customer_id,
 
-                            sortKey: Number(String(v_8d41d7.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
+                            sortKey: Number(String(v_23805a.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
                         } as MyItemData;
                     })
                     : [];
@@ -270,7 +250,7 @@ export const v_8c1d95 = () => {
             v_34a50a(false);
             v_575aad(false);
         }
-    }, [v_9b57fc]);
+    }, [v_9b57fc, v_8d41d7]);
 
     v_c4deb2(() => {
         v_34a50a(true);
