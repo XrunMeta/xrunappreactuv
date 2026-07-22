@@ -68,6 +68,34 @@ export default {
     failedNote: 'Gagal atau dikembalikan',
     successNote: 'Juga dapat dikonfirmasi via SMS operator',
   },
+  myItemsStatus: {
+    iak: {
+      pending: 'Memproses',
+      success: 'Top-up selesai',
+      failed: 'Gagal',
+      refunded: 'Dikembalikan',
+    },
+    giftishow: {
+      s01: 'Tersedia',
+      s02: 'Terpakai',
+      s03: 'Dikembalikan',
+      s04: 'Dibuang',
+      s05: 'Dikembalikan',
+      s06: 'Diterbitkan ulang',
+      s07: 'Pembelian dibatalkan',
+      s08: 'Kedaluwarsa',
+      s09: 'Saldo kedaluwarsa',
+      s10: 'Pembatalan kedaluwarsa',
+      s11: 'Ditukar',
+      s12: 'Pengembalian penuh',
+      s13: 'Saldo dikembalikan',
+      s14: 'Pembatalan saldo kedaluwarsa',
+      s15: 'Terdaftar',
+      s16: 'Pendaftaran dibatalkan',
+      s17: 'Voucher (nonaktif)',
+      s99: 'Menunggu pengiriman',
+    },
+  },
 };
 
 

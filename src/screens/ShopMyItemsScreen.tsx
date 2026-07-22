@@ -75,38 +75,17 @@ function iakStatusToCategory(status?: string): 'available' | 'used' | 'expired' 
   if (status === 'failed') return 'expired';  
   return 'available'; 
 }
-function iakStatusLabel(status?: string): string {
-  const map: Record<string, string> = {
-    'pending':  '처리 중',
-    'success':  '충전 완료',
-    'failed':   '실패',
-    'refunded': '환불됨',
-  };
-  return map[String(status ?? '')] ?? String(status ?? '-');
+
+function iakStatusLabel(status: string | undefined, t: (k: string, opts?: any) => string): string {
+  const key = String(status ?? '');
+  if (!key) return '-';
+  return t(`screens.shop.myItemsStatus.iak.${key}`, { defaultValue: key });
 }
 
-function pinStatusLabel(pin_status?: string): string {
-  const map: Record<string, string> = {
-    '01': '사용가능',
-    '02': '사용완료',
-    '03': '반품',
-    '04': '관리폐기',
-    '05': '환불',
-    '06': '재발행',
-    '07': '구매취소',
-    '08': '기간만료',
-    '09': '잔액기간만료',
-    '10': '기간만료취소',
-    '11': '환전',
-    '12': '환급',
-    '13': '잔액환급',
-    '14': '잔액기간만료취소',
-    '15': '등록',
-    '16': '등록취소',
-    '17': '바우처(비활성)',
-    '99': '발송대기',
-  };
-  return map[String(pin_status ?? '')] ?? String(pin_status ?? '-');
+function pinStatusLabel(pin_status: string | undefined, t: (k: string, opts?: any) => string): string {
+  const code = String(pin_status ?? '');
+  if (!code) return '-';
+  return t(`screens.shop.myItemsStatus.giftishow.s${code}`, { defaultValue: code });
 }
 
 function isCancelledGiftishowCoupon(coupon: MyGiftishowCouponItem): boolean {
@@ -131,7 +110,7 @@ function formatPurchaseDate(raw?: string): string {
   return raw;
 }
 
-function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
+function couponToMyItemData(c: MyGiftishowCouponItem, t: (k: string, opts?: any) => string): MyItemData {
 
   const candidates = [c.image_url, c.coupon_img_url];
   const validUrl = candidates.find((u) => typeof u === 'string' && /^https?:\/\//i.test(u));
@@ -150,7 +129,7 @@ function couponToMyItemData(c: MyGiftishowCouponItem): MyItemData {
     title: c.goods_name ?? '-',
     image,
     status: mapPinStatusToAvailable(c.pin_status),
-    statusLabel: pinStatusLabel(c.pin_status),
+    statusLabel: pinStatusLabel(c.pin_status, t),
     purchaseDate: formatPurchaseDate(c.purchase_date),
     type: 'giftishow',
     couponImgUrl: c.coupon_img_url || undefined,
@@ -232,7 +211,7 @@ export const ShopMyItemsScreen = () => {
                 giftishowRes?.status === 'success' && Array.isArray(giftishowRes.data)
                     ? giftishowRes.data
                         .filter((coupon) => !isCancelledGiftishowCoupon(coupon))
-                        .map(couponToMyItemData)
+                        .map((coupon) => couponToMyItemData(coupon, t))
                     : [];
             const xrunList: MyItemData[] =
                 xrunRes?.status === 'success' && Array.isArray(xrunRes.data)
@@ -241,24 +220,25 @@ export const ShopMyItemsScreen = () => {
 
             const iakList: MyItemData[] =
                 iakRes?.status === 'success' && Array.isArray(iakRes.data)
-                    ? iakRes.data.map((t) => {
 
-                        const iconUri = normalizeIconUrl(t.icon_url);
+                    ? iakRes.data.map((it) => {
+
+                        const iconUri = normalizeIconUrl(it.icon_url);
                         return {
-                            id: `iak-${t.ref_id}`,
+                            id: `iak-${it.ref_id}`,
                             brand: 'IAK',
-                            title: t.product_name || t.product_code,
+                            title: it.product_name || it.product_code,
                             image: iconUri ? { uri: iconUri } : genericFallbackImage,
 
-                            status: iakStatusToCategory(t.status),
-                            statusLabel: iakStatusLabel(t.status),
-                            purchaseDate: String(t.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
-                            tr_id: t.ref_id,
+                            status: iakStatusToCategory(it.status),
+                            statusLabel: iakStatusLabel(it.status, t),
+                            purchaseDate: String(it.created_at ?? '').slice(0, 10).replace(/-/g, '.'),
+                            tr_id: it.ref_id,
                             type: 'iak' as const,
-                            iakSn: t.iak_sn ?? undefined,
-                            iakCustomerId: t.customer_id,
+                            iakSn: it.iak_sn ?? undefined,
+                            iakCustomerId: it.customer_id,
 
-                            sortKey: Number(String(t.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
+                            sortKey: Number(String(it.created_at ?? '').replace(/\D/g, '').slice(0, 14)) || 0,
                         } as MyItemData;
                     })
                     : [];
@@ -270,7 +250,7 @@ export const ShopMyItemsScreen = () => {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [navigate]);
+    }, [navigate, t]);
 
     useEffect(() => {
         setLoading(true);
