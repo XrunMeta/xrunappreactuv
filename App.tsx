@@ -341,22 +341,28 @@ const v_c0dbdf = () => {
           console.log('[Install Referrer] utm_source:', v_a560de);
           console.log('[Install Referrer] utm_content:', v_2c9a0c);
 
-          if (v_a560de === 'referral' && v_2c9a0c) {
+          const v_4b1c8e = await v_e84827.getItem('processed_install_referrer');
+          const v_70d95d = v_4b1c8e === v_23b320;
+
+          if (v_a560de === 'referral' && v_2c9a0c && !v_70d95d) {
             const v_9bf12c = decodeURIComponent(v_2c9a0c);
             console.log('[Install Referrer] 추천인 이메일:', v_9bf12c);
-
-            const v_4b1c8e = await v_e84827.getItem('processed_install_referrer');
-            if (v_4b1c8e === v_23b320) {
-              console.log('[Install Referrer] 이미 처리된 referrer, 건너뛰기');
-              return;
-            }
-
             await v_e84827.setItem('processed_install_referrer', v_23b320);
-
             v_eee6b0({ referralEmail: v_9bf12c });
-
             console.log('[Install Referrer] 회원가입 화면으로 이동');
             v_9b57fc('signup');
+          } else if (v_a560de === 'afterlife_signup' && v_2c9a0c && !v_70d95d) {
+
+            const v_b450eb = decodeURIComponent(v_2c9a0c);
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v_b450eb)) {
+              console.log('[Install Referrer] afterlife 회원가입 이메일:', v_b450eb);
+              await v_e84827.setItem('processed_install_referrer', v_23b320);
+              await v_e84827.setItem('pendingSignupEmail', v_b450eb);
+              console.log('[Install Referrer] 회원가입 화면으로 이동 (afterlife)');
+              v_9b57fc('signup');
+            }
+          } else if (v_70d95d) {
+            console.log('[Install Referrer] 이미 처리된 referrer, 건너뛰기');
           }
         }
       } catch (v_5e9bfe) {
