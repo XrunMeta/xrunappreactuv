@@ -18,6 +18,7 @@ import { unbindAdisonUid } from '../services/adison';
 import { useAppContext } from '../context';
 import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { useSessionGuard } from '../hooks';
 import { SafeScrollView, SafeView } from '../components';
 
 type MenuConfig = {
@@ -38,6 +39,8 @@ export const MyInfoScreen = () => {
   const { t } = useTranslation();
   const { showAlert } = useAlertDialog();
   const { setVerificationEmail } = useAppContext();
+
+  useSessionGuard('myInfo');
   const [userInfo, setUserInfo] = useState<{
     name?: string;
     email?: string;

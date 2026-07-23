@@ -44,6 +44,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useOTAUpdate } from '../context/OTAUpdateContext';
+import { useSessionGuard } from '../hooks';
 
 import { SpotData } from '../types';
 
@@ -227,6 +228,8 @@ export const MapMainScreen: React.FC = () => {
   const { navigate, previousScreen, reset: resetNav } = useAppNavigation();
 
   const { t } = useTranslation();
+
+  useSessionGuard('map');
 
   const insets = useSafeAreaInsets();
 

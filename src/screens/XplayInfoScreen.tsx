@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeView } from '../components';
 import { Header } from '../components';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { useSessionGuard } from '../hooks';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
 import { fetchWalletData } from '../services';
@@ -32,6 +33,8 @@ export const XplayInfoScreen = () => {
   const { goBack, navigate } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const { t } = useTranslation();
+
+  useSessionGuard('xplayInfo');
   const [pointsBalance, setPointsBalance] = useState<number | null>(null);
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [memberId, setMemberId] = useState<string | null>(null);

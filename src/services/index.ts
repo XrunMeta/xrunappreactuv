@@ -17,6 +17,7 @@ import {
   legacyCleanupOnce,
   classifyWalletsByNetwork,
   verifyAllWallets,
+  clearUserUnlock,
   type WalletKey,
   type WalletUnavailable,
   type WalletAvailabilitySentinel,
@@ -1025,12 +1026,31 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
         if (status === 401 && !isExpectedAuthFlow) {
           try {
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', url);
+
+            let unlockEmail: string | null = null;
+            let userDataStr: string | null = null;
+            try {
+              [unlockEmail, userDataStr] = await Promise.all([
+                AsyncStorage.getItem('userEmail'),
+                AsyncStorage.getItem('userData'),
+              ]);
+            } catch (e) {
+              console.warn('[API] 언락 캐시 클리어용 스냅샷 조회 실패 — auth 클리어는 계속 진행:', e);
+            }
             await Promise.all([
               AsyncStorage.removeItem('isLoggedIn'),
               AsyncStorage.removeItem('rememberMe'),
               AsyncStorage.removeItem('jwt'),
               AsyncStorage.removeItem('userData'),
             ]);
+            try {
+              const member = userDataStr ? JSON.parse(userDataStr)?.member : undefined;
+              if (unlockEmail && typeof member === 'number') {
+                clearUserUnlock(unlockEmail, member);
+              }
+            } catch (e) {
+              console.warn('[API] 지갑 PIN 언락 캐시 클리어 실패 (userData 파싱):', e);
+            }
           } catch (e) {
             console.warn('[API] auth state 클리어 실패:', e);
           }
@@ -6135,7 +6155,8 @@ export const fetchEtherscanTransactions = async (
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
 
-    return response.data;
+    const xCache = response.headers?.['x-cache'] ?? response.headers?.['X-Cache'];
+    return { ...response.data, __xCache: xCache };
   } catch (error) {
     console.error('[트랜잭션] Etherscan 거래내역 조회 오류:', error);
     if (error instanceof AxiosError) {
