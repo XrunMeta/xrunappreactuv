@@ -17,6 +17,7 @@ import {
   v_6390b2,
   v_f17f34,
   v_04c296,
+  v_77f799,
   type v_b9a3bd,
   type v_39431d,
   type v_30b48f,
@@ -1025,12 +1026,31 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
         if (v_d308b5 === 401 && !v_f9da5d) {
           try {
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', v_f71b56);
+
+            let v_90f3c7 = null;
+            let v_f24fd5 = null;
+            try {
+              [v_90f3c7, v_f24fd5] = await Promise.all([
+                v_e84827.getItem('userEmail'),
+                v_e84827.getItem('userData'),
+              ]);
+            } catch (v_9e86fd) {
+              console.warn('[API] 언락 캐시 클리어용 스냅샷 조회 실패 — auth 클리어는 계속 진행:', v_9e86fd);
+            }
             await Promise.all([
               v_e84827.removeItem('isLoggedIn'),
               v_e84827.removeItem('rememberMe'),
               v_e84827.removeItem('jwt'),
               v_e84827.removeItem('userData'),
             ]);
+            try {
+              const v_660822 = v_f24fd5 ? JSON.parse(v_f24fd5)?.member : undefined;
+              if (v_90f3c7 && typeof v_660822 === 'number') {
+                v_77f799(v_90f3c7, v_660822);
+              }
+            } catch (v_9e86fd) {
+              console.warn('[API] 지갑 PIN 언락 캐시 클리어 실패 (userData 파싱):', v_9e86fd);
+            }
           } catch (v_9e86fd) {
             console.warn('[API] auth state 클리어 실패:', v_9e86fd);
           }
@@ -6135,7 +6155,8 @@ export const v_69bcd0 = async (
 
     console.log('[트랜잭션] Etherscan 거래내역 조회 성공');
 
-    return v_3393e3.data;
+    const v_383106 = v_3393e3.headers?.['x-cache'] ?? v_3393e3.headers?.['X-Cache'];
+    return { ...v_3393e3.data, __xCache: v_383106 };
   } catch (v_5e9bfe) {
     console.error('[트랜잭션] Etherscan 거래내역 조회 오류:', v_5e9bfe);
     if (v_5e9bfe instanceof v_3333d3) {

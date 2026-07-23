@@ -44,6 +44,7 @@ import { v_ce4741, v_a0daa8 } from '../navigation';
 
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_ba5086 } from '../context/OTAUpdateContext';
+import { v_6e4589 } from '../hooks';
 
 import { v_f71847 } from '../types';
 
@@ -227,6 +228,8 @@ export const MapMainScreen: v_a3453e.FC = () => {
   const { navigate: v_9b57fc, previousScreen: v_640ccc, reset: v_1320ed } = v_a0daa8();
 
   const { t: v_8d41d7 } = v_772971();
+
+  v_6e4589('map');
 
   const v_033e14 = v_e0068c();
 
