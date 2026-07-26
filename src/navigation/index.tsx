@@ -10,6 +10,8 @@ import React, {
 import { BackHandler, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { trackScreen, trackEvent } from '../services/clickTracker';
+import { resolveBackAction } from './backNavigationPolicy';
+import { replaceTop } from './stackOps';
 
 export const ROUTES = {
   authLanding: 'authLanding',
@@ -98,6 +100,8 @@ interface NavigationContextValue {
   currentScreen: ScreenName;
   previousScreen: ScreenName | null;
   navigate: (screen: ScreenName) => void;
+
+  replace: (screen: ScreenName) => void;
   goBack: () => void;
   reset: (screen: ScreenName) => void;
   canGoBack: boolean;
@@ -181,6 +185,14 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
+  const replace = useCallback((screen: ScreenName) => {
+    setStack((prev) => {
+      const newStack = replaceTop(prev as string[], screen) as ScreenName[];
+      stackRef.current = newStack;
+      return newStack;
+    });
+  }, []);
+
   const goBack = useCallback(() => {
     setStack((prev) => {
       if (prev.length <= 1) {
@@ -217,59 +229,40 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', currentStack.length, '화면:', currentStack, '현재 화면:', currentScreen);
       trackEvent('back_press', { category: 'navigation', params: { from: currentScreen } });
 
-      if (currentScreen === 'walletKeyTutorial') {
-        console.log('[Navigation] BackHandler: 가입 튜토리얼 - 백버튼 차단');
+      const action = resolveBackAction({
+        screen: currentScreen,
+        canGoBack: currentStack.length > 1,
+        source: 'hardware',
+      });
+      console.log('[Navigation] BackHandler: 정책 판정 =', action);
+
+      if (action === 'block') {
         return true; 
       }
 
-      const isWalletScreen = currentScreen?.startsWith('wallet') || currentScreen === 'polygonHistory' || currentScreen === 'xrunHistory' || currentScreen === 'nftHistory' || currentScreen === 'xrunHistory2' || currentScreen === 'adHistory';
+      if (action === 'goBack') {
+        goBack();
+        return true; 
+      }
 
-      const isMyInfoScreen = currentScreen?.startsWith('myInfo');
-
-      const isShopScreen = currentScreen?.startsWith('shop');
-
-      const isReferralScreen = currentScreen?.startsWith('referral');
-
-      if (isWalletScreen || isMyInfoScreen) {
-        if (currentStack.length > 1) {
-          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 이전 화면으로 이동');
-          goBack();
-          return true; 
-        } else {
-
-          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 뒤로 갈 수 없으므로 맵으로 이동');
-          reset(ROUTES.map);
-          return true;
-        }
-      } else if (isShopScreen || isReferralScreen) {
-
-        console.log('[Navigation] BackHandler: 쇼핑/추천 화면 - 맵으로 이동');
+      if (action === 'resetMap') {
         reset(ROUTES.map);
         return true;
-      } else {
-
-        if (currentStack.length > 1) {
-          console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
-          goBack();
-          return true; 
-        }
-
-        const now = Date.now();
-        const timeSinceLastPress = now - backHandlerTimeRef.current;
-        console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', timeSinceLastPress, 'ms');
-
-        if (timeSinceLastPress < 2000) {
-
-          console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
-          BackHandler.exitApp();
-          return true;
-        } else {
-
-          backHandlerTimeRef.current = now;
-          console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
-          return true; 
-        }
       }
+
+      const now = Date.now();
+      const timeSinceLastPress = now - backHandlerTimeRef.current;
+      console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', timeSinceLastPress, 'ms');
+
+      if (timeSinceLastPress < 2000) {
+        console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
+        BackHandler.exitApp();
+        return true;
+      }
+
+      backHandlerTimeRef.current = now;
+      console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
+      return true; 
     };
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
@@ -286,11 +279,12 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
       currentScreen,
       previousScreen,
       navigate,
+      replace,
       goBack,
       reset,
       canGoBack: stack.length > 1,
     }),
-    [currentScreen, previousScreen, navigate, goBack, reset, stack.length],
+    [currentScreen, previousScreen, navigate, replace, goBack, reset, stack.length],
   );
 
   return (

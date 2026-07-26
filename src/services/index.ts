@@ -6,6 +6,7 @@ import { ROUTES } from '../navigation';
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
 import { getPlayStoreUrl } from '../utils/playStoreUrl';
+import type { RpcBalanceEntry } from '../utils/rpcBalance';
 
 import {
   jwtPayloadSub,
@@ -5566,6 +5567,18 @@ export const fetchWalletData = async (
     }
     throw error;
   }
+};
+
+export const fetchWalletRpcBalances = async (
+  member: number | string,
+  navigation?: any,
+): Promise<RpcBalanceEntry[]> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const response = await axiosInstance.post<{ data?: RpcBalanceEntry[] }>(
+    '/getWalletRpcBalances',
+    { member },
+  );
+  return response.data?.data ?? [];
 };
 
 export const fetchOtherChainsStatus = async (

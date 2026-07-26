@@ -33,7 +33,7 @@ const transformRankData = (apiData: RankItem[]): TransformedRankData[] => {
 const ITEMS_PER_PAGE = 15;
 
 export const ReferralRankScreen = () => {
-  const { navigate } = useAppNavigation();
+  const { navigate, replace } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const [memberId, setMemberId] = useState<number | null>(null);
   const [rankData, setRankData] = useState<TransformedRankData[]>([]);
@@ -193,9 +193,9 @@ export const ReferralRankScreen = () => {
 
   const handleSegmentChange = (value: typeof segmentedOptions[number]['value']) => {
     if (value === 'group') {
-      navigate(ROUTES.referralMyGroup);
+      replace(ROUTES.referralMyGroup);
     } else if (value === 'settlement') {
-      navigate(ROUTES.referralSettlement);
+      replace(ROUTES.referralSettlement);
     }
   };
 

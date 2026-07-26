@@ -12,8 +12,10 @@ import { useAppContext } from '../context';
 import { TransactionDetails, TransactionDetailsScreen } from './TransactionDetailsScreen';
 import {
   fetchEtherscanTransactions,
+  fetchWalletRpcBalances,
   getXRUNGopaxPrice,
 } from '../services';
+import { isRpcRefetchableCurrency, pickRpcBalance } from '../utils/rpcBalance';
 import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
@@ -247,14 +249,39 @@ export const WalletDetailScreen = () => {
 
   const [currencyRates, setCurrencyRates] = useState<Record<string, number>>({});
 
+  const [liveAmount, setLiveAmount] = useState<string | null>(null);
+
   const txnListRef = useRef<DataListRef>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const walletCurrency = selectedWalletAsset?.currency;
+
+  const refreshBalance = useCallback(async () => {
+
+    if (!member || !isRpcRefetchableCurrency(walletCurrency)) return;
+    try {
+      const results = await fetchWalletRpcBalances(member, navigate);
+      const amount = pickRpcBalance(results, Number(walletCurrency));
+      if (amount !== null) {
+        setLiveAmount(amount);
+      }
+    } catch (error: any) {
+
+      console.warn('[WalletDetail] 잔액 재조회 실패:', error?.message);
+    }
+  }, [member, walletCurrency, navigate]);
+
+  useEffect(() => {
+    refreshBalance();
+  }, [refreshBalance]);
+
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
     try { txnListRef.current?.reloadData(); } catch {  }
 
+    refreshBalance();
+
     setTimeout(() => setRefreshing(false), 500);
-  }, []);
+  }, [refreshBalance]);
 
   const [txnStatusBanner, setTxnStatusBanner] = useState<'delayed' | 'stale' | null>(null);
 
@@ -293,6 +320,8 @@ export const WalletDetailScreen = () => {
 
     setCachedTransactionData(null);
     setCacheKey('');
+
+    setLiveAmount(null);
 
     const loadGopaxPrice = async () => {
 
@@ -719,11 +748,12 @@ export const WalletDetailScreen = () => {
     }
   }, [t, showAlert, navigate]);
 
+  const displayAmount = liveAmount ?? selectedWalletAsset?.amount ?? '0';
+
   const formattedBalance = useMemo(() => {
-    if (!selectedWalletAsset?.amount) return '0';
-    const amount = selectedWalletAsset?.amount;
-    return `${fmtBalance(amount)} ${selectedWalletAsset.symbol || ''}`;
-  }, [selectedWalletAsset]);
+    if (!displayAmount || displayAmount === '0') return '0';
+    return `${fmtBalance(displayAmount)} ${selectedWalletAsset?.symbol || ''}`;
+  }, [displayAmount, selectedWalletAsset]);
 
   const krwValue = useMemo(() => {
     if (!selectedWalletAsset || (selectedWalletAsset.currency !== 18 && selectedWalletAsset.currency !== 19)) {
@@ -734,7 +764,7 @@ export const WalletDetailScreen = () => {
     }
 
     try {
-      const balanceAmount = new BigNumber(selectedWalletAsset.amount || '0');
+      const balanceAmount = new BigNumber(displayAmount || '0');
       const krwAmount = balanceAmount.multipliedBy(gopaxPrice); 
       const lang = (i18n.language || 'ko').toLowerCase();
       const kr = Number(currencyRates.KR || 0);
@@ -761,7 +791,7 @@ export const WalletDetailScreen = () => {
       console.error('[WalletDetail] 통화 환산 오류:', error);
       return t('screens.walletDetail.priceUpdating');
     }
-  }, [selectedWalletAsset, gopaxPrice, currencyRates, t, i18n.language]);
+  }, [selectedWalletAsset, displayAmount, gopaxPrice, currencyRates, t, i18n.language]);
 
   const shortenedAddress = useMemo(() => {
     return publicAddress || '';
