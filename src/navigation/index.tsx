@@ -250,6 +250,11 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({
         return true;
       }
 
+      if (action === 'resetWallet') {
+        reset(ROUTES.wallet);
+        return true;
+      }
+
       const now = Date.now();
       const timeSinceLastPress = now - backHandlerTimeRef.current;
       console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', timeSinceLastPress, 'ms');

@@ -6,6 +6,8 @@ export type BackAction =
 
   | 'resetMap'
 
+  | 'resetWallet'
+
   | 'block'
 
   | 'rootExit';
@@ -19,18 +21,24 @@ export interface BackActionInput {
 const isStackBackScreen = (screen: string): boolean =>
   screen.startsWith('wallet') ||
   screen.startsWith('myInfo') ||
-  screen.startsWith('referral') ||
   screen === 'polygonHistory' ||
   screen === 'xrunHistory' ||
   screen === 'xrunHistory2' ||
   screen === 'nftHistory' ||
   screen === 'adHistory';
 
+const isReferralScreen = (screen: string): boolean =>
+  screen.startsWith('referral');
+
 export function resolveBackAction({ screen, canGoBack, source }: BackActionInput): BackAction {
   const current = screen ?? '';
 
   if (source === 'hardware' && current === 'walletKeyTutorial') {
     return 'block';
+  }
+
+  if (isReferralScreen(current)) {
+    return 'resetWallet';
   }
 
   if (isStackBackScreen(current)) {
