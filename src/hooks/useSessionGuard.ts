@@ -91,8 +91,6 @@ export function v_6e4589(v_695063): void {
 
       await v_889fad(v_8d41d7('common.notice'), v_8d41d7('common.sessionExpired.message'));
 
-      if (v_2008a4) return;
-
       v_487a25(v_ce4741.login);
     })();
 
