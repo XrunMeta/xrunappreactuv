@@ -96,7 +96,7 @@ const v_325ac3 = (
 const v_0d35a8 = 15;
 
 export const v_08aac3 = () => {
-  const { navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc, replace: v_fc039d } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
   const [v_717992, v_9d6aeb] = v_5ab095<number | null>(null);
   const [v_3af388, v_2f9613] = v_5ab095<TransformedSettlementData[]>([]);
@@ -323,9 +323,9 @@ export const v_08aac3 = () => {
 
   const v_c411e0 = (value: typeof v_1c4d31[number]['value']) => {
     if (v_3b402b === 'group') {
-      v_9b57fc(v_ce4741.referralMyGroup);
+      v_fc039d(v_ce4741.referralMyGroup);
     } else if (v_3b402b === 'rank') {
-      v_9b57fc(v_ce4741.referralRank);
+      v_fc039d(v_ce4741.referralRank);
     }
   };
 

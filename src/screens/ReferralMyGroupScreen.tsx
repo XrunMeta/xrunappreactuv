@@ -26,7 +26,7 @@ interface MemberData {
 
 export const v_58584a = () => {
   const { t: v_8d41d7 } = v_772971();
-  const { navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc, replace: v_fc039d } = v_a0daa8();
   const { showAlert: v_889fad } = v_4b1173();
   const { setSelectedReferralMember: v_779227 } = v_700ef9();
   const v_e5fc4b = v_e662ae<v_029581>(null);
@@ -209,9 +209,9 @@ export const v_58584a = () => {
 
   const v_c411e0 = (value: typeof v_1c4d31[number]['value']) => {
     if (v_3b402b === 'settlement') {
-      v_9b57fc(v_ce4741.referralSettlement);
+      v_fc039d(v_ce4741.referralSettlement);
     } else if (v_3b402b === 'rank') {
-      v_9b57fc(v_ce4741.referralRank);
+      v_fc039d(v_ce4741.referralRank);
     } else if (v_3b402b === 'group') {
 
       v_58d2fc.current = false;

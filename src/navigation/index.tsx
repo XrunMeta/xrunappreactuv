@@ -10,6 +10,8 @@ import v_a3453e, {
 import { v_1ed974, v_326be8 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_9673ae, v_e1c2cb } from '../services/clickTracker';
+import { v_be6b97 } from './backNavigationPolicy';
+import { v_68ecf9 } from './stackOps';
 
 export const v_ce4741 = {
   authLanding: 'authLanding',
@@ -98,6 +100,8 @@ interface NavigationContextValue {
   currentScreen: ScreenName;
   previousScreen: ScreenName | null;
   navigate: (screen: ScreenName) => void;
+
+  replace: (screen: ScreenName) => void;
   goBack: () => void;
   reset: (screen: ScreenName) => void;
   canGoBack: boolean;
@@ -181,6 +185,14 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
     });
   }, []);
 
+  const v_fc039d = v_de06a3((v_53746a) => {
+    v_768005((v_ba2215) => {
+      const v_0be3f3 = v_68ecf9(v_ba2215 as string[], v_53746a) as ScreenName[];
+      v_cf6dc2.current = v_0be3f3;
+      return v_0be3f3;
+    });
+  }, []);
+
   const v_c7ac57 = v_de06a3(() => {
     v_768005((v_ba2215) => {
       if (v_ba2215.length <= 1) {
@@ -217,59 +229,40 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
       console.log('[Navigation] BackHandler: 뒤로가기 버튼 감지, 현재 스택 길이:', v_393a6b.length, '화면:', v_393a6b, '현재 화면:', v_0f0c7b);
       v_e1c2cb('back_press', { category: 'navigation', params: { from: v_0f0c7b } });
 
-      if (v_0f0c7b === 'walletKeyTutorial') {
-        console.log('[Navigation] BackHandler: 가입 튜토리얼 - 백버튼 차단');
+      const v_9b064f = v_be6b97({
+        screen: v_0f0c7b,
+        canGoBack: v_393a6b.length > 1,
+        source: 'hardware',
+      });
+      console.log('[Navigation] BackHandler: 정책 판정 =', v_9b064f);
+
+      if (v_9b064f === 'block') {
         return true; 
       }
 
-      const v_7af375 = v_0f0c7b?.startsWith('wallet') || v_0f0c7b === 'polygonHistory' || v_0f0c7b === 'xrunHistory' || v_0f0c7b === 'nftHistory' || v_0f0c7b === 'xrunHistory2' || v_0f0c7b === 'adHistory';
+      if (v_9b064f === 'goBack') {
+        v_c7ac57();
+        return true; 
+      }
 
-      const v_439a85 = v_0f0c7b?.startsWith('myInfo');
-
-      const v_2a04b0 = v_0f0c7b?.startsWith('shop');
-
-      const v_3485f6 = v_0f0c7b?.startsWith('referral');
-
-      if (v_7af375 || v_439a85) {
-        if (v_393a6b.length > 1) {
-          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 이전 화면으로 이동');
-          v_c7ac57();
-          return true; 
-        } else {
-
-          console.log('[Navigation] BackHandler: 지갑/정보 화면 - 뒤로 갈 수 없으므로 맵으로 이동');
-          v_487a25(v_ce4741.map);
-          return true;
-        }
-      } else if (v_2a04b0 || v_3485f6) {
-
-        console.log('[Navigation] BackHandler: 쇼핑/추천 화면 - 맵으로 이동');
+      if (v_9b064f === 'resetMap') {
         v_487a25(v_ce4741.map);
         return true;
-      } else {
-
-        if (v_393a6b.length > 1) {
-          console.log('[Navigation] BackHandler: 스택에 화면이 있으므로 이전 화면으로 이동');
-          v_c7ac57();
-          return true; 
-        }
-
-        const v_5c2f9f = Date.now();
-        const v_78e1e8 = v_5c2f9f - v_f5057b.current;
-        console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', v_78e1e8, 'ms');
-
-        if (v_78e1e8 < 2000) {
-
-          console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
-          v_1ed974.exitApp();
-          return true;
-        } else {
-
-          v_f5057b.current = v_5c2f9f;
-          console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
-          return true; 
-        }
       }
+
+      const v_5c2f9f = Date.now();
+      const v_78e1e8 = v_5c2f9f - v_f5057b.current;
+      console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', v_78e1e8, 'ms');
+
+      if (v_78e1e8 < 2000) {
+        console.log('[Navigation] BackHandler: 두 번 눌렀으므로 앱 종료');
+        v_1ed974.exitApp();
+        return true;
+      }
+
+      v_f5057b.current = v_5c2f9f;
+      console.log('[Navigation] BackHandler: 첫 번째 클릭, 뒤로가기를 한 번 더 누르면 앱이 종료됩니다.');
+      return true; 
     };
 
     const v_d9821c = v_1ed974.addEventListener('hardwareBackPress', v_4499d0);
@@ -286,11 +279,12 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
       currentScreen: v_0f0c7b,
       previousScreen: v_640ccc,
       navigate: v_9b57fc,
+      replace: v_fc039d,
       goBack: v_c7ac57,
       reset: v_487a25,
       canGoBack: v_8d490a.length > 1,
     }),
-    [v_0f0c7b, v_640ccc, v_9b57fc, v_c7ac57, v_487a25, v_8d490a.length],
+    [v_0f0c7b, v_640ccc, v_9b57fc, v_fc039d, v_c7ac57, v_487a25, v_8d490a.length],
   );
 
   return (
