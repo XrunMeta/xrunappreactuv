@@ -6,6 +6,7 @@ import { v_ce4741 } from '../navigation';
 import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
 import { v_843337 } from '../utils/playStoreUrl';
+import type { v_f32a31 } from '../utils/rpcBalance';
 
 import {
   v_9bbbdc,
@@ -5566,6 +5567,18 @@ export const v_4d25ff = async (
     }
     throw v_5e9bfe;
   }
+};
+
+export const v_04b185 = async (
+  v_660822,
+  v_c65f5d,
+): Promise<v_f32a31[]> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post<{ data?: v_f32a31[] }>(
+    '/getWalletRpcBalances',
+    { member: v_660822 },
+  );
+  return v_3393e3.data?.data ?? [];
 };
 
 export const v_8ffd12 = async (

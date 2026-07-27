@@ -4,6 +4,7 @@ import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0 } from '../constants';
 import { v_ee0c5a } from '../hooks';
 import { v_a0daa8, v_ce4741 } from '../navigation';
+import { v_be6b97 } from '../navigation/backNavigationPolicy';
 import { v_843035 } from '../constants';
 
 interface HeaderProps {
@@ -32,27 +33,11 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
       return;
     }
 
-    const v_7af375 = v_0f0c7b?.startsWith('wallet') || v_0f0c7b === 'polygonHistory' || v_0f0c7b === 'xrunHistory' || v_0f0c7b === 'nftHistory' || v_0f0c7b === 'xrunHistory2' || v_0f0c7b === 'adHistory';
+    const v_9b064f = v_be6b97({ screen: v_0f0c7b, canGoBack: v_7e32fb, source: 'header' });
 
-    const v_439a85 = v_0f0c7b?.startsWith('myInfo');
-
-    const v_2a04b0 = v_0f0c7b?.startsWith('shop');
-
-    const v_3485f6 = v_0f0c7b?.startsWith('referral');
-
-    if (v_7af375 || v_439a85) {
-
-      if (v_7e32fb) {
-        v_c7ac57();
-      } else {
-
-        v_487a25(v_ce4741.map);
-      }
-    } else if (v_2a04b0 || v_3485f6) {
-
-      v_487a25(v_ce4741.map);
+    if (v_9b064f === 'goBack') {
+      v_c7ac57();
     } else {
-
       v_487a25(v_ce4741.map);
     }
   };
