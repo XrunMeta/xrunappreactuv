@@ -26,7 +26,7 @@ interface MemberData {
 
 export const ReferralMyGroupScreen = () => {
   const { t } = useTranslation();
-  const { navigate } = useAppNavigation();
+  const { navigate, replace } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const { setSelectedReferralMember } = useAppContext();
   const dataListRef = useRef<DataListRef>(null);
@@ -209,9 +209,9 @@ export const ReferralMyGroupScreen = () => {
 
   const handleSegmentChange = (value: typeof segmentedOptions[number]['value']) => {
     if (value === 'settlement') {
-      navigate(ROUTES.referralSettlement);
+      replace(ROUTES.referralSettlement);
     } else if (value === 'rank') {
-      navigate(ROUTES.referralRank);
+      replace(ROUTES.referralRank);
     } else if (value === 'group') {
 
       hasLoadedRef.current = false;

@@ -96,7 +96,7 @@ const transformSettlementData = (
 const ITEMS_PER_PAGE = 15;
 
 export const ReferralSettlementScreen = () => {
-  const { navigate } = useAppNavigation();
+  const { navigate, replace } = useAppNavigation();
   const { showAlert } = useAlertDialog();
   const [memberId, setMemberId] = useState<number | null>(null);
   const [settlementData, setSettlementData] = useState<TransformedSettlementData[]>([]);
@@ -323,9 +323,9 @@ export const ReferralSettlementScreen = () => {
 
   const handleSegmentChange = (value: typeof segmentedOptions[number]['value']) => {
     if (value === 'group') {
-      navigate(ROUTES.referralMyGroup);
+      replace(ROUTES.referralMyGroup);
     } else if (value === 'rank') {
-      navigate(ROUTES.referralRank);
+      replace(ROUTES.referralRank);
     }
   };
 
