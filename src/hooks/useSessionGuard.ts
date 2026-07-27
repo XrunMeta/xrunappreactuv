@@ -91,8 +91,6 @@ export function useSessionGuard(screenName: string): void {
 
       await showAlert(t('common.notice'), t('common.sessionExpired.message'));
 
-      if (cancelled) return;
-
       reset(ROUTES.login);
     })();
 
