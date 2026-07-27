@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import { useHeaderDimensions } from '../hooks';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { resolveBackAction } from '../navigation/backNavigationPolicy';
 import { FONTS } from '../constants';
 
 interface HeaderProps {
@@ -32,27 +33,11 @@ export const Header: React.FC<HeaderProps> = ({
       return;
     }
 
-    const isWalletScreen = currentScreen?.startsWith('wallet') || currentScreen === 'polygonHistory' || currentScreen === 'xrunHistory' || currentScreen === 'nftHistory' || currentScreen === 'xrunHistory2' || currentScreen === 'adHistory';
+    const action = resolveBackAction({ screen: currentScreen, canGoBack, source: 'header' });
 
-    const isMyInfoScreen = currentScreen?.startsWith('myInfo');
-
-    const isShopScreen = currentScreen?.startsWith('shop');
-
-    const isReferralScreen = currentScreen?.startsWith('referral');
-
-    if (isWalletScreen || isMyInfoScreen) {
-
-      if (canGoBack) {
-        goBack();
-      } else {
-
-        reset(ROUTES.map);
-      }
-    } else if (isShopScreen || isReferralScreen) {
-
-      reset(ROUTES.map);
+    if (action === 'goBack') {
+      goBack();
     } else {
-
       reset(ROUTES.map);
     }
   };
