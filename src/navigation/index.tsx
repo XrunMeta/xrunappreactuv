@@ -250,6 +250,11 @@ export const NavigationProvider: v_a3453e.FC<{ children: v_a3453e.ReactNode }> =
         return true;
       }
 
+      if (v_9b064f === 'resetWallet') {
+        v_487a25(v_ce4741.wallet);
+        return true;
+      }
+
       const v_5c2f9f = Date.now();
       const v_78e1e8 = v_5c2f9f - v_f5057b.current;
       console.log('[Navigation] BackHandler: 루트 화면, 마지막 클릭으로부터 경과 시간:', v_78e1e8, 'ms');

@@ -6,6 +6,8 @@ export type BackAction =
 
   | 'resetMap'
 
+  | 'resetWallet'
+
   | 'block'
 
   | 'rootExit';
@@ -19,18 +21,24 @@ export interface BackActionInput {
 const v_460d6a = (v_53746a): boolean =>
   v_53746a.startsWith('wallet') ||
   v_53746a.startsWith('myInfo') ||
-  v_53746a.startsWith('referral') ||
   v_53746a === 'polygonHistory' ||
   v_53746a === 'xrunHistory' ||
   v_53746a === 'xrunHistory2' ||
   v_53746a === 'nftHistory' ||
   v_53746a === 'adHistory';
 
+const v_3485f6 = (v_53746a): boolean =>
+  v_53746a.startsWith('referral');
+
 export function v_be6b97({ screen: v_53746a, canGoBack: v_7e32fb, source: v_04e790 }: BackActionInput): BackAction {
   const v_275ccd = v_53746a ?? '';
 
   if (v_04e790 === 'hardware' && v_275ccd === 'walletKeyTutorial') {
     return 'block';
+  }
+
+  if (v_3485f6(v_275ccd)) {
+    return 'resetWallet';
   }
 
   if (v_460d6a(v_275ccd)) {

@@ -37,6 +37,8 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
 
     if (v_9b064f === 'goBack') {
       v_c7ac57();
+    } else if (v_9b064f === 'resetWallet') {
+      v_487a25(v_ce4741.wallet);
     } else {
       v_487a25(v_ce4741.map);
     }
