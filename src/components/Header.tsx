@@ -37,6 +37,8 @@ export const Header: React.FC<HeaderProps> = ({
 
     if (action === 'goBack') {
       goBack();
+    } else if (action === 'resetWallet') {
+      reset(ROUTES.wallet);
     } else {
       reset(ROUTES.map);
     }
