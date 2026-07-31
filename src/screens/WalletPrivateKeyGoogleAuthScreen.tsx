@@ -377,13 +377,13 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
         }
 
         if (res.status === 403 && /storage quota|quotaExceeded/i.test(errBody)) {
-          throw new Error('구글 드라이브 용량이 부족합니다.\n다른 계정을 선택하거나 "파일로 저장" 옵션을 사용해주세요.');
+          throw new Error(t('screens.walletPrivateKeyGoogleAuth.gdriveQuotaExceeded'));
         }
         if (res.status === 401) {
-          throw new Error('구글 로그인이 만료되었어요.\n다시 로그인 후 시도해주세요.');
+          throw new Error(t('screens.walletPrivateKeyGoogleAuth.gdriveAuthExpired'));
         }
         if (res.status >= 500) {
-          throw new Error('구글 드라이브 서비스가 일시적으로 응답하지 않아요.\n잠시 후 다시 시도하거나 "파일로 저장" 옵션을 사용해주세요.');
+          throw new Error(t('screens.walletPrivateKeyGoogleAuth.gdriveServerError'));
         }
         throw new Error(`Drive upload ${res.status}: ${errBody.slice(0, 200)}`);
       }

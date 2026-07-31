@@ -70,4 +70,7 @@ export default {
   passphraseTooShort: '비밀번호는 8자 이상이어야 해요.',
   passphraseMismatch: '비밀번호가 일치하지 않습니다.',
   passphraseSubmit: '백업하기',
+  gdriveQuotaExceeded: '구글 드라이브 용량이 부족합니다.\n다른 계정을 선택하거나 "파일로 저장" 옵션을 사용해주세요.',
+  gdriveAuthExpired: '구글 로그인이 만료되었어요.\n다시 로그인 후 시도해주세요.',
+  gdriveServerError: '구글 드라이브 서비스가 일시적으로 응답하지 않아요.\n잠시 후 다시 시도하거나 "파일로 저장" 옵션을 사용해주세요.',
 };
