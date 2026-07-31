@@ -69,5 +69,8 @@ export default {
   passphraseConfirmPlaceholder: 'Masukkan ulang kata sandi cadangan',
   passphraseTooShort: 'Kata sandi harus minimal 8 karakter.',
   passphraseMismatch: 'Kata sandi tidak cocok.',
+  gdriveQuotaExceeded: 'Kapasitas Google Drive Anda penuh.\nSilakan pilih akun lain atau gunakan "Simpan ke file".',
+  gdriveAuthExpired: 'Login Google Anda telah kedaluwarsa.\nSilakan masuk kembali dan coba lagi.',
+  gdriveServerError: 'Layanan Google Drive tidak merespons untuk sementara.\nCoba lagi nanti atau gunakan "Simpan ke file".',
   passphraseSubmit: 'Cadangkan',
 };

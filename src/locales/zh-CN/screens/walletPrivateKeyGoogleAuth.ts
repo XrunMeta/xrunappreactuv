@@ -69,5 +69,8 @@ export default {
   passphraseConfirmPlaceholder: '再次输入备份密码',
   passphraseTooShort: '密码必须至少8个字符。',
   passphraseMismatch: '密码不匹配。',
+  gdriveQuotaExceeded: 'Google Drive 存储空间不足。\n请选择其他账号或使用"保存为文件"。',
+  gdriveAuthExpired: 'Google 登录已过期。\n请重新登录后再试。',
+  gdriveServerError: 'Google Drive 服务暂时无响应。\n请稍后重试或使用"保存为文件"。',
   passphraseSubmit: '备份',
 };

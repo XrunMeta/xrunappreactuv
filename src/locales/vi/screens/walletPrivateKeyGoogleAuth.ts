@@ -69,5 +69,8 @@ export default {
   passphraseConfirmPlaceholder: 'Nhập lại mật khẩu sao lưu',
   passphraseTooShort: 'Mật khẩu phải có ít nhất 8 ký tự.',
   passphraseMismatch: 'Mật khẩu không khớp.',
+  gdriveQuotaExceeded: 'Bộ nhớ Google Drive của bạn đã đầy.\nHãy chọn tài khoản khác hoặc dùng "Lưu vào tệp".',
+  gdriveAuthExpired: 'Phiên đăng nhập Google đã hết hạn.\nVui lòng đăng nhập lại và thử lại.',
+  gdriveServerError: 'Google Drive tạm thời không phản hồi.\nHãy thử lại sau hoặc dùng "Lưu vào tệp".',
   passphraseSubmit: 'Sao lưu',
 };

@@ -69,5 +69,8 @@ export default {
   passphraseConfirmPlaceholder: 'Re-enter backup password',
   passphraseTooShort: 'Password must be at least 8 characters.',
   passphraseMismatch: 'Passwords do not match.',
+  gdriveQuotaExceeded: 'Your Google Drive is out of storage.\nPlease pick another account or use "Save to file".',
+  gdriveAuthExpired: 'Your Google sign-in has expired.\nPlease sign in again and try once more.',
+  gdriveServerError: 'Google Drive is temporarily unavailable.\nPlease try again later or use "Save to file".',
   passphraseSubmit: 'Back up',
 };
