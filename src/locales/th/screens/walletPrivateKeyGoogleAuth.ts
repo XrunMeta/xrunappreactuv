@@ -69,5 +69,8 @@ export default {
   passphraseConfirmPlaceholder: 'ป้อนรหัสผ่านสำรองข้อมูลอีกครั้ง',
   passphraseTooShort: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',
   passphraseMismatch: 'รหัสผ่านไม่ตรงกัน',
+  gdriveQuotaExceeded: 'พื้นที่ Google Drive ของคุณเต็มแล้ว\nโปรดเลือกบัญชีอื่นหรือใช้ "บันทึกเป็นไฟล์"',
+  gdriveAuthExpired: 'การเข้าสู่ระบบ Google หมดอายุแล้ว\nโปรดเข้าสู่ระบบใหม่แล้วลองอีกครั้ง',
+  gdriveServerError: 'Google Drive ไม่ตอบสนองชั่วคราว\nโปรดลองใหม่ภายหลังหรือใช้ "บันทึกเป็นไฟล์"',
   passphraseSubmit: 'สำรองข้อมูล',
 };

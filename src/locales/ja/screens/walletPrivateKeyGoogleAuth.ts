@@ -69,5 +69,8 @@ export default {
   passphraseConfirmPlaceholder: 'バックアップパスワードを再入力',
   passphraseTooShort: 'パスワードは8文字以上である必要があります。',
   passphraseMismatch: 'パスワードが一致しません。',
+  gdriveQuotaExceeded: 'Google ドライブの容量が不足しています。\n他のアカウントを選ぶか「ファイルで保存」を利用してください。',
+  gdriveAuthExpired: 'Google ログインの有効期限が切れました。\n再度ログインしてお試しください。',
+  gdriveServerError: 'Google ドライブが一時的に応答していません。\n後ほど再試行するか「ファイルで保存」を利用してください。',
   passphraseSubmit: 'バックアップする',
 };

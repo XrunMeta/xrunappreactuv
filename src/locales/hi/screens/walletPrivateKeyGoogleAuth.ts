@@ -69,5 +69,8 @@ export default {
   passphraseConfirmPlaceholder: 'बैकअप पासवर्ड पुनः दर्ज करें',
   passphraseTooShort: 'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।',
   passphraseMismatch: 'पासवर्ड मेल नहीं खाते।',
+  gdriveQuotaExceeded: 'आपकी Google Drive में जगह नहीं है।\nकृपया दूसरा खाता चुनें या "फ़ाइल में सहेजें" का उपयोग करें।',
+  gdriveAuthExpired: 'आपका Google लॉगिन समाप्त हो गया है।\nकृपया फिर से साइन इन करें और पुनः प्रयास करें।',
+  gdriveServerError: 'Google Drive अस्थायी रूप से उपलब्ध नहीं है।\nकृपया बाद में पुनः प्रयास करें या "फ़ाइल में सहेजें" का उपयोग करें।',
   passphraseSubmit: 'बैकअप करें',
 };
