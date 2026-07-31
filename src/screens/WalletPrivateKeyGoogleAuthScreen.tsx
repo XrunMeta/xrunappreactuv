@@ -375,6 +375,16 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             'Google Drive API 가 활성화되어 있지 않습니다.\n관리자가 GCP 콘솔에서 Drive API 를 활성화해야 합니다.',
           );
         }
+
+        if (res.status === 403 && /storage quota|quotaExceeded/i.test(errBody)) {
+          throw new Error('구글 드라이브 용량이 부족합니다.\n다른 계정을 선택하거나 "파일로 저장" 옵션을 사용해주세요.');
+        }
+        if (res.status === 401) {
+          throw new Error('구글 로그인이 만료되었어요.\n다시 로그인 후 시도해주세요.');
+        }
+        if (res.status >= 500) {
+          throw new Error('구글 드라이브 서비스가 일시적으로 응답하지 않아요.\n잠시 후 다시 시도하거나 "파일로 저장" 옵션을 사용해주세요.');
+        }
         throw new Error(`Drive upload ${res.status}: ${errBody.slice(0, 200)}`);
       }
       await res.json(); 
