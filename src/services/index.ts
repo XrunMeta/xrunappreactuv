@@ -5578,19 +5578,7 @@ export const v_04b185 = async (
     '/getWalletRpcBalances',
     { member: v_660822 },
   );
-  const v_1e6eca = v_3393e3.data?.data ?? [];
-
-  try {
-    const { maybeOverrideXrunAmount: v_6dd7b9 } = await import('../utils/demoBalanceOverride');
-    for (const v_9e86fd of v_1e6eca) {
-      const v_87f784 = await v_6dd7b9(v_9e86fd.currency, v_9e86fd.rpcAmount);
-      if (v_87f784 !== v_9e86fd.rpcAmount) {
-        v_9e86fd.rpcAmount = v_87f784 as string;
-        v_9e86fd.status = 'ok';
-      }
-    }
-  } catch {  }
-  return v_1e6eca;
+  return v_3393e3.data?.data ?? [];
 };
 
 export const v_8ffd12 = async (
