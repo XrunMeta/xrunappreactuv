@@ -446,14 +446,18 @@ export const VerificationCodeScreen = () => {
         } catch (error) {
           console.error('[회원가입] 회원가입 처리 중 오류:', error);
 
+          let alertTitle = t('screens.signup.alerts.error') || '오류';
           let errorMsg = t('screens.signup.errors.error') || '회원가입 중 오류가 발생했습니다.';
           if (error instanceof AxiosError) {
-            const respData = error.response?.data as { message?: string } | undefined;
+            const respData = error.response?.data as { title?: string; message?: string } | undefined;
+            if (respData?.title && typeof respData.title === 'string') {
+              alertTitle = respData.title;
+            }
             if (respData?.message && typeof respData.message === 'string') {
               errorMsg = respData.message;
             }
           }
-          await showAlert(t('screens.signup.alerts.error') || '오류', errorMsg);
+          await showAlert(alertTitle, errorMsg);
 
           try {
             await AsyncStorage.removeItem('pendingSignupData');
