@@ -5578,19 +5578,7 @@ export const fetchWalletRpcBalances = async (
     '/getWalletRpcBalances',
     { member },
   );
-  const entries = response.data?.data ?? [];
-
-  try {
-    const { maybeOverrideXrunAmount } = await import('../utils/demoBalanceOverride');
-    for (const e of entries) {
-      const overridden = await maybeOverrideXrunAmount(e.currency, e.rpcAmount);
-      if (overridden !== e.rpcAmount) {
-        e.rpcAmount = overridden as string;
-        e.status = 'ok';
-      }
-    }
-  } catch {  }
-  return entries;
+  return response.data?.data ?? [];
 };
 
 export const fetchOtherChainsStatus = async (
