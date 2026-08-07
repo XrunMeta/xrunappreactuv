@@ -500,16 +500,6 @@ export const WalletScreen = () => {
             return 0;
           });
 
-          try {
-            const { maybeOverrideXrunAmount } = await import('../utils/demoBalanceOverride');
-            for (const item of sortedData as any[]) {
-              const overridden = await maybeOverrideXrunAmount(item.currency, item.amount);
-              if (overridden != null && overridden !== item.amount) {
-                item.amount = overridden;
-                item.Wamount = overridden;
-              }
-            }
-          } catch {  }
           setCardsData(sortedData);
           setIsLoading(false);
 
@@ -529,13 +519,9 @@ export const WalletScreen = () => {
               const rpcJson: any = await rpcRes.json().catch(() => null);
               const balances: Array<{ currency: number; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
               const rpcByCurrency = new Map<number, string>();
-
-              const { maybeOverrideXrunAmount } = await import('../utils/demoBalanceOverride');
               for (const b of balances) {
-                const overridden = await maybeOverrideXrunAmount(b.currency, b.rpcAmount);
-                const amount = overridden ?? b.rpcAmount;
-                if ((b.status === 'ok' || overridden !== b.rpcAmount) && amount != null) {
-                  rpcByCurrency.set(Number(b.currency), amount);
+                if (b.status === 'ok' && b.rpcAmount != null) {
+                  rpcByCurrency.set(Number(b.currency), b.rpcAmount);
                 }
               }
               if (rpcByCurrency.size === 0) return;
