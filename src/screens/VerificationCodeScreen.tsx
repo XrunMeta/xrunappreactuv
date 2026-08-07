@@ -445,10 +445,15 @@ export const v_667a00 = () => {
           }
         } catch (v_5e9bfe) {
           console.error('[회원가입] 회원가입 처리 중 오류:', v_5e9bfe);
-          await v_889fad(
-            v_8d41d7('screens.signup.alerts.error') || '오류',
-            v_8d41d7('screens.signup.errors.error') || '회원가입 중 오류가 발생했습니다.',
-          );
+
+          let v_976e82 = v_8d41d7('screens.signup.errors.error') || '회원가입 중 오류가 발생했습니다.';
+          if (v_5e9bfe instanceof v_3333d3) {
+            const v_49b0b7 = v_5e9bfe.response?.data as { message?: string } | undefined;
+            if (v_49b0b7?.message && typeof v_49b0b7.message === 'string') {
+              v_976e82 = v_49b0b7.message;
+            }
+          }
+          await v_889fad(v_8d41d7('screens.signup.alerts.error') || '오류', v_976e82);
 
           try {
             await v_e84827.removeItem('pendingSignupData');
