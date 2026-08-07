@@ -500,6 +500,16 @@ export const WalletScreen = () => {
             return 0;
           });
 
+          try {
+            const { maybeOverrideXrunAmount } = await import('../utils/demoBalanceOverride');
+            for (const item of sortedData as any[]) {
+              const overridden = await maybeOverrideXrunAmount(item.currency, item.amount);
+              if (overridden != null && overridden !== item.amount) {
+                item.amount = overridden;
+                item.Wamount = overridden;
+              }
+            }
+          } catch {  }
           setCardsData(sortedData);
           setIsLoading(false);
 
