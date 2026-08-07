@@ -1040,10 +1040,13 @@ export const SignupScreen = () => {
           return;
         } catch (error: any) {
           console.error('[회원가입] 애플 회원가입 처리 중 오류:', error);
-          await showAlert(
-            t('screens.signup.alerts.error'),
-            t('screens.signup.errors.error') || '회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
-          );
+
+          let errMsg = t('screens.signup.errors.error') || '회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+          const respData = error?.response?.data as { message?: string } | undefined;
+          if (respData?.message && typeof respData.message === 'string') {
+            errMsg = respData.message;
+          }
+          await showAlert(t('screens.signup.alerts.error'), errMsg);
           setIsSubmitting(false);
           return;
         }

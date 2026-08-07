@@ -445,10 +445,15 @@ export const VerificationCodeScreen = () => {
           }
         } catch (error) {
           console.error('[회원가입] 회원가입 처리 중 오류:', error);
-          await showAlert(
-            t('screens.signup.alerts.error') || '오류',
-            t('screens.signup.errors.error') || '회원가입 중 오류가 발생했습니다.',
-          );
+
+          let errorMsg = t('screens.signup.errors.error') || '회원가입 중 오류가 발생했습니다.';
+          if (error instanceof AxiosError) {
+            const respData = error.response?.data as { message?: string } | undefined;
+            if (respData?.message && typeof respData.message === 'string') {
+              errorMsg = respData.message;
+            }
+          }
+          await showAlert(t('screens.signup.alerts.error') || '오류', errorMsg);
 
           try {
             await AsyncStorage.removeItem('pendingSignupData');
