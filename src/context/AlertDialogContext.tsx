@@ -1,4 +1,4 @@
-import v_a3453e, { v_af12cb, v_76a8a9, v_e662ae, v_4a8ba2, v_5ab095 } from 'bapkr';
+import v_a3453e, { v_af12cb, v_76a8a9, v_e662ae, v_4a8ba2, v_5ab095, v_c4deb2 } from 'bapkr';
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_3a67b0, v_eaf177 } from '../components/ChoiceDialog';
 import { v_c2fdd1 } from '../components/Dialog';
@@ -20,6 +20,9 @@ interface AlertDialogContextValue {
 }
 
 const v_ec4174 = v_af12cb<AlertDialogContextValue | undefined>(undefined);
+
+let v_4d65e1 = null;
+export function v_c551a1() { return v_4d65e1; }
 
 export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
   const { t: v_8d41d7 } = v_772971();
@@ -146,6 +149,11 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
     v_4519dd?.resolve?.();
     v_af9459(null);
   };
+
+  v_c4deb2(() => {
+    v_4d65e1 = v_889fad;
+    return () => { v_4d65e1 = null; };
+  }, []);
 
   return (
     <AlertDialogContext.Provider value={{ showAlert: v_889fad }}>
