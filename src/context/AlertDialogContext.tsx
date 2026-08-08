@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useRef, ReactNode, useState } from 'react';
+import React, { createContext, useContext, useRef, ReactNode, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChoiceDialog, ChoiceDialogRef } from '../components/ChoiceDialog';
 import { Dialog } from '../components/Dialog';
@@ -20,6 +20,9 @@ interface AlertDialogContextValue {
 }
 
 const AlertDialogContext = createContext<AlertDialogContextValue | undefined>(undefined);
+
+let _globalShowAlert: AlertDialogContextValue['showAlert'] | null = null;
+export function getGlobalShowAlert() { return _globalShowAlert; }
 
 export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
   const { t } = useTranslation();
@@ -150,6 +153,11 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
     currentConfig?.resolve?.();
     setCurrentConfig(null);
   };
+
+  useEffect(() => {
+    _globalShowAlert = showAlert;
+    return () => { _globalShowAlert = null; };
+  }, []);
 
   return (
     <AlertDialogContext.Provider value={{ showAlert }}>
