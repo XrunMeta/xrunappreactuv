@@ -1042,22 +1042,27 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
           url.includes('/email-login') ||
           url.includes('rotateSession');
         if (status === 401 && !isExpectedAuthFlow) {
+
+          try {
+            const inDeviceChange = await AsyncStorage.getItem('pendingDeviceChangeFlow');
+            if (inDeviceChange === '1') {
+              console.log('[API] 401 in device change flow → 처리 스킵');
+              return Promise.reject(error);
+            }
+          } catch {  }
           try {
 
             const respReason = (error.response?.data as any)?.reason;
             if (respReason === 'session_invalidated' || respReason === 'device_mismatch_apiguard') {
               try {
-                const inDeviceChange = await AsyncStorage.getItem('pendingDeviceChangeFlow');
-                if (inDeviceChange !== '1') {
-                  const i18n = require('i18next').default || require('i18next');
-                  const { getGlobalShowAlert } = require('../context/AlertDialogContext');
-                  const showAlertFn = getGlobalShowAlert?.();
-                  if (showAlertFn) {
-                    void showAlertFn(
-                      i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
-                      i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
-                    );
-                  }
+                const i18n = require('i18next').default || require('i18next');
+                const { getGlobalShowAlert } = require('../context/AlertDialogContext');
+                const showAlertFn = getGlobalShowAlert?.();
+                if (showAlertFn) {
+                  void showAlertFn(
+                    i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
+                    i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                  );
                 }
               } catch {  }
             }
