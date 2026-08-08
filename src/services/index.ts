@@ -1205,9 +1205,11 @@ export const v_35200c = async (
       region: v_df7dab.region,
     });
 
+    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
+    const v_b6d4b8 = await v_863c7f();
     const v_3393e3 = await v_9f42a4.post<v_2c1a39>(
       '/login-06-joinAndAccount',
-      v_df7dab,
+      { ...v_df7dab, device_id: v_b6d4b8 },
     );
 
     console.log('[회원가입 3단계] 회원가입 응답:', {
@@ -1300,10 +1302,13 @@ export const v_b699a9 = async (
 ): Promise<v_74e8fc> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const request: v_8fc862 = {
+    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
+    const v_b6d4b8 = await v_863c7f();
+    const v_576f5a = {
       type: 4,
       email: v_e0c7e8,
       pin: v_6bee94,
+      device_id: v_b6d4b8,
     };
 
     console.log('[로그인] 이메일/비밀번호 로그인 요청:', v_e0c7e8);
@@ -1752,8 +1757,11 @@ export const v_a81308 = async (
     const v_9f42a4 = v_7488d5(v_c65f5d, {
       baseURL: v_a57efd(),
     });
-    const request: v_5060a1 = {
+    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
+    const v_b6d4b8 = await v_863c7f();
+    const v_576f5a = {
       email: v_e0c7e8,
+      device_id: v_b6d4b8,
     };
 
     console.log('[로그인] 이메일 인증 로그인 요청:', v_e0c7e8);
@@ -1809,8 +1817,11 @@ export const v_32502f = async (
 
     console.log('[로그인] Google ID Token 로그인 요청');
 
+    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
+    const v_b6d4b8 = await v_863c7f();
     const v_3393e3 = await v_9f42a4.post<v_74e8fc>('/login-google', {
       idToken: v_b50834,
+      device_id: v_b6d4b8,
     });
 
     if (v_3393e3.data.status === 'success') {
