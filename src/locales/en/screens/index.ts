@@ -1,4 +1,5 @@
 export { default as login } from './login';
+export { default as deviceBinding } from './deviceBinding';
 export { default as signup } from './signup';
 export { default as loginSignup } from './loginSignup';
 export { default as countryCodeSelect } from './countryCodeSelect';

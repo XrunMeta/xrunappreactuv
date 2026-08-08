@@ -156,6 +156,18 @@ export const VerificationCodeScreen = () => {
             signupSuccess = await signup(signupData, navigate);
           } catch (signupError) {
 
+            const respData = (signupError as any)?.response?.data;
+            if (signupError instanceof AxiosError && signupError.response?.status === 409 && respData?.reason === 'blocked_device') {
+              await AsyncStorage.removeItem('pendingSignupData');
+              await showAlert(
+                t('screens.deviceBinding.signupBlockedTitle'),
+                t('screens.deviceBinding.signupBlockedBody'),
+              );
+              resetVerificationSuccessRoute();
+              setIsVerifying(false);
+              return;
+            }
+
             if (signupError instanceof AxiosError && signupError.response?.status === 409) {
               console.log('[회원가입] 이미 사용중인 이메일 (409) - 회원가입이 이미 완료된 것으로 간주, 로그인 화면으로 이동');
 
@@ -523,9 +535,9 @@ export const VerificationCodeScreen = () => {
           if (isDeviceChange === '1') {
             await AsyncStorage.removeItem('pendingDeviceChangeFlow');
             await showAlert(
-              '로그인 완료',
-              '이메일 인증이 완료되어 새로운 기기로 로그인되었습니다.\n안전한 이용을 위해 기존 기기에서는 자동 로그아웃되었습니다.',
-              [{ text: '확인' }],
+              t('screens.deviceBinding.completeTitle'),
+              t('screens.deviceBinding.completeBody'),
+              [{ text: t('screens.deviceBinding.completeConfirm') }],
             );
           }
         } catch {  }
