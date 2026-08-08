@@ -216,6 +216,15 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
         };
       }
 
+      if (v_9390e8.code === 409 && v_9390e8.reason === 'device_mismatch') {
+        return {
+          success: false,
+          code: 'DEVICE_MISMATCH',
+          message: v_9390e8.message ?? '',
+          data: { email: v_9390e8.data?.email ?? '' },
+        } as any;
+      }
+
       if (v_9390e8.code === 216) {
         console.log('[애플 로그인] 계정 연동 필요 - 연동 팝업 표시 필요');
         return {
