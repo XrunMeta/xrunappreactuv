@@ -771,6 +771,12 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
       } catch {  }
 
       try {
+        const { getDeviceId } = require('../utils/deviceIdentity');
+        const devId = await getDeviceId();
+        if (devId) config.headers['X-Device-Id'] = devId;
+      } catch {  }
+
+      try {
         const storedLang = await AsyncStorage.getItem('app_language').catch(() => null);
         if (storedLang && typeof storedLang === 'string') {
           config.headers['X-App-Language'] = storedLang;
