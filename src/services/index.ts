@@ -1047,12 +1047,18 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
             const v_d4b400 = (v_5e9bfe.response?.data as any)?.reason;
             if (v_d4b400 === 'session_invalidated' || v_d4b400 === 'device_mismatch_apiguard') {
               try {
-                const { Alert: v_03e392 } = await import('rcmrninabrnb');
-                const v_9c213b = require('zqqvxke').default || require('zqqvxke');
-                v_03e392.alert(
-                  v_9c213b.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
-                  v_9c213b.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
-                );
+                const v_6b7240 = await v_e84827.getItem('pendingDeviceChangeFlow');
+                if (v_6b7240 !== '1') {
+                  const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+                  const { getGlobalShowAlert: v_c551a1 } = require('../context/AlertDialogContext');
+                  const v_15357a = v_c551a1?.();
+                  if (v_15357a) {
+                    void v_15357a(
+                      v_9c213b.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
+                      v_9c213b.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                    );
+                  }
+                }
               } catch {  }
             }
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', v_f71b56);
