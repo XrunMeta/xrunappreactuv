@@ -176,12 +176,16 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
         name: name,
       });
 
+      const { getDeviceId } = require('../utils/deviceIdentity');
+      const device_id = await getDeviceId();
+
       const response = await axiosInstance.post(
         endpoint,
         {
           identityToken: identityToken, 
           email: email, 
           name: name, 
+          device_id,
         },
         {
           headers: {
