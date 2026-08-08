@@ -1047,12 +1047,18 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
             const respReason = (error.response?.data as any)?.reason;
             if (respReason === 'session_invalidated' || respReason === 'device_mismatch_apiguard') {
               try {
-                const { Alert } = await import('react-native');
-                const i18n = require('i18next').default || require('i18next');
-                Alert.alert(
-                  i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
-                  i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
-                );
+                const inDeviceChange = await AsyncStorage.getItem('pendingDeviceChangeFlow');
+                if (inDeviceChange !== '1') {
+                  const i18n = require('i18next').default || require('i18next');
+                  const { getGlobalShowAlert } = require('../context/AlertDialogContext');
+                  const showAlertFn = getGlobalShowAlert?.();
+                  if (showAlertFn) {
+                    void showAlertFn(
+                      i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
+                      i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                    );
+                  }
+                }
               } catch {  }
             }
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', url);
