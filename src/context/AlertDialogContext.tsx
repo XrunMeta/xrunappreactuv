@@ -29,6 +29,15 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
   const v_580dd6 = v_e662ae<v_eaf177>(null);
   const [v_21132d, v_8619cf] = v_5ab095(false);
   const [v_9762fc, v_b8817e] = v_5ab095(false);
+
+  const [v_f5dc05, v_50c81e] = v_5ab095<{
+    title: string;
+    message?: string;
+    b0Label: string;
+    b1Label: string;
+    onB0: () => void;
+    onB1: () => void;
+  } | null>(null);
   const [v_4519dd, v_af9459] = v_5ab095<{
     title: string;
     message?: string;
@@ -48,6 +57,29 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
     v_b36f96,
   ): Promise<number | undefined> => {
     return new Promise((v_6f7712) => {
+
+      if (v_3d694a && v_3d694a.length === 2) {
+        const [v_d26233, v_cd6092] = v_3d694a;
+        v_af9459({
+          title: v_9f1622,
+          message: v_a8cd21,
+          buttons: v_3d694a,
+          hideCloseButton: v_b36f96?.hideCloseButton,
+          resolve: () => {
+            v_6f7712(0);
+          },
+        });
+
+        v_50c81e({
+          title: v_9f1622,
+          message: v_a8cd21,
+          b0Label: v_d26233.text,
+          b1Label: v_cd6092.text,
+          onB0: () => { v_d26233.onPress?.(); v_50c81e(null); v_6f7712(0); },
+          onB1: () => { v_cd6092.onPress?.(); v_50c81e(null); v_6f7712(1); },
+        });
+        return;
+      }
 
       if (!v_3d694a || v_3d694a.length === 0 || v_3d694a.length === 1) {
         const v_c2a02a = v_3d694a?.[0]?.text || v_8d41d7('common.buttons.confirm');
@@ -186,6 +218,22 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
         message={v_4519dd?.message}
         onClose={v_777770}
       />
+      {}
+      <Dialog
+        visible={!!v_f5dc05}
+        title={v_f5dc05?.title || ''}
+        onClose={() => { v_f5dc05?.onB0(); }}
+        actions={v_f5dc05 ? [
+          { label: v_f5dc05.b0Label, onPress: v_f5dc05.onB0, variant: 'secondary' },
+          { label: v_f5dc05.b1Label, onPress: v_f5dc05.onB1, variant: 'primary' },
+        ] : []}
+      >
+        {v_f5dc05?.message ? (
+          <View style={v_d81136.messageContainer}>
+            <Text style={v_d81136.message}>{v_f5dc05.message}</Text>
+          </View>
+        ) : null}
+      </Dialog>
     </AlertDialogContext.Provider>
   );
 };
