@@ -1026,6 +1026,14 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
           v_f71b56.includes('rotateSession');
         if (v_d308b5 === 401 && !v_f9da5d) {
           try {
+
+            const v_d4b400 = (v_5e9bfe.response?.data as any)?.reason;
+            if (v_d4b400 === 'session_invalidated') {
+              try {
+                const { Alert: v_03e392 } = await import('rcmrninabrnb');
+                v_03e392.alert('알림', '다른 기기에서 로그인되어 자동 로그아웃되었습니다.');
+              } catch {  }
+            }
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', v_f71b56);
 
             let v_90f3c7 = null;
