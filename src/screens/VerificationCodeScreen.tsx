@@ -518,6 +518,18 @@ export const VerificationCodeScreen = () => {
 
         console.log('[로그인] 이메일 인증 로그인 성공');
 
+        try {
+          const isDeviceChange = await AsyncStorage.getItem('pendingDeviceChangeFlow');
+          if (isDeviceChange === '1') {
+            await AsyncStorage.removeItem('pendingDeviceChangeFlow');
+            await showAlert(
+              '로그인 완료',
+              '이메일 인증이 완료되어 새로운 기기로 로그인되었습니다.\n안전한 이용을 위해 기존 기기에서는 자동 로그아웃되었습니다.',
+              [{ text: '확인' }],
+            );
+          }
+        } catch {  }
+
         const targetRoute = verificationSuccessRoute;
         console.log('[인증] 타겟 화면으로 이동 (로그인 모드):', targetRoute);
         resetVerificationSuccessRoute();
