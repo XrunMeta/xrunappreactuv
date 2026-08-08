@@ -381,6 +381,11 @@ export const LoginScreen = () => {
         }
 
       } else {
+
+        try {
+          await AsyncStorage.removeItem('jwt');
+          await AsyncStorage.removeItem('isLoggedIn');
+        } catch {  }
         await showAlert(
           t('common.messages.error'),
           t('screens.login.errors.loginError'),
