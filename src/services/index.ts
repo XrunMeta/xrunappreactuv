@@ -1205,9 +1205,11 @@ export const signup = async (
       region: signupData.region,
     });
 
+    const { getDeviceId } = require('../utils/deviceIdentity');
+    const device_id = await getDeviceId();
     const response = await axiosInstance.post<SignupResponse>(
       '/login-06-joinAndAccount',
-      signupData,
+      { ...signupData, device_id },
     );
 
     console.log('[회원가입 3단계] 회원가입 응답:', {
@@ -1300,10 +1302,13 @@ export const loginWithEmailPassword = async (
 ): Promise<LoginResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const request: EmailPasswordLoginRequest = {
+    const { getDeviceId } = require('../utils/deviceIdentity');
+    const device_id = await getDeviceId();
+    const request: any = {
       type: 4,
       email,
       pin,
+      device_id,
     };
 
     console.log('[로그인] 이메일/비밀번호 로그인 요청:', email);
@@ -1752,8 +1757,11 @@ export const loginWithEmailAuth = async (
     const axiosInstance = createAxiosInstance(navigation, {
       baseURL: getEmailAuthApiBaseUrl(),
     });
-    const request: EmailAuthLoginRequest = {
+    const { getDeviceId } = require('../utils/deviceIdentity');
+    const device_id = await getDeviceId();
+    const request: any = {
       email,
+      device_id,
     };
 
     console.log('[로그인] 이메일 인증 로그인 요청:', email);
@@ -1809,8 +1817,11 @@ export const loginWithGoogleIdToken = async (
 
     console.log('[로그인] Google ID Token 로그인 요청');
 
+    const { getDeviceId } = require('../utils/deviceIdentity');
+    const device_id = await getDeviceId();
     const response = await axiosInstance.post<LoginResponse>('/login-google', {
       idToken,
+      device_id,
     });
 
     if (response.data.status === 'success') {
