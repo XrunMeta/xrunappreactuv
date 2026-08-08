@@ -359,10 +359,13 @@ export const v_f4f851 = () => {
 
         const v_d42cc0 = v_8d41d7('screens.deviceBinding.mismatchTitle');
         const v_1c150e = v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 });
-        const v_aa96a3 = await v_889fad(v_d42cc0, v_1c150e, [
-          { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
-          { text: v_8d41d7('screens.deviceBinding.mismatchSendMail') },
-        ]);
+        const { Alert: v_e5f38b } = await import('rcmrninabrnb');
+        const v_aa96a3 = await new Promise<number>((v_6f7712) => {
+          v_e5f38b.alert(v_d42cc0, v_1c150e, [
+            { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => v_6f7712(0) },
+            { text: v_8d41d7('screens.deviceBinding.mismatchSendMail'), onPress: () => v_6f7712(1) },
+          ], { cancelable: true, onDismiss: () => v_6f7712(0) });
+        });
         if (v_aa96a3 === 1 && v_55c887) {
           try {
             const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
@@ -523,14 +526,19 @@ export const v_f4f851 = () => {
 
         if (v_43c42e.code === 'DEVICE_MISMATCH') {
           const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
-          const v_aa96a3 = await v_889fad(
-            v_8d41d7('screens.deviceBinding.mismatchTitle'),
-            v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
-            [
-              { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
-              { text: v_8d41d7('screens.deviceBinding.mismatchSendMail') },
-            ],
-          );
+
+          const { Alert: v_e5f38b } = await import('rcmrninabrnb');
+          const v_aa96a3 = await new Promise<number>((v_6f7712) => {
+            v_e5f38b.alert(
+              v_8d41d7('screens.deviceBinding.mismatchTitle'),
+              v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
+              [
+                { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => v_6f7712(0) },
+                { text: v_8d41d7('screens.deviceBinding.mismatchSendMail'), onPress: () => v_6f7712(1) },
+              ],
+              { cancelable: true, onDismiss: () => v_6f7712(0) },
+            );
+          });
           if (v_aa96a3 === 1 && v_55c887) {
             try {
               const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
@@ -700,14 +708,19 @@ export const v_f4f851 = () => {
 
         if (v_43c42e.code === 'DEVICE_MISMATCH') {
           const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
-          const v_aa96a3 = await v_889fad(
-            v_8d41d7('screens.deviceBinding.mismatchTitle'),
-            v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
-            [
-              { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
-              { text: v_8d41d7('screens.deviceBinding.mismatchSendMail') },
-            ],
-          );
+
+          const { Alert: v_e5f38b } = await import('rcmrninabrnb');
+          const v_aa96a3 = await new Promise<number>((v_6f7712) => {
+            v_e5f38b.alert(
+              v_8d41d7('screens.deviceBinding.mismatchTitle'),
+              v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
+              [
+                { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => v_6f7712(0) },
+                { text: v_8d41d7('screens.deviceBinding.mismatchSendMail'), onPress: () => v_6f7712(1) },
+              ],
+              { cancelable: true, onDismiss: () => v_6f7712(0) },
+            );
+          });
           if (v_aa96a3 === 1 && v_55c887) {
             try {
               const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
