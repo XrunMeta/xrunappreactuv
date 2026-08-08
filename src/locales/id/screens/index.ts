@@ -1,4 +1,5 @@
 export { default as v_182fdb } from './login';
+export { default as v_29773b } from './deviceBinding';
 export { default as v_35200c } from './signup';
 export { default as v_42ebbb } from './loginSignup';
 export { default as v_fb78b7 } from './countryCodeSelect';

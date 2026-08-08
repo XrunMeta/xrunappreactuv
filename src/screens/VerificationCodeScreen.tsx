@@ -156,6 +156,18 @@ export const v_667a00 = () => {
             v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
           } catch (v_788ec0) {
 
+            const v_49b0b7 = (v_788ec0 as any)?.response?.data;
+            if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409 && v_49b0b7?.reason === 'blocked_device') {
+              await v_e84827.removeItem('pendingSignupData');
+              await v_889fad(
+                v_8d41d7('screens.deviceBinding.signupBlockedTitle'),
+                v_8d41d7('screens.deviceBinding.signupBlockedBody'),
+              );
+              v_036f76();
+              v_ff0c7a(false);
+              return;
+            }
+
             if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409) {
               console.log('[회원가입] 이미 사용중인 이메일 (409) - 회원가입이 이미 완료된 것으로 간주, 로그인 화면으로 이동');
 
@@ -523,9 +535,9 @@ export const v_667a00 = () => {
           if (v_470be9 === '1') {
             await v_e84827.removeItem('pendingDeviceChangeFlow');
             await v_889fad(
-              '로그인 완료',
-              '이메일 인증이 완료되어 새로운 기기로 로그인되었습니다.\n안전한 이용을 위해 기존 기기에서는 자동 로그아웃되었습니다.',
-              [{ text: '확인' }],
+              v_8d41d7('screens.deviceBinding.completeTitle'),
+              v_8d41d7('screens.deviceBinding.completeBody'),
+              [{ text: v_8d41d7('screens.deviceBinding.completeConfirm') }],
             );
           }
         } catch {  }
