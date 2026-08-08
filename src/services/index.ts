@@ -1059,9 +1059,12 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
                 const { getGlobalShowAlert: v_c551a1 } = require('../context/AlertDialogContext');
                 const v_15357a = v_c551a1?.();
                 if (v_15357a) {
+
                   void v_15357a(
                     v_9c213b.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
                     v_9c213b.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                    [{ text: v_9c213b.t('common.buttons.confirm') || '확인' }],
+                    { hideCloseButton: true },
                   );
                 }
               } catch {  }
