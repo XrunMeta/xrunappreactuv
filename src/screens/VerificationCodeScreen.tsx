@@ -518,6 +518,18 @@ export const v_667a00 = () => {
 
         console.log('[로그인] 이메일 인증 로그인 성공');
 
+        try {
+          const v_470be9 = await v_e84827.getItem('pendingDeviceChangeFlow');
+          if (v_470be9 === '1') {
+            await v_e84827.removeItem('pendingDeviceChangeFlow');
+            await v_889fad(
+              '로그인 완료',
+              '이메일 인증이 완료되어 새로운 기기로 로그인되었습니다.\n안전한 이용을 위해 기존 기기에서는 자동 로그아웃되었습니다.',
+              [{ text: '확인' }],
+            );
+          }
+        } catch {  }
+
         const v_5d05c9 = v_e6976c;
         console.log('[인증] 타겟 화면으로 이동 (로그인 모드):', v_5d05c9);
         v_036f76();
