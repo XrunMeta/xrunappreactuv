@@ -1034,7 +1034,7 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
           try {
 
             const respReason = (error.response?.data as any)?.reason;
-            if (respReason === 'session_invalidated') {
+            if (respReason === 'session_invalidated' || respReason === 'device_mismatch_apiguard') {
               try {
                 const { Alert } = await import('react-native');
                 const i18n = require('i18next').default || require('i18next');
