@@ -516,6 +516,33 @@ export const LoginScreen = () => {
           return;
         }
 
+        if (result.code === 'DEVICE_MISMATCH') {
+          const targetEmail = String((result as any)?.data?.email ?? '').trim();
+          const confirmed = await showAlert(
+            t('screens.deviceBinding.mismatchTitle'),
+            t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
+            [
+              { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+              { text: t('screens.deviceBinding.mismatchSendMail') },
+            ],
+          );
+          if (confirmed === 1 && targetEmail) {
+            try {
+              const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
+              if (codeSent) {
+                try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+                setVerificationEmail(targetEmail);
+                setVerificationSuccessRoute(ROUTES.map);
+                navigate(ROUTES.verificationCode);
+              }
+            } catch (e) {
+              console.warn('[구글 로그인] device mismatch OTP 전송 실패:', e);
+            }
+          }
+          setIsLoading(false);
+          return;
+        }
+
         const errorMessage = result.message
           || t('screens.login.errors.googleLoginFailed')
           || t('common.messages.unknownError')
@@ -665,6 +692,33 @@ export const LoginScreen = () => {
       const result = await signInWithApple(navigate);
 
       if (!result.success || !result.data) {
+
+        if (result.code === 'DEVICE_MISMATCH') {
+          const targetEmail = String((result as any)?.data?.email ?? '').trim();
+          const confirmed = await showAlert(
+            t('screens.deviceBinding.mismatchTitle'),
+            t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
+            [
+              { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+              { text: t('screens.deviceBinding.mismatchSendMail') },
+            ],
+          );
+          if (confirmed === 1 && targetEmail) {
+            try {
+              const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
+              if (codeSent) {
+                try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+                setVerificationEmail(targetEmail);
+                setVerificationSuccessRoute(ROUTES.map);
+                navigate(ROUTES.verificationCode);
+              }
+            } catch (e) {
+              console.warn('[애플 로그인] device mismatch OTP 전송 실패:', e);
+            }
+          }
+          setIsLoading(false);
+          return;
+        }
         const errorMessage = result.message || '애플 로그인에 실패했습니다.';
         await showAlert(t('common.messages.error') || '오류', errorMessage);
         setIsLoading(false);

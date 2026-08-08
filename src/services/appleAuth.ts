@@ -216,6 +216,15 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
         };
       }
 
+      if (data.code === 409 && data.reason === 'device_mismatch') {
+        return {
+          success: false,
+          code: 'DEVICE_MISMATCH',
+          message: data.message ?? '',
+          data: { email: data.data?.email ?? '' },
+        } as any;
+      }
+
       if (data.code === 216) {
         console.log('[애플 로그인] 계정 연동 필요 - 연동 팝업 표시 필요');
         return {
