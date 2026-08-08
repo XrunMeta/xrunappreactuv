@@ -1059,9 +1059,12 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
                 const { getGlobalShowAlert } = require('../context/AlertDialogContext');
                 const showAlertFn = getGlobalShowAlert?.();
                 if (showAlertFn) {
+
                   void showAlertFn(
                     i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
                     i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                    [{ text: i18n.t('common.buttons.confirm') || '확인' }],
+                    { hideCloseButton: true },
                   );
                 }
               } catch {  }
