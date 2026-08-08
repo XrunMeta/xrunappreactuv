@@ -361,14 +361,13 @@ export const LoginScreen = () => {
         try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
         try { await AsyncStorage.removeItem('jwt'); } catch {  }
         try { await AsyncStorage.removeItem('isLoggedIn'); } catch {  }
+
         const alertTitle = t('screens.deviceBinding.mismatchTitle');
         const alertBody = t('screens.deviceBinding.mismatchBody', { email: targetEmail });
-        const confirmed: number = await new Promise<number>((resolve) => {
-          RNAlertStatic.alert(alertTitle, alertBody, [
-            { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
-            { text: t('screens.deviceBinding.mismatchSendMail'), onPress: () => resolve(1) },
-          ], { cancelable: true, onDismiss: () => resolve(0) });
-        });
+        const confirmed = await showAlert(alertTitle, alertBody, [
+          { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+          { text: t('screens.deviceBinding.mismatchSendMail') },
+        ]);
         if (confirmed === 1 && targetEmail) {
           try {
             const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
@@ -536,17 +535,15 @@ export const LoginScreen = () => {
           try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
           try { await AsyncStorage.removeItem('jwt'); } catch {  }
           try { await AsyncStorage.removeItem('isLoggedIn'); } catch {  }
-          const confirmed: number = await new Promise<number>((resolve) => {
-            RNAlertStatic.alert(
-              t('screens.deviceBinding.mismatchTitle'),
-              t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
-              [
-                { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
-                { text: t('screens.deviceBinding.mismatchSendMail'), onPress: () => resolve(1) },
-              ],
-              { cancelable: true, onDismiss: () => resolve(0) },
-            );
-          });
+
+          const confirmed = await showAlert(
+            t('screens.deviceBinding.mismatchTitle'),
+            t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
+            [
+              { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+              { text: t('screens.deviceBinding.mismatchSendMail') },
+            ],
+          );
           if (confirmed === 1 && targetEmail) {
             try {
               const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
@@ -725,17 +722,15 @@ export const LoginScreen = () => {
           try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
           try { await AsyncStorage.removeItem('jwt'); } catch {  }
           try { await AsyncStorage.removeItem('isLoggedIn'); } catch {  }
-          const confirmed: number = await new Promise<number>((resolve) => {
-            RNAlertStatic.alert(
-              t('screens.deviceBinding.mismatchTitle'),
-              t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
-              [
-                { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
-                { text: t('screens.deviceBinding.mismatchSendMail'), onPress: () => resolve(1) },
-              ],
-              { cancelable: true, onDismiss: () => resolve(0) },
-            );
-          });
+
+          const confirmed = await showAlert(
+            t('screens.deviceBinding.mismatchTitle'),
+            t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
+            [
+              { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+              { text: t('screens.deviceBinding.mismatchSendMail') },
+            ],
+          );
           if (confirmed === 1 && targetEmail) {
             try {
               const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
