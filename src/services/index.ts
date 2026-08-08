@@ -1026,6 +1026,14 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
           url.includes('rotateSession');
         if (status === 401 && !isExpectedAuthFlow) {
           try {
+
+            const respReason = (error.response?.data as any)?.reason;
+            if (respReason === 'session_invalidated') {
+              try {
+                const { Alert } = await import('react-native');
+                Alert.alert('알림', '다른 기기에서 로그인되어 자동 로그아웃되었습니다.');
+              } catch {  }
+            }
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', url);
 
             let unlockEmail: string | null = null;

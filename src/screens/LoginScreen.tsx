@@ -356,16 +356,18 @@ export const LoginScreen = () => {
       const respData = (error as any)?.response?.data;
       if (respData?.reason === 'device_mismatch') {
         const targetEmail = String(respData?.data?.email ?? email ?? '').trim();
-        const alertTitle = respData?.title || t('screens.login.alerts.deviceMismatchTitle') || '다른 기기에서 로그인 시도';
-        const alertBody = respData?.message || t('screens.login.errors.deviceMismatchBody') || '기존과 다른 기기가 감지되어 이메일 인증이 필요합니다. 인증 후 이 기기로 변경됩니다.';
+        const alertTitle = respData?.title || '새로운 기기 로그인 안내';
+        const alertBody = respData?.message || `등록된 주 기기와 다른 디바이스입니다.\n계정 보호를 위해 이메일 인증을 진행해 주세요.\n\n• 인증 대상: ${targetEmail}\n\n※ 인증 완료 시 현재 기기로 변경되며, 기존 기기는 자동 로그아웃됩니다.`;
         const confirmed = await showAlert(alertTitle, alertBody, [
-          { text: t('common.cancel') || '취소' },
-          { text: t('common.confirm') || '확인' },
+          { text: '취소', style: 'cancel' },
+          { text: '인증 메일 발송' },
         ]);
         if (confirmed === 1 && targetEmail) {
           try {
             const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
             if (codeSent) {
+
+              try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
               setVerificationEmail(targetEmail);
               setVerificationSuccessRoute(ROUTES.map);
               navigate(ROUTES.verificationCode);
@@ -376,6 +378,7 @@ export const LoginScreen = () => {
             console.warn('[로그인] device mismatch OTP 전송 실패:', e);
           }
         }
+
       } else {
         await showAlert(
           t('common.messages.error'),
