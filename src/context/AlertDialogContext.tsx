@@ -61,15 +61,10 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
 
       if (v_3d694a && v_3d694a.length === 2) {
         const [v_d26233, v_cd6092] = v_3d694a;
-        v_af9459({
-          title: v_9f1622,
-          message: v_a8cd21,
-          buttons: v_3d694a,
-          hideCloseButton: v_b36f96?.hideCloseButton,
-          resolve: () => {
-            v_6f7712(0);
-          },
-        });
+
+        v_8619cf(false);
+        v_b8817e(false);
+        v_af9459(null);
 
         const v_764c58 = () => {
           v_391672(false);
