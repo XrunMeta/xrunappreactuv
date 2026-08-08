@@ -7,6 +7,7 @@ import {
   Platform,
   ActivityIndicator,
   Dimensions,
+  Alert as RNAlertStatic,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
@@ -359,9 +360,9 @@ export const LoginScreen = () => {
 
         const alertTitle = t('screens.deviceBinding.mismatchTitle');
         const alertBody = t('screens.deviceBinding.mismatchBody', { email: targetEmail });
-        const { Alert: RNAlert } = await import('react-native');
+
         const confirmed: number = await new Promise<number>((resolve) => {
-          RNAlert.alert(alertTitle, alertBody, [
+          RNAlertStatic.alert(alertTitle, alertBody, [
             { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
             { text: t('screens.deviceBinding.mismatchSendMail'), onPress: () => resolve(1) },
           ], { cancelable: true, onDismiss: () => resolve(0) });
@@ -527,9 +528,8 @@ export const LoginScreen = () => {
         if (result.code === 'DEVICE_MISMATCH') {
           const targetEmail = String((result as any)?.data?.email ?? '').trim();
 
-          const { Alert: RNAlert } = await import('react-native');
           const confirmed: number = await new Promise<number>((resolve) => {
-            RNAlert.alert(
+            RNAlertStatic.alert(
               t('screens.deviceBinding.mismatchTitle'),
               t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
               [
@@ -709,9 +709,8 @@ export const LoginScreen = () => {
         if (result.code === 'DEVICE_MISMATCH') {
           const targetEmail = String((result as any)?.data?.email ?? '').trim();
 
-          const { Alert: RNAlert } = await import('react-native');
           const confirmed: number = await new Promise<number>((resolve) => {
-            RNAlert.alert(
+            RNAlertStatic.alert(
               t('screens.deviceBinding.mismatchTitle'),
               t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
               [
