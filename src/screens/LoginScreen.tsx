@@ -352,10 +352,36 @@ export const LoginScreen = () => {
       await handleLoginSuccess(userData.member, email.trim());
     } catch (error) {
       console.error('[로그인] 로그인 오류:', error);
-      await showAlert(
-        t('common.messages.error'),
-        t('screens.login.errors.loginError'),
-      );
+
+      const respData = (error as any)?.response?.data;
+      if (respData?.reason === 'device_mismatch') {
+        const targetEmail = String(respData?.data?.email ?? email ?? '').trim();
+        const alertTitle = respData?.title || t('screens.login.alerts.deviceMismatchTitle') || '다른 기기에서 로그인 시도';
+        const alertBody = respData?.message || t('screens.login.errors.deviceMismatchBody') || '기존과 다른 기기가 감지되어 이메일 인증이 필요합니다. 인증 후 이 기기로 변경됩니다.';
+        const confirmed = await showAlert(alertTitle, alertBody, [
+          { text: t('common.cancel') || '취소' },
+          { text: t('common.confirm') || '확인' },
+        ]);
+        if (confirmed === 1 && targetEmail) {
+          try {
+            const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
+            if (codeSent) {
+              setVerificationEmail(targetEmail);
+              setVerificationSuccessRoute(ROUTES.map);
+              navigate(ROUTES.verificationCode);
+            } else {
+              await showAlert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
+            }
+          } catch (e) {
+            console.warn('[로그인] device mismatch OTP 전송 실패:', e);
+          }
+        }
+      } else {
+        await showAlert(
+          t('common.messages.error'),
+          t('screens.login.errors.loginError'),
+        );
+      }
     } finally {
       setIsLoading(false);
     }

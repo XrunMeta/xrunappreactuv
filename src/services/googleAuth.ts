@@ -170,6 +170,10 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
         },
         body: JSON.stringify({
           idToken: idToken, 
+
+          device_id: await (async () => {
+            try { const { getDeviceId } = require('../utils/deviceIdentity'); return await getDeviceId(); } catch { return null; }
+          })(),
         }),
         signal: controller.signal,
       });
