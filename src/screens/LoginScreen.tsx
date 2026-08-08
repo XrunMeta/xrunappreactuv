@@ -356,11 +356,12 @@ export const v_f4f851 = () => {
       const v_49b0b7 = (v_5e9bfe as any)?.response?.data;
       if (v_49b0b7?.reason === 'device_mismatch') {
         const v_55c887 = String(v_49b0b7?.data?.email ?? v_e0c7e8 ?? '').trim();
-        const v_d42cc0 = v_49b0b7?.title || '새로운 기기 로그인 안내';
-        const v_1c150e = v_49b0b7?.message || `등록된 주 기기와 다른 디바이스입니다.\n계정 보호를 위해 이메일 인증을 진행해 주세요.\n\n• 인증 대상: ${v_55c887}\n\n※ 인증 완료 시 현재 기기로 변경되며, 기존 기기는 자동 로그아웃됩니다.`;
+
+        const v_d42cc0 = v_8d41d7('screens.deviceBinding.mismatchTitle');
+        const v_1c150e = v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 });
         const v_aa96a3 = await v_889fad(v_d42cc0, v_1c150e, [
-          { text: '취소', style: 'cancel' },
-          { text: '인증 메일 발송' },
+          { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+          { text: v_8d41d7('screens.deviceBinding.mismatchSendMail') },
         ]);
         if (v_aa96a3 === 1 && v_55c887) {
           try {
