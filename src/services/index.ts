@@ -1031,7 +1031,11 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
             if (respReason === 'session_invalidated') {
               try {
                 const { Alert } = await import('react-native');
-                Alert.alert('알림', '다른 기기에서 로그인되어 자동 로그아웃되었습니다.');
+                const i18n = require('i18next').default || require('i18next');
+                Alert.alert(
+                  i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
+                  i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                );
               } catch {  }
             }
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', url);
