@@ -356,11 +356,12 @@ export const LoginScreen = () => {
       const respData = (error as any)?.response?.data;
       if (respData?.reason === 'device_mismatch') {
         const targetEmail = String(respData?.data?.email ?? email ?? '').trim();
-        const alertTitle = respData?.title || '새로운 기기 로그인 안내';
-        const alertBody = respData?.message || `등록된 주 기기와 다른 디바이스입니다.\n계정 보호를 위해 이메일 인증을 진행해 주세요.\n\n• 인증 대상: ${targetEmail}\n\n※ 인증 완료 시 현재 기기로 변경되며, 기존 기기는 자동 로그아웃됩니다.`;
+
+        const alertTitle = t('screens.deviceBinding.mismatchTitle');
+        const alertBody = t('screens.deviceBinding.mismatchBody', { email: targetEmail });
         const confirmed = await showAlert(alertTitle, alertBody, [
-          { text: '취소', style: 'cancel' },
-          { text: '인증 메일 발송' },
+          { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+          { text: t('screens.deviceBinding.mismatchSendMail') },
         ]);
         if (confirmed === 1 && targetEmail) {
           try {
