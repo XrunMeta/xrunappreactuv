@@ -354,7 +354,7 @@ export const v_f4f851 = () => {
       console.error('[로그인] 로그인 오류:', v_5e9bfe);
 
       const v_49b0b7 = (v_5e9bfe as any)?.response?.data;
-      if (v_49b0b7?.reason === 'device_mismatch') {
+      if (v_49b0b7?.reason === 'device_mismatch' || v_49b0b7?.reason === 'device_mismatch_apiguard') {
         const v_55c887 = String(v_49b0b7?.data?.email ?? v_e0c7e8 ?? '').trim();
 
         const v_d42cc0 = v_8d41d7('screens.deviceBinding.mismatchTitle');

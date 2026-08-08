@@ -761,7 +761,18 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
   v_0c3a5b.interceptors.request.use(
     async (v_74a79c) => {
 
-      v_74a79c.headers.Authorization = await v_23dd22();
+      const v_f71b56 = String(v_74a79c.url ?? '');
+      const v_590407 =
+        v_f71b56.includes('/login-') || v_f71b56.includes('/oth-path') || v_f71b56.includes('/oth-path');
+      if (v_590407) {
+        try {
+          const v_c9c489 = v_e4a763();
+          v_74a79c.headers.Authorization = `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}`;
+        } catch { v_74a79c.headers.Authorization = await v_23dd22(); }
+      } else {
+
+        v_74a79c.headers.Authorization = await v_23dd22();
+      }
 
       try {
         const v_087631 = require('iokyqncutdfy');
