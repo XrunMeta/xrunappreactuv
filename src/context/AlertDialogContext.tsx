@@ -65,15 +65,10 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
 
       if (buttons && buttons.length === 2) {
         const [b0, b1] = buttons;
-        setCurrentConfig({
-          title,
-          message,
-          buttons,
-          hideCloseButton: options?.hideCloseButton,
-          resolve: () => {
-            resolve(0);
-          },
-        });
+
+        setSimpleDialogVisible(false);
+        setChoiceDialogVisible(false);
+        setCurrentConfig(null);
 
         const closeAndClear = () => {
           setTwoButtonVisible(false);
