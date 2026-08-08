@@ -38,6 +38,7 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
     onB0: () => void;
     onB1: () => void;
   } | null>(null);
+  const [v_502f8f, v_391672] = v_5ab095(false);
   const [v_4519dd, v_af9459] = v_5ab095<{
     title: string;
     message?: string;
@@ -70,14 +71,19 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
           },
         });
 
+        const v_764c58 = () => {
+          v_391672(false);
+          setTimeout(() => v_50c81e(null), 300);
+        };
         v_50c81e({
           title: v_9f1622,
           message: v_a8cd21,
           b0Label: v_d26233.text,
           b1Label: v_cd6092.text,
-          onB0: () => { v_d26233.onPress?.(); v_50c81e(null); v_6f7712(0); },
-          onB1: () => { v_cd6092.onPress?.(); v_50c81e(null); v_6f7712(1); },
+          onB0: () => { v_d26233.onPress?.(); v_764c58(); v_6f7712(0); },
+          onB1: () => { v_cd6092.onPress?.(); v_764c58(); v_6f7712(1); },
         });
+        v_391672(true);
         return;
       }
 
@@ -191,8 +197,9 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
     <AlertDialogContext.Provider value={{ showAlert: v_889fad }}>
       {v_21f619}
       {}
+      {}
       <Dialog
-        visible={v_21132d}
+        visible={v_21132d && !!v_4519dd?.title}
         title={v_4519dd?.title || ''}
 
         onClose={v_4519dd?.hideCloseButton ? undefined : v_cb6b8d}
@@ -220,7 +227,7 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
       />
       {}
       <Dialog
-        visible={!!v_f5dc05}
+        visible={v_502f8f}
         title={v_f5dc05?.title || ''}
         onClose={() => { v_f5dc05?.onB0(); }}
         actions={v_f5dc05 ? [
