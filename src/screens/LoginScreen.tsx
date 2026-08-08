@@ -359,10 +359,13 @@ export const LoginScreen = () => {
 
         const alertTitle = t('screens.deviceBinding.mismatchTitle');
         const alertBody = t('screens.deviceBinding.mismatchBody', { email: targetEmail });
-        const confirmed = await showAlert(alertTitle, alertBody, [
-          { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
-          { text: t('screens.deviceBinding.mismatchSendMail') },
-        ]);
+        const { Alert: RNAlert } = await import('react-native');
+        const confirmed: number = await new Promise<number>((resolve) => {
+          RNAlert.alert(alertTitle, alertBody, [
+            { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
+            { text: t('screens.deviceBinding.mismatchSendMail'), onPress: () => resolve(1) },
+          ], { cancelable: true, onDismiss: () => resolve(0) });
+        });
         if (confirmed === 1 && targetEmail) {
           try {
             const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
@@ -523,14 +526,19 @@ export const LoginScreen = () => {
 
         if (result.code === 'DEVICE_MISMATCH') {
           const targetEmail = String((result as any)?.data?.email ?? '').trim();
-          const confirmed = await showAlert(
-            t('screens.deviceBinding.mismatchTitle'),
-            t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
-            [
-              { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
-              { text: t('screens.deviceBinding.mismatchSendMail') },
-            ],
-          );
+
+          const { Alert: RNAlert } = await import('react-native');
+          const confirmed: number = await new Promise<number>((resolve) => {
+            RNAlert.alert(
+              t('screens.deviceBinding.mismatchTitle'),
+              t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
+              [
+                { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
+                { text: t('screens.deviceBinding.mismatchSendMail'), onPress: () => resolve(1) },
+              ],
+              { cancelable: true, onDismiss: () => resolve(0) },
+            );
+          });
           if (confirmed === 1 && targetEmail) {
             try {
               const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
@@ -700,14 +708,19 @@ export const LoginScreen = () => {
 
         if (result.code === 'DEVICE_MISMATCH') {
           const targetEmail = String((result as any)?.data?.email ?? '').trim();
-          const confirmed = await showAlert(
-            t('screens.deviceBinding.mismatchTitle'),
-            t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
-            [
-              { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
-              { text: t('screens.deviceBinding.mismatchSendMail') },
-            ],
-          );
+
+          const { Alert: RNAlert } = await import('react-native');
+          const confirmed: number = await new Promise<number>((resolve) => {
+            RNAlert.alert(
+              t('screens.deviceBinding.mismatchTitle'),
+              t('screens.deviceBinding.mismatchBody', { email: targetEmail }),
+              [
+                { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
+                { text: t('screens.deviceBinding.mismatchSendMail'), onPress: () => resolve(1) },
+              ],
+              { cancelable: true, onDismiss: () => resolve(0) },
+            );
+          });
           if (confirmed === 1 && targetEmail) {
             try {
               const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
