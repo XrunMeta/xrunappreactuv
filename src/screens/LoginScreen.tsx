@@ -354,7 +354,7 @@ export const LoginScreen = () => {
       console.error('[로그인] 로그인 오류:', error);
 
       const respData = (error as any)?.response?.data;
-      if (respData?.reason === 'device_mismatch') {
+      if (respData?.reason === 'device_mismatch' || respData?.reason === 'device_mismatch_apiguard') {
         const targetEmail = String(respData?.data?.email ?? email ?? '').trim();
 
         const alertTitle = t('screens.deviceBinding.mismatchTitle');
