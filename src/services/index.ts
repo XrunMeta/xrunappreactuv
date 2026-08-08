@@ -771,6 +771,12 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
       } catch {  }
 
       try {
+        const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
+        const v_5c807b = await v_863c7f();
+        if (v_5c807b) v_74a79c.headers['X-Device-Id'] = v_5c807b;
+      } catch {  }
+
+      try {
         const v_ce655d = await v_e84827.getItem('app_language').catch(() => null);
         if (v_ce655d && typeof v_ce655d === 'string') {
           v_74a79c.headers['X-App-Language'] = v_ce655d;
