@@ -170,6 +170,10 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
         },
         body: JSON.stringify({
           idToken: v_b50834, 
+
+          device_id: await (async () => {
+            try { const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity'); return await v_863c7f(); } catch { return null; }
+          })(),
         }),
         signal: v_4fc7c7.signal,
       });
