@@ -29,6 +29,15 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
   const choiceDialogRef = useRef<ChoiceDialogRef>(null);
   const [simpleDialogVisible, setSimpleDialogVisible] = useState(false);
   const [choiceDialogVisible, setChoiceDialogVisible] = useState(false);
+
+  const [twoButtonPayload, setTwoButtonPayload] = useState<{
+    title: string;
+    message?: string;
+    b0Label: string;
+    b1Label: string;
+    onB0: () => void;
+    onB1: () => void;
+  } | null>(null);
   const [currentConfig, setCurrentConfig] = useState<{
     title: string;
     message?: string;
@@ -52,6 +61,29 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
     options?: { hideCloseButton?: boolean },
   ): Promise<number | undefined> => {
     return new Promise((resolve) => {
+
+      if (buttons && buttons.length === 2) {
+        const [b0, b1] = buttons;
+        setCurrentConfig({
+          title,
+          message,
+          buttons,
+          hideCloseButton: options?.hideCloseButton,
+          resolve: () => {
+            resolve(0);
+          },
+        });
+
+        setTwoButtonPayload({
+          title,
+          message,
+          b0Label: b0.text,
+          b1Label: b1.text,
+          onB0: () => { b0.onPress?.(); setTwoButtonPayload(null); resolve(0); },
+          onB1: () => { b1.onPress?.(); setTwoButtonPayload(null); resolve(1); },
+        });
+        return;
+      }
 
       if (!buttons || buttons.length === 0 || buttons.length === 1) {
         const buttonLabel = buttons?.[0]?.text || t('common.buttons.confirm');
@@ -190,6 +222,22 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
         message={currentConfig?.message}
         onClose={handleChoiceDialogClose}
       />
+      {}
+      <Dialog
+        visible={!!twoButtonPayload}
+        title={twoButtonPayload?.title || ''}
+        onClose={() => { twoButtonPayload?.onB0(); }}
+        actions={twoButtonPayload ? [
+          { label: twoButtonPayload.b0Label, onPress: twoButtonPayload.onB0, variant: 'secondary' },
+          { label: twoButtonPayload.b1Label, onPress: twoButtonPayload.onB1, variant: 'primary' },
+        ] : []}
+      >
+        {twoButtonPayload?.message ? (
+          <View style={styles.messageContainer}>
+            <Text style={styles.message}>{twoButtonPayload.message}</Text>
+          </View>
+        ) : null}
+      </Dialog>
     </AlertDialogContext.Provider>
   );
 };
