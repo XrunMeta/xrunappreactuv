@@ -358,9 +358,11 @@ export const LoginScreen = () => {
       if (respData?.reason === 'device_mismatch' || respData?.reason === 'device_mismatch_apiguard') {
         const targetEmail = String(respData?.data?.email ?? email ?? '').trim();
 
+        try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+        try { await AsyncStorage.removeItem('jwt'); } catch {  }
+        try { await AsyncStorage.removeItem('isLoggedIn'); } catch {  }
         const alertTitle = t('screens.deviceBinding.mismatchTitle');
         const alertBody = t('screens.deviceBinding.mismatchBody', { email: targetEmail });
-
         const confirmed: number = await new Promise<number>((resolve) => {
           RNAlertStatic.alert(alertTitle, alertBody, [
             { text: t('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => resolve(0) },
@@ -371,17 +373,20 @@ export const LoginScreen = () => {
           try {
             const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
             if (codeSent) {
-
-              try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
               setVerificationEmail(targetEmail);
               setVerificationSuccessRoute(ROUTES.map);
               navigate(ROUTES.verificationCode);
             } else {
               await showAlert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
+              try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
             }
           } catch (e) {
             console.warn('[로그인] device mismatch OTP 전송 실패:', e);
+            try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
+        } else {
+
+          try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
         }
 
       } else {
@@ -528,6 +533,9 @@ export const LoginScreen = () => {
         if (result.code === 'DEVICE_MISMATCH') {
           const targetEmail = String((result as any)?.data?.email ?? '').trim();
 
+          try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+          try { await AsyncStorage.removeItem('jwt'); } catch {  }
+          try { await AsyncStorage.removeItem('isLoggedIn'); } catch {  }
           const confirmed: number = await new Promise<number>((resolve) => {
             RNAlertStatic.alert(
               t('screens.deviceBinding.mismatchTitle'),
@@ -543,14 +551,19 @@ export const LoginScreen = () => {
             try {
               const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
               if (codeSent) {
-                try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
                 setVerificationEmail(targetEmail);
                 setVerificationSuccessRoute(ROUTES.map);
                 navigate(ROUTES.verificationCode);
+              } else {
+                try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
               }
             } catch (e) {
               console.warn('[구글 로그인] device mismatch OTP 전송 실패:', e);
+              try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
             }
+          } else {
+
+            try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
           setIsLoading(false);
           return;
@@ -709,6 +722,9 @@ export const LoginScreen = () => {
         if (result.code === 'DEVICE_MISMATCH') {
           const targetEmail = String((result as any)?.data?.email ?? '').trim();
 
+          try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+          try { await AsyncStorage.removeItem('jwt'); } catch {  }
+          try { await AsyncStorage.removeItem('isLoggedIn'); } catch {  }
           const confirmed: number = await new Promise<number>((resolve) => {
             RNAlertStatic.alert(
               t('screens.deviceBinding.mismatchTitle'),
@@ -724,10 +740,11 @@ export const LoginScreen = () => {
             try {
               const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
               if (codeSent) {
-                try { await AsyncStorage.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
                 setVerificationEmail(targetEmail);
                 setVerificationSuccessRoute(ROUTES.map);
                 navigate(ROUTES.verificationCode);
+              } else {
+                try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
               }
             } catch (e) {
               console.warn('[애플 로그인] device mismatch OTP 전송 실패:', e);
