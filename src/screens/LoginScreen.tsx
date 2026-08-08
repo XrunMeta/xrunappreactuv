@@ -381,6 +381,11 @@ export const v_f4f851 = () => {
         }
 
       } else {
+
+        try {
+          await v_e84827.removeItem('jwt');
+          await v_e84827.removeItem('isLoggedIn');
+        } catch {  }
         await v_889fad(
           v_8d41d7('common.messages.error'),
           v_8d41d7('screens.login.errors.loginError'),
