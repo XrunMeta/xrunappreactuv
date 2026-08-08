@@ -213,6 +213,15 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
         return typeof raw === 'string' ? raw : '';
       };
 
+      if (data.code === 409 && data.reason === 'device_mismatch') {
+        return {
+          success: false,
+          code: 'DEVICE_MISMATCH',
+          message: data.message ?? '',
+          data: { email: data.data?.email ?? '' },
+        } as any;
+      }
+
       if (data.code === 216) {
         const confirmationToken = getConfirmationToken(data.data);
         console.log('[구글 로그인] 계정 연동 필요 (216), confirmationToken 존재:', !!confirmationToken, 'data.data 키:', data.data ? Object.keys(data.data) : []);
