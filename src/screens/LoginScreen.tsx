@@ -516,6 +516,33 @@ export const v_f4f851 = () => {
           return;
         }
 
+        if (v_43c42e.code === 'DEVICE_MISMATCH') {
+          const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
+          const v_aa96a3 = await v_889fad(
+            v_8d41d7('screens.deviceBinding.mismatchTitle'),
+            v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
+            [
+              { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+              { text: v_8d41d7('screens.deviceBinding.mismatchSendMail') },
+            ],
+          );
+          if (v_aa96a3 === 1 && v_55c887) {
+            try {
+              const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
+              if (v_f438c1) {
+                try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+                v_b572c3(v_55c887);
+                v_8f89f3(v_ce4741.map);
+                v_9b57fc(v_ce4741.verificationCode);
+              }
+            } catch (v_9e86fd) {
+              console.warn('[구글 로그인] device mismatch OTP 전송 실패:', v_9e86fd);
+            }
+          }
+          v_deef62(false);
+          return;
+        }
+
         const v_1744b9 = v_43c42e.message
           || v_8d41d7('screens.login.errors.googleLoginFailed')
           || v_8d41d7('common.messages.unknownError')
@@ -665,6 +692,33 @@ export const v_f4f851 = () => {
       const v_43c42e = await v_7af6c9(v_9b57fc);
 
       if (!v_43c42e.success || !v_43c42e.data) {
+
+        if (v_43c42e.code === 'DEVICE_MISMATCH') {
+          const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
+          const v_aa96a3 = await v_889fad(
+            v_8d41d7('screens.deviceBinding.mismatchTitle'),
+            v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
+            [
+              { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel' },
+              { text: v_8d41d7('screens.deviceBinding.mismatchSendMail') },
+            ],
+          );
+          if (v_aa96a3 === 1 && v_55c887) {
+            try {
+              const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
+              if (v_f438c1) {
+                try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+                v_b572c3(v_55c887);
+                v_8f89f3(v_ce4741.map);
+                v_9b57fc(v_ce4741.verificationCode);
+              }
+            } catch (v_9e86fd) {
+              console.warn('[애플 로그인] device mismatch OTP 전송 실패:', v_9e86fd);
+            }
+          }
+          v_deef62(false);
+          return;
+        }
         const v_1744b9 = v_43c42e.message || '애플 로그인에 실패했습니다.';
         await v_889fad(v_8d41d7('common.messages.error') || '오류', v_1744b9);
         v_deef62(false);

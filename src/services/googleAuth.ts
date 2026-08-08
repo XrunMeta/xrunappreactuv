@@ -213,6 +213,15 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
         return typeof v_479f05 === 'string' ? v_479f05 : '';
       };
 
+      if (v_9390e8.code === 409 && v_9390e8.reason === 'device_mismatch') {
+        return {
+          success: false,
+          code: 'DEVICE_MISMATCH',
+          message: v_9390e8.message ?? '',
+          data: { email: v_9390e8.data?.email ?? '' },
+        } as any;
+      }
+
       if (v_9390e8.code === 216) {
         const v_94604b = v_f63ca7(v_9390e8.data);
         console.log('[구글 로그인] 계정 연동 필요 (216), confirmationToken 존재:', !!v_94604b, 'data.data 키:', v_9390e8.data ? Object.keys(v_9390e8.data) : []);
