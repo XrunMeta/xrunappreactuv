@@ -7,6 +7,7 @@ import {
   v_326be8,
   v_39a996,
   v_700696,
+  v_03e392 as v_01db75,
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_b6a872 } from 'vpztcxjmsfanunln';
@@ -359,9 +360,9 @@ export const v_f4f851 = () => {
 
         const v_d42cc0 = v_8d41d7('screens.deviceBinding.mismatchTitle');
         const v_1c150e = v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 });
-        const { Alert: v_e5f38b } = await import('rcmrninabrnb');
+
         const v_aa96a3 = await new Promise<number>((v_6f7712) => {
-          v_e5f38b.alert(v_d42cc0, v_1c150e, [
+          v_01db75.alert(v_d42cc0, v_1c150e, [
             { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => v_6f7712(0) },
             { text: v_8d41d7('screens.deviceBinding.mismatchSendMail'), onPress: () => v_6f7712(1) },
           ], { cancelable: true, onDismiss: () => v_6f7712(0) });
@@ -527,9 +528,8 @@ export const v_f4f851 = () => {
         if (v_43c42e.code === 'DEVICE_MISMATCH') {
           const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
 
-          const { Alert: v_e5f38b } = await import('rcmrninabrnb');
           const v_aa96a3 = await new Promise<number>((v_6f7712) => {
-            v_e5f38b.alert(
+            v_01db75.alert(
               v_8d41d7('screens.deviceBinding.mismatchTitle'),
               v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
               [
@@ -709,9 +709,8 @@ export const v_f4f851 = () => {
         if (v_43c42e.code === 'DEVICE_MISMATCH') {
           const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
 
-          const { Alert: v_e5f38b } = await import('rcmrninabrnb');
           const v_aa96a3 = await new Promise<number>((v_6f7712) => {
-            v_e5f38b.alert(
+            v_01db75.alert(
               v_8d41d7('screens.deviceBinding.mismatchTitle'),
               v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 }),
               [
