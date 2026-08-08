@@ -38,6 +38,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
     onB0: () => void;
     onB1: () => void;
   } | null>(null);
+  const [twoButtonVisible, setTwoButtonVisible] = useState(false);
   const [currentConfig, setCurrentConfig] = useState<{
     title: string;
     message?: string;
@@ -74,14 +75,19 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
           },
         });
 
+        const closeAndClear = () => {
+          setTwoButtonVisible(false);
+          setTimeout(() => setTwoButtonPayload(null), 300);
+        };
         setTwoButtonPayload({
           title,
           message,
           b0Label: b0.text,
           b1Label: b1.text,
-          onB0: () => { b0.onPress?.(); setTwoButtonPayload(null); resolve(0); },
-          onB1: () => { b1.onPress?.(); setTwoButtonPayload(null); resolve(1); },
+          onB0: () => { b0.onPress?.(); closeAndClear(); resolve(0); },
+          onB1: () => { b1.onPress?.(); closeAndClear(); resolve(1); },
         });
+        setTwoButtonVisible(true);
         return;
       }
 
@@ -195,8 +201,9 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
     <AlertDialogContext.Provider value={{ showAlert }}>
       {children}
       {}
+      {}
       <Dialog
-        visible={simpleDialogVisible}
+        visible={simpleDialogVisible && !!currentConfig?.title}
         title={currentConfig?.title || ''}
 
         onClose={currentConfig?.hideCloseButton ? undefined : handleSimpleDialogClose}
@@ -224,7 +231,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
       />
       {}
       <Dialog
-        visible={!!twoButtonPayload}
+        visible={twoButtonVisible}
         title={twoButtonPayload?.title || ''}
         onClose={() => { twoButtonPayload?.onB0(); }}
         actions={twoButtonPayload ? [
