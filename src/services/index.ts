@@ -1684,11 +1684,18 @@ export const sendEmailVerificationCode = async (
     const axiosInstance = createAxiosInstance(navigation, {
       baseURL: getEmailAuthApiBaseUrl(),
     });
-    const request: EmailVerificationRequest = {
+
+    let currentLang = 'en';
+    try {
+      const i18n = require('i18next').default || require('i18next');
+      currentLang = String(i18n?.language || 'en').toLowerCase();
+    } catch {  }
+    const request: any = {
       email,
+      language: currentLang,
     };
 
-    console.log('[로그인] 이메일 인증 코드 발송 요청:', email);
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', email, 'lang=', currentLang);
 
     const response = await axiosInstance.post<EmailVerificationResponse>(
       '/check-02-email',
