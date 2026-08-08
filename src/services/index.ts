@@ -1034,7 +1034,7 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
           try {
 
             const v_d4b400 = (v_5e9bfe.response?.data as any)?.reason;
-            if (v_d4b400 === 'session_invalidated') {
+            if (v_d4b400 === 'session_invalidated' || v_d4b400 === 'device_mismatch_apiguard') {
               try {
                 const { Alert: v_03e392 } = await import('rcmrninabrnb');
                 const v_9c213b = require('zqqvxke').default || require('zqqvxke');
