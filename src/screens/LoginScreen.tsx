@@ -358,9 +358,11 @@ export const v_f4f851 = () => {
       if (v_49b0b7?.reason === 'device_mismatch' || v_49b0b7?.reason === 'device_mismatch_apiguard') {
         const v_55c887 = String(v_49b0b7?.data?.email ?? v_e0c7e8 ?? '').trim();
 
+        try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+        try { await v_e84827.removeItem('jwt'); } catch {  }
+        try { await v_e84827.removeItem('isLoggedIn'); } catch {  }
         const v_d42cc0 = v_8d41d7('screens.deviceBinding.mismatchTitle');
         const v_1c150e = v_8d41d7('screens.deviceBinding.mismatchBody', { email: v_55c887 });
-
         const v_aa96a3 = await new Promise<number>((v_6f7712) => {
           v_01db75.alert(v_d42cc0, v_1c150e, [
             { text: v_8d41d7('screens.deviceBinding.mismatchCancel'), style: 'cancel', onPress: () => v_6f7712(0) },
@@ -371,17 +373,20 @@ export const v_f4f851 = () => {
           try {
             const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
             if (v_f438c1) {
-
-              try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
               v_b572c3(v_55c887);
               v_8f89f3(v_ce4741.map);
               v_9b57fc(v_ce4741.verificationCode);
             } else {
               await v_889fad(v_8d41d7('screens.emailVerification.alerts.sendFailed'), v_8d41d7('screens.emailVerification.errors.sendFailed'));
+              try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
             }
           } catch (v_9e86fd) {
             console.warn('[로그인] device mismatch OTP 전송 실패:', v_9e86fd);
+            try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
+        } else {
+
+          try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
         }
 
       } else {
@@ -528,6 +533,9 @@ export const v_f4f851 = () => {
         if (v_43c42e.code === 'DEVICE_MISMATCH') {
           const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
 
+          try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+          try { await v_e84827.removeItem('jwt'); } catch {  }
+          try { await v_e84827.removeItem('isLoggedIn'); } catch {  }
           const v_aa96a3 = await new Promise<number>((v_6f7712) => {
             v_01db75.alert(
               v_8d41d7('screens.deviceBinding.mismatchTitle'),
@@ -543,14 +551,19 @@ export const v_f4f851 = () => {
             try {
               const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
               if (v_f438c1) {
-                try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
                 v_b572c3(v_55c887);
                 v_8f89f3(v_ce4741.map);
                 v_9b57fc(v_ce4741.verificationCode);
+              } else {
+                try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
               }
             } catch (v_9e86fd) {
               console.warn('[구글 로그인] device mismatch OTP 전송 실패:', v_9e86fd);
+              try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
             }
+          } else {
+
+            try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
           v_deef62(false);
           return;
@@ -709,6 +722,9 @@ export const v_f4f851 = () => {
         if (v_43c42e.code === 'DEVICE_MISMATCH') {
           const v_55c887 = String((v_43c42e as any)?.data?.email ?? '').trim();
 
+          try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
+          try { await v_e84827.removeItem('jwt'); } catch {  }
+          try { await v_e84827.removeItem('isLoggedIn'); } catch {  }
           const v_aa96a3 = await new Promise<number>((v_6f7712) => {
             v_01db75.alert(
               v_8d41d7('screens.deviceBinding.mismatchTitle'),
@@ -724,10 +740,11 @@ export const v_f4f851 = () => {
             try {
               const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
               if (v_f438c1) {
-                try { await v_e84827.setItem('pendingDeviceChangeFlow', '1'); } catch {  }
                 v_b572c3(v_55c887);
                 v_8f89f3(v_ce4741.map);
                 v_9b57fc(v_ce4741.verificationCode);
+              } else {
+                try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
               }
             } catch (v_9e86fd) {
               console.warn('[애플 로그인] device mismatch OTP 전송 실패:', v_9e86fd);
