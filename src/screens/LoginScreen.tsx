@@ -352,10 +352,36 @@ export const v_f4f851 = () => {
       await v_211c2c(v_ef7306.member, v_e0c7e8.trim());
     } catch (v_5e9bfe) {
       console.error('[로그인] 로그인 오류:', v_5e9bfe);
-      await v_889fad(
-        v_8d41d7('common.messages.error'),
-        v_8d41d7('screens.login.errors.loginError'),
-      );
+
+      const v_49b0b7 = (v_5e9bfe as any)?.response?.data;
+      if (v_49b0b7?.reason === 'device_mismatch') {
+        const v_55c887 = String(v_49b0b7?.data?.email ?? v_e0c7e8 ?? '').trim();
+        const v_d42cc0 = v_49b0b7?.title || v_8d41d7('screens.login.alerts.deviceMismatchTitle') || '다른 기기에서 로그인 시도';
+        const v_1c150e = v_49b0b7?.message || v_8d41d7('screens.login.errors.deviceMismatchBody') || '기존과 다른 기기가 감지되어 이메일 인증이 필요합니다. 인증 후 이 기기로 변경됩니다.';
+        const v_aa96a3 = await v_889fad(v_d42cc0, v_1c150e, [
+          { text: v_8d41d7('common.cancel') || '취소' },
+          { text: v_8d41d7('common.confirm') || '확인' },
+        ]);
+        if (v_aa96a3 === 1 && v_55c887) {
+          try {
+            const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
+            if (v_f438c1) {
+              v_b572c3(v_55c887);
+              v_8f89f3(v_ce4741.map);
+              v_9b57fc(v_ce4741.verificationCode);
+            } else {
+              await v_889fad(v_8d41d7('screens.emailVerification.alerts.sendFailed'), v_8d41d7('screens.emailVerification.errors.sendFailed'));
+            }
+          } catch (v_9e86fd) {
+            console.warn('[로그인] device mismatch OTP 전송 실패:', v_9e86fd);
+          }
+        }
+      } else {
+        await v_889fad(
+          v_8d41d7('common.messages.error'),
+          v_8d41d7('screens.login.errors.loginError'),
+        );
+      }
     } finally {
       v_deef62(false);
     }
