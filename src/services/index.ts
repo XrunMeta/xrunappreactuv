@@ -761,7 +761,18 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
   instance.interceptors.request.use(
     async (config) => {
 
-      config.headers.Authorization = await getAuthHeader();
+      const url = String(config.url ?? '');
+      const isLoginEndpoint =
+        url.includes('/login-') || url.includes('/oth-path') || url.includes('/oth-path');
+      if (isLoginEndpoint) {
+        try {
+          const env = getEnv();
+          config.headers.Authorization = `Bearer ${env.GATEWAY_AUTH_CODE}`;
+        } catch { config.headers.Authorization = await getAuthHeader(); }
+      } else {
+
+        config.headers.Authorization = await getAuthHeader();
+      }
 
       try {
         const Updates = require('expo-updates');
