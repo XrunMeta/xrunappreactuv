@@ -1684,11 +1684,18 @@ export const v_8025d1 = async (
     const v_9f42a4 = v_7488d5(v_c65f5d, {
       baseURL: v_a57efd(),
     });
-    const request: v_897bd3 = {
+
+    let v_677f64 = 'en';
+    try {
+      const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+      v_677f64 = String(v_9c213b?.language || 'en').toLowerCase();
+    } catch {  }
+    const v_576f5a = {
       email: v_e0c7e8,
+      language: v_677f64,
     };
 
-    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8);
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8, 'lang=', v_677f64);
 
     const v_3393e3 = await v_9f42a4.post<v_3eb2f0>(
       '/check-02-email',
