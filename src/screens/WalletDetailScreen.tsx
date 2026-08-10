@@ -20,7 +20,7 @@ import { TransactionHistoryItem, TransactionHistoryResponse } from '../types';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard, showToast } from '../utils';
-import { fmtBalance } from '../utils/formatAmount';
+import { fmtBalance, fmtAmount } from '../utils/formatAmount';
 import { findEntriesForUser } from '../services/walletKeyStore';
 import { getWalletKeyATStatus } from '../services';
 import { isLocalSendEnabledForUser } from '../services/walletSendLocal';
@@ -501,7 +501,7 @@ export const WalletDetailScreen = () => {
             }
           }
 
-          const amountInEth = weiToEth(item.value, item.tokenDecimal);
+          const amountInEth = fmtAmount(weiToEth(item.value, item.tokenDecimal), 8);
 
           if (typeof (globalThis as any).__walletDetailAmtLogged === 'undefined') {
             console.log('[WalletDetail] 첫 변환 sample:', {
