@@ -504,36 +504,45 @@ export const WalletScreen = () => {
           setIsLoading(false);
 
           (async () => {
-            try {
-              const baseUrl = getApiBaseUrl();
-              const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-                Authorization: await getAuthHeader(),
-              };
-              const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ member }),
-              });
-              if (!rpcRes.ok) return;
-              const rpcJson: any = await rpcRes.json().catch(() => null);
-              const balances: Array<{ currency: number; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
-              const rpcByCurrency = new Map<number, string>();
-              for (const b of balances) {
-                if (b.status === 'ok' && b.rpcAmount != null) {
-                  rpcByCurrency.set(Number(b.currency), b.rpcAmount);
+            const baseUrl = getApiBaseUrl();
+            const attemptDelays = [0, 3000, 5000, 10000];
+            const seenOk = new Set<number>();
+            const targetCurrencies = [1, 2, 16, 18];
+            for (const delay of attemptDelays) {
+              if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+              try {
+                const headers: Record<string, string> = {
+                  'Content-Type': 'application/json',
+                  Authorization: await getAuthHeader(),
+                };
+                const rpcRes = await fetch(`${baseUrl}/getWalletRpcBalances`, {
+                  method: 'POST',
+                  headers,
+                  body: JSON.stringify({ member }),
+                });
+                if (!rpcRes.ok) continue;
+                const rpcJson: any = await rpcRes.json().catch(() => null);
+                const balances: Array<{ currency: number; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
+                const rpcByCurrency = new Map<number, string>();
+                for (const b of balances) {
+                  if (b.status === 'ok' && b.rpcAmount != null) {
+                    rpcByCurrency.set(Number(b.currency), b.rpcAmount);
+                    seenOk.add(Number(b.currency));
+                  }
                 }
+                if (rpcByCurrency.size > 0) {
+                  setCardsData((prev) => prev.map((item: any) => {
+                    const cur = Number(item.currency);
+                    if (!rpcByCurrency.has(cur)) return item;
+                    const rpcAmt = rpcByCurrency.get(cur)!;
+                    if (String(item.amount) === rpcAmt) return item;
+                    return { ...item, Wamount: rpcAmt, amount: rpcAmt };
+                  }));
+                }
+                if (targetCurrencies.every((c) => seenOk.has(c))) break;
+              } catch (e: any) {
+                console.warn('[WalletScreen] RPC 잔액 백그라운드 갱신 실패 (재시도):', e?.message);
               }
-              if (rpcByCurrency.size === 0) return;
-              setCardsData((prev) => prev.map((item: any) => {
-                const cur = Number(item.currency);
-                if (!rpcByCurrency.has(cur)) return item;
-                const rpcAmt = rpcByCurrency.get(cur)!;
-                if (String(item.amount) === rpcAmt) return item;
-                return { ...item, Wamount: rpcAmt, amount: rpcAmt };
-              }));
-            } catch (e: any) {
-              console.warn('[WalletScreen] RPC 잔액 백그라운드 갱신 실패:', e?.message);
             }
           })();
 
