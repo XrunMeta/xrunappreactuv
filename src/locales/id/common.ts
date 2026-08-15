@@ -48,6 +48,9 @@ export default {
   etherscanStale: {
     message: 'Tidak dapat memuat riwayat transaksi terbaru — menampilkan data sebelumnya.',
   },
+  balanceStale: {
+    message: 'Sebagian saldo gagal diperbarui. Tarik ke bawah untuk menyegarkan.',
+  },
   gasInsufficient: {
     title: 'Biaya Gas Tidak Cukup',
     messageTransfer: 'Saldo biaya jaringan (gas) di dompet Anda tidak cukup untuk melakukan transfer.\n\nSilakan isi ulang token gas jaringan Polygon (POL) dan coba lagi.',
