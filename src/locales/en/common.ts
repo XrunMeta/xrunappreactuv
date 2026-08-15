@@ -49,6 +49,9 @@ export default {
   etherscanStale: {
     message: 'Unable to load the latest transaction history — showing previous data.',
   },
+  balanceStale: {
+    message: 'Some balances could not be refreshed. Pull down to try again.',
+  },
   gasInsufficient: {
     title: 'Insufficient Gas',
     messageTransfer: 'Your wallet does not have enough network fee (gas) to send.\n\nPlease top up Polygon network gas tokens (POL) and try again.',
