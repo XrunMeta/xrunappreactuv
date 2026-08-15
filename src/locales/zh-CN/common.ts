@@ -48,6 +48,9 @@ export default {
   etherscanStale: {
     message: '无法加载最新交易记录，正在显示此前的记录。',
   },
+  balanceStale: {
+    message: '部分余额未能更新至最新。请下拉刷新重试。',
+  },
   gasInsufficient: {
     title: 'Gas费不足',
     messageTransfer: '钱包中的网络手续费(Gas费)不足，无法转账。\n\n请充值Polygon网络Gas代币(POL)后再试。',
