@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
 import { COLORS, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
+import * as Updates from 'expo-updates';
 import {
   getCurrentAppVersionNumber,
   checkServerVersion,
@@ -265,6 +266,21 @@ export const MyInfoSettingsScreen = () => {
                 {Platform.OS === 'android'
                   ? `Android : ${versionInfo.androidCurrent}/${versionInfo.androidLatest}`
                   : `iOS : ${versionInfo.iosCurrent}/${versionInfo.iosLatest}`}
+              </Text>
+              {
+}
+              <Text style={styles.versionText}>
+                {(() => {
+                  const id = Updates.updateId;
+                  if (!id) return 'OTA : embedded';
+                  const shortId = String(id).replace(/-/g, '').slice(0, 8);
+                  const ts = Updates.createdAt;
+                  if (!ts) return `OTA : ${shortId}`;
+                  const kst = new Date(ts.getTime() + 9 * 60 * 60 * 1000);
+                  const p = (n: number) => String(n).padStart(2, '0');
+                  const date = `${kst.getUTCFullYear()}-${p(kst.getUTCMonth() + 1)}-${p(kst.getUTCDate())} ${p(kst.getUTCHours())}:${p(kst.getUTCMinutes())}`;
+                  return `OTA : ${shortId} (${date})`;
+                })()}
               </Text>
             </TouchableOpacity>
           )}
