@@ -188,7 +188,6 @@ export const v_a3bbf0 = async (
 
     v_4f186c = {
       message: v_a8cd21,
-      title: v_b657c9,
     };
 
     console.log('[shareReferralLink] Share API 호출 시작:', v_4f186c);
