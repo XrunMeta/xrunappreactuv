@@ -594,13 +594,13 @@ export const v_10886b = () => {
                     ) : null}
                     {v_2141e0 && v_01bee9.description && (
                         <View style={v_d81136.imageDescriptionOverlay}>
-                            <Text style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
+                            <Text testID={v_5401ae.shop.descriptionLabel} style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
                         </View>
                     )}
                 </View>
                 <View style={v_d81136.productInfo}>
                     <Text style={v_d81136.productBrand}>{v_01bee9.brand || (v_01bee9.isIak ? v_8d41d7('screens.shop.iakBrand') : v_8d41d7('screens.shop.giftBrand'))}</Text>
-                    <Text style={v_d81136.productTitle} numberOfLines={2}>
+                    <Text testID={v_5401ae.shop.titleLabel} style={v_d81136.productTitle} numberOfLines={2}>
                         {v_01bee9.title}
                     </Text>
                     {}

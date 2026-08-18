@@ -58,6 +58,7 @@ import { v_e4a763 } from '../utils/env';
 import { v_a61db3, v_843035 } from '../constants';
 import { v_f3de6d, v_a4e2ac } from '../utils/napApiUtils';
 import { v_cba33f } from '../utils';
+import { v_5401ae } from '../testIDs';
 import {
   v_235370,
   v_019a30,
@@ -3747,7 +3748,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
               </View>
 
               <View style={v_d81136.calloutRight}>
-                <Text style={v_d81136.calloutBrand} numberOfLines={2}>
+                <Text testID={v_5401ae.mapMain.nameLabel} style={v_d81136.calloutBrand} numberOfLines={2}>
                   {v_456f34.name || v_456f34.brand || 'XRUN'} 획득 가능합니다.
                 </Text>
               </View>

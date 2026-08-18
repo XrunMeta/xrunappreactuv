@@ -728,11 +728,11 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
             </TouchableOpacity>
           )}
           <View style={v_d81136.campaignBox}>
-            <Text style={v_d81136.campaignTitle}>
+            <Text testID={v_5401ae.showPockAd.nameLabel} style={v_d81136.campaignTitle}>
               {v_9f9e7d.ad_name || v_d0b6d4.name || v_8d41d7('screens.showNapAd.campaignInfo')}
             </Text>
           </View>
-          <Text style={v_d81136.campaignReward}>
+          <Text testID={v_5401ae.showPockAd.priceLabel} style={v_d81136.campaignReward}>
             {v_8d41d7('screens.showNapAd.reward')} : {(() => {
               const v_6bbb57 = v_d0b6d4?.xrunPrice || 0;
               const v_123554 = parseFloat(String(v_6bbb57));
@@ -788,7 +788,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
         <View style={v_d81136.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[v_d81136.webViewHeader, { paddingTop: v_033e14.top + 12 }]}>
-            <Text
+            <Text testID={v_5401ae.showPockAd.adNameLabel}
               style={v_d81136.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"

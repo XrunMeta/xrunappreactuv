@@ -8,6 +8,7 @@ import {
     v_fee73b,
 } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 export interface ShopSalesMemberData {
     id: string;        
@@ -37,8 +38,8 @@ export const ShopSalesMemberRow: v_a3453e.FC<ShopSalesMemberRowProps> = ({
             disabled={!v_719eed}
         >
             <View style={v_d81136.leftColumn}>
-                <Text style={v_d81136.id} numberOfLines={1}>{v_e0c7e8}</Text>
-                <Text style={v_d81136.name} numberOfLines={1}>{v_1833e7}</Text>
+                <Text testID={v_5401ae.shopSalesMemberRow.emailLabel} style={v_d81136.id} numberOfLines={1}>{v_e0c7e8}</Text>
+                <Text testID={v_5401ae.shopSalesMemberRow.nameLabel} style={v_d81136.name} numberOfLines={1}>{v_1833e7}</Text>
             </View>
             <View style={v_d81136.rightColumn}>
                 <Text style={v_d81136.date}>{v_8dffde}</Text>

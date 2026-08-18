@@ -126,7 +126,7 @@ export const v_040c8f = () => {
         {v_2ae4e7 === 'code' && (
           <>
             <View style={v_d81136.descriptionWrapper}>
-              <Text style={v_d81136.description}>{v_e0c7e8}{v_bee4c1('code.description')}</Text>
+              <Text testID={v_5401ae.forgotPassword.emailLabel} style={v_d81136.description}>{v_e0c7e8}{v_bee4c1('code.description')}</Text>
             </View>
 
             <View style={v_d81136.codeRow}>

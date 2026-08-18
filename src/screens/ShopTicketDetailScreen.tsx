@@ -359,7 +359,7 @@ export const v_a1c4a5 = () => {
           </View>
         </View>
 
-        <Text style={v_d81136.itemTitle}>{v_dfe883?.title ?? '티켓'}</Text>
+        <Text testID={v_5401ae.shopTicketDetail.titleLabel} style={v_d81136.itemTitle}>{v_dfe883?.title ?? '티켓'}</Text>
 
         {}
         <View style={v_d81136.ticketFieldContainer}>

@@ -9,6 +9,7 @@ import {
   v_5e8657,
 } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface ReferralMemberRowProps {
   rank?: number | string;
@@ -51,8 +52,8 @@ export const ReferralMemberRow: v_a3453e.FC<ReferralMemberRowProps> = ({
         <View style={v_d81136.rankPlaceholder} />
       ) : null}
       <View style={v_d81136.infoColumn}>
-        <Text style={v_d81136.email} numberOfLines={1} ellipsizeMode="tail">{v_e0c7e8}</Text>
-        {v_6856a9 ? <Text style={v_d81136.description}>{v_6856a9}</Text> : null}
+        <Text testID={v_5401ae.referralMemberRow.emailLabel} style={v_d81136.email} numberOfLines={1} ellipsizeMode="tail">{v_e0c7e8}</Text>
+        {v_6856a9 ? <Text testID={v_5401ae.referralMemberRow.descriptionLabel} style={v_d81136.description}>{v_6856a9}</Text> : null}
       </View>
       <View style={v_d81136.metaColumn}>
         {v_8dffde ? <Text style={v_d81136.date}>{v_8dffde}</Text> : null}

@@ -2,6 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_09d0e5, v_472849, v_19b633, v_3094a2 } from 'rcmrninabrnb';
 import { v_3b7ae0 } from '../constants/regions';
 import { v_1bfbd0, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 type Props = {
   region: v_3b7ae0;
@@ -27,7 +28,7 @@ export const RegionListItem: v_a3453e.FC<Props> = ({
         <Text style={v_d81136.iconText}>📍</Text>
       </View>
       <View style={v_d81136.info}>
-        <Text style={v_d81136.regionName}>{v_a6c30b.name}</Text>
+        <Text testID={v_5401ae.regionListItem.nameLabel} style={v_d81136.regionName}>{v_a6c30b.name}</Text>
         <Text style={v_d81136.regionNameEn}>{v_a6c30b.nameEn}</Text>
       </View>
     </Pressable>

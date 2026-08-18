@@ -545,7 +545,7 @@ export const v_1a0a02 = () => {
               <>
                 <View style={v_d81136.row}>
                   <Text style={v_d81136.label}>{v_8d41d7('screens.shopBuy.price')}</Text>
-                  <Text style={v_d81136.value}>
+                  <Text testID={v_5401ae.shopBuy.priceKrwLabel} style={v_d81136.value}>
                     {v_89f939(v_1c86a8, 'KRW')} / {v_06e3b4(v_318e8b)} XRUN
                   </Text>
                 </View>

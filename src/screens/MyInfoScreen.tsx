@@ -446,10 +446,10 @@ export const v_03a231 = () => {
               <ActivityIndicator size="small" color={v_1bfbd0.headerText} />
             ) : (
               <>
-                <Text style={v_d81136.profileName}>
+                <Text testID={v_5401ae.myInfo.nameLabel} style={v_d81136.profileName}>
                   {v_bb789b.name || '사용자'}
                 </Text>
-                <Text style={v_d81136.profileEmail}>
+                <Text testID={v_5401ae.myInfo.emailLabel} style={v_d81136.profileEmail}>
                   {v_bb789b.email}
                 </Text>
               </>

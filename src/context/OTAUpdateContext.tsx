@@ -6,6 +6,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_94035f from 'ryynyumnbcgyvtiickefs';
 import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
 import { v_412fbc } from '../components/AnimatedDots';
+import { v_5401ae } from '../testIDs';
 
 type OTAUpdateContextValue = {
   checkForUpdate: () => Promise<void>;
@@ -96,7 +97,7 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
           <View style={v_d81136.fullScreenContainer}>
             <View style={v_d81136.contentContainer}>
               <Text style={v_d81136.fullScreenTitle}>{v_8d41d7('common.versionUpdate.title')}</Text>
-              <Text style={v_d81136.fullScreenMessage}>
+              <Text testID={v_5401ae.otaupdateContext.descriptionLabel} style={v_d81136.fullScreenMessage}>
                 {v_a2dcc0?.description || v_8d41d7('common.versionUpdate.message')}
               </Text>
               {v_5fafb0 ? (

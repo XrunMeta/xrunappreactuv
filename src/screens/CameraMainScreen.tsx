@@ -3072,7 +3072,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                   {}
                   <View style={{ flex: 1 }}>
-                    <Text
+                    <Text testID={v_5401ae.cameraMain.coinLabel}
                       style={{
                         fontFamily: 'Roboto-Medium',
                         fontSize: v_843035.size.medium,
@@ -3187,7 +3187,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                         <View style={v_d81136.recentItemIcon} />
                       )}
                       <View style={v_d81136.recentItemTextWrap}>
-                        <Text style={v_d81136.recentItemName} numberOfLines={1}>{v_ddcfed.name || '광고'}</Text>
+                        <Text testID={v_5401ae.cameraMain.nameLabel} style={v_d81136.recentItemName} numberOfLines={1}>{v_ddcfed.name || '광고'}</Text>
                         <Text style={v_d81136.recentItemTime}>{v_375a17}</Text>
                       </View>
                       <View style={v_d81136.recentItemOpenBtn}>

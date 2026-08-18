@@ -1604,7 +1604,7 @@ export const v_cdb169 = () => {
             <View style={v_d81136.fieldContainer}>
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.email')}</Text>
               <View style={v_d81136.disabledInput}>
-                <Text style={v_d81136.disabledText}>{v_e0c7e8 || v_8d41d7('screens.myInfoEdit.email')}</Text>
+                <Text testID={v_5401ae.myInfoEdit.emailLabel} style={v_d81136.disabledText}>{v_e0c7e8 || v_8d41d7('screens.myInfoEdit.email')}</Text>
               </View>
             </View>
             <View style={v_d81136.fieldContainer}>
@@ -1615,7 +1615,7 @@ export const v_cdb169 = () => {
                 </TouchableOpacity>
               </View>
               <View style={[{ ...v_d81136.readonlyInput }, { marginTop: 0 }]}>
-                <Text style={v_d81136.readonlyText}>
+                <Text testID={v_5401ae.myInfoEdit.datepinchangedLabel} style={v_d81136.readonlyText}>
                   {v_8d41d7('screens.myInfoEdit.lastPasswordChangeDateLabel', 'e', { date: v_3535cd || '-' })}
                 </Text>
               </View>

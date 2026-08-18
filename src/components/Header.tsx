@@ -63,7 +63,7 @@ export const Header: v_a3453e.FC<HeaderProps> = ({
       <View style={v_d81136.content}>
         {v_91b7e0()}
         <View style={v_d81136.titleWrapper} pointerEvents="none">
-          <Text style={v_d81136.title}>{v_9f1622}</Text>
+          <Text testID={v_5401ae.header.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
         </View>
         {v_52c3cc ? (
           <View style={v_d81136.rightComponent}>{v_52c3cc}</View>

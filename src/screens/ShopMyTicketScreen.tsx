@@ -319,7 +319,7 @@ export const v_052a8a = () => {
             variant: 'primary',
           },
         ]}>
-        <Text style={v_d81136.dialogText}>{v_be52bc.description}</Text>
+        <Text testID={v_5401ae.shopMyTicket.descriptionLabel} style={v_d81136.dialogText}>{v_be52bc.description}</Text>
       </Dialog>
     </SafeView>
   );

@@ -102,7 +102,7 @@ export const EmailOtpGate: v_a3453e.FC<Props> = ({ email: v_e0c7e8, onSuccess: v
       />
       <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.descriptionWrapper}>
-          <Text style={v_d81136.description}>
+          <Text testID={v_5401ae.emailOtpGate.emailLabel} style={v_d81136.description}>
             {v_e0c7e8}
             {v_8d41d7('screens.verificationCode.description') || '로 발송된 인증 코드를 입력해 주세요.'}
           </Text>

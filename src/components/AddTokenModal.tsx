@@ -269,7 +269,7 @@ export const AddTokenModal: v_a3453e.FC<AddTokenModalProps> = v_a3453e.memo(
                     <Text style={v_d81136.confirmLabel}>
                       {v_8d41d7('screens.addToken.tokenName')}
                     </Text>
-                    <Text style={v_d81136.confirmValue}>
+                    <Text testID={v_5401ae.addToken.nameLabel} style={v_d81136.confirmValue}>
                       {v_6d4c0b || v_04cb77?.name}
                     </Text>
                   </View>

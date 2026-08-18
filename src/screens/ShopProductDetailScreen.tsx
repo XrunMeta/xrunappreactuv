@@ -468,7 +468,7 @@ export const v_a59951 = () => {
                                     <Text style={v_d81136.minAmountHint}>{v_8d41d7('screens.shopProductDetail.checkingBalance')}</Text>
                                 </View>
                             ) : (
-                                <Text style={v_d81136.minAmountHint}>{v_8d41d7('screens.shopProductDetail.balanceHold', { amount: v_87676e.toLocaleString() })}</Text>
+                                <Text testID={v_5401ae.shopProductDetail.amountLabel} style={v_d81136.minAmountHint}>{v_8d41d7('screens.shopProductDetail.balanceHold', { amount: v_87676e.toLocaleString() })}</Text>
                             )}
                             <View style={v_d81136.inputContainer}>
                                 <TextInput testID={v_5401ae.shopProductDetail.xplayAmountInput}
@@ -1145,7 +1145,7 @@ export const v_a59951 = () => {
                         <View style={v_d81136.modalLogoContainer}>
                             <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
-                        <Text style={v_d81136.paymentSuccessMessage}>
+                        <Text testID={v_5401ae.shopProductDetail.couponImgUrlLabel} style={v_d81136.paymentSuccessMessage}>
                             {v_a71862?.coupon_img_url ? v_8d41d7('screens.shopProductDetail.couponIssued') : v_8d41d7('screens.shopProductDetail.paymentComplete')}
                         </Text>
                         {v_a71862?.coupon_img_url ? (

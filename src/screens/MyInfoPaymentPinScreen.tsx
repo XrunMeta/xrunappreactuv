@@ -165,7 +165,7 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
     <View style={v_d81136.container}>
       <Header title="결제 비밀번호" onBackPress={v_c7ac57} showBackButton />
       <View style={v_d81136.body}>
-        <Text style={v_d81136.title}>{v_9f1622}</Text>
+        <Text testID={v_5401ae.myInfoPaymentPin.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
         <View style={v_d81136.dotsRow}>
           {Array.from({ length: 6 }).map((v_37eab7, v_ebec57) => (
             <View key={v_ebec57} style={[v_d81136.dot, v_bdc450.length > v_ebec57 && v_d81136.dotFilled]} />

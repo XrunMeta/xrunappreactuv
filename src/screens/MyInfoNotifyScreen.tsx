@@ -347,7 +347,7 @@ export const v_386af2 = () => {
               onLongPress={() => v_57fac2(v_b9faeb.board)}
               activeOpacity={0.8}
             >
-              <Text style={v_d81136.replyText}>{v_b9faeb.title}</Text>
+              <Text testID={v_5401ae.myInfoNotify.titleLabel} style={v_d81136.replyText}>{v_b9faeb.title}</Text>
             </TouchableOpacity>
             {}
           </View>
@@ -363,7 +363,7 @@ export const v_386af2 = () => {
           {v_ee89db && (
             <Image source={{ uri: v_ee89db }} style={v_d81136.heroImage} resizeMode="cover" />
           )}
-          <Text style={v_d81136.badge}>{v_b9faeb.title}</Text>
+          <Text testID={v_5401ae.myInfoNotify.titleLabel2} style={v_d81136.badge}>{v_b9faeb.title}</Text>
           {}
           {v_b9faeb.contents !== null && v_b9faeb.type !== 9303 && (
             <View>
