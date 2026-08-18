@@ -188,7 +188,6 @@ export const shareReferralLink = async (
 
     shareOptions = {
       message,
-      title: shareText,
     };
 
     console.log('[shareReferralLink] Share API 호출 시작:', shareOptions);
