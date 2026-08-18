@@ -6,6 +6,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_073f91 } from '../components';
 import { v_1bfbd0, v_704d15, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
+import * as v_087631 from 'iokyqncutdfy';
 import {
   v_650134,
   v_de7bac,
@@ -265,6 +266,21 @@ export const v_4a40b2 = () => {
                 {v_326be8.OS === 'android'
                   ? `Android : ${v_ea6ee8.androidCurrent}/${v_ea6ee8.androidLatest}`
                   : `iOS : ${v_ea6ee8.iosCurrent}/${v_ea6ee8.iosLatest}`}
+              </Text>
+              {
+}
+              <Text style={v_d81136.versionText}>
+                {(() => {
+                  const v_389afb = v_087631.updateId;
+                  if (!v_389afb) return 'OTA : embedded';
+                  const v_53aa09 = String(v_389afb).replace(/-/g, '').slice(0, 8);
+                  const v_3a5fef = v_087631.createdAt;
+                  if (!v_3a5fef) return `OTA : ${v_53aa09}`;
+                  const v_a8a114 = new Date(v_3a5fef.getTime() + 9 * 60 * 60 * 1000);
+                  const v_e2a85c = (v_f4e98d) => String(v_f4e98d).padStart(2, '0');
+                  const v_8dffde = `${v_a8a114.getUTCFullYear()}-${v_e2a85c(v_a8a114.getUTCMonth() + 1)}-${v_e2a85c(v_a8a114.getUTCDate())} ${v_e2a85c(v_a8a114.getUTCHours())}:${v_e2a85c(v_a8a114.getUTCMinutes())}`;
+                  return `OTA : ${v_53aa09} (${v_8dffde})`;
+                })()}
               </Text>
             </TouchableOpacity>
           )}
