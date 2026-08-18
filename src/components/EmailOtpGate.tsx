@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Header, PrimaryButton, SafeScrollView } from '.';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { sendEmailVerificationCode, verifyEmailCode } from '../services';
+import { TID } from '../testIDs';
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 180;
@@ -111,7 +112,7 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
           {Array.from({ length: CODE_LENGTH }).map((_, index) => {
             const digit = code[index] ?? '';
             return (
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.emailOtpGate.hiddenInputRef}
                 key={index}
                 style={styles.codeBox}
                 onPress={() => hiddenInputRef.current?.focus()}
@@ -123,7 +124,7 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
           })}
         </View>
 
-        <TextInput
+        <TextInput testID={TID.emailOtpGate.codeInput}
           ref={hiddenInputRef}
           value={code}
           onChangeText={(v) => setCode(v.replace(/[^0-9]/g, '').slice(0, CODE_LENGTH))}

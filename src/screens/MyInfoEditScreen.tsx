@@ -37,6 +37,7 @@ import {
 import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
 import { isCountryWithRegionsByCode } from '../utils/countryStateCityUtils';
 import { CountryDialCode } from '../types';
+import { TID } from '../testIDs';
 
 const AGE_OPTIONS = ['select', '10', '20', '30', '40', '50+'] as const;
 
@@ -1609,7 +1610,7 @@ export const MyInfoEditScreen = () => {
             <View style={styles.fieldContainer}>
               <View style={[{ ...styles.inlineLabelRow, ...styles.label }]}>
                 <Text style={styles.sectionLabel}>{t('screens.myInfoEdit.password')}</Text>
-                <TouchableOpacity onPress={handleChangePassword} style={styles.linkTextContainer}>
+                <TouchableOpacity testID={TID.myInfoEdit.changePassword} onPress={handleChangePassword} style={styles.linkTextContainer}>
                   <Text style={styles.linkText}>{t('screens.myInfoEdit.changePassword')}</Text>
                 </TouchableOpacity>
               </View>
@@ -1623,7 +1624,7 @@ export const MyInfoEditScreen = () => {
               <Text style={styles.label}>{t('screens.myInfoEdit.phone')}</Text>
               <View style={styles.phoneFieldContainer}>
                 {}
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myInfoEdit.countrySelect}
                   style={styles.phonePrefix}
                   onPress={handleCountrySelect}
                   activeOpacity={0.7}
@@ -1635,7 +1636,7 @@ export const MyInfoEditScreen = () => {
                   </Text>
                 </TouchableOpacity>
                 {}
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myInfoEdit.phoneEdit}
                   style={styles.phoneValueContainer}
                   onPress={handlePhoneEdit}
                   activeOpacity={0.7}
@@ -1658,7 +1659,7 @@ export const MyInfoEditScreen = () => {
             })() && (
               <View style={styles.fieldContainer}>
                 <Text style={styles.label}>{t('screens.myInfoEdit.region')}</Text>
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myInfoEdit.openRegionModal}
                   style={styles.regionField}
                   onPress={handleOpenRegionModal}
                   activeOpacity={0.7}
@@ -1819,7 +1820,7 @@ export const MyInfoEditScreen = () => {
             </View>
             <View style={styles.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={TID.myInfoEdit.countrySearchQueryInput}
                 style={styles.modalSearchInput}
                 value={countrySearchQuery}
                 onChangeText={setCountrySearchQuery}
@@ -1837,7 +1838,7 @@ export const MyInfoEditScreen = () => {
                 data={filteredCountries}
                 keyExtractor={(item, index) => `${item.iso2}-${item.dialCode}-${item.name}-${index}`}
                 renderItem={({ item: country }) => (
-                  <TouchableOpacity
+                  <TouchableOpacity testID={TID.myInfoEdit.selectCountry}
                     style={[
                       styles.modalItem,
                       selectedCountryDialCode?.iso2 === country.iso2 && styles.modalItemSelected,
@@ -1914,7 +1915,7 @@ export const MyInfoEditScreen = () => {
             </View>
             <View style={styles.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={TID.myInfoEdit.regionSearchQueryInput}
                 style={styles.modalSearchInput}
                 value={regionSearchQuery}
                 onChangeText={setRegionSearchQuery}

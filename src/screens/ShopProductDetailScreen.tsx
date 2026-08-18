@@ -20,6 +20,7 @@ import { WalletKeyPinPromptModal } from '../components';
 import { LoadingText } from '../components/AnimatedDots';
 import { sendOnchainLocal, isLocalSendEnabledForUser } from '../services/walletSendLocal';
 import { findEntriesForUser, type WalletKey } from '../services/walletKeyStore';
+import { TID } from '../testIDs';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -444,7 +445,7 @@ export const ShopProductDetailScreen = () => {
                         <View style={styles.inputSection}>
                             <Text style={styles.inputLabel}>{t('screens.shopProductDetail.depositAddress')}</Text>
                             <View style={styles.inputContainer}>
-                                <TextInput
+                                <TextInput testID={TID.shopProductDetail.depositAddressInput}
                                     style={styles.input}
                                     placeholder="..."
                                     value={depositAddress}
@@ -452,7 +453,7 @@ export const ShopProductDetailScreen = () => {
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                 />
-                                <TouchableOpacity onPress={handleQrScan} style={styles.qrButton}>
+                                <TouchableOpacity testID={TID.shopProductDetail.qrScan} onPress={handleQrScan} style={styles.qrButton}>
                                     <Ionicons name="qr-code-outline" size={22} color="#111827" />
                                 </TouchableOpacity>
                             </View>
@@ -470,7 +471,7 @@ export const ShopProductDetailScreen = () => {
                                 <Text style={styles.minAmountHint}>{t('screens.shopProductDetail.balanceHold', { amount: exchangeXplayBalance.toLocaleString() })}</Text>
                             )}
                             <View style={styles.inputContainer}>
-                                <TextInput
+                                <TextInput testID={TID.shopProductDetail.xplayAmountInput}
                                     style={styles.input}
                                     placeholder=""
                                     value={xplayAmount}
@@ -480,7 +481,7 @@ export const ShopProductDetailScreen = () => {
                                     }}
                                     keyboardType="numeric"
                                 />
-                                <TouchableOpacity onPress={handleMaxAmount} style={styles.maxButton}>
+                                <TouchableOpacity testID={TID.shopProductDetail.maxAmount} onPress={handleMaxAmount} style={styles.maxButton}>
                                     <Text style={styles.maxButtonText}>{t('screens.shopProductDetail.maxAmount')}</Text>
                                 </TouchableOpacity>
                             </View>
@@ -874,7 +875,7 @@ export const ShopProductDetailScreen = () => {
                                     </Text>
                                 </TouchableOpacity>
                             )}
-                            <TouchableOpacity
+                            <TouchableOpacity testID={TID.shopProductDetail.detailTab}
                                 onPress={() => setDetailTab('guide')}
                                 style={[styles.tabButton, effectiveTab === 'guide' && styles.tabButtonActive]}
                                 activeOpacity={0.8}
@@ -988,7 +989,7 @@ export const ShopProductDetailScreen = () => {
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : isXplayShop ? (
-                    <TouchableOpacity
+                    <TouchableOpacity testID={TID.shopProductDetail.xplayPurchase}
                         style={[styles.purchaseButton, xplayPurchaseLoading && styles.purchaseButtonDisabled]}
                         onPress={handleXplayPurchase}
                         disabled={xplayPurchaseLoading || xplayBalanceLoading || member == null}
@@ -1011,7 +1012,7 @@ export const ShopProductDetailScreen = () => {
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : (
-                    <TouchableOpacity
+                    <TouchableOpacity testID={TID.shopProductDetail.purchase}
                         style={styles.purchaseButton}
                         onPress={handlePurchase}
                         activeOpacity={0.8}
@@ -1042,7 +1043,7 @@ export const ShopProductDetailScreen = () => {
                             <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={styles.paymentSuccessMessage}>{t('screens.shopProductDetail.paymentComplete')}</Text>
-                        <TouchableOpacity style={styles.paymentSuccessButton} onPress={handlePaymentSuccessClose} activeOpacity={0.8}>
+                        <TouchableOpacity testID={TID.shopProductDetail.paymentSuccessClose} style={styles.paymentSuccessButton} onPress={handlePaymentSuccessClose} activeOpacity={0.8}>
                             <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -1067,7 +1068,7 @@ export const ShopProductDetailScreen = () => {
                         <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
                             {t(tkInput('ModalDesc'))}
                         </Text>
-                        <TextInput
+                        <TextInput testID={TID.shopProductDetail.iakPhoneInput}
                             value={iakPhone}
                             onChangeText={setIakPhone}
                             placeholder={t(tkInput('Placeholder'))}
@@ -1125,7 +1126,7 @@ export const ShopProductDetailScreen = () => {
                                 {t('screens.shop.iak.smsNotice')}
                             </Text>
                         </View>
-                        <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleIakSuccessClose} activeOpacity={0.8}>
+                        <TouchableOpacity testID={TID.shopProductDetail.iakSuccessClose} style={styles.paymentSuccessButton} onPress={handleIakSuccessClose} activeOpacity={0.8}>
                             <Text style={styles.paymentSuccessButtonText}>{t('screens.shop.iak.ok')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -1162,7 +1163,7 @@ export const ShopProductDetailScreen = () => {
                                 ) : null}
                             </ScrollView>
                         ) : null}
-                        <TouchableOpacity style={styles.paymentSuccessButton} onPress={handleXplayPaymentSuccessClose} activeOpacity={0.8}>
+                        <TouchableOpacity testID={TID.shopProductDetail.xplayPaymentSuccessClose} style={styles.paymentSuccessButton} onPress={handleXplayPaymentSuccessClose} activeOpacity={0.8}>
                             <Text style={styles.paymentSuccessButtonText}>{t('screens.shopProductDetail.viewMyGift')}</Text>
                         </TouchableOpacity>
                     </View>

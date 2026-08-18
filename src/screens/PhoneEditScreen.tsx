@@ -15,6 +15,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { updatePhone } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 
 export const PhoneEditScreen = () => {
   const { t } = useTranslation();
@@ -126,7 +127,7 @@ export const PhoneEditScreen = () => {
             placeholder={t('screens.phoneEdit.phonePlaceholder')}
             editable={!isSaving}
             leftAccessory={
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.phoneEdit.countryCodeSelect}
                 style={styles.phonePrefix}
                 onPress={handleCountryCodeSelect}
                 activeOpacity={0.7}

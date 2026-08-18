@@ -20,6 +20,7 @@ import { PurchasedItemData } from '../types';
 import { getXrunPurchasedItems, deleteXrunPurchasedItem } from '../services';
 import { getEnv } from '../utils/env';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 export const ShopTicketDetailScreen = () => {
   const { selectedShopItem } = useAppContext();
@@ -392,13 +393,13 @@ export const ShopTicketDetailScreen = () => {
       <View style={styles.actionButtonsContainer}>
         {isAvailable ? (
           <>
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.shopTicketDetail.copyTicketNumber}
               style={[styles.actionButton, styles.copyButton]}
               onPress={handleCopyTicketNumber}
               disabled={!qrCodeValue}>
               <Text style={styles.actionButtonText}>{t('screens.shopTicketDetail.share.copyTicketNumber')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.shopTicketDetail.shareQr}
               style={[styles.actionButton, styles.shareButton]}
               onPress={handleShareQR}
               disabled={!qrCodeValue}>
@@ -406,7 +407,7 @@ export const ShopTicketDetailScreen = () => {
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.shopTicketDetail.confirmDelete}
             style={[styles.actionButton, styles.deleteButton]}
             onPress={confirmDelete}>
             <Text style={styles.actionButtonText}>{t('screens.shopTicketDetail.share.delete')}</Text>

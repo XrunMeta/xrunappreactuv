@@ -21,6 +21,7 @@ import { showToast } from '../utils';
 import { getToastBody } from '../services/nasmediaAd';
 import { ShowNapAdScreen } from './ShowNapAdScreen';
 import { ShowPockAdScreen } from './ShowPockAdScreen';
+import { TID } from '../testIDs';
 
 interface ShowWebViewScreenProps {
   onClose?: () => void; 
@@ -124,7 +125,7 @@ export const ShowWebViewScreen: React.FC<ShowWebViewScreenProps> = ({ onClose, i
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'ios' ? 20 : 40) }]}>
         {}
         <View style={styles.leftButtons}>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.showWebView.goBack}
             onPress={handleGoBack}
             style={styles.backButton}
           >

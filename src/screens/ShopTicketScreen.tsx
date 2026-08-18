@@ -15,6 +15,7 @@ import { formatXrunAmount, formatWonAmount, formatCurrency } from '../utils';
 import { cashingimages } from '../utils/imageCache';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
 import * as IAP from 'expo-iap';
+import { TID } from '../testIDs';
 
 const transformShopItem = (
   item: ShopItemData,
@@ -525,7 +526,7 @@ export const ShopTicketScreen = () => {
             {showSearchBar && (
               <View style={styles.searchBar}>
                 <Feather name="search" size={18} color="#0296f2" />
-                <TextInput
+                <TextInput testID={TID.shopTicket.searchQueryInput}
                   style={styles.searchInput}
                   placeholder={t('screens.shop.searchPlaceholder')}
                   placeholderTextColor="#bcbec4"
@@ -547,7 +548,7 @@ export const ShopTicketScreen = () => {
                               {t('screens.shop.pointsBalance', '포인트 잔액')}: {pointsBalance !== null ? pointsBalance.toLocaleString() : '-'}
                             </Text>
                           )}
-                      <TouchableOpacity
+                      <TouchableOpacity testID={TID.shopTicket.testSpend10}
                         style={[styles.xplayTestButton, (pointsBalanceLoading || pointsSpendLoading || (pointsBalance !== null && pointsBalance < 10)) && styles.xplayTestButtonDisabled]}
                         onPress={handleTestSpend10}
                         disabled={pointsBalanceLoading || pointsSpendLoading || (pointsBalance !== null && pointsBalance < 10)}

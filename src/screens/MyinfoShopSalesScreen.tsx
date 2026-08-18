@@ -10,6 +10,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { getItemInfo, getItemPurchaseList } from '../services';
 import { PurchaseItem } from '../types';
+import { TID } from '../testIDs';
 
 type PeriodOption = '1week' | '1month' | '3months' | '6months' | 'custom';
 type DatePickerTarget = 'start' | 'end' | null;
@@ -318,13 +319,13 @@ export const MyinfoShopSalesScreen = () => {
       <View style={styles.calendarContainer}>
         {}
         <View style={styles.calendarHeader}>
-          <TouchableOpacity onPress={() => changeCalendarMonth(-1)} style={styles.calendarNavButton}>
+          <TouchableOpacity testID={TID.myinfoShopSales.changeCalendarMonth} onPress={() => changeCalendarMonth(-1)} style={styles.calendarNavButton}>
             <Ionicons name="chevron-back" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.calendarHeaderText}>
             {t('screens.myinfoShopSales.yearMonth', { year, month: month + 1 })}
           </Text>
-          <TouchableOpacity onPress={() => changeCalendarMonth(1)} style={styles.calendarNavButton}>
+          <TouchableOpacity testID={TID.myinfoShopSales.changeCalendarMonth2} onPress={() => changeCalendarMonth(1)} style={styles.calendarNavButton}>
             <Ionicons name="chevron-forward" size={24} color="#333" />
           </TouchableOpacity>
         </View>
@@ -546,7 +547,7 @@ export const MyinfoShopSalesScreen = () => {
             </View>
 
             {}
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.myinfoShopSales.modifyItem}
               onPress={handleModifyItem}
               activeOpacity={0.7}
               style={{ marginTop: 12, alignSelf: 'flex-end', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8, backgroundColor: '#f3f4f6', borderWidth: 1, borderColor: '#e5e7eb' }}
@@ -560,7 +561,7 @@ export const MyinfoShopSalesScreen = () => {
         {!isLoading && shopmember && (!itemInfo.title || !itemInfo.title.trim()) ? (
           <View style={styles.emptyItemContainer}>
             <Text style={styles.emptyItemDescription}>{t('screens.myinfoShopSales.noItemData')}</Text>
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.myinfoShopSales.navigate}
               style={styles.addItemButton}
               onPress={() => navigate(ROUTES.shopItemRegister)}
               activeOpacity={0.7}
@@ -617,7 +618,7 @@ export const MyinfoShopSalesScreen = () => {
               {}
               <View style={styles.periodOptionsContainer}>
                 {periodOptions.map((option) => (
-                  <TouchableOpacity
+                  <TouchableOpacity testID={TID.myinfoShopSales.periodSelect}
                     key={option.key}
                     style={[
                       styles.periodOptionButton,
@@ -638,7 +639,7 @@ export const MyinfoShopSalesScreen = () => {
 
               {}
               <View style={styles.dateRangeContainer}>
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myinfoShopSales.dateInput}
                   style={styles.dateInputContainer}
                   onPress={() => handleDateInputPress('start')}
                   activeOpacity={0.7}
@@ -652,7 +653,7 @@ export const MyinfoShopSalesScreen = () => {
                   </View>
                 </TouchableOpacity>
                 <Text style={styles.dateSeparator}>~</Text>
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myinfoShopSales.dateInput2}
                   style={styles.dateInputContainer}
                   onPress={() => handleDateInputPress('end')}
                   activeOpacity={0.7}
@@ -679,7 +680,7 @@ export const MyinfoShopSalesScreen = () => {
                 >
                   <Text style={styles.cancelButtonText}>{t('screens.myinfoShopSales.cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myinfoShopSales.applySearch}
                   style={styles.applyButton}
                   onPress={handleApplySearch}
                   activeOpacity={0.7}

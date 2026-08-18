@@ -26,6 +26,7 @@ import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
 import { PockAdsResponse } from '../types';
 import { Ionicons } from '@expo/vector-icons';
+import { TID } from '../testIDs';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -623,7 +624,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
           borderBottomColor: '#e0e0e0',
           backgroundColor: '#fff',
         }}>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.showPockAd.close}
             onPress={handleClose}
             style={{
               padding: 8,
@@ -712,7 +713,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
         <View style={[styles.campaignContainer, isModal && styles.modalCampaignContainer]}>
           {}
           {isModal && (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.showPockAd.close2}
               onPress={handleClose}
               style={{
                 position: 'absolute',

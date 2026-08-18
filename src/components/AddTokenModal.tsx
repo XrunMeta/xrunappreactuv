@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { WalletData, CustomToken } from '../types';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 interface PredefinedToken {
   symbol: string;
@@ -234,7 +235,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = React.memo(
               {}
               {activeTab === 'Contract' && (
                 <View style={styles.tabContent}>
-                  <TextInput
+                  <TextInput testID={TID.addToken.contractAddressInput}
                     style={styles.input}
                     placeholder={t('screens.addToken.contractPlaceholder')}
                     value={contractAddress}

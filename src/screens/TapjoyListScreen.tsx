@@ -8,6 +8,7 @@ import { showTapjoyPlacement, consumeAutoShowTapjoy } from '../services/tapjoy';
 import { logRewardedAdCompleted } from '../services/appsflyer';
 import { showToast } from '../utils';
 import { getToastBody } from '../services/nasmediaAd';
+import { TID } from '../testIDs';
 
 export const TapjoyListScreen = () => {
   const { goBack } = useAppNavigation();
@@ -70,7 +71,7 @@ export const TapjoyListScreen = () => {
           <Text style={styles.description}>
             아래 버튼을 누르면 Tapjoy 오퍼월(보상형 광고)이 표시됩니다.
           </Text>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.tapjoyList.showAd}
             style={[styles.button, loading && styles.buttonDisabled]}
             activeOpacity={0.8}
             onPress={() => handleShowAd()}

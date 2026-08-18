@@ -19,6 +19,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { SafeView } from '../components';
 import { CombinedAsset } from '../types';
+import { TID } from '../testIDs';
 
 const createAssetFromCurrency = (currency: number): CombinedAsset => {
   switch (currency) {
@@ -160,7 +161,7 @@ export const WalletQrScanScreen = () => {
           </View>
           {}
           <View style={styles.qrScanButtonContainer}>
-            <TouchableOpacity style={styles.qrScanButton} onPress={handleQrScanPress}>
+            <TouchableOpacity testID={TID.walletQrScan.qrScan} style={styles.qrScanButton} onPress={handleQrScanPress}>
               <Text style={styles.qrScanButtonTextActive}>{t('screens.walletReceive.myQrCode')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.qrScanButton, styles.buttonActive]}>

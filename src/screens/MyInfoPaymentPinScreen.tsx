@@ -14,6 +14,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { nodeGatewayRequest } from '../services';
 import { getEnv } from '../utils/env';
 import { useAlertDialog } from '../context';
+import { TID } from '../testIDs';
 
 type Step = 'enter-old' | 'enter-new' | 'confirm-new';
 
@@ -180,7 +181,7 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
         {}
         <View style={styles.keypad}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.myInfoPaymentPin.pressDigit}
               key={n}
               style={styles.key}
               onPress={() => onPressDigit(String(n))}
@@ -190,14 +191,14 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
             </TouchableOpacity>
           ))}
           <View style={[styles.key, { backgroundColor: 'transparent' }]} />
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.myInfoPaymentPin.pressDigit2}
             style={styles.key}
             onPress={() => onPressDigit('0')}
             disabled={loading}
           >
             <Text style={styles.keyText}>0</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.myInfoPaymentPin.pressBackspace}
             style={styles.key}
             onPress={onPressBackspace}
             disabled={loading}

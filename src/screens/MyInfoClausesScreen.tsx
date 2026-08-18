@@ -7,6 +7,7 @@ import { COLORS, COMMON_STYLES, LIST_STYLES, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { ClauseId } from '../types';
+import { TID } from '../testIDs';
 
 export const MyInfoClausesScreen = () => {
   const { t } = useTranslation();
@@ -33,7 +34,7 @@ export const MyInfoClausesScreen = () => {
       >
         <View style={styles.inner}>
           {clauses.map((clause) => (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.myInfoClauses.select}
               key={clause.id}
               style={styles.card}
               onPress={() => handleSelect(clause.id)}

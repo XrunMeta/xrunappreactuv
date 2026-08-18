@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Dialog } from './Dialog';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 type TokenOption = {
   id: string;
@@ -148,7 +149,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
 
   const renderContractInput = () => (
     <View style={styles.contractWrapper}>
-      <TextInput
+      <TextInput testID={TID.addTokenDialog.contractAddressInput}
         style={styles.contractInput}
         placeholder="Contract address"
         placeholderTextColor="#a6a6a6"

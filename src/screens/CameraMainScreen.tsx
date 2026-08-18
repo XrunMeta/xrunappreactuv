@@ -39,6 +39,7 @@ import { showToast } from '../utils';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
+import { TID } from '../testIDs';
 
 const { width, height } = Dimensions.get('window');
 
@@ -3235,7 +3236,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           }}>
             {}
             <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.cameraMain.webviewBack}
                 onPress={() => {
                   if (webViewCanGoBack && webViewModalRef.current) {
                     webViewModalRef.current.goBack();

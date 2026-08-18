@@ -23,6 +23,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
+import { TID } from '../testIDs';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -799,7 +800,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
         <View style={[styles.campaignContainer, isModal && styles.modalCampaignContainer]}>
           {}
           {isModal && (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.showNapAd.close}
               onPress={handleClose}
               style={{
                 position: 'absolute',

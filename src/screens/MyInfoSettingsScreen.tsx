@@ -18,6 +18,7 @@ import {
   updateNotificationSettings,
 } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 
 export const MyInfoSettingsScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -193,7 +194,7 @@ export const MyInfoSettingsScreen = () => {
             {pushToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={TID.myInfoSettings.togglePushToggle}
                 value={pushEnabled}
                 onValueChange={handleTogglePush}
                 disabled={!memberId}
@@ -211,7 +212,7 @@ export const MyInfoSettingsScreen = () => {
             {noticeToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={TID.myInfoSettings.toggleNoticeToggle}
                 value={noticeEnabled}
                 onValueChange={handleToggleNotice}
                 disabled={!memberId || !pushEnabled}
@@ -228,7 +229,7 @@ export const MyInfoSettingsScreen = () => {
             {eventToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={TID.myInfoSettings.toggleEventToggle}
                 value={eventEnabled}
                 onValueChange={handleToggleEvent}
                 disabled={!memberId || !pushEnabled}
@@ -238,7 +239,7 @@ export const MyInfoSettingsScreen = () => {
             )}
           </View>
 
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.myInfoSettings.languageSelectorVisible}
             style={styles.card}
             activeOpacity={0.85}
             onPress={() => setLanguageSelectorVisible(true)}
@@ -246,7 +247,7 @@ export const MyInfoSettingsScreen = () => {
             <Text style={styles.cardText}>{t('screens.myInfoSettings.languageSelect')}</Text>
           </TouchableOpacity>
           {}
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.myInfoSettings.navigate}
             style={styles.card}
             activeOpacity={0.85}
             onPress={() => navigate(ROUTES.myInfoCloseMembership)}

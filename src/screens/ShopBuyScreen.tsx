@@ -13,6 +13,7 @@ import { formatCurrency, formatXrunAmount } from '../utils';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import * as IAP from 'expo-iap';
 import { cashingimages } from '../utils/imageCache';
+import { TID } from '../testIDs';
 
 export const ShopBuyScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -617,7 +618,7 @@ export const ShopBuyScreen = () => {
           >
             <Text style={styles.cancelText}>{t('screens.shopBuy.cancel')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.shopBuy.purchase}
             style={[
               styles.button,
               styles.primaryButton,
@@ -635,7 +636,7 @@ export const ShopBuyScreen = () => {
             )}
           </TouchableOpacity>
           {isPointPurchasable && (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.shopBuy.purchaseWithPoints}
               style={[
                 styles.button,
                 styles.pointsButton,

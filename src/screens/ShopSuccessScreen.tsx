@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Header, SafeView } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
@@ -30,7 +31,7 @@ export const ShopSuccessScreen = () => {
         <View style={styles.card}>
           <Image source={LOGO} style={styles.logo} resizeMode="contain" />
           <Text style={styles.message}>{t('screens.shopSuccess.paymentComplete')}</Text>
-          <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+          <TouchableOpacity testID={TID.shopSuccess.confirm} style={styles.button} onPress={handleConfirm}>
             <Text style={styles.buttonText}>{t('screens.shopSuccess.confirm')}</Text>
           </TouchableOpacity>
         </View>

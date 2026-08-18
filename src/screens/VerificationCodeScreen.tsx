@@ -31,6 +31,7 @@ import {
 import { signInWithApple } from '../services/appleAuth';
 import { AxiosError } from 'axios';
 import { TUTORIAL_PENDING_KEY, TUTORIAL_COMPLETED_KEY } from './walletKeyTutorialHelpers';
+import { TID } from '../testIDs';
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 300;
@@ -630,7 +631,7 @@ export const VerificationCodeScreen = () => {
         </View>
 
         {}
-        <TextInput
+        <TextInput testID={TID.verificationCode.codeInput}
           ref={hiddenInputRef}
           value={code}
           onChangeText={setCode}

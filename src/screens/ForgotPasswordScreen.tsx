@@ -7,6 +7,7 @@ import { SafeScrollView, FormField, PrimaryButton, Header } from '../components'
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { sendForgotPasswordCode, resetPasswordWithCode } from '../services';
 import { COLORS, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 type Stage = 'email' | 'code' | 'password';
 const CODE_LENGTH = 6;
@@ -132,7 +133,7 @@ export const ForgotPasswordScreen = () => {
               {Array.from({ length: CODE_LENGTH }).map((_, index) => {
                 const digit = code[index] ?? '';
                 return (
-                  <TouchableOpacity
+                  <TouchableOpacity testID={TID.forgotPassword.hiddenInputRef}
                     key={index}
                     style={styles.codeBox}
                     onPress={() => hiddenInputRef.current?.focus()}
@@ -144,7 +145,7 @@ export const ForgotPasswordScreen = () => {
               })}
             </View>
 
-            <TextInput
+            <TextInput testID={TID.forgotPassword.codeInput}
               ref={hiddenInputRef}
               value={code}
               onChangeText={(v) => setCode(v.replace(/\D/g, '').slice(0, CODE_LENGTH))}
