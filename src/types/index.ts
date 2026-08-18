@@ -111,7 +111,8 @@ export type CountryDialCode = {
   name: string;
   dialCode: string;
   flagEmoji: string;
-  countryCode: number;
+
+  countryCode?: number;
 };
 
 export interface AdvertisementParams {
