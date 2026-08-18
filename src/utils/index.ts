@@ -161,7 +161,8 @@ export const v_a3bbf0 = async (
       if (v_825625) {
         const { createAxiosInstance: v_7488d5 } = await import('../services');
         const v_c02583 = v_7488d5(v_c65f5d);
-        const v_8f00b9 = await v_c02583.get(`/referral-share-text?lang=${v_825625}`, { timeout: 3000 });
+
+        const v_8f00b9 = await v_c02583.get(`/referral-share-text?lang=${v_825625}&marker=1`, { timeout: 3000 });
         const v_133cb4 = v_8f00b9?.data?.data?.text;
         if (v_133cb4 && typeof v_133cb4 === 'string' && v_133cb4.trim()) {
           v_b657c9 = v_133cb4;
