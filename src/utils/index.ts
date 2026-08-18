@@ -152,7 +152,22 @@ export const shareReferralLink = async (
       : (userDetails.email ? `referral=${encodeURIComponent(userDetails.email)}` : '');
     const deepLinkUrl = `https://www.xrun.run/invite?${inviteParam}`;
 
-    const shareText = t('screens.referral.share.shareText');
+    let shareText = t('screens.referral.share.shareText');
+    try {
+      const i18n = require('i18next').default || require('i18next');
+      const lng = String(i18n?.language || '').toLowerCase();
+      const norm = lng === 'ko' || lng.startsWith('ko-') ? 'ko'
+        : lng === 'en' || lng.startsWith('en-') ? 'en' : null;
+      if (norm) {
+        const { createAxiosInstance } = await import('../services');
+        const axi = createAxiosInstance(navigation);
+        const res = await axi.get(`/referral-share-text?lang=${norm}`, { timeout: 3000 });
+        const serverText = res?.data?.data?.text;
+        if (serverText && typeof serverText === 'string' && serverText.trim()) {
+          shareText = serverText;
+        }
+      }
+    } catch (e) {  }
     const downloadLabel = t('screens.referral.share.download');
     const linkLabel = t('screens.referral.share.linkLabel') || 'Link';
 
