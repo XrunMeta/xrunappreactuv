@@ -161,7 +161,8 @@ export const shareReferralLink = async (
       if (norm) {
         const { createAxiosInstance } = await import('../services');
         const axi = createAxiosInstance(navigation);
-        const res = await axi.get(`/referral-share-text?lang=${norm}`, { timeout: 3000 });
+
+        const res = await axi.get(`/referral-share-text?lang=${norm}&marker=1`, { timeout: 3000 });
         const serverText = res?.data?.data?.text;
         if (serverText && typeof serverText === 'string' && serverText.trim()) {
           shareText = serverText;
