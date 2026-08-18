@@ -152,7 +152,22 @@ export const v_a3bbf0 = async (
       : (v_412c99.email ? `referral=${encodeURIComponent(v_412c99.email)}` : '');
     const v_25f202 = `https://www.xrun.run/invite?${v_400193}`;
 
-    const v_b657c9 = v_8d41d7('screens.referral.share.shareText');
+    let v_b657c9 = v_8d41d7('screens.referral.share.shareText');
+    try {
+      const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+      const v_c87b30 = String(v_9c213b?.language || '').toLowerCase();
+      const v_825625 = v_c87b30 === 'ko' || v_c87b30.startsWith('ko-') ? 'ko'
+        : v_c87b30 === 'en' || v_c87b30.startsWith('en-') ? 'en' : null;
+      if (v_825625) {
+        const { createAxiosInstance: v_7488d5 } = await import('../services');
+        const v_c02583 = v_7488d5(v_c65f5d);
+        const v_8f00b9 = await v_c02583.get(`/referral-share-text?lang=${v_825625}`, { timeout: 3000 });
+        const v_133cb4 = v_8f00b9?.data?.data?.text;
+        if (v_133cb4 && typeof v_133cb4 === 'string' && v_133cb4.trim()) {
+          v_b657c9 = v_133cb4;
+        }
+      }
+    } catch (v_9e86fd) {  }
     const v_542b81 = v_8d41d7('screens.referral.share.download');
     const v_8d1ab0 = v_8d41d7('screens.referral.share.linkLabel') || 'Link';
 
