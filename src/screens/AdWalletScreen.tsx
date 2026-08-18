@@ -27,6 +27,7 @@ import { loadAndShowRewardedAd, getPangleRewardedAdUnitId, isPangleReadySync, is
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { ADXRUNEstimateItem, ADXRUNResultItem, QuestItem } from '../types';
 import { PaginationParams, PaginationResponse, DataListRef } from '../types/pagination';
+import { TID } from '../testIDs';
 
 type TabValue = 'pending' | 'quest' | 'settled';
 
@@ -1343,7 +1344,7 @@ export const AdWalletScreen = () => {
           </View>
         ) : (itemTab === 'settled' && item.extrastr3 === '추천인이벤트') ? (
           <View style={styles.adCardRow}>
-            <Text style={[styles.adCardRowLabel, { maxWidth: '70%' }]} numberOfLines={1} ellipsizeMode="tail">{item.extrastr4 ? t('screens.adWallet.referralRewardWithName', { name: item.extrastr4 }) : t('screens.adWallet.referralRewardLabel')}</Text>
+            <Text testID={TID.adWallet.nameLabel} style={[styles.adCardRowLabel, { maxWidth: '70%' }]} numberOfLines={1} ellipsizeMode="tail">{item.extrastr4 ? t('screens.adWallet.referralRewardWithName', { name: item.extrastr4 }) : t('screens.adWallet.referralRewardLabel')}</Text>
             <Text style={[styles.adCardRowAmount, { color: item.adRevenueSettlementColor }]}>
               {item.adRevenueSettlement}
             </Text>
@@ -1452,7 +1453,7 @@ export const AdWalletScreen = () => {
                 </View>
                 {tab === 'pending' && <Text style={styles.settlementNotice}>{t('screens.adWallet.settlementNotice')}</Text>}
               </View>
-              <Text style={styles.summaryValue}>
+              <Text testID={TID.adWallet.amountasxrunLabel} style={styles.summaryValue}>
                 {topBannersLoading ? '...' : topBannersData.amountasxrun}
               </Text>
               <Text style={styles.summaryExtra}>

@@ -347,7 +347,7 @@ export const MyInfoNotifyScreen = () => {
               onLongPress={() => handleDelete(notification.board)}
               activeOpacity={0.8}
             >
-              <Text style={styles.replyText}>{notification.title}</Text>
+              <Text testID={TID.myInfoNotify.titleLabel} style={styles.replyText}>{notification.title}</Text>
             </TouchableOpacity>
             {}
           </View>
@@ -363,7 +363,7 @@ export const MyInfoNotifyScreen = () => {
           {imageUri && (
             <Image source={{ uri: imageUri }} style={styles.heroImage} resizeMode="cover" />
           )}
-          <Text style={styles.badge}>{notification.title}</Text>
+          <Text testID={TID.myInfoNotify.titleLabel2} style={styles.badge}>{notification.title}</Text>
           {}
           {notification.contents !== null && notification.type !== 9303 && (
             <View>

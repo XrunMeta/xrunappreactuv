@@ -999,11 +999,11 @@ export const WalletScreen = () => {
           </View>
         </View>
         <View style={styles.tokenItemMiddle}>
-          <Text style={styles.tokenItemTitle}>{title}</Text>
+          <Text testID={TID.wallet.titleLabel} style={styles.tokenItemTitle}>{title}</Text>
           <Text style={styles.tokenItemSubtitle}>{subtitle}</Text>
         </View>
         <View style={styles.tokenItemRight}>
-          <Text style={styles.tokenItemAmount} numberOfLines={2} ellipsizeMode="tail">
+          <Text testID={TID.wallet.amountLabel} style={styles.tokenItemAmount} numberOfLines={2} ellipsizeMode="tail">
             {amount} {suffix || ''}
           </Text>
         </View>

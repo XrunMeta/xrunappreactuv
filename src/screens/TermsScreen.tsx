@@ -9,6 +9,7 @@ import { useAppContext } from '../context';
 import { COMMON_STYLES, FONTS, COLORS } from '../constants';
 import { getAgreementByType } from '../services';
 import { AgreementData } from '../types';
+import { TID } from '../testIDs';
 
 export const TermsScreen = () => {
   const { t } = useTranslation();
@@ -74,7 +75,7 @@ export const TermsScreen = () => {
         ) : agreementData ? (
           <View style={styles.card}>
             {agreementData.title && (
-              <Text style={styles.titleText}>{agreementData.title}</Text>
+              <Text testID={TID.terms.titleLabel} style={styles.titleText}>{agreementData.title}</Text>
             )}
             <Text style={styles.contentText}>{agreementData.content}</Text>
           </View>

@@ -140,7 +140,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
                 <Image source={token.icon} style={styles.tokenImage} />
               </View>
             </View>
-            <Text style={styles.tokenLabel}>{token.name}</Text>
+            <Text testID={TID.addTokenDialog.nameLabel} style={styles.tokenLabel}>{token.name}</Text>
           </TouchableOpacity>
         );
       })}
@@ -169,7 +169,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
       </View>
       <View style={styles.summaryItem}>
         <Text style={styles.summaryLabel}>Token Name</Text>
-        <Text style={styles.summaryValue}>{selectedToken?.name}</Text>
+        <Text testID={TID.addTokenDialog.nameLabel2} style={styles.summaryValue}>{selectedToken?.name}</Text>
       </View>
       <View style={styles.summaryItem}>
         <Text style={styles.summaryLabel}>Token Symbol</Text>

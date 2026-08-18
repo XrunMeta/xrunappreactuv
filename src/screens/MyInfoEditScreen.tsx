@@ -1604,7 +1604,7 @@ export const MyInfoEditScreen = () => {
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>{t('screens.myInfoEdit.email')}</Text>
               <View style={styles.disabledInput}>
-                <Text style={styles.disabledText}>{email || t('screens.myInfoEdit.email')}</Text>
+                <Text testID={TID.myInfoEdit.emailLabel} style={styles.disabledText}>{email || t('screens.myInfoEdit.email')}</Text>
               </View>
             </View>
             <View style={styles.fieldContainer}>
@@ -1615,7 +1615,7 @@ export const MyInfoEditScreen = () => {
                 </TouchableOpacity>
               </View>
               <View style={[{ ...styles.readonlyInput }, { marginTop: 0 }]}>
-                <Text style={styles.readonlyText}>
+                <Text testID={TID.myInfoEdit.datepinchangedLabel} style={styles.readonlyText}>
                   {t('screens.myInfoEdit.lastPasswordChangeDateLabel', 'e', { date: datepinchanged || '-' })}
                 </Text>
               </View>

@@ -660,7 +660,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               return (
                 <View key={w.wallet_code} style={styles.keyCard}>
                   {}
-                  <Text style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
+                  <Text testID={TID.walletPrivateKeyGoogleAuth.networkLabel} style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
                   <Text style={styles.fieldLabel}>{t('screens.walletPrivateKeyGoogleAuth.walletAddress')}</Text>
                   <Text style={styles.fieldValue} selectable>
                     {w.address}

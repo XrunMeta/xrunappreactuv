@@ -468,7 +468,7 @@ export const ShopProductDetailScreen = () => {
                                     <Text style={styles.minAmountHint}>{t('screens.shopProductDetail.checkingBalance')}</Text>
                                 </View>
                             ) : (
-                                <Text style={styles.minAmountHint}>{t('screens.shopProductDetail.balanceHold', { amount: exchangeXplayBalance.toLocaleString() })}</Text>
+                                <Text testID={TID.shopProductDetail.amountLabel} style={styles.minAmountHint}>{t('screens.shopProductDetail.balanceHold', { amount: exchangeXplayBalance.toLocaleString() })}</Text>
                             )}
                             <View style={styles.inputContainer}>
                                 <TextInput testID={TID.shopProductDetail.xplayAmountInput}
@@ -1145,7 +1145,7 @@ export const ShopProductDetailScreen = () => {
                         <View style={styles.modalLogoContainer}>
                             <Image source={xrunRoundLogo} style={styles.modalLogo} resizeMode="contain" />
                         </View>
-                        <Text style={styles.paymentSuccessMessage}>
+                        <Text testID={TID.shopProductDetail.couponImgUrlLabel} style={styles.paymentSuccessMessage}>
                             {xplayPurchaseResult?.coupon_img_url ? t('screens.shopProductDetail.couponIssued') : t('screens.shopProductDetail.paymentComplete')}
                         </Text>
                         {xplayPurchaseResult?.coupon_img_url ? (

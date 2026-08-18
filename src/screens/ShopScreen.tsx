@@ -594,13 +594,13 @@ export const ShopScreen = () => {
                     ) : null}
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
-                            <Text style={styles.imageDescriptionText}>{product.description}</Text>
+                            <Text testID={TID.shop.descriptionLabel} style={styles.imageDescriptionText}>{product.description}</Text>
                         </View>
                     )}
                 </View>
                 <View style={styles.productInfo}>
                     <Text style={styles.productBrand}>{product.brand || (product.isIak ? t('screens.shop.iakBrand') : t('screens.shop.giftBrand'))}</Text>
-                    <Text style={styles.productTitle} numberOfLines={2}>
+                    <Text testID={TID.shop.titleLabel} style={styles.productTitle} numberOfLines={2}>
                         {product.title}
                     </Text>
                     {}

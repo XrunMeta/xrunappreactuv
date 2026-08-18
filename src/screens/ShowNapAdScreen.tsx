@@ -815,11 +815,11 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
             </TouchableOpacity>
           )}
           <View style={styles.campaignBox}>
-            <Text style={styles.campaignTitle}>
+            <Text testID={TID.showNapAd.nameLabel} style={styles.campaignTitle}>
               {campaignData.name || t('screens.showNapAd.campaignInfo')}
             </Text>
           </View>
-          <Text style={styles.campaignReward}>
+          <Text testID={TID.showNapAd.priceLabel} style={styles.campaignReward}>
             {t('screens.showNapAd.reward')} : {(() => {
               const price = advertisementParams?.xrunPrice || 0;
               const priceValue = parseFloat(String(price));
@@ -866,7 +866,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
         <View style={styles.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[styles.webViewHeader, { paddingTop: insets.top + 12 }]}>
-            <Text
+            <Text testID={TID.showNapAd.nameLabel2}
               style={styles.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"

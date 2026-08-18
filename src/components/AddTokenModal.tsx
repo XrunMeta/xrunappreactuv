@@ -269,7 +269,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = React.memo(
                     <Text style={styles.confirmLabel}>
                       {t('screens.addToken.tokenName')}
                     </Text>
-                    <Text style={styles.confirmValue}>
+                    <Text testID={TID.addToken.nameLabel} style={styles.confirmValue}>
                       {tokenName || selectedToken?.name}
                     </Text>
                   </View>

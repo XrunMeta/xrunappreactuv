@@ -545,7 +545,7 @@ export const ShopBuyScreen = () => {
               <>
                 <View style={styles.row}>
                   <Text style={styles.label}>{t('screens.shopBuy.price')}</Text>
-                  <Text style={styles.value}>
+                  <Text testID={TID.shopBuy.priceKrwLabel} style={styles.value}>
                     {formatCurrency(priceKRW, 'KRW')} / {formatXrunDisplay(priceXrun)} XRUN
                   </Text>
                 </View>

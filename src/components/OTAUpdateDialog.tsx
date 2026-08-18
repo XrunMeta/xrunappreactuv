@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
 import { LoadingText } from './AnimatedDots';
+import { TID } from '../testIDs';
 
 export type OTAUpdateDialogProps = { isAdFinished?: boolean };
 
@@ -126,7 +127,7 @@ const OTAUpdateDialog: React.FC<OTAUpdateDialogProps> = ({ isAdFinished = true }
                         <Text style={styles.versionText}>v{updateInfo?.version}</Text>
                     </View>
 
-                    <Text style={styles.fullScreenMessage}>
+                    <Text testID={TID.otaupdateDialog.descriptionLabel} style={styles.fullScreenMessage}>
                         {updateInfo?.description || t('common.versionUpdate.message')}
                     </Text>
 

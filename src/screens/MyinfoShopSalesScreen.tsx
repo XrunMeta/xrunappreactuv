@@ -503,7 +503,7 @@ export const MyinfoShopSalesScreen = () => {
           <View style={styles.infoCard}>
             {}
             <View style={{ alignItems: 'center', marginBottom: 14 }}>
-              <Text
+              <Text testID={TID.myinfoShopSales.titleLabel}
                 style={[styles.infoTitle, { textAlign: 'center', marginBottom: 6 }]}
                 numberOfLines={2}
                 ellipsizeMode="tail"
@@ -529,7 +529,7 @@ export const MyinfoShopSalesScreen = () => {
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#e5e7eb' }}>
               <View style={{ alignItems: 'center', flex: 1 }}>
                 <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{t('screens.myinfoShopSales.productPrice')}</Text>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#111827' }}>{Number(itemInfo.priceXrun ?? 0).toLocaleString('ko-KR')}</Text>
+                <Text testID={TID.myinfoShopSales.priceXrunLabel} style={{ fontSize: 14, fontWeight: '700', color: '#111827' }}>{Number(itemInfo.priceXrun ?? 0).toLocaleString('ko-KR')}</Text>
                 <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>XRUN</Text>
               </View>
               <View style={{ width: 1, backgroundColor: '#e5e7eb' }} />
@@ -541,7 +541,7 @@ export const MyinfoShopSalesScreen = () => {
               <View style={{ width: 1, backgroundColor: '#e5e7eb' }} />
               <View style={{ alignItems: 'center', flex: 1 }}>
                 <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{t('screens.myinfoShopSales.totalSales')}</Text>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#16a34a' }}>{(Number(itemInfo.priceXrun ?? 0) * Number(itemInfo.participantCount ?? 0)).toLocaleString('ko-KR')}</Text>
+                <Text testID={TID.myinfoShopSales.priceXrunLabel2} style={{ fontSize: 14, fontWeight: '700', color: '#16a34a' }}>{(Number(itemInfo.priceXrun ?? 0) * Number(itemInfo.participantCount ?? 0)).toLocaleString('ko-KR')}</Text>
                 <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>XRUN</Text>
               </View>
             </View>

@@ -359,7 +359,7 @@ export const ShopTicketDetailScreen = () => {
           </View>
         </View>
 
-        <Text style={styles.itemTitle}>{selectedShopItem?.title ?? '티켓'}</Text>
+        <Text testID={TID.shopTicketDetail.titleLabel} style={styles.itemTitle}>{selectedShopItem?.title ?? '티켓'}</Text>
 
         {}
         <View style={styles.ticketFieldContainer}>

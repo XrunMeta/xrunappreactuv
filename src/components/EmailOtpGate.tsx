@@ -102,7 +102,7 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
       />
       <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.descriptionWrapper}>
-          <Text style={styles.description}>
+          <Text testID={TID.emailOtpGate.emailLabel} style={styles.description}>
             {email}
             {t('screens.verificationCode.description') || '로 발송된 인증 코드를 입력해 주세요.'}
           </Text>

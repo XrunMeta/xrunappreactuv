@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Region } from '../constants/regions';
 import { COLORS, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 type Props = {
   region: Region;
@@ -27,7 +28,7 @@ export const RegionListItem: React.FC<Props> = ({
         <Text style={styles.iconText}>📍</Text>
       </View>
       <View style={styles.info}>
-        <Text style={styles.regionName}>{region.name}</Text>
+        <Text testID={TID.regionListItem.nameLabel} style={styles.regionName}>{region.name}</Text>
         <Text style={styles.regionNameEn}>{region.nameEn}</Text>
       </View>
     </Pressable>

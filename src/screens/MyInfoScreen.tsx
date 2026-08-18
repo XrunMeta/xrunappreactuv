@@ -446,10 +446,10 @@ export const MyInfoScreen = () => {
               <ActivityIndicator size="small" color={COLORS.headerText} />
             ) : (
               <>
-                <Text style={styles.profileName}>
+                <Text testID={TID.myInfo.nameLabel} style={styles.profileName}>
                   {userInfo.name || '사용자'}
                 </Text>
-                <Text style={styles.profileEmail}>
+                <Text testID={TID.myInfo.emailLabel} style={styles.profileEmail}>
                   {userInfo.email}
                 </Text>
               </>

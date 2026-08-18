@@ -126,7 +126,7 @@ export const ForgotPasswordScreen = () => {
         {stage === 'code' && (
           <>
             <View style={styles.descriptionWrapper}>
-              <Text style={styles.description}>{email}{tr('code.description')}</Text>
+              <Text testID={TID.forgotPassword.emailLabel} style={styles.description}>{email}{tr('code.description')}</Text>
             </View>
 
             <View style={styles.codeRow}>

@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
       <View style={styles.content}>
         {renderBackArea()}
         <View style={styles.titleWrapper} pointerEvents="none">
-          <Text style={styles.title}>{title}</Text>
+          <Text testID={TID.header.titleLabel} style={styles.title}>{title}</Text>
         </View>
         {rightComponent ? (
           <View style={styles.rightComponent}>{rightComponent}</View>

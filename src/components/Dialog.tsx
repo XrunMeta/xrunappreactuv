@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 type DialogAction = {
   label: string;
@@ -46,13 +47,13 @@ export const Dialog: React.FC<DialogProps> = ({
             {onClose && actions.length === 0 ? (
               <>
                 <View style={styles.closePlaceholder} />
-                <Text style={styles.title}>{title}</Text>
+                <Text testID={TID.dialog.titleLabel} style={styles.title}>{title}</Text>
                 <TouchableOpacity onPress={onClose} hitSlop={HIT_SLOP} style={styles.close}>
                   <Ionicons name="close" size={24} color="#747474" />
                 </TouchableOpacity>
               </>
             ) : (
-              <Text style={styles.title}>{title}</Text>
+              <Text testID={TID.dialog.titleLabel2} style={styles.title}>{title}</Text>
             )}
           </View>
 

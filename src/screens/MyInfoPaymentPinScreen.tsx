@@ -165,7 +165,7 @@ export const MyInfoPaymentPinScreen: React.FC = () => {
     <View style={styles.container}>
       <Header title="결제 비밀번호" onBackPress={goBack} showBackButton />
       <View style={styles.body}>
-        <Text style={styles.title}>{title}</Text>
+        <Text testID={TID.myInfoPaymentPin.titleLabel} style={styles.title}>{title}</Text>
         <View style={styles.dotsRow}>
           {Array.from({ length: 6 }).map((_, i) => (
             <View key={i} style={[styles.dot, currentInput.length > i && styles.dotFilled]} />

@@ -728,11 +728,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
             </TouchableOpacity>
           )}
           <View style={styles.campaignBox}>
-            <Text style={styles.campaignTitle}>
+            <Text testID={TID.showPockAd.nameLabel} style={styles.campaignTitle}>
               {pockAdData.ad_name || advertisementParams.name || t('screens.showNapAd.campaignInfo')}
             </Text>
           </View>
-          <Text style={styles.campaignReward}>
+          <Text testID={TID.showPockAd.priceLabel} style={styles.campaignReward}>
             {t('screens.showNapAd.reward')} : {(() => {
               const price = advertisementParams?.xrunPrice || 0;
               const priceValue = parseFloat(String(price));
@@ -788,7 +788,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
         <View style={styles.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[styles.webViewHeader, { paddingTop: insets.top + 12 }]}>
-            <Text
+            <Text testID={TID.showPockAd.adNameLabel}
               style={styles.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"

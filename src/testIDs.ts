@@ -1,22 +1,38 @@
 
 
 export const TID = {
-  bottomNavigationBar: {
-
-    item: 'bottom-nav',
+  adWallet: {
+    amountasxrunLabel: 'ad-wallet-amountasxrun-label',
+    nameLabel: 'ad-wallet-name-label',
   },
   addToken: {
     contractAddressInput: 'add-token-contract-address-input',
+    nameLabel: 'add-token-name-label',
   },
   addTokenDialog: {
     contractAddressInput: 'add-token-dialog-contract-address-input',
+    nameLabel: 'add-token-dialog-name-label',
+    nameLabel2: 'add-token-dialog-name-label-2',
   },
   addWalletAddress: {
     addressInput: 'add-wallet-address-address-input',
     nameInput: 'add-wallet-address-name-input',
     qrScan: 'add-wallet-address-qr-scan',
   },
+  addressInfoItem: {
+    addressLabel: 'address-info-item-address-label',
+    nameLabel: 'address-info-item-name-label',
+    networkLabel: 'address-info-item-network-label',
+  },
+  bottomNavigationBar: {
+    item: 'bottom-nav',
+  },
+  button: {
+    titleLabel: 'button-title-label',
+  },
   cameraMain: {
+    coinLabel: 'camera-main-coin-label',
+    nameLabel: 'camera-main-name-label',
     webviewBack: 'camera-main-webview-back',
   },
   countryCodeSelect: {
@@ -25,8 +41,13 @@ export const TID = {
   devDebugPanel: {
     copyCurrentTab: 'dev-debug-panel-copy-current-tab',
   },
+  dialog: {
+    titleLabel: 'dialog-title-label',
+    titleLabel2: 'dialog-title-label-2',
+  },
   emailOtpGate: {
     codeInput: 'email-otp-gate-code-input',
+    emailLabel: 'email-otp-gate-email-label',
     hiddenInputRef: 'email-otp-gate-hidden-input-ref',
   },
   emergencyStopDialog: {
@@ -34,10 +55,12 @@ export const TID = {
   },
   forgotPassword: {
     codeInput: 'forgot-password-code-input',
+    emailLabel: 'forgot-password-email-label',
     hiddenInputRef: 'forgot-password-hidden-input-ref',
   },
   header: {
     back: 'header-back',
+    titleLabel: 'header-title-label',
   },
   login: {
     appleLogin: 'login-apple-login',
@@ -45,9 +68,14 @@ export const TID = {
     googleLogin: 'login-google-login',
     passwordVisible: 'login-password-visible',
   },
+  mapMain: {
+    nameLabel: 'map-main-name-label',
+  },
   myInfo: {
+    emailLabel: 'my-info-email-label',
     logout: 'my-info-logout',
     menu: 'my-info-menu',
+    nameLabel: 'my-info-name-label',
   },
   myInfoClauses: {
     select: 'my-info-clauses-select',
@@ -59,6 +87,8 @@ export const TID = {
     changePassword: 'my-info-edit-change-password',
     countrySearchQueryInput: 'my-info-edit-country-search-query-input',
     countrySelect: 'my-info-edit-country-select',
+    datepinchangedLabel: 'my-info-edit-datepinchanged-label',
+    emailLabel: 'my-info-edit-email-label',
     openRegionModal: 'my-info-edit-open-region-modal',
     phoneEdit: 'my-info-edit-phone-edit',
     regionSearchQueryInput: 'my-info-edit-region-search-query-input',
@@ -73,11 +103,14 @@ export const TID = {
     openLink: 'my-info-notify-open-link',
     questionInput: 'my-info-notify-question-input',
     send: 'my-info-notify-send',
+    titleLabel: 'my-info-notify-title-label',
+    titleLabel2: 'my-info-notify-title-label-2',
   },
   myInfoPaymentPin: {
     pressBackspace: 'my-info-payment-pin-press-backspace',
     pressDigit: 'my-info-payment-pin-press-digit',
     pressDigit2: 'my-info-payment-pin-press-digit-2',
+    titleLabel: 'my-info-payment-pin-title-label',
   },
   myInfoSettings: {
     languageSelectorVisible: 'my-info-settings-language-selector-visible',
@@ -95,9 +128,21 @@ export const TID = {
     modifyItem: 'myinfo-shop-sales-modify-item',
     navigate: 'myinfo-shop-sales-navigate',
     periodSelect: 'myinfo-shop-sales-period-select',
+    priceXrunLabel: 'myinfo-shop-sales-price-xrun-label',
+    priceXrunLabel2: 'myinfo-shop-sales-price-xrun-label-2',
+    titleLabel: 'myinfo-shop-sales-title-label',
   },
   nftWallet: {
     filterVisible: 'nft-wallet-filter-visible',
+  },
+  otaupdateContext: {
+    descriptionLabel: 'otaupdate-context-description-label',
+  },
+  otaupdateDialog: {
+    descriptionLabel: 'otaupdate-dialog-description-label',
+  },
+  pangleList: {
+    nameLabel: 'pangle-list-name-label',
   },
   phoneEdit: {
     countryCodeSelect: 'phone-edit-country-code-select',
@@ -111,6 +156,10 @@ export const TID = {
   referralDepthTwo: {
     close: 'referral-depth-two-close',
   },
+  referralMemberRow: {
+    descriptionLabel: 'referral-member-row-description-label',
+    emailLabel: 'referral-member-row-email-label',
+  },
   referralMyGroup: {
     share: 'referral-my-group-share',
   },
@@ -120,13 +169,28 @@ export const TID = {
   referralSettlement: {
     share: 'referral-settlement-share',
   },
+  referralStatsCard: {
+    titleLabel: 'referral-stats-card-title-label',
+  },
+  regionListItem: {
+    nameLabel: 'region-list-item-name-label',
+  },
+  secondaryButton: {
+    titleLabel: 'secondary-button-title-label',
+  },
   shop: {
+    descriptionLabel: 'shop-description-label',
     productClick: 'shop-product-click',
     searchQueryInput: 'shop-search-query-input',
+    titleLabel: 'shop-title-label',
   },
   shopBuy: {
+    priceKrwLabel: 'shop-buy-price-krw-label',
     purchase: 'shop-buy-purchase',
     purchaseWithPoints: 'shop-buy-purchase-with-points',
+  },
+  shopItemCard: {
+    titleLabel: 'shop-item-card-title-label',
   },
   shopItemRegister: {
     deleteItem: 'shop-item-register-delete-item',
@@ -146,9 +210,12 @@ export const TID = {
     view: 'shop-my-items-view',
   },
   shopMyTicket: {
+    descriptionLabel: 'shop-my-ticket-description-label',
     searchQueryInput: 'shop-my-ticket-search-query-input',
   },
   shopProductDetail: {
+    amountLabel: 'shop-product-detail-amount-label',
+    couponImgUrlLabel: 'shop-product-detail-coupon-img-url-label',
     depositAddressInput: 'shop-product-detail-deposit-address-input',
     detailTab: 'shop-product-detail-detail-tab',
     iakPhoneInput: 'shop-product-detail-iak-phone-input',
@@ -161,6 +228,10 @@ export const TID = {
     xplayPaymentSuccessClose: 'shop-product-detail-xplay-payment-success-close',
     xplayPurchase: 'shop-product-detail-xplay-purchase',
   },
+  shopSalesMemberRow: {
+    emailLabel: 'shop-sales-member-row-email-label',
+    nameLabel: 'shop-sales-member-row-name-label',
+  },
   shopSuccess: {
     confirm: 'shop-success-confirm',
   },
@@ -172,13 +243,20 @@ export const TID = {
     confirmDelete: 'shop-ticket-detail-confirm-delete',
     copyTicketNumber: 'shop-ticket-detail-copy-ticket-number',
     shareQr: 'shop-ticket-detail-share-qr',
+    titleLabel: 'shop-ticket-detail-title-label',
   },
   showNapAd: {
     close: 'show-nap-ad-close',
+    nameLabel: 'show-nap-ad-name-label',
+    nameLabel2: 'show-nap-ad-name-label-2',
+    priceLabel: 'show-nap-ad-price-label',
   },
   showPockAd: {
+    adNameLabel: 'show-pock-ad-ad-name-label',
     close: 'show-pock-ad-close',
     close2: 'show-pock-ad-close-2',
+    nameLabel: 'show-pock-ad-name-label',
+    priceLabel: 'show-pock-ad-price-label',
   },
   showWebView: {
     goBack: 'show-web-view-go-back',
@@ -190,15 +268,38 @@ export const TID = {
   tapjoyList: {
     showAd: 'tapjoy-list-show-ad',
   },
+  terms: {
+    titleLabel: 'terms-title-label',
+  },
+  tokenListItem: {
+    amountLabel: 'token-list-item-amount-label',
+    titleLabel: 'token-list-item-title-label',
+  },
+  transactionListItem: {
+    amountLabel: 'transaction-list-item-amount-label',
+    titleLabel: 'transaction-list-item-title-label',
+  },
   verificationCode: {
     codeInput: 'verification-code-code-input',
   },
   wallet: {
     addToken: 'wallet-add-token',
+    amountLabel: 'wallet-amount-label',
     btn2: 'wallet-btn-2',
     btn3: 'wallet-btn-3',
     keyGuide: 'wallet-key-guide',
+    titleLabel: 'wallet-title-label',
     walletInfoVisible: 'wallet-wallet-info-visible',
+  },
+  walletHeaderCard: {
+    addressLabel: 'wallet-header-card-address-label',
+    titleLabel: 'wallet-header-card-title-label',
+  },
+  walletKeyPinPrompt: {
+    titleLabel: 'wallet-key-pin-prompt-title-label',
+  },
+  walletKeyTutorial: {
+    titleLabel: 'wallet-key-tutorial-title-label',
   },
   walletPrivateKeyDisplay: {
     backToWallet: 'wallet-private-key-display-back-to-wallet',
@@ -207,6 +308,7 @@ export const TID = {
   walletPrivateKeyGoogleAuth: {
     closeConsent: 'wallet-private-key-google-auth-close-consent',
     copyKey: 'wallet-private-key-google-auth-copy-key',
+    networkLabel: 'wallet-private-key-google-auth-network-label',
     proceedConsent: 'wallet-private-key-google-auth-proceed-consent',
     requestBackupConsent: 'wallet-private-key-google-auth-request-backup-consent',
     requestBackupConsent2: 'wallet-private-key-google-auth-request-backup-consent-2',
@@ -221,12 +323,14 @@ export const TID = {
     qrScan2: 'wallet-receive-qr-scan-2',
   },
   walletRestore: {
+    emailLabel: 'wallet-restore-email-label',
     otpHiddenInputRef: 'wallet-restore-otp-hidden-input-ref',
     pickDriveFile: 'wallet-restore-pick-drive-file',
     restoreFromGdrive: 'wallet-restore-restore-from-gdrive',
   },
   walletSend: {
     amountChangeInput: 'wallet-send-amount-change-input',
+    amountLabel: 'wallet-send-amount-label',
     availableBalance: 'wallet-send-available-balance',
     clearReceiverAddress: 'wallet-send-clear-receiver-address',
     closeModal: 'wallet-send-close-modal',
@@ -234,6 +338,8 @@ export const TID = {
     editAddress: 'wallet-send-edit-address',
     modalAddressInput: 'wallet-send-modal-address-input',
     modalNameInput: 'wallet-send-modal-name-input',
+    nameLabel: 'wallet-send-name-label',
+    nameLabel2: 'wallet-send-name-label-2',
     paste: 'wallet-send-paste',
     qrScanFromModal: 'wallet-send-qr-scan-from-modal',
     scan: 'wallet-send-scan',

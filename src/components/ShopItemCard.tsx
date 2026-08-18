@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { COLORS, FONTS, SIZES } from '../constants';
+import { TID } from '../testIDs';
 
 export interface ShopItemCardProps {
   title: string;
@@ -120,7 +121,7 @@ export const ShopItemCard: React.FC<ShopItemCardProps> = ({
       </View>
 
       <View style={styles.infoWrapper}>
-        <Text style={styles.title}>{title}</Text>
+        <Text testID={TID.shopItemCard.titleLabel} style={styles.title}>{title}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         {priceLabel ? <Text style={styles.price}>{priceLabel}</Text> : null}
         {quantityLabel ? (

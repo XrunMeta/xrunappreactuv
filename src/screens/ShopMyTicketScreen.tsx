@@ -319,7 +319,7 @@ export const ShopMyTicketScreen = () => {
             variant: 'primary',
           },
         ]}>
-        <Text style={styles.dialogText}>{transferTicketDialog.description}</Text>
+        <Text testID={TID.shopMyTicket.descriptionLabel} style={styles.dialogText}>{transferTicketDialog.description}</Text>
       </Dialog>
     </SafeView>
   );

@@ -604,7 +604,7 @@ export const WalletSendScreen = () => {
           </View>
 
           <View style={styles.tokenBadge}>
-            <Text style={styles.tokenBadgeText}>{selectedWalletAsset.symbol || selectedWalletAsset.name}</Text>
+            <Text testID={TID.walletSend.nameLabel} style={styles.tokenBadgeText}>{selectedWalletAsset.symbol || selectedWalletAsset.name}</Text>
           </View>
         </View>
         <View style={styles.helperContainer}>
@@ -643,10 +643,10 @@ export const WalletSendScreen = () => {
         {}
         <TouchableOpacity testID={TID.walletSend.availableBalance} onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
           <Text style={styles.availableBalanceLabel}>{t('screens.walletSend.availableBalance')}</Text>
-          <Text style={styles.availableBalanceValue}>{selectedWalletAsset.amount}</Text>
+          <Text testID={TID.walletSend.amountLabel} style={styles.availableBalanceValue}>{selectedWalletAsset.amount}</Text>
           {memberLimit !== null && (
             <>
-              <Text style={styles.availableBalanceToken}> {selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>
+              <Text testID={TID.walletSend.nameLabel2} style={styles.availableBalanceToken}> {selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>
             </>
           )}
           {}

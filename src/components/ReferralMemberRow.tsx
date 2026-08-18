@@ -9,6 +9,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { COLORS, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 interface ReferralMemberRowProps {
   rank?: number | string;
@@ -51,8 +52,8 @@ export const ReferralMemberRow: React.FC<ReferralMemberRowProps> = ({
         <View style={styles.rankPlaceholder} />
       ) : null}
       <View style={styles.infoColumn}>
-        <Text style={styles.email} numberOfLines={1} ellipsizeMode="tail">{email}</Text>
-        {description ? <Text style={styles.description}>{description}</Text> : null}
+        <Text testID={TID.referralMemberRow.emailLabel} style={styles.email} numberOfLines={1} ellipsizeMode="tail">{email}</Text>
+        {description ? <Text testID={TID.referralMemberRow.descriptionLabel} style={styles.description}>{description}</Text> : null}
       </View>
       <View style={styles.metaColumn}>
         {date ? <Text style={styles.date}>{date}</Text> : null}

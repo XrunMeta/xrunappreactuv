@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, ViewStyle } from 'react-native';
 import { COLORS, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 interface SecondaryButtonProps extends TouchableOpacityProps {
   title: string;
@@ -26,7 +27,7 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       activeOpacity={0.8}
       {...props}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text testID={TID.secondaryButton.titleLabel} style={styles.text}>{title}</Text>
     </TouchableOpacity>
   );
 };

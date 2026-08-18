@@ -813,7 +813,7 @@ export const WalletRestoreScreen = () => {
           autoAdjustKeyboardPadding={true}
         >
           <View style={restoreStyles.otpDescriptionWrapper}>
-            <Text style={restoreStyles.otpDescription}>
+            <Text testID={TID.walletRestore.emailLabel} style={restoreStyles.otpDescription}>
               {(email || '이메일') + (t('screens.verificationCode.description') || ' 로 인증번호를 발송했어요. 6자리 번호를 입력해주세요.')}
             </Text>
           </View>
