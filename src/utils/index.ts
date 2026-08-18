@@ -172,7 +172,12 @@ export const shareReferralLink = async (
     const linkLabel = t('screens.referral.share.linkLabel') || 'Link';
 
     const identifier = referralCode || userDetails.email || '';
-    const message = `${shareText}${identifier}\n\n🔗 ${linkLabel} ${deepLinkUrl}`;
+    let message: string;
+    if (shareText.includes('${referralCode}')) {
+      message = shareText.replace(/\$\{referralCode\}/g, identifier);
+    } else {
+      message = `${shareText}${identifier}\n\n🔗 ${linkLabel} ${deepLinkUrl}`;
+    }
 
     console.log('[shareReferralLink] 공유 메시지:', message);
 
