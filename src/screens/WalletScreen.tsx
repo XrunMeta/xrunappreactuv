@@ -30,6 +30,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
 import { fmtBalance } from '../utils/formatAmount';
+import { mergeRpcBalances, pickOkCurrencies, type RpcBalanceEntry } from '../utils/rpcBalance';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useSessionGuard } from '../hooks';
 import {
@@ -433,6 +434,8 @@ export const WalletScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const refreshAllRef = useRef<(() => void) | null>(null);
 
+  const [staleBalanceCurrencies, setStaleBalanceCurrencies] = useState<number[]>([]);
+
   useEffect(() => {
     if (!member) return;
 
@@ -508,8 +511,15 @@ export const WalletScreen = () => {
             const attemptDelays = [0, 3000, 5000, 10000];
             const seenOk = new Set<number>();
             const targetCurrencies = [1, 2, 16, 18];
+            const RPC_FETCH_TIMEOUT_MS = 12000;
+
             for (const delay of attemptDelays) {
+              if (abortController.signal.aborted) return; 
               if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+              if (abortController.signal.aborted) return;
+
+              const timeoutCtrl = new AbortController();
+              const timeoutId = setTimeout(() => timeoutCtrl.abort(), RPC_FETCH_TIMEOUT_MS);
               try {
                 const headers: Record<string, string> = {
                   'Content-Type': 'application/json',
@@ -519,30 +529,30 @@ export const WalletScreen = () => {
                   method: 'POST',
                   headers,
                   body: JSON.stringify({ member }),
+                  signal: timeoutCtrl.signal,
                 });
                 if (!rpcRes.ok) continue;
                 const rpcJson: any = await rpcRes.json().catch(() => null);
-                const balances: Array<{ currency: number; rpcAmount: string | null; status: string }> = rpcJson?.data ?? [];
-                const rpcByCurrency = new Map<number, string>();
-                for (const b of balances) {
-                  if (b.status === 'ok' && b.rpcAmount != null) {
-                    rpcByCurrency.set(Number(b.currency), b.rpcAmount);
-                    seenOk.add(Number(b.currency));
-                  }
-                }
-                if (rpcByCurrency.size > 0) {
-                  setCardsData((prev) => prev.map((item: any) => {
-                    const cur = Number(item.currency);
-                    if (!rpcByCurrency.has(cur)) return item;
-                    const rpcAmt = rpcByCurrency.get(cur)!;
-                    if (String(item.amount) === rpcAmt) return item;
-                    return { ...item, Wamount: rpcAmt, amount: rpcAmt };
-                  }));
-                }
+                const balances: RpcBalanceEntry[] = rpcJson?.data ?? [];
+                if (abortController.signal.aborted) return;
+
+                setCardsData((prev) => mergeRpcBalances(prev as any[], balances).cards as any);
+                for (const c of pickOkCurrencies(balances)) seenOk.add(c);
+
                 if (targetCurrencies.every((c) => seenOk.has(c))) break;
               } catch (e: any) {
                 console.warn('[WalletScreen] RPC 잔액 백그라운드 갱신 실패 (재시도):', e?.message);
+              } finally {
+                clearTimeout(timeoutId);
               }
+            }
+
+            const staleCurrencies = targetCurrencies.filter((c) => !seenOk.has(c));
+            if (staleCurrencies.length > 0 && !abortController.signal.aborted) {
+              console.warn('[WalletScreen] RPC 갱신 실패 통화(표시값은 DB 캐시):', staleCurrencies);
+              setStaleBalanceCurrencies(staleCurrencies);
+            } else if (!abortController.signal.aborted) {
+              setStaleBalanceCurrencies([]);
             }
           })();
 
@@ -1066,6 +1076,15 @@ export const WalletScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {
+
+}
+        {!isLoading && staleBalanceCurrencies.length > 0 && (
+          <View style={styles.balanceStaleBanner}>
+            <Text style={styles.balanceStaleBannerText}>{t('common.balanceStale.message')}</Text>
+          </View>
+        )}
+
         <View style={styles.listWrapper}>
           {isLoading ? (
             <View style={styles.loadingContainer}>
@@ -1266,6 +1285,20 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.medium,
     fontFamily: 'Roboto-Medium',
     color: '#121212',
+  },
+
+  balanceStaleBanner: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 15,
+    marginBottom: 12,
+  },
+  balanceStaleBannerText: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Regular',
+    color: '#374151',
+    lineHeight: 20,
   },
   addTokenButton: {
     flexDirection: 'row',

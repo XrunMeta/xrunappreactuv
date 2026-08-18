@@ -54,6 +54,9 @@ export default {
   etherscanStale: {
     message: '최신 거래내역을 불러오지 못해 이전 내역을 표시 중입니다',
   },
+  balanceStale: {
+    message: '일부 잔액을 최신으로 갱신하지 못했습니다. 화면을 아래로 당겨 새로고침해 주세요',
+  },
   gasInsufficient: {
     title: '가스비 부족',
     messageTransfer: '전송료(POL)가 부족합니다.\n폴리곤 네트워크 가스 토큰(POL)을 충전한 뒤 다시 시도해주세요.',

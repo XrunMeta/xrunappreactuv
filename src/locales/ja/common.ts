@@ -49,6 +49,9 @@ export default {
   etherscanStale: {
     message: '最新の取引履歴を読み込めなかったため、以前の履歴を表示しています。',
   },
+  balanceStale: {
+    message: '一部の残高を最新に更新できませんでした。画面を下に引いて再読み込みしてください。',
+  },
   gasInsufficient: {
     title: 'ガス代不足',
     messageTransfer: 'ウォレットに送金手数料(ガス代)が不足しているため、送金できません。\n\nPolygonネットワークのガストークン(POL)をチャージしてから、もう一度お試しください。',

@@ -46,6 +46,9 @@ export default {
   etherscanStale: {
     message: 'Không thể tải lịch sử giao dịch mới nhất — đang hiển thị dữ liệu trước đó.',
   },
+  balanceStale: {
+    message: 'Không thể cập nhật một số số dư. Vui lòng kéo xuống để làm mới.',
+  },
   gasInsufficient: {
     title: 'Phí Gas không đủ',
     messageTransfer: 'Ví của bạn không đủ phí mạng (gas) để thực hiện chuyển khoản.\n\nVui lòng nạp token gas mạng Polygon (POL) rồi thử lại.',
