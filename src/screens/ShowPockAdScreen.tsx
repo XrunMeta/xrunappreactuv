@@ -26,6 +26,7 @@ import { v_4c7b5d, v_570c34 } from '../components';
 import { v_843035 } from '../constants';
 import { v_6b63f9 } from '../types';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
+import { v_5401ae } from '../testIDs';
 
 const SequentialDots: v_a3453e.FC = () => {
   const [v_9b82f3, v_67dd3d] = v_5ab095(0);
@@ -623,7 +624,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
           borderBottomColor: '#e0e0e0',
           backgroundColor: '#fff',
         }}>
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.showPockAd.close}
             onPress={v_7f2e65}
             style={{
               padding: 8,
@@ -712,7 +713,7 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
         <View style={[v_d81136.campaignContainer, v_bf1005 && v_d81136.modalCampaignContainer]}>
           {}
           {v_bf1005 && (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.showPockAd.close2}
               onPress={v_7f2e65}
               style={{
                 position: 'absolute',

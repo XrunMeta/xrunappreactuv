@@ -20,6 +20,7 @@ import { v_f9f38e } from '../components';
 import { v_412fbc } from '../components/AnimatedDots';
 import { v_e134f3, v_5e6c2c } from '../services/walletSendLocal';
 import { v_9d7f6b, type v_b9a3bd } from '../services/walletKeyStore';
+import { v_5401ae } from '../testIDs';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -444,7 +445,7 @@ export const v_a59951 = () => {
                         <View style={v_d81136.inputSection}>
                             <Text style={v_d81136.inputLabel}>{v_8d41d7('screens.shopProductDetail.depositAddress')}</Text>
                             <View style={v_d81136.inputContainer}>
-                                <TextInput
+                                <TextInput testID={v_5401ae.shopProductDetail.depositAddressInput}
                                     style={v_d81136.input}
                                     placeholder="..."
                                     value={v_b36076}
@@ -452,7 +453,7 @@ export const v_a59951 = () => {
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                 />
-                                <TouchableOpacity onPress={v_817006} style={v_d81136.qrButton}>
+                                <TouchableOpacity testID={v_5401ae.shopProductDetail.qrScan} onPress={v_817006} style={v_d81136.qrButton}>
                                     <Ionicons name="qr-code-outline" size={22} color="#111827" />
                                 </TouchableOpacity>
                             </View>
@@ -470,7 +471,7 @@ export const v_a59951 = () => {
                                 <Text style={v_d81136.minAmountHint}>{v_8d41d7('screens.shopProductDetail.balanceHold', { amount: v_87676e.toLocaleString() })}</Text>
                             )}
                             <View style={v_d81136.inputContainer}>
-                                <TextInput
+                                <TextInput testID={v_5401ae.shopProductDetail.xplayAmountInput}
                                     style={v_d81136.input}
                                     placeholder=""
                                     value={v_a0d01e}
@@ -480,7 +481,7 @@ export const v_a59951 = () => {
                                     }}
                                     keyboardType="numeric"
                                 />
-                                <TouchableOpacity onPress={v_8b5670} style={v_d81136.maxButton}>
+                                <TouchableOpacity testID={v_5401ae.shopProductDetail.maxAmount} onPress={v_8b5670} style={v_d81136.maxButton}>
                                     <Text style={v_d81136.maxButtonText}>{v_8d41d7('screens.shopProductDetail.maxAmount')}</Text>
                                 </TouchableOpacity>
                             </View>
@@ -874,7 +875,7 @@ export const v_a59951 = () => {
                                     </Text>
                                 </TouchableOpacity>
                             )}
-                            <TouchableOpacity
+                            <TouchableOpacity testID={v_5401ae.shopProductDetail.detailTab}
                                 onPress={() => v_047920('guide')}
                                 style={[v_d81136.tabButton, v_dbeca6 === 'guide' && v_d81136.tabButtonActive]}
                                 activeOpacity={0.8}
@@ -988,7 +989,7 @@ export const v_a59951 = () => {
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : v_5db874 ? (
-                    <TouchableOpacity
+                    <TouchableOpacity testID={v_5401ae.shopProductDetail.xplayPurchase}
                         style={[v_d81136.purchaseButton, v_18a900 && v_d81136.purchaseButtonDisabled]}
                         onPress={v_b000c1}
                         disabled={v_18a900 || v_837630 || v_660822 == null}
@@ -1011,7 +1012,7 @@ export const v_a59951 = () => {
                         </LinearGradient>
                     </TouchableOpacity>
                 ) : (
-                    <TouchableOpacity
+                    <TouchableOpacity testID={v_5401ae.shopProductDetail.purchase}
                         style={v_d81136.purchaseButton}
                         onPress={v_dfaad1}
                         activeOpacity={0.8}
@@ -1042,7 +1043,7 @@ export const v_a59951 = () => {
                             <Image source={v_33c40c} style={v_d81136.modalLogo} resizeMode="contain" />
                         </View>
                         <Text style={v_d81136.paymentSuccessMessage}>{v_8d41d7('screens.shopProductDetail.paymentComplete')}</Text>
-                        <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_184ff4} activeOpacity={0.8}>
+                        <TouchableOpacity testID={v_5401ae.shopProductDetail.paymentSuccessClose} style={v_d81136.paymentSuccessButton} onPress={v_184ff4} activeOpacity={0.8}>
                             <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.confirm')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -1067,7 +1068,7 @@ export const v_a59951 = () => {
                         <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16, textAlign: 'center' }}>
                             {v_8d41d7(v_d1823a('ModalDesc'))}
                         </Text>
-                        <TextInput
+                        <TextInput testID={v_5401ae.shopProductDetail.iakPhoneInput}
                             value={v_f3e760}
                             onChangeText={v_23d029}
                             placeholder={v_8d41d7(v_d1823a('Placeholder'))}
@@ -1125,7 +1126,7 @@ export const v_a59951 = () => {
                                 {v_8d41d7('screens.shop.iak.smsNotice')}
                             </Text>
                         </View>
-                        <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_435347} activeOpacity={0.8}>
+                        <TouchableOpacity testID={v_5401ae.shopProductDetail.iakSuccessClose} style={v_d81136.paymentSuccessButton} onPress={v_435347} activeOpacity={0.8}>
                             <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shop.iak.ok')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -1162,7 +1163,7 @@ export const v_a59951 = () => {
                                 ) : null}
                             </ScrollView>
                         ) : null}
-                        <TouchableOpacity style={v_d81136.paymentSuccessButton} onPress={v_48c801} activeOpacity={0.8}>
+                        <TouchableOpacity testID={v_5401ae.shopProductDetail.xplayPaymentSuccessClose} style={v_d81136.paymentSuccessButton} onPress={v_48c801} activeOpacity={0.8}>
                             <Text style={v_d81136.paymentSuccessButtonText}>{v_8d41d7('screens.shopProductDetail.viewMyGift')}</Text>
                         </TouchableOpacity>
                     </View>

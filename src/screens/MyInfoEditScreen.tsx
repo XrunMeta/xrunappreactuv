@@ -37,6 +37,7 @@ import {
 import { v_151d5f, v_5c7129, v_107459 } from '../utils/countryUtils';
 import { v_58c98d } from '../utils/countryStateCityUtils';
 import { v_da1883 } from '../types';
+import { v_5401ae } from '../testIDs';
 
 const v_0c96f7 = ['select', '10', '20', '30', '40', '50+'] as const;
 
@@ -1609,7 +1610,7 @@ export const v_cdb169 = () => {
             <View style={v_d81136.fieldContainer}>
               <View style={[{ ...v_d81136.inlineLabelRow, ...v_d81136.label }]}>
                 <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.myInfoEdit.password')}</Text>
-                <TouchableOpacity onPress={v_c09605} style={v_d81136.linkTextContainer}>
+                <TouchableOpacity testID={v_5401ae.myInfoEdit.changePassword} onPress={v_c09605} style={v_d81136.linkTextContainer}>
                   <Text style={v_d81136.linkText}>{v_8d41d7('screens.myInfoEdit.changePassword')}</Text>
                 </TouchableOpacity>
               </View>
@@ -1623,7 +1624,7 @@ export const v_cdb169 = () => {
               <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.phone')}</Text>
               <View style={v_d81136.phoneFieldContainer}>
                 {}
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myInfoEdit.countrySelect}
                   style={v_d81136.phonePrefix}
                   onPress={v_261e69}
                   activeOpacity={0.7}
@@ -1635,7 +1636,7 @@ export const v_cdb169 = () => {
                   </Text>
                 </TouchableOpacity>
                 {}
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myInfoEdit.phoneEdit}
                   style={v_d81136.phoneValueContainer}
                   onPress={v_801fea}
                   activeOpacity={0.7}
@@ -1658,7 +1659,7 @@ export const v_cdb169 = () => {
             })() && (
               <View style={v_d81136.fieldContainer}>
                 <Text style={v_d81136.label}>{v_8d41d7('screens.myInfoEdit.region')}</Text>
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myInfoEdit.openRegionModal}
                   style={v_d81136.regionField}
                   onPress={v_c0d2d4}
                   activeOpacity={0.7}
@@ -1819,7 +1820,7 @@ export const v_cdb169 = () => {
             </View>
             <View style={v_d81136.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={v_5401ae.myInfoEdit.countrySearchQueryInput}
                 style={v_d81136.modalSearchInput}
                 value={v_bd30a1}
                 onChangeText={v_e03dd9}
@@ -1837,7 +1838,7 @@ export const v_cdb169 = () => {
                 data={v_daa71c}
                 keyExtractor={(v_8c0b26, v_a56041) => `${v_8c0b26.iso2}-${v_8c0b26.dialCode}-${v_8c0b26.name}-${v_a56041}`}
                 renderItem={({ item: v_b9bbbd }) => (
-                  <TouchableOpacity
+                  <TouchableOpacity testID={v_5401ae.myInfoEdit.selectCountry}
                     style={[
                       v_d81136.modalItem,
                       v_459d5e?.iso2 === v_b9bbbd.iso2 && v_d81136.modalItemSelected,
@@ -1914,7 +1915,7 @@ export const v_cdb169 = () => {
             </View>
             <View style={v_d81136.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={v_5401ae.myInfoEdit.regionSearchQueryInput}
                 style={v_d81136.modalSearchInput}
                 value={v_7962f1}
                 onChangeText={v_6a0bf8}

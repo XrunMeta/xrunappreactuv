@@ -31,6 +31,7 @@ import {
 import { v_d9bc70, v_dbf3ef } from '../types';
 import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
+import { v_5401ae } from '../testIDs';
 
 const v_144b19 = require('../../assets/thumb_event.png');
 const v_436552 = require('../../assets/chat-xrun.png');
@@ -381,7 +382,7 @@ export const v_386af2 = () => {
               {}
               {}
               {v_d37866 && (
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myInfoNotify.open}
                   style={[v_d81136.ctaButton, v_d81136.ctaButtonWithMargin]}
                   onPress={async () => {
 
@@ -407,7 +408,7 @@ export const v_386af2 = () => {
               )}
               {}
               {v_fc7457 && (
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myInfoNotify.openLink}
                   style={[v_d81136.ctaButton, v_d81136.ctaButtonWithMargin]}
                   onPress={() => v_0a2feb(v_9181c6('event', v_b9faeb.board))}
                   activeOpacity={0.85}
@@ -477,7 +478,7 @@ export const v_386af2 = () => {
             showBackButton
             rightComponent={
               v_b9c00c.length > 0 ? (
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myInfoNotify.deleteAll}
                   onPress={v_30a30f}
                   activeOpacity={0.7}
                   style={v_d81136.deleteAllButton}
@@ -516,7 +517,7 @@ export const v_386af2 = () => {
 
           <View style={v_d81136.inputBar}>
             <View style={v_d81136.inputWrapper}>
-              <TextInput
+              <TextInput testID={v_5401ae.myInfoNotify.questionInput}
                 style={v_d81136.input}
                 placeholder={v_8d41d7('screens.myInfoNotify.placeholder')}
                 placeholderTextColor="#7d7e83"
@@ -525,7 +526,7 @@ export const v_386af2 = () => {
                 editable={!v_5e23ec}
               />
             </View>
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.myInfoNotify.send}
               style={[v_d81136.sendButton, v_5e23ec && v_d81136.sendButtonDisabled]}
               onPress={v_465869}
               activeOpacity={0.8}

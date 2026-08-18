@@ -13,6 +13,7 @@ import { v_97ad19 } from '../services';
 import { v_029bad } from '../types';
 import { v_858bfa } from '../utils/imageCache';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 const v_c59b9f = (item: v_029bad, v_a56041, v_8d41d7): v_745d71 => {
 
@@ -252,7 +253,7 @@ export const v_052a8a = () => {
           {v_61d92f && (
             <View style={v_d81136.searchBar}>
               <Feather name="search" size={18} color="#0296f2" />
-              <TextInput
+              <TextInput testID={v_5401ae.shopMyTicket.searchQueryInput}
                 placeholder="Search"
                 placeholderTextColor="#bcbec4"
                 style={v_d81136.searchInput}

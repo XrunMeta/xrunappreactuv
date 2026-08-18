@@ -19,6 +19,7 @@ import { v_a61db3, v_843035, v_1bfbd0, v_9b1a04 } from '../constants';
 import { v_4d25ff } from '../services';
 import { v_a3bbf0 } from '../utils';
 import { v_772971 } from 'jmpfvteuuztnp';
+import { v_5401ae } from '../testIDs';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_10a702 = require('../../assets/images/blur_yellow.png');
@@ -134,7 +135,7 @@ export const v_305be8 = () => {
 
         {}
         <View style={v_d81136.zonesRow}>
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.xplayInfo.navigate}
             style={v_d81136.zoneCard}
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.ayetOffersXplay)}
@@ -142,7 +143,7 @@ export const v_305be8 = () => {
             <Image source={v_288e0b} style={v_d81136.zoneImage} resizeMode="contain" />
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.xplayInfo.navigate2}
             style={v_d81136.zoneCard}
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.myChipsOfferwall)}
@@ -151,7 +152,7 @@ export const v_305be8 = () => {
             <Text style={v_d81136.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
           {v_06e388 && (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.xplayInfo.navigate3}
               style={v_d81136.zoneCard}
               activeOpacity={0.85}
               onPress={() => v_9b57fc(v_ce4741.adisonOfferwall)}
@@ -164,7 +165,7 @@ export const v_305be8 = () => {
 
         {}
         <Text style={v_d81136.questSectionTitle}>{v_8d41d7('screens.xplayInfo.quest')}</Text>
-        <TouchableOpacity
+        <TouchableOpacity testID={v_5401ae.xplayInfo.questShare}
           style={v_d81136.questCard}
           activeOpacity={0.9}
           onPress={v_3f9989}

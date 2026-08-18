@@ -8,6 +8,7 @@ import { v_729608, v_814266 } from '../components';
 import { v_a61db3, v_9b1a04, v_1bfbd0 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
+import { v_5401ae } from '../testIDs';
 
 const v_18b8bf = Array.from({ length: 7 }, (v_37eab7, v_a56041) => ({
   rank: v_a56041 === 0 ? 2 : 1,
@@ -51,7 +52,7 @@ export const v_8c15c4 = () => {
         showBackButton={true}
         onBackPress={v_6ca26b}
         rightComponent={
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.referralDepthTwo.close}
             style={v_d81136.closeButton}
             onPress={v_7f2e65}
             activeOpacity={0.7}

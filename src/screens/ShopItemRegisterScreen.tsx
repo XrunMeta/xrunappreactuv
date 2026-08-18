@@ -27,6 +27,7 @@ import { v_dd87bc, v_5027e2, v_7488d5, v_d33616 } from '../services';
 import { v_8b0d2e } from '../types';
 import { v_e4a763 } from '../utils/env';
 import { v_858bfa } from '../utils/imageCache';
+import { v_5401ae } from '../testIDs';
 
 export const v_680bee = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -547,7 +548,7 @@ export const v_680bee = () => {
           {}
           <View style={v_d81136.section}>
             <Text style={v_d81136.label}>{v_8d41d7('screens.shopItemRegister.labelProductName')} *</Text>
-            <TextInput
+            <TextInput testID={v_5401ae.shopItemRegister.titleInput}
               style={v_d81136.input}
               value={v_9f1622}
               onChangeText={v_73c0df}
@@ -560,7 +561,7 @@ export const v_680bee = () => {
           {}
           <View style={v_d81136.section}>
             <Text style={v_d81136.label}>{v_8d41d7('screens.shopItemRegister.description')}</Text>
-            <TextInput
+            <TextInput testID={v_5401ae.shopItemRegister.descriptionInput}
               style={[v_d81136.input, v_d81136.textArea]}
               value={v_6856a9}
               onChangeText={v_b7e174}
@@ -575,7 +576,7 @@ export const v_680bee = () => {
           {}
           <View style={v_d81136.section}>
             <Text style={v_d81136.label}>{v_8d41d7('screens.shopItemRegister.labelPrice')} *</Text>
-            <TextInput
+            <TextInput testID={v_5401ae.shopItemRegister.priceXrunInput}
               style={v_d81136.input}
               value={v_318e8b}
 
@@ -591,7 +592,7 @@ export const v_680bee = () => {
           {}
           <View style={v_d81136.section}>
             <Text style={v_d81136.label}>{v_8d41d7('screens.shopItemRegister.maxPurchaseQty')}</Text>
-            <TextInput
+            <TextInput testID={v_5401ae.shopItemRegister.maxpurchaseInput}
               style={v_d81136.input}
               value={v_e0f1a6}
               onChangeText={v_a06ef2}
@@ -683,7 +684,7 @@ export const v_680bee = () => {
           {!v_1b9174 && (
             <View style={v_d81136.section}>
               <Text style={v_d81136.label}>{v_8d41d7('screens.shopItemRegister.labelProductCode')}</Text>
-              <TextInput
+              <TextInput testID={v_5401ae.shopItemRegister.submitInput}
                 style={[v_d81136.input, v_d81136.readOnlyInput]}
                 value={v_a5da00}
                 editable={false}
@@ -697,7 +698,7 @@ export const v_680bee = () => {
           {}
           {v_1b9174 ? (
             <View style={{ flexDirection: 'row', gap: 10, marginTop: v_9b1a04.large }}>
-              <TouchableOpacity
+              <TouchableOpacity testID={v_5401ae.shopItemRegister.submit}
                 style={[
                   v_d81136.submitButton,
                   { flex: 1, marginTop: 0 },
@@ -713,7 +714,7 @@ export const v_680bee = () => {
                   <Text style={v_d81136.submitButtonText}>{v_8d41d7('screens.shopItemRegister.editButton')}</Text>
                 )}
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity testID={v_5401ae.shopItemRegister.deleteItem}
                 style={[
                   v_d81136.submitButton,
                   { flex: 1, marginTop: 0, backgroundColor: '#ef4444' },
@@ -727,7 +728,7 @@ export const v_680bee = () => {
               </TouchableOpacity>
             </View>
           ) : (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.shopItemRegister.submit2}
               style={[v_d81136.submitButton, v_88dca2 && v_d81136.submitButtonDisabled]}
               onPress={v_585b02}
               disabled={v_88dca2}

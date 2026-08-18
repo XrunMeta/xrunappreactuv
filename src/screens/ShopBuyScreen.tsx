@@ -13,6 +13,7 @@ import { v_89f939, v_35c0e0 } from '../utils';
 import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import * as v_759f4d from 'ssuyxdbb';
 import { v_858bfa } from '../utils/imageCache';
+import { v_5401ae } from '../testIDs';
 
 export const v_1a0a02 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -617,7 +618,7 @@ export const v_1a0a02 = () => {
           >
             <Text style={v_d81136.cancelText}>{v_8d41d7('screens.shopBuy.cancel')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.shopBuy.purchase}
             style={[
               v_d81136.button,
               v_d81136.primaryButton,
@@ -635,7 +636,7 @@ export const v_1a0a02 = () => {
             )}
           </TouchableOpacity>
           {v_ce7108 && (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.shopBuy.purchaseWithPoints}
               style={[
                 v_d81136.button,
                 v_d81136.pointsButton,

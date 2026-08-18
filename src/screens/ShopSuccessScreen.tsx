@@ -4,6 +4,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_556baf } from '../components';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 const v_16cea9 = require('../../assets/xrun-horizontal-logo.png');
 
@@ -30,7 +31,7 @@ export const v_8734da = () => {
         <View style={v_d81136.card}>
           <Image source={v_16cea9} style={v_d81136.logo} resizeMode="contain" />
           <Text style={v_d81136.message}>{v_8d41d7('screens.shopSuccess.paymentComplete')}</Text>
-          <TouchableOpacity style={v_d81136.button} onPress={v_03cae9}>
+          <TouchableOpacity testID={v_5401ae.shopSuccess.confirm} style={v_d81136.button} onPress={v_03cae9}>
             <Text style={v_d81136.buttonText}>{v_8d41d7('screens.shopSuccess.confirm')}</Text>
           </TouchableOpacity>
         </View>

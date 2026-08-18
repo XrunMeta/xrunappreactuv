@@ -11,6 +11,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_c2fdd1 } from './Dialog';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 type TokenOption = {
   id: string;
@@ -148,7 +149,7 @@ export const AddTokenDialog: v_a3453e.FC<AddTokenDialogProps> = ({
 
   const v_ba3568 = () => (
     <View style={v_d81136.contractWrapper}>
-      <TextInput
+      <TextInput testID={v_5401ae.addTokenDialog.contractAddressInput}
         style={v_d81136.contractInput}
         placeholder="Contract address"
         placeholderTextColor="#a6a6a6"

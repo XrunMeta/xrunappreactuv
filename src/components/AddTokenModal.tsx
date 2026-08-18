@@ -13,6 +13,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_533fd3, v_c03e7f } from '../types';
 import { v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface PredefinedToken {
   symbol: string;
@@ -234,7 +235,7 @@ export const AddTokenModal: v_a3453e.FC<AddTokenModalProps> = v_a3453e.memo(
               {}
               {v_ac1d22 === 'Contract' && (
                 <View style={v_d81136.tabContent}>
-                  <TextInput
+                  <TextInput testID={v_5401ae.addToken.contractAddressInput}
                     style={v_d81136.input}
                     placeholder={v_8d41d7('screens.addToken.contractPlaceholder')}
                     value={v_bf7657}

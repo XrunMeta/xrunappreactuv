@@ -20,6 +20,7 @@ import { v_a3bbf0 } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_6e4589 } from '../hooks';
 import { v_570c34, v_556baf } from '../components';
+import { v_5401ae } from '../testIDs';
 
 type MenuConfig = {
   id: string;
@@ -420,7 +421,7 @@ export const v_03a231 = () => {
         }}
         showBackButton
         rightComponent={
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.myInfo.logout}
             onPress={v_06b8a4}
             style={v_d81136.headerLogoutButton}
             activeOpacity={0.7}
@@ -461,7 +462,7 @@ export const v_03a231 = () => {
           <View style={v_d81136.menuList}>
             {v_e47202.map((v_714568, v_a56041) => (
               <React.Fragment key={v_714568.id}>
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myInfo.menu}
                   style={v_d81136.menuItem}
                   onPress={() => v_18219f(v_714568)}
                   activeOpacity={0.7}

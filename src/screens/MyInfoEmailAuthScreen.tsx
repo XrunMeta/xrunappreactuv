@@ -13,6 +13,7 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_8025d1 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_5401ae } from '../testIDs';
 
 const v_0e461e = (v_e0c7e8): boolean => {
   const v_9a3638 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -93,7 +94,7 @@ export const v_dec378 = () => {
 
           editable={false}
           rightAccessory={
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.myInfoEmailAuth.sendEmail}
               style={v_d81136.inlineButton}
               onPress={v_d23445}
               disabled={v_5e23ec}

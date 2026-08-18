@@ -47,6 +47,7 @@ import {
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_700ef9 } from '../context';
+import { v_5401ae } from '../testIDs';
 
 type LoginTab = 'account' | 'otp';
 
@@ -899,7 +900,7 @@ export const v_f4f851 = () => {
       <Text style={v_d81136.snsLoginLabel}>{v_8d41d7('screens.login.orLoginWith')}</Text>
       <View style={v_d81136.snsButtonContainer}>
         {}
-        <TouchableOpacity
+        <TouchableOpacity testID={v_5401ae.login.googleLogin}
           style={v_d81136.snsButton}
           disabled={v_4a6533}
           onPress={v_6dd38d}
@@ -908,7 +909,7 @@ export const v_f4f851 = () => {
         </TouchableOpacity>
         {}
         {v_326be8.OS === 'ios' && (
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.login.appleLogin}
             style={v_d81136.snsButton}
             disabled={v_4a6533}
             onPress={v_ef4111}
@@ -970,7 +971,7 @@ export const v_f4f851 = () => {
             containerStyle={v_d81136.fieldContainer}
             editable={!v_cd31a8}
             rightAccessory={
-              <TouchableOpacity
+              <TouchableOpacity testID={v_5401ae.login.passwordVisible}
                 style={v_d81136.eyeButton}
                 onPress={() => v_c6fe9e((v_ba2215) => !v_ba2215)}
                 activeOpacity={0.7}
@@ -994,7 +995,7 @@ export const v_f4f851 = () => {
                 variant="square"
               />
             </View>
-            <TouchableOpacity onPress={() => !v_cd31a8 && v_9b57fc(v_ce4741.forgotPassword)} disabled={v_cd31a8}>
+            <TouchableOpacity testID={v_5401ae.login.forgotPassword} onPress={() => !v_cd31a8 && v_9b57fc(v_ce4741.forgotPassword)} disabled={v_cd31a8}>
               <Text style={{ fontSize: 13, color: '#000' }}>{v_8d41d7('screens.login.forgotPassword')}</Text>
             </TouchableOpacity>
           </View>

@@ -18,6 +18,7 @@ import {
   v_13c90a,
 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_5401ae } from '../testIDs';
 
 export const v_4a40b2 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -193,7 +194,7 @@ export const v_4a40b2 = () => {
             {v_b3e3c3 ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={v_5401ae.myInfoSettings.togglePushToggle}
                 value={v_1486be}
                 onValueChange={v_465139}
                 disabled={!v_717992}
@@ -211,7 +212,7 @@ export const v_4a40b2 = () => {
             {v_7aa88d ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={v_5401ae.myInfoSettings.toggleNoticeToggle}
                 value={v_be324f}
                 onValueChange={v_880ae3}
                 disabled={!v_717992 || !v_1486be}
@@ -228,7 +229,7 @@ export const v_4a40b2 = () => {
             {v_5fed92 ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={v_5401ae.myInfoSettings.toggleEventToggle}
                 value={v_839078}
                 onValueChange={v_004928}
                 disabled={!v_717992 || !v_1486be}
@@ -238,7 +239,7 @@ export const v_4a40b2 = () => {
             )}
           </View>
 
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.myInfoSettings.languageSelectorVisible}
             style={v_d81136.card}
             activeOpacity={0.85}
             onPress={() => v_7f8510(true)}
@@ -246,7 +247,7 @@ export const v_4a40b2 = () => {
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
           </TouchableOpacity>
           {}
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.myInfoSettings.navigate}
             style={v_d81136.card}
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.myInfoCloseMembership)}

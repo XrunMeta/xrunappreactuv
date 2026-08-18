@@ -11,6 +11,7 @@ import { v_4a38fa, v_6a034c } from '../services';
 import { v_1cc79a } from '../types';
 import { v_a3bbf0, v_8cf86b } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_5401ae } from '../testIDs';
 
 interface TransformedRankData {
   id: string;
@@ -224,7 +225,7 @@ export const v_f57686 = () => {
       <Header
         title={v_8d41d7('screens.referralRank.title')}
         rightComponent={
-          <TouchableOpacity style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
+          <TouchableOpacity testID={v_5401ae.referralRank.share} style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
             <Text style={v_d81136.headerShareText}>{v_8d41d7('screens.referralRank.referralLabel')}</Text>
           </TouchableOpacity>

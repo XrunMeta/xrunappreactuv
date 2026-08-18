@@ -20,6 +20,7 @@ import { v_029bad } from '../types';
 import { v_97ad19, v_7b3801 } from '../services';
 import { v_e4a763 } from '../utils/env';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 export const v_a1c4a5 = () => {
   const { selectedShopItem: v_dfe883 } = v_700ef9();
@@ -392,13 +393,13 @@ export const v_a1c4a5 = () => {
       <View style={v_d81136.actionButtonsContainer}>
         {v_2911e0 ? (
           <>
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.shopTicketDetail.copyTicketNumber}
               style={[v_d81136.actionButton, v_d81136.copyButton]}
               onPress={v_a155a6}
               disabled={!v_1de78e}>
               <Text style={v_d81136.actionButtonText}>{v_8d41d7('screens.shopTicketDetail.share.copyTicketNumber')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.shopTicketDetail.shareQr}
               style={[v_d81136.actionButton, v_d81136.shareButton]}
               onPress={v_434673}
               disabled={!v_1de78e}>
@@ -406,7 +407,7 @@ export const v_a1c4a5 = () => {
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.shopTicketDetail.confirmDelete}
             style={[v_d81136.actionButton, v_d81136.deleteButton]}
             onPress={v_6ff8af}>
             <Text style={v_d81136.actionButtonText}>{v_8d41d7('screens.shopTicketDetail.share.delete')}</Text>

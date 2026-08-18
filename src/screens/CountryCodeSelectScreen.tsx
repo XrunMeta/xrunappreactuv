@@ -17,6 +17,7 @@ import { v_1bfbd0, v_a61db3, v_202d44, v_52495e, v_843035, v_789afd, v_369014, v
 import { v_da1883 } from '../types';
 import { v_60f557, v_11e39e } from '../services';
 import { v_151d5f, v_5c7129, v_107459 } from '../utils/countryUtils';
+import { v_5401ae } from '../testIDs';
 
 export const v_379bd1 = () => {
   console.log('CountryCodeSelectScreen');
@@ -278,7 +279,7 @@ export const v_379bd1 = () => {
 
         <View style={v_d81136.searchBox}>
           <Ionicons name="search" size={18} color="#9ca3af" />
-          <TextInput
+          <TextInput testID={v_5401ae.countryCodeSelect.queryInput}
             style={v_d81136.searchInput}
             value={v_7c5791}
             onChangeText={v_c57190}

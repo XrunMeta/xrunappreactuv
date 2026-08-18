@@ -21,6 +21,7 @@ import { v_cba33f } from '../utils';
 import { v_566465 } from '../services/nasmediaAd';
 import { v_287831 } from './ShowNapAdScreen';
 import { v_540580 } from './ShowPockAdScreen';
+import { v_5401ae } from '../testIDs';
 
 interface ShowWebViewScreenProps {
   onClose?: () => void; 
@@ -124,7 +125,7 @@ export const ShowWebViewScreen: v_a3453e.FC<ShowWebViewScreenProps> = ({ onClose
       <View style={[v_d81136.header, { paddingTop: v_033e14.top + (v_326be8.OS === 'ios' ? 20 : 40) }]}>
         {}
         <View style={v_d81136.leftButtons}>
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.showWebView.goBack}
             onPress={v_ed2f14}
             style={v_d81136.backButton}
           >
