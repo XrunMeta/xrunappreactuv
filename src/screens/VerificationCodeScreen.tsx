@@ -32,6 +32,8 @@ import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
 import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
 import { v_5401ae } from '../testIDs';
+import { v_b0eb02 } from '../utils/blockedDeviceGate';
+import { v_1d18c9 } from '../utils/resendVerificationPurpose';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -157,13 +159,16 @@ export const v_667a00 = () => {
             v_d0b446 = await v_35200c(v_df7dab, v_9b57fc);
           } catch (v_788ec0) {
 
-            const v_49b0b7 = (v_788ec0 as any)?.response?.data;
-            if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409 && v_49b0b7?.reason === 'blocked_device') {
+            const v_d1e508 = await v_b0eb02(v_788ec0, v_889fad, v_8d41d7);
+            if (v_d1e508.handled) {
               await v_e84827.removeItem('pendingSignupData');
-              await v_889fad(
-                v_8d41d7('screens.deviceBinding.signupBlockedTitle'),
-                v_8d41d7('screens.deviceBinding.signupBlockedBody'),
-              );
+              if (v_d1e508.requestUnblock) {
+                try { await v_e84827.setItem('deviceUnblockRequestEmail', v_df7dab.email); } catch {  }
+                v_036f76();
+                v_ff0c7a(false);
+                v_9b57fc('deviceUnblockRequest');
+                return;
+              }
               v_036f76();
               v_ff0c7a(false);
               return;
@@ -584,7 +589,9 @@ export const v_667a00 = () => {
 
     try {
       console.log('[인증] 이메일 인증 코드 재전송 요청:', v_fc0b2c);
-      const v_f438c1 = await v_8025d1(v_fc0b2c, v_9b57fc);
+
+      const v_f01f44 = v_1d18c9(v_e6976c);
+      const v_f438c1 = await v_8025d1(v_fc0b2c, v_f01f44, v_9b57fc);
 
       if (v_f438c1) {
         v_83fe8f(v_ef7132);

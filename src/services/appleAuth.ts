@@ -176,8 +176,8 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
         name: v_1833e7,
       });
 
-      const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
-      const v_b6d4b8 = await v_863c7f();
+      const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+      const v_146485 = await v_716927();
 
       const v_3393e3 = await v_9f42a4.post(
         v_09dafd,
@@ -185,7 +185,11 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
           identityToken: v_55f908, 
           email: v_e0c7e8, 
           name: v_1833e7, 
-          device_id: v_b6d4b8,
+          device_id: v_146485.device_id,
+          device_key: v_146485.device_key,
+          install_uuid: v_146485.install_uuid,
+          platform: v_146485.platform,
+          app_build: v_146485.app_build,
         },
         {
           headers: {

@@ -162,6 +162,10 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
 
     try {
 
+      const v_43f4ba = await (async () => {
+        try { const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals'); return await v_716927(); } catch { return null; }
+      })();
+
       const v_3393e3 = await fetch(v_8a32c8, {
         method: 'POST',
         headers: {
@@ -170,10 +174,11 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
         },
         body: JSON.stringify({
           idToken: v_b50834, 
-
-          device_id: await (async () => {
-            try { const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity'); return await v_863c7f(); } catch { return null; }
-          })(),
+          device_id: v_43f4ba?.device_id ?? null,
+          device_key: v_43f4ba?.device_key ?? null,
+          install_uuid: v_43f4ba?.install_uuid ?? null,
+          platform: v_43f4ba?.platform ?? null,
+          app_build: v_43f4ba?.app_build ?? null,
         }),
         signal: v_4fc7c7.signal,
       });
