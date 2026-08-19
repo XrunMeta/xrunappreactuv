@@ -885,7 +885,8 @@ export const WalletScreen = () => {
         ...asset,
         title: asset.symbol,
         subtitle: asset.subCurrencyName || asset.name,
-        amount: fmtBalance(asset.amount || '0'),
+
+        amount: asset.amount || '0',
         suffix: asset.symbol,
         iconSource,
 
