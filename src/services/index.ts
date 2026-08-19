@@ -1719,8 +1719,11 @@ export const v_7e0a86 = async (
   }
 };
 
+export type EmailVerificationPurpose = 'signup' | 'restore' | 'email_change' | 'login' | 'send_confirm';
+
 export const v_8025d1 = async (
   v_e0c7e8,
+  v_fa63e0,
   v_c65f5d,
 ): Promise<boolean> => {
   try {
@@ -1736,9 +1739,20 @@ export const v_8025d1 = async (
     const v_576f5a = {
       email: v_e0c7e8,
       language: v_677f64,
+      purpose: v_fa63e0,
     };
 
-    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8, 'lang=', v_677f64);
+    if (v_fa63e0 === 'signup') {
+      try {
+        const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+        const v_146485 = await v_716927();
+        v_576f5a.device_key = v_146485.device_key;
+        v_576f5a.platform = v_146485.platform;
+        v_576f5a.app_build = v_146485.app_build;
+      } catch {  }
+    }
+
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8, 'lang=', v_677f64, 'purpose=', v_fa63e0);
 
     const v_3393e3 = await v_9f42a4.post<v_3eb2f0>(
       '/check-02-email',

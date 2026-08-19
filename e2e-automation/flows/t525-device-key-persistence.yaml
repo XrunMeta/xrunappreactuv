@@ -35,11 +35,28 @@ appId: ${APP_ID}
 
 # ⚠️ dev 빌드 함정 2 — 개발자 메뉴 안내 모달이 첫 실행에서 화면을 덮는다.
 #    요소는 계층에 멀쩡히 있는데 탭이 모달에 먹힌다 (app-maestro.md 의 "가리는 모달" 케이스).
+# ⚠️ dev 빌드 함정 3 — "Continue" 는 안내를 닫는 버튼이 아니라 **개발자 메뉴 본체를 여는** 버튼이다.
+#    누르면 Reload·TOOLS 목록이 뜨므로 xmark 로 다시 닫아야 한다.
+- runFlow:
+    when:
+      visible:
+        id: "xmark"
+    commands:
+      - tapOn:
+          id: "xmark"
+
 - runFlow:
     when:
       visible: "Continue"
     commands:
       - tapOn: "Continue"
+      - runFlow:
+          when:
+            visible:
+              id: "xmark"
+          commands:
+            - tapOn:
+                id: "xmark"
 
 # ⚠️ dev 빌드 함정 3 — clearState 로 앱 언어 설정이 초기화되면
 #    시뮬레이터 시스템 언어(여기서는 일본어)를 따른다. 셀렉터를 언어에 묶지 않는다.
@@ -58,13 +75,11 @@ appId: ${APP_ID}
 
 - tapOn:
     text: "이메일을 입력해주세요.|メールアドレスを入力してください。"
-- inputText: "e2e-t525@example.com"
-- hideKeyboard
+- inputText: ${TEST_EMAIL}
 
 - tapOn:
     text: "비밀번호를 입력해주세요.|パスワードを入力してください。"
 - inputText: "1234"
-- hideKeyboard
 
 # 헤더 타이틀이 아닌 제출 버튼
 - tapOn:
