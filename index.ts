@@ -28,7 +28,12 @@ function v_fafd0c() {
     const v_0483af = process.env.EXPO_PUBLIC_E2E_HARNESS;
     if (v_0483af) {
       console.log('[E2E] 하니스 모드:', v_0483af);
-      import('./e2e-automation/harness/HarnessApp').then((v_35f85c) => {
+
+      const v_b3a075 =
+        v_0483af === 'changed-imports'
+          ? import('./e2e-automation/harness/ChangedImportsHarness')
+          : import('./e2e-automation/harness/HarnessApp');
+      v_b3a075.then((v_35f85c) => {
         v_b96ac3(() => v_35f85c.default);
       });
       return;
