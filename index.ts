@@ -32,7 +32,9 @@ function Root() {
       const loader =
         harness === 'changed-imports'
           ? import('./e2e-automation/harness/ChangedImportsHarness')
-          : import('./e2e-automation/harness/HarnessApp');
+          : harness === 'wallet-migration'
+            ? import('./e2e-automation/harness/WalletMigrationHarness')
+            : import('./e2e-automation/harness/HarnessApp');
       loader.then((m) => {
         setAppComponent(() => m.default);
       });
