@@ -15,9 +15,8 @@ jest.mock('../versionCheck', () => ({
 
 function registerRow(i: number, currency: number, symbol: string, amount: string) {
   probeRegister('wallet', `${i}|${currency}|title`, symbol);
-  probeRegister('wallet', `${i}|${currency}|symbol`, symbol);
+  probeRegister('wallet', `${i}|${currency}|subtitle`, `${symbol} chain`);
   probeRegister('wallet', `${i}|${currency}|amount`, amount);
-  probeRegister('wallet', `${i}|${currency}|suffix`, symbol);
 }
 
 function snap() {
@@ -34,8 +33,8 @@ describe('buildWalletReportRows', () => {
     registerRow(0, 18, 'XRUN', '1,234.56');
 
     expect(buildWalletReportRows(snap())).toEqual([
-      { i: 0, currency: 18, symbol: 'XRUN', title: 'XRUN', amount: '1,234.56', suffix: 'XRUN' },
-      { i: 1, currency: 16, symbol: 'POL', title: 'POL', amount: '0.00', suffix: 'POL' },
+      { i: 0, currency: 18, title: 'XRUN', subtitle: 'XRUN chain', amount: '1,234.56' },
+      { i: 1, currency: 16, title: 'POL', subtitle: 'POL chain', amount: '0.00' },
     ]);
   });
 
@@ -48,8 +47,17 @@ describe('buildWalletReportRows', () => {
     probeRegister('wallet', '0|18|amount', '1,234.56');
 
     expect(buildWalletReportRows(snap())).toEqual([
-      { i: 0, currency: 18, symbol: '', title: '', amount: '1,234.56', suffix: '' },
+      { i: 0, currency: 18, title: '', subtitle: '', amount: '1,234.56' },
     ]);
+  });
+
+  it('화면에 없는 필드(symbol·suffix)는 행에 담지 않는다', () => {
+    registerRow(0, 18, 'XRUN', '1,234.56');
+    probeRegister('wallet', '0|18|symbol', 'XRUN');
+    probeRegister('wallet', '0|18|suffix', 'XRUN');
+
+    const row = buildWalletReportRows(snap())[0] as Record<string, unknown>;
+    expect(Object.keys(row).sort()).toEqual(['amount', 'currency', 'i', 'subtitle', 'title']);
   });
 
   it('규약에 안 맞는 키는 무시한다', () => {

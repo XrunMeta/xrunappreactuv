@@ -28,6 +28,12 @@ function Row({ index, currency, symbol, amount }: {
       </ProbeText>
       <ProbeText
         probeScreen="wallet"
+        probeKey={`${index}|${currency}|subtitle`}
+      >
+        {symbol} chain
+      </ProbeText>
+      <ProbeText
+        probeScreen="wallet"
         probeKey={`${index}|${currency}|amount`}
         testID={`${TID.wallet.amountLabel}-${currency}`}
       >
@@ -63,8 +69,8 @@ describe('지갑 리스트 행 계약', () => {
     const rows = buildWalletReportRows(probeSnapshot('wallet')!);
 
     expect(rows).toHaveLength(2);
-    expect(rows[0]).toMatchObject({ i: 0, currency: 18, title: 'XRUN', amount: '1,234.56 XRUN' });
-    expect(rows[1]).toMatchObject({ i: 1, currency: 16, title: 'POL', amount: '0.00 POL' });
+    expect(rows[0]).toMatchObject({ i: 0, currency: 18, title: 'XRUN', subtitle: 'XRUN chain', amount: '1,234.56 XRUN' });
+    expect(rows[1]).toMatchObject({ i: 1, currency: 16, title: 'POL', subtitle: 'POL chain', amount: '0.00 POL' });
   });
 
   it('행이 사라지면 리포트에서도 빠진다', () => {

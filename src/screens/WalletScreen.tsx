@@ -1034,7 +1034,13 @@ export const WalletScreen = () => {
           >
             {title}
           </ProbeText>
-          <Text style={styles.tokenItemSubtitle}>{subtitle}</Text>
+          <ProbeText
+            probeScreen="wallet"
+            probeKey={`${listIndex ?? 0}|${currency}|subtitle`}
+            style={styles.tokenItemSubtitle}
+          >
+            {subtitle}
+          </ProbeText>
         </View>
         <View style={styles.tokenItemRight}>
           <ProbeText

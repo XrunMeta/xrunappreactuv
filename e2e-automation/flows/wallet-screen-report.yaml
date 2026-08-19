@@ -1,0 +1,68 @@
+# T-528 — 지갑화면 진입 시 리스트 표시값이 서버로 리포트되는지 검증
+#
+# 【검증함】 앱이 지갑화면에서 렌더한 (통화 → 표시금액) 이 실제로 서버까지 도달하는가
+# 【확인 못 함】 리포트 내용의 정확성 — 판정은 이 플로우가 아니라 로컬 D1 SELECT 가 한다.
+#              플로우는 화면을 지나가게만 한다.
+#
+# 실측 통과 2026-08-19 KST · iPhone 16 Pro · iOS 26.2 · dev 빌드(Metro)
+#
+# ── 실행 전 준비 (이거 안 하면 다른 프로젝트 API 를 때린다) ──────────────
+# 1. xrun 워커를 로컬로 띄운다. 🔴 8787 은 afterlifeapi 가 점유 중이다:
+#      cd xrunNewApi/api && npx wrangler dev --port 8788 --ip 127.0.0.1
+# 2. 로컬 D1 에 마이그 100 적용:
+#      npx wrangler d1 execute xrun --local --file=migrations/100_wallet_screen_reports.sql
+# 3. 앱이 그 워커를 보게 한다 — src/utils/env.ts 의 dev 분기를
+#      `http://127.0.0.1:8788/gateway` 로 임시 변경. **검증 후 반드시 원복.**
+#      부팅 로그에서 `[createAxiosInstance] API baseURL:` 이 바뀐 것을 눈으로 확인한다.
+# 4. Metro: npx expo start --port 8081
+#      시뮬레이터에서 dev launcher 가 뜨면 딥링크로 붙인다:
+#      xcrun simctl openurl <SIM> "run.xrun.xrunapps://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+#
+# ── 실행 ────────────────────────────────────────────────────────────────
+#   maestro test e2e-automation/flows/wallet-screen-report.yaml
+#   (로그인이 필요하면 login.yaml 을 먼저 돌린다)
+#
+# ── 판정 ────────────────────────────────────────────────────────────────
+#   cd xrunNewApi/api && npx wrangler d1 execute xrun --local --json \
+#     --command "SELECT member, seq, address_masked, row_count, rows_json
+#                FROM WalletScreenReports ORDER BY id DESC LIMIT 1"
+#
+# ── 실측으로 데인 것 ────────────────────────────────────────────────────
+# 🔴 지도 화면에서는 하단 탭이 접근성 트리에 안 나온다. `bottom-nav-wallet` 을
+#    id 로도 텍스트("지갑")로도 못 찾는다 — 지도 뷰가 트리를 덮는다.
+#    그래서 지갑 탭만 좌표로 누른다. 나머지는 전부 id 로 찾는다.
+# 🔴 로그인 직후 iOS 키체인 "パスワードを保存しますか?" 모달이 앱을 가린다.
+#    요소는 멀쩡한데 탭이 안 먹는 형태로 실패한다.
+# 🔴 eraseText 는 커서 앞만 지운다. 폼을 비우려 하지 말고 launchApp 으로 새로 연다.
+
+appId: run.xrun.xrunapps
+---
+- launchApp
+
+# 세션 만료 알림이 떠 있으면 닫는다.
+- runFlow:
+    when:
+      visible: "확인"
+    commands:
+      - tapOn: "확인"
+
+# iOS 키체인 저장 모달이 앱을 가린다 (로그인 직후에 뜬다).
+- runFlow:
+    when:
+      visible: "今はしない"
+    commands:
+      - tapOn: "今はしない"
+
+# 🔴 하단 지갑 탭. 지도 화면이 접근성 트리를 덮어 id 로 못 찾는다 → 좌표.
+#    testID `bottom-nav-wallet` 은 코드에 붙어 있고 다른 화면에서는 잡힌다.
+- tapOn:
+    point: "73%,89%"
+
+# 리스트가 그려질 때까지 기다린다. 타이밍 가드를 쌓지 않고
+# 성공 조건 하나를 길게 기다린다. testID 는 통화별이다 — 18 = XRUN Polygon.
+- extendedWaitUntil:
+    visible:
+      id: "wallet-amount-label-18"
+    timeout: 90000
+
+- takeScreenshot: 01-지갑화면-로드완료

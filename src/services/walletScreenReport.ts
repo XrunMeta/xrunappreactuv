@@ -13,10 +13,9 @@ const EMPTY_REPORT_AFTER_MS = 60000;
 export type WalletReportRow = {
   i: number;
   currency: number;
-  symbol: string;
   title: string;
+  subtitle: string;
   amount: string;
-  suffix: string;
 };
 
 export type WalletReportContext = {
@@ -25,8 +24,8 @@ export type WalletReportContext = {
   staleCurrencies: number[];
 };
 
-type RowField = 'title' | 'amount' | 'symbol' | 'suffix';
-const ROW_FIELDS: RowField[] = ['title', 'amount', 'symbol', 'suffix'];
+type RowField = 'title' | 'subtitle' | 'amount';
+const ROW_FIELDS: RowField[] = ['title', 'subtitle', 'amount'];
 
 export function buildWalletReportRows(snap: ProbeSnapshot): WalletReportRow[] {
   const byRow = new Map<string, WalletReportRow>();
@@ -44,7 +43,7 @@ export function buildWalletReportRows(snap: ProbeSnapshot): WalletReportRow[] {
     const rowKey = `${i}|${currency}`;
     let row = byRow.get(rowKey);
     if (!row) {
-      row = { i, currency, symbol: '', title: '', amount: '', suffix: '' };
+      row = { i, currency, title: '', subtitle: '', amount: '' };
       byRow.set(rowKey, row);
     }
     row[field] = value;
