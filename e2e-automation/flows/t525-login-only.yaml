@@ -1,0 +1,67 @@
+# T-525 2단계 — 로그인만 수행 (앱 상태 초기화는 하지 않는다)
+#
+# t525-device-key-persistence.yaml 이 clearState 를 마친 뒤, 그 상태에서 로그인만 태우는 용도.
+# dev 빌드의 개발자 메뉴가 열려 있으면 먼저 닫는다.
+#
+# 【검증함】 로그인 요청에 device_key 가 실려 서버가 device_registry 를 갱신하는가
+# 【확인 못 함】 registry 행 내용 — 러너가 로컬 D1 을 직접 조회해 판정한다.
+#
+# ⚠️ 로컬 전용 (스킬 §5).
+
+appId: run.xrun.xrunapps
+---
+- launchApp:
+    clearState: false
+
+# dev 메뉴가 열려 있으면 닫는다 (Continue 는 안내를 닫는 게 아니라 메뉴 본체를 연다)
+- runFlow:
+    when:
+      visible:
+        id: "xmark"
+    commands:
+      - tapOn:
+          id: "xmark"
+
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+      - runFlow:
+          when:
+            visible:
+              id: "xmark"
+          commands:
+            - tapOn:
+                id: "xmark"
+
+# 언어 설정이 초기화되면 시뮬레이터 시스템 언어를 따르므로 셀렉터를 언어에 묶지 않는다
+- extendedWaitUntil:
+    visible:
+      text: "로그인|ログイン|Login"
+    timeout: 60000
+
+- tapOn:
+    text: "로그인|ログイン|Login"
+
+- extendedWaitUntil:
+    visible:
+      text: "이메일을 입력해주세요.*|メールアドレスを入力してください.*"
+    timeout: 20000
+
+- tapOn:
+    text: "이메일을 입력해주세요.*|メールアドレスを入力してください.*"
+- inputText: "e2e-t525@example.com"
+
+- tapOn:
+    text: "비밀번호를 입력해주세요.*|パスワードを入力してください.*"
+- inputText: "1234"
+
+- tapOn:
+    text: "로그인|ログイン|Login"
+    index: 1
+
+- extendedWaitUntil:
+    notVisible:
+      text: "비밀번호를 입력해주세요.*|パスワードを入力してください.*"
+    timeout: 30000
