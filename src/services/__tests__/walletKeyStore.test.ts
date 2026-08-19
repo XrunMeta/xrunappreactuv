@@ -25,6 +25,7 @@ import {
 
   classifyWalletsByNetwork,
   verifyPinAgainstS1Entries,
+  clearUserUnlock,
 } from '../walletKeyStore';
 import type { VaultEntry, WalletKey } from '../walletKeyStore';
 import { deleteKek } from '../walletKek';
@@ -32,10 +33,14 @@ import { deleteKek } from '../walletKek';
 const SecureStore = require('expo-secure-store');
 const AsyncStorage = require('@react-native-async-storage/async-storage');
 
-beforeEach(async () => { SecureStore.__reset(); await AsyncStorage.clear(); });
-
 const EMAIL = 'a@x.com';
 const MEMBER = 7;
+
+beforeEach(async () => {
+  SecureStore.__reset();
+  await AsyncStorage.clear();
+  clearUserUnlock(EMAIL, MEMBER);
+});
 const PK = '0x' + '11'.repeat(32);
 
 async function deriveAddr(): Promise<string> {
@@ -518,5 +523,91 @@ describe('T-147 A3: verifyPinAgainstS1Entries', () => {
     const res = await verifyPinAgainstS1Entries(EMAIL, MEMBER, '123456', ['eth']);
     expect(res.ok).toBe(true);
     expect(res.failed).toHaveLength(0);
+  });
+});
+
+describe('부분 마이그레이션 — eth 성공 · pol 실패', () => {
+  const PIN = '123456';
+
+  async function putValidV1(network: 'eth' | 'pol') {
+    const addr = await deriveAddr();
+    const pt = JSON.stringify([
+      { wallet_code: network, address: addr, private_key: PK, derivation_path: '' },
+    ]);
+    await upsertEntry({
+      u: userHash(EMAIL, MEMBER, network),
+      c: encryptWithPin(pt, PIN, EMAIL, MEMBER),
+      h: pinVerifyHash(PIN, EMAIL, MEMBER),
+      s: 's1',
+    } as any);
+  }
+
+  async function putCorruptV1(network: 'eth' | 'pol') {
+    const pt = JSON.stringify([
+      { wallet_code: network, address: '0xdeadbeef', private_key: PK, derivation_path: '' },
+    ]);
+    await upsertEntry({
+      u: userHash(EMAIL, MEMBER, network),
+      c: encryptWithPin(pt, PIN, EMAIL, MEMBER),
+      h: pinVerifyHash(PIN, EMAIL, MEMBER),
+      s: 's1',
+    } as any);
+  }
+
+  const entryOf = async (network: 'eth' | 'pol') =>
+    (await readVault()).find((x) => x.u === userHash(EMAIL, MEMBER, network));
+
+  it('pol 이 실패해도 먼저 통과한 eth 는 v2 로 저장된다 (건별 커밋)', async () => {
+    await putValidV1('eth');
+    await putCorruptV1('pol');
+
+    const res = await unlockUserWallets(PIN, EMAIL, MEMBER);
+    expect(res.ok).toBe(false);
+
+    expect((await entryOf('eth'))?.ver).toBe(2); 
+    expect((await entryOf('pol'))?.ver).toBeUndefined(); 
+  });
+
+  it('🔑 부분 마이그 상태에서 detectLegacyEntries 가 계속 true — 다음 로그인에 모달이 다시 뜬다', async () => {
+    await putValidV1('eth');
+    await putCorruptV1('pol');
+    await unlockUserWallets(PIN, EMAIL, MEMBER);
+
+    expect(await detectLegacyEntries(EMAIL, MEMBER)).toBe(true);
+  });
+
+  it('부분 마이그된 eth 는 같은 PIN 으로 계속 열린다 — 잠기지 않는다', async () => {
+    await putValidV1('eth');
+    await putCorruptV1('pol');
+    await unlockUserWallets(PIN, EMAIL, MEMBER); 
+
+    await putValidV1('pol');
+    const res = await unlockUserWallets(PIN, EMAIL, MEMBER);
+    expect(res.ok).toBe(true);
+  });
+
+  it('재시도가 남은 entry 만 이어서 마이그해 수렴한다', async () => {
+    await putValidV1('eth');
+    await putCorruptV1('pol');
+    await unlockUserWallets(PIN, EMAIL, MEMBER);
+    await putValidV1('pol');
+
+    const res = await unlockUserWallets(PIN, EMAIL, MEMBER);
+    expect(res.ok).toBe(true);
+    expect((await entryOf('eth'))?.ver).toBe(2);
+    expect((await entryOf('pol'))?.ver).toBe(2);
+
+    expect(await detectLegacyEntries(EMAIL, MEMBER)).toBe(false);
+  });
+
+  it('먼저 처리되는 eth 가 실패하면 아무것도 저장되지 않는다 (검증 전 쓰기 없음)', async () => {
+    await putCorruptV1('eth');
+    await putValidV1('pol');
+
+    const res = await unlockUserWallets(PIN, EMAIL, MEMBER);
+    expect(res.ok).toBe(false);
+
+    expect((await entryOf('eth'))?.ver).toBeUndefined();
+    expect((await entryOf('pol'))?.ver).toBeUndefined();
   });
 });
