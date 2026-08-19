@@ -30,6 +30,7 @@ import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW, getIsTransfer
 import type { WalletKey } from '../services/walletKeyStore';
 import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 import { TID } from '../testIDs';
+import { checkSendAmount } from '../utils/sendAmountGuard';
 
 interface AddressBookItem {
   id: string;
@@ -490,23 +491,24 @@ export const WalletSendScreen = () => {
       await showAlert(t('screens.walletSend.alerts.invalidAddress'), t('screens.walletSend.errors.invalidAddress'));
       return;
     }
-    if (!cleanAmount || new BigNumber(cleanAmount || '0').lte(0)) {
-      await showAlert(t('screens.walletSend.alerts.amountRequired'), t('screens.walletSend.errors.amountRequired'));
-      return;
-    }
 
-    const balance = new BigNumber(selectedWalletAsset?.amount || '0');
-    const amount = new BigNumber(cleanAmount || '0');
-    if (amount.gt(balance)) {
-      await showAlert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
-      return;
-    }
+    const verdict = checkSendAmount({
+      input: cleanAmount,
+      balance: selectedWalletAsset?.amount,
+      limit: memberLimit,
+    });
+    if (!verdict.ok) {
+      if (verdict.reason === 'invalidAmount') {
+        await showAlert(t('screens.walletSend.alerts.amountRequired'), t('screens.walletSend.errors.amountRequired'));
+      } else if (verdict.reason === 'overLimit') {
+        await showAlert(
+          t('screens.walletSend.alerts.insufficientBalance'),
+          `1회 송금 한도(${memberLimit?.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
+        );
+      } else {
 
-    if (memberLimit !== null && amount.gt(new BigNumber(memberLimit))) {
-      await showAlert(
-        t('screens.walletSend.alerts.insufficientBalance'),
-        `1회 송금 한도(${memberLimit.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
-      );
+        await showAlert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
+      }
       return;
     }
 
