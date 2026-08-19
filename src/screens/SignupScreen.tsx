@@ -51,6 +51,7 @@ import {
 import { signInWithApple } from '../services/appleAuth';
 import { AxiosError } from 'axios';
 import { TUTORIAL_PENDING_KEY, TUTORIAL_COMPLETED_KEY } from './walletKeyTutorialHelpers';
+import { TID } from '../testIDs';
 
 const AGE_OPTIONS = ['0', '10', '20', '30', '40', '50+'] as const;
 
@@ -1491,7 +1492,7 @@ export const SignupScreen = () => {
             </View>
             <View style={styles.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={TID.signup.countrySearchQueryInput}
                 style={styles.modalSearchInput}
                 value={countrySearchQuery}
                 onChangeText={setCountrySearchQuery}
@@ -1564,7 +1565,7 @@ export const SignupScreen = () => {
             </View>
             <View style={styles.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={TID.signup.regionSearchQueryInput}
                 style={styles.modalSearchInput}
                 value={regionSearchQuery}
                 onChangeText={setRegionSearchQuery}

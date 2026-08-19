@@ -6,6 +6,7 @@ import { useHeaderDimensions } from '../hooks';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { resolveBackAction } from '../navigation/backNavigationPolicy';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 interface HeaderProps {
   title: string;
@@ -46,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const renderBackArea = () =>
     shouldShowBackButton ? (
-      <TouchableOpacity
+      <TouchableOpacity testID={TID.header.back}
         style={styles.backButton}
         onPress={handleBackPress}
         activeOpacity={0.7}
@@ -62,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
       <View style={styles.content}>
         {renderBackArea()}
         <View style={styles.titleWrapper} pointerEvents="none">
-          <Text style={styles.title}>{title}</Text>
+          <Text testID={TID.header.titleLabel} style={styles.title}>{title}</Text>
         </View>
         {rightComponent ? (
           <View style={styles.rightComponent}>{rightComponent}</View>

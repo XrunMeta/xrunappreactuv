@@ -18,6 +18,7 @@ import { SafeView, FormCheckbox, PrimaryButton } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { recordWalletTutorialComplete } from '../services';
 import { logEvent, XRUN_EVENTS } from '../services/analytics';
+import { TID } from '../testIDs';
 import {
   TOTAL_PAGES,
   isLastPage,
@@ -48,7 +49,7 @@ const TutorialPage: React.FC<{
   >
     {}
     <View style={styles.header}>
-      <Text style={styles.title}>{title}</Text>
+      <Text testID={TID.walletKeyTutorial.titleLabel} style={styles.title}>{title}</Text>
       <View style={styles.iconBox}>
         <Ionicons name={iconName} size={28} color={COLORS.buttonPrimary} />
       </View>

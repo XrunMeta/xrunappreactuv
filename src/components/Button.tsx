@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps } from 'react-native';
 import { COLORS, FONTS, SIZES } from '../constants';
+import { TID } from '../testIDs';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -22,7 +23,7 @@ export const Button: React.FC<ButtonProps> = ({
       ]}
       {...props}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text testID={TID.button.titleLabel} style={styles.text}>{title}</Text>
     </TouchableOpacity>
   );
 };

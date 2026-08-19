@@ -47,6 +47,7 @@ import {
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
+import { TID } from '../testIDs';
 
 type LoginTab = 'account' | 'otp';
 
@@ -899,7 +900,7 @@ export const LoginScreen = () => {
       <Text style={styles.snsLoginLabel}>{t('screens.login.orLoginWith')}</Text>
       <View style={styles.snsButtonContainer}>
         {}
-        <TouchableOpacity
+        <TouchableOpacity testID={TID.login.googleLogin}
           style={styles.snsButton}
           disabled={disabled}
           onPress={handleGoogleLogin}
@@ -908,7 +909,7 @@ export const LoginScreen = () => {
         </TouchableOpacity>
         {}
         {Platform.OS === 'ios' && (
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.login.appleLogin}
             style={styles.snsButton}
             disabled={disabled}
             onPress={handleAppleLogin}
@@ -970,7 +971,7 @@ export const LoginScreen = () => {
             containerStyle={styles.fieldContainer}
             editable={!isLoading}
             rightAccessory={
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.login.passwordVisible}
                 style={styles.eyeButton}
                 onPress={() => setIsPasswordVisible((prev) => !prev)}
                 activeOpacity={0.7}
@@ -994,7 +995,7 @@ export const LoginScreen = () => {
                 variant="square"
               />
             </View>
-            <TouchableOpacity onPress={() => !isLoading && navigate(ROUTES.forgotPassword)} disabled={isLoading}>
+            <TouchableOpacity testID={TID.login.forgotPassword} onPress={() => !isLoading && navigate(ROUTES.forgotPassword)} disabled={isLoading}>
               <Text style={{ fontSize: 13, color: '#000' }}>{t('screens.login.forgotPassword')}</Text>
             </TouchableOpacity>
           </View>

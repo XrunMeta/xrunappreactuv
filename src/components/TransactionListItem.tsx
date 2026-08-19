@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 interface TransactionListItemProps extends TouchableOpacityProps {
   title: string;
@@ -74,12 +75,12 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
         )}
       </View>
       <View style={styles.middle}>
-        <Text style={styles.title}>{title}</Text>
+        <Text testID={TID.transactionListItem.titleLabel} style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
       <View style={styles.right}>
         <Text style={styles.timestamp}>{timestamp}</Text>
-        <Text style={[styles.amount, amountColor ? { color: amountColor } : null]}>
+        <Text testID={TID.transactionListItem.amountLabel} style={[styles.amount, amountColor ? { color: amountColor } : null]}>
           {suffix ? `${amount} ${suffix}` : amount}
         </Text>
       </View>

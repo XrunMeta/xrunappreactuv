@@ -11,6 +11,7 @@ import { getRank, getRankSpesific } from '../services';
 import { RankItem } from '../types';
 import { shareReferralLink, maskEmail } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 
 interface TransformedRankData {
   id: string;
@@ -224,7 +225,7 @@ export const ReferralRankScreen = () => {
       <Header
         title={t('screens.referralRank.title')}
         rightComponent={
-          <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
+          <TouchableOpacity testID={TID.referralRank.share} style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={COLORS.headerText} />
             <Text style={styles.headerShareText}>{t('screens.referralRank.referralLabel')}</Text>
           </TouchableOpacity>

@@ -18,6 +18,7 @@ import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
 import { useAppNavigation, ROUTES } from '../navigation';
+import { TID } from '../testIDs';
 
 export const WalletReceiveScreen = () => {
   const { t } = useTranslation();
@@ -151,10 +152,10 @@ export const WalletReceiveScreen = () => {
       >
         {}
         <View style={styles.qrScanButtonContainer}>
-          <TouchableOpacity style={[styles.qrScanButton, styles.buttonActive]}>
+          <TouchableOpacity testID={TID.walletReceive.qrScan} style={[styles.qrScanButton, styles.buttonActive]}>
             <Text style={styles.qrScanButtonTextActive}>{t('screens.walletReceive.myQrCode')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.qrScanButton} onPress={handleQrScanPress}>
+          <TouchableOpacity testID={TID.walletReceive.qrScan2} style={styles.qrScanButton} onPress={handleQrScanPress}>
             <Text style={styles.qrScanButtonText}>{t('screens.walletReceive.scan')}</Text>
           </TouchableOpacity>
         </View>

@@ -13,6 +13,7 @@ import { getXrunPurchasedItems } from '../services';
 import { PurchasedItemData } from '../types';
 import { cashingimages } from '../utils/imageCache';
 import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 const transformPurchasedItem = (item: PurchasedItemData, index: number, t: any): ShopItem => {
 
@@ -252,7 +253,7 @@ export const ShopMyTicketScreen = () => {
           {showSearchBar && (
             <View style={styles.searchBar}>
               <Feather name="search" size={18} color="#0296f2" />
-              <TextInput
+              <TextInput testID={TID.shopMyTicket.searchQueryInput}
                 placeholder="Search"
                 placeholderTextColor="#bcbec4"
                 style={styles.searchInput}
@@ -318,7 +319,7 @@ export const ShopMyTicketScreen = () => {
             variant: 'primary',
           },
         ]}>
-        <Text style={styles.dialogText}>{transferTicketDialog.description}</Text>
+        <Text testID={TID.shopMyTicket.descriptionLabel} style={styles.dialogText}>{transferTicketDialog.description}</Text>
       </Dialog>
     </SafeView>
   );

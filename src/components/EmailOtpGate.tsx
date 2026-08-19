@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Header, PrimaryButton, SafeScrollView } from '.';
 import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { sendEmailVerificationCode, verifyEmailCode } from '../services';
+import { TID } from '../testIDs';
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 180;
@@ -101,7 +102,7 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
       />
       <SafeScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.descriptionWrapper}>
-          <Text style={styles.description}>
+          <Text testID={TID.emailOtpGate.emailLabel} style={styles.description}>
             {email}
             {t('screens.verificationCode.description') || '로 발송된 인증 코드를 입력해 주세요.'}
           </Text>
@@ -111,7 +112,7 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
           {Array.from({ length: CODE_LENGTH }).map((_, index) => {
             const digit = code[index] ?? '';
             return (
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.emailOtpGate.hiddenInputRef}
                 key={index}
                 style={styles.codeBox}
                 onPress={() => hiddenInputRef.current?.focus()}
@@ -123,7 +124,7 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
           })}
         </View>
 
-        <TextInput
+        <TextInput testID={TID.emailOtpGate.codeInput}
           ref={hiddenInputRef}
           value={code}
           onChangeText={(v) => setCode(v.replace(/[^0-9]/g, '').slice(0, CODE_LENGTH))}

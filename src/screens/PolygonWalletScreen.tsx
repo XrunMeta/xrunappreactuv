@@ -9,6 +9,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
+import { TID } from '../testIDs';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -117,7 +118,7 @@ export const PolygonWalletScreen = () => {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t('screens.polygonWallet.history')}</Text>
-          <TouchableOpacity onPress={handleFilter} activeOpacity={0.7}>
+          <TouchableOpacity testID={TID.polygonWallet.filter} onPress={handleFilter} activeOpacity={0.7}>
             <Ionicons name="options-outline" size={20} color="#343434" />
           </TouchableOpacity>
         </View>

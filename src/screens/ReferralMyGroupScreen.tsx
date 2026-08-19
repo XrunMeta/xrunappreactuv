@@ -14,6 +14,7 @@ import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { getMyGroup, getMyRecommender } from '../services';
 import { prefetchReferralSettlement } from '../services/referralSettlementCache';
 import { MyGroupItem } from '../types';
+import { TID } from '../testIDs';
 
 interface MemberData {
   rank: number;
@@ -240,7 +241,7 @@ export const ReferralMyGroupScreen = () => {
       <Header
         title={t('screens.referralMyGroup.title')}
         rightComponent={
-          <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
+          <TouchableOpacity testID={TID.referralMyGroup.share} style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={COLORS.headerText} />
             <Text style={styles.headerShareText}>{t('screens.referralMyGroup.referralLabel')}</Text>
           </TouchableOpacity>

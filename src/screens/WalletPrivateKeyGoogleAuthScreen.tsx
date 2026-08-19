@@ -40,6 +40,7 @@ import {
   type WalletNetwork,
 } from '../services/walletKeyStore';
 import { getWalletKeyATStatus } from '../services';
+import { TID } from '../testIDs';
 
 type Stage = 'loading' | 'pin' | 'options' | 'view' | 'busy';
 
@@ -574,7 +575,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               {t('screens.walletPrivateKeyGoogleAuth.chooseBackupSubtitle')}
             </Text>
 
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.walletPrivateKeyGoogleAuth.requestBackupConsent}
               style={[styles.optionCard, stage === 'busy' && styles.disabled]}
               onPress={() => requestBackupConsent(() => {
 
@@ -594,7 +595,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.walletPrivateKeyGoogleAuth.requestBackupConsent2}
               style={[styles.optionCard, stage === 'busy' && styles.disabled]}
               onPress={() => requestBackupConsent(
                 () => {
@@ -617,7 +618,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               <Ionicons name="chevron-forward" size={20} color={COLORS.darkGray} />
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.walletPrivateKeyGoogleAuth.requestBackupConsent3}
               style={[styles.optionCard, styles.viewCard, stage === 'busy' && styles.disabled]}
               onPress={() => requestBackupConsent(handleViewKey, { dangerNote: t('screens.walletPrivateKeyGoogleAuth.consentDangerView') })}
               disabled={stage === 'busy'}
@@ -659,7 +660,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               return (
                 <View key={w.wallet_code} style={styles.keyCard}>
                   {}
-                  <Text style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
+                  <Text testID={TID.walletPrivateKeyGoogleAuth.networkLabel} style={styles.networkLabel}>{NETWORK_LABEL[network]}</Text>
                   <Text style={styles.fieldLabel}>{t('screens.walletPrivateKeyGoogleAuth.walletAddress')}</Text>
                   <Text style={styles.fieldValue} selectable>
                     {w.address}
@@ -668,7 +669,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
                   <Text style={[styles.fieldValue, styles.privateKey]} selectable>
                     {w.private_key}
                   </Text>
-                  <TouchableOpacity
+                  <TouchableOpacity testID={TID.walletPrivateKeyGoogleAuth.copyKey}
                     style={styles.copyButton}
                     onPress={() => handleCopyKey(w.private_key)}
                     activeOpacity={0.7}
@@ -842,7 +843,7 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
               {confirmLabels.map((label, idx) => {
                 const checked = confirmChecks[idx] ?? false;
                 return (
-                  <TouchableOpacity
+                  <TouchableOpacity testID={TID.walletPrivateKeyGoogleAuth.toggleConfirmCheck}
                     key={idx}
                     style={styles.consentCheckRow}
                     activeOpacity={0.7}
@@ -860,14 +861,14 @@ export const WalletPrivateKeyGoogleAuthScreen = () => {
             </View>
 
             <View style={styles.consentButtonRow}>
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.walletPrivateKeyGoogleAuth.closeConsent}
                 style={[styles.consentButton, styles.consentCancel]}
                 onPress={closeConsent}
                 activeOpacity={0.8}
               >
                 <Text style={styles.consentCancelText}>{t('screens.walletPrivateKeyGoogleAuth.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.walletPrivateKeyGoogleAuth.proceedConsent}
                 style={[
                   styles.consentButton,
                   styles.consentProceed,

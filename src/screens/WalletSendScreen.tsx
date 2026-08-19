@@ -29,6 +29,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW, getIsTransferAble } from '../services';
 import type { WalletKey } from '../services/walletKeyStore';
 import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
+import { TID } from '../testIDs';
 
 interface AddressBookItem {
   id: string;
@@ -582,7 +583,7 @@ export const WalletSendScreen = () => {
         <Text style={styles.amountLabel}>{t('screens.walletSend.amount')}</Text>
         <View style={styles.amountContainer}>
           <View style={styles.amountSection}>
-            <TextInput
+            <TextInput testID={TID.walletSend.amountChangeInput}
               ref={amountInputRef}
               style={styles.amountInput}
               value={sendAmount}
@@ -603,7 +604,7 @@ export const WalletSendScreen = () => {
           </View>
 
           <View style={styles.tokenBadge}>
-            <Text style={styles.tokenBadgeText}>{selectedWalletAsset.symbol || selectedWalletAsset.name}</Text>
+            <Text testID={TID.walletSend.nameLabel} style={styles.tokenBadgeText}>{selectedWalletAsset.symbol || selectedWalletAsset.name}</Text>
           </View>
         </View>
         <View style={styles.helperContainer}>
@@ -640,12 +641,12 @@ export const WalletSendScreen = () => {
           })()}
         </View>
         {}
-        <TouchableOpacity onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
+        <TouchableOpacity testID={TID.walletSend.availableBalance} onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
           <Text style={styles.availableBalanceLabel}>{t('screens.walletSend.availableBalance')}</Text>
-          <Text style={styles.availableBalanceValue}>{selectedWalletAsset.amount}</Text>
+          <Text testID={TID.walletSend.amountLabel} style={styles.availableBalanceValue}>{selectedWalletAsset.amount}</Text>
           {memberLimit !== null && (
             <>
-              <Text style={styles.availableBalanceToken}> {selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>
+              <Text testID={TID.walletSend.nameLabel2} style={styles.availableBalanceToken}> {selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>
             </>
           )}
           {}
@@ -654,7 +655,7 @@ export const WalletSendScreen = () => {
         <FormField
           label={t('screens.walletSend.receiverAddress')}
           labelRightAccessory={
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.walletSend.clearReceiverAddress}
               onPress={handleClearReceiverAddress}
               activeOpacity={0.7}
               disabled={!receiverAddress || receiverAddress.trim().length === 0}
@@ -678,7 +679,7 @@ export const WalletSendScreen = () => {
           rightAccessory={
             <>
               {}
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.walletSend.scan}
                 onPress={handleScanPress}
                 activeOpacity={0.7}
                 style={styles.qrButton}
@@ -700,7 +701,7 @@ export const WalletSendScreen = () => {
               <Text style={styles.addressSwipeHint}>{t('screens.walletSend.swipeHint')}</Text>
             </View>
             {}
-            <TouchableOpacity onPress={handlePastePress} activeOpacity={0.7} style={styles.addAddressButton}>
+            <TouchableOpacity testID={TID.walletSend.paste} onPress={handlePastePress} activeOpacity={0.7} style={styles.addAddressButton}>
               <Ionicons name="add" size={18} color="#ffffff" />
             </TouchableOpacity>
           </View>
@@ -785,14 +786,14 @@ export const WalletSendScreen = () => {
                     <View key={item.id} style={styles.swipeableContainer}>
                       {}
                       <View style={styles.swipeableActions}>
-                        <TouchableOpacity
+                        <TouchableOpacity testID={TID.walletSend.editAddress}
                           style={[styles.swipeableButton, styles.editButton]}
                           onPress={() => handleEditAddress(item)}
                         >
                           <Ionicons name="pencil-outline" size={20} color="#ffffff" />
                           <Text style={styles.swipeableButtonText}>{t('common.buttons.edit')}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
+                        <TouchableOpacity testID={TID.walletSend.deleteAddress}
                           style={[styles.swipeableButton, styles.deleteButton]}
                           onPress={() => handleDeleteAddress(item.id)}
                         >
@@ -860,7 +861,7 @@ export const WalletSendScreen = () => {
               <Text style={styles.modalTitle}>
                 {editingItem ? t('screens.walletSend.addressEdit') : t('screens.walletSend.addressAdd')}
               </Text>
-              <TouchableOpacity onPress={handleCloseModal} style={styles.modalCloseButton}>
+              <TouchableOpacity testID={TID.walletSend.closeModal} onPress={handleCloseModal} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color={COLORS.headerText} />
               </TouchableOpacity>
             </View>
@@ -871,7 +872,7 @@ export const WalletSendScreen = () => {
                 <Text style={styles.modalInputLabel}>{t('screens.walletSend.nameLabel')}</Text>
                 <View style={styles.modalInputContainer}>
                   <Ionicons name="person-outline" size={20} color={COLORS.headerText} style={styles.modalInputIcon} />
-                  <TextInput
+                  <TextInput testID={TID.walletSend.modalNameInput}
                     style={styles.modalInput}
                     placeholder={t('screens.walletSend.namePlaceholder')}
                     placeholderTextColor="#999"
@@ -904,7 +905,7 @@ export const WalletSendScreen = () => {
                 <Text style={styles.modalInputLabel}>{t('screens.walletSend.addressLabel')}</Text>
                 <View style={styles.modalInputContainer}>
                   <Ionicons name="wallet-outline" size={20} color={COLORS.headerText} style={styles.modalInputIcon} />
-                  <TextInput
+                  <TextInput testID={TID.walletSend.modalAddressInput}
                     style={styles.modalInput}
                     placeholder={t('screens.walletSend.addressPlaceholder')}
                     placeholderTextColor="#999"
@@ -913,7 +914,7 @@ export const WalletSendScreen = () => {
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
-                  <TouchableOpacity
+                  <TouchableOpacity testID={TID.walletSend.qrScanFromModal}
                     style={styles.modalQrButton}
                     onPress={handleQrScanFromModal}
                     activeOpacity={0.7}

@@ -26,6 +26,7 @@ import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
 import { PockAdsResponse } from '../types';
 import { Ionicons } from '@expo/vector-icons';
+import { TID } from '../testIDs';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -623,7 +624,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
           borderBottomColor: '#e0e0e0',
           backgroundColor: '#fff',
         }}>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.showPockAd.close}
             onPress={handleClose}
             style={{
               padding: 8,
@@ -712,7 +713,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
         <View style={[styles.campaignContainer, isModal && styles.modalCampaignContainer]}>
           {}
           {isModal && (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.showPockAd.close2}
               onPress={handleClose}
               style={{
                 position: 'absolute',
@@ -727,11 +728,11 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
             </TouchableOpacity>
           )}
           <View style={styles.campaignBox}>
-            <Text style={styles.campaignTitle}>
+            <Text testID={TID.showPockAd.nameLabel} style={styles.campaignTitle}>
               {pockAdData.ad_name || advertisementParams.name || t('screens.showNapAd.campaignInfo')}
             </Text>
           </View>
-          <Text style={styles.campaignReward}>
+          <Text testID={TID.showPockAd.priceLabel} style={styles.campaignReward}>
             {t('screens.showNapAd.reward')} : {(() => {
               const price = advertisementParams?.xrunPrice || 0;
               const priceValue = parseFloat(String(price));
@@ -787,7 +788,7 @@ export const ShowPockAdScreen: React.FC<ShowPockAdScreenProps> = ({ onClose, isM
         <View style={styles.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[styles.webViewHeader, { paddingTop: insets.top + 12 }]}>
-            <Text
+            <Text testID={TID.showPockAd.adNameLabel}
               style={styles.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"

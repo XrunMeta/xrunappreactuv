@@ -3,6 +3,7 @@ import { Share, Platform, ToastAndroid, Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as CryptoJS from 'crypto-js';
+import i18n from 'i18next';
 import { getPlayStoreUrl } from './playStoreUrl';
 import { getToastBody } from '../services/nasmediaAd';
 
@@ -153,21 +154,23 @@ export const shareReferralLink = async (
     const deepLinkUrl = `https://www.xrun.run/invite?${inviteParam}`;
 
     let shareText = t('screens.referral.share.shareText');
+
     try {
-      const i18n = require('i18next').default || require('i18next');
-      const lng = String(i18n?.language || '').toLowerCase();
-      const norm = lng === 'ko' || lng.startsWith('ko-') ? 'ko'
-        : lng === 'en' || lng.startsWith('en-') ? 'en' : null;
-      if (norm) {
-        const { createAxiosInstance } = await import('../services');
-        const axi = createAxiosInstance(navigation);
-        const res = await axi.get(`/referral-share-text?lang=${norm}`, { timeout: 3000 });
-        const serverText = res?.data?.data?.text;
-        if (serverText && typeof serverText === 'string' && serverText.trim()) {
-          shareText = serverText;
-        }
+      const lng = String(i18n?.language || 'ko').toLowerCase();
+      const norm = lng.startsWith('en') ? 'en' : 'ko'; 
+      console.log('[shareReferralLink] server fetch lang=', norm);
+      const { createAxiosInstance } = await import('../services');
+      const axi = createAxiosInstance(navigation);
+
+      const res = await axi.get(`/referral-share-text?lang=${norm}&marker=1`, { timeout: 5000 });
+      const serverText = res?.data?.data?.text;
+      console.log('[shareReferralLink] serverText length:', serverText?.length);
+      if (serverText && typeof serverText === 'string' && serverText.trim()) {
+        shareText = serverText;
       }
-    } catch (e) {  }
+    } catch (e: any) {
+      console.warn('[shareReferralLink] server fetch failed:', e?.message);
+    }
     const downloadLabel = t('screens.referral.share.download');
     const linkLabel = t('screens.referral.share.linkLabel') || 'Link';
 
@@ -185,7 +188,6 @@ export const shareReferralLink = async (
 
     shareOptions = {
       message,
-      title: shareText,
     };
 
     console.log('[shareReferralLink] Share API 호출 시작:', shareOptions);

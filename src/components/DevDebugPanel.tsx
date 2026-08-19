@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
 import { devDebugStore } from '../utils/devDebugStore';
 import type { ApiLogEntry, BootStepEntry, LogEntry } from '../utils/devDebugStore';
+import { TID } from '../testIDs';
 
 const TAB_API = 'API';
 const TAB_BOOT = '부팅';
@@ -127,7 +128,7 @@ export function DevDebugPanel() {
             {tab === TAB_BOOT && renderBoot()}
             {tab === TAB_LOG && renderLog()}
             <View style={[styles.footer, { paddingBottom: footerPaddingBottom }]}>
-              <TouchableOpacity style={styles.copyBtn} onPress={copyCurrentTab}>
+              <TouchableOpacity testID={TID.devDebugPanel.copyCurrentTab} style={styles.copyBtn} onPress={copyCurrentTab}>
                 <Text style={styles.copyText}>로그 복사하기</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.clearBtn} onPress={() => devDebugStore.clear()}>

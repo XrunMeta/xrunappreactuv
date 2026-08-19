@@ -13,6 +13,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
 import { sendEmailVerificationCode } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -93,7 +94,7 @@ export const MyInfoEmailAuthScreen = () => {
 
           editable={false}
           rightAccessory={
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.myInfoEmailAuth.sendEmail}
               style={styles.inlineButton}
               onPress={handleSendEmail}
               disabled={sending}

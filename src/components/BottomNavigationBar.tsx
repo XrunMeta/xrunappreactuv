@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { getIosWalletShowStatus, getAndroidWalletShowStatus } from '../services';
+import { TID } from '../testIDs';
 
 let iconMap: any = null;
 let iconMapWhite: any = null;
@@ -207,6 +208,7 @@ export const BottomNavigationBar: React.FC<BottomNavigationBarProps> = ({
 
     return (
       <TouchableOpacity
+        testID={`${TID.bottomNavigationBar.item}-${item.id}`}
         style={[styles.navItem, isXplay && styles.navItemXplayNudge]}
         onPress={() => handleItemPress(item.id)}
         activeOpacity={0.7}>

@@ -15,6 +15,7 @@ import { useAlertDialog } from '../context/AlertDialogContext';
 import { getWalletPrivateKey } from '../services';
 import { copyToClipboard, maskPrivateKey } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TID } from '../testIDs';
 
 export const WalletPrivateKeyDisplayScreen = () => {
     const { t } = useTranslation();
@@ -119,7 +120,7 @@ export const WalletPrivateKeyDisplayScreen = () => {
                             </Text>
                         )}
                         {!isLoading && (
-                            <TouchableOpacity onPress={toggleKeyVisibility} style={styles.visibilityBtn}>
+                            <TouchableOpacity testID={TID.walletPrivateKeyDisplay.toggleKeyVisibility} onPress={toggleKeyVisibility} style={styles.visibilityBtn}>
                                 <Ionicons
                                     name={isKeyVisible ? 'eye-off-outline' : 'eye-outline'}
                                     size={20}
@@ -138,7 +139,7 @@ export const WalletPrivateKeyDisplayScreen = () => {
                         fullWidth
                         style={styles.copyBtn}
                     />
-                    <TouchableOpacity style={styles.backBtn} onPress={handleBackToWallet}>
+                    <TouchableOpacity testID={TID.walletPrivateKeyDisplay.backToWallet} style={styles.backBtn} onPress={handleBackToWallet}>
                         <Text style={styles.backBtnText}>{t('screens.walletPrivateKeyDisplay.backToWallet')}</Text>
                     </TouchableOpacity>
                 </View>

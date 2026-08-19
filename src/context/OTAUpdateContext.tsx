@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import * as Progress from 'react-native-progress';
 import { checkOTAVersion, downloadBundle, updateLocalVersion, OTAVersionInfo } from '../services/otaCheck';
 import { LoadingText } from '../components/AnimatedDots';
+import { TID } from '../testIDs';
 
 type OTAUpdateContextValue = {
   checkForUpdate: () => Promise<void>;
@@ -96,7 +97,7 @@ export const OTAUpdateProvider = ({ children }: { children: React.ReactNode }) =
           <View style={styles.fullScreenContainer}>
             <View style={styles.contentContainer}>
               <Text style={styles.fullScreenTitle}>{t('common.versionUpdate.title')}</Text>
-              <Text style={styles.fullScreenMessage}>
+              <Text testID={TID.otaupdateContext.descriptionLabel} style={styles.fullScreenMessage}>
                 {updateInfo?.description || t('common.versionUpdate.message')}
               </Text>
               {downloading ? (

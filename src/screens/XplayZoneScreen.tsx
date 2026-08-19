@@ -5,6 +5,7 @@ import { Header } from '../components';
 import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS } from '../constants';
+import { TID } from '../testIDs';
 
 let xplaySymbol: any = null;
 try {
@@ -39,7 +40,7 @@ export const XplayZoneScreen = () => {
         <Text style={styles.title}>Xplay Zone</Text>
         <Text style={styles.subtitle}>진입할 Zone을 선택하세요</Text>
 
-        <TouchableOpacity
+        <TouchableOpacity testID={TID.xplayZone.zone1}
           style={styles.zoneCard}
           activeOpacity={0.8}
           onPress={onZone1Press}
@@ -48,7 +49,7 @@ export const XplayZoneScreen = () => {
           <Text style={styles.zoneDescription}>ayeT 오퍼 · Xplay 적립</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        <TouchableOpacity testID={TID.xplayZone.zone2}
           style={styles.zoneCard}
           activeOpacity={0.8}
           onPress={onZone2Press}

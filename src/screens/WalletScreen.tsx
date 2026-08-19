@@ -53,6 +53,10 @@ import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { TaboolaBanner } from '../components/TaboolaBanner';
 import { LoadingText } from '../components/AnimatedDots';
 import { getTokenIcon } from '../constants/tokenMeta';
+import { TID } from '../testIDs';
+import { ProbeText } from '../components/ProbeText';
+import { probeReset } from '../services/screenProbe';
+import { startWalletScreenReporter, WalletReportContext } from '../services/walletScreenReport';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 
@@ -435,6 +439,28 @@ export const WalletScreen = () => {
   const refreshAllRef = useRef<(() => void) | null>(null);
 
   const [staleBalanceCurrencies, setStaleBalanceCurrencies] = useState<number[]>([]);
+
+  const reportCtxRef = useRef<WalletReportContext>({
+    isLoading: true,
+    addressMasked: null,
+    staleCurrencies: [],
+  });
+
+  reportCtxRef.current = {
+    isLoading,
+    addressMasked: publicAddress ? shortenAddress(publicAddress, 6, 6) : null,
+    staleCurrencies: staleBalanceCurrencies,
+  };
+
+  const probeSessionRef = useRef<string | null>(null);
+  if (probeSessionRef.current === null) {
+    probeSessionRef.current = probeReset('wallet');
+  }
+
+  useEffect(() => {
+    const stop = startWalletScreenReporter(() => reportCtxRef.current);
+    return stop;
+  }, []);
 
   useEffect(() => {
     if (!member) return;
@@ -998,13 +1024,35 @@ export const WalletScreen = () => {
           </View>
         </View>
         <View style={styles.tokenItemMiddle}>
-          <Text style={styles.tokenItemTitle}>{title}</Text>
-          <Text style={styles.tokenItemSubtitle}>{subtitle}</Text>
+          {
+}
+          <ProbeText
+            probeScreen="wallet"
+            probeKey={`${listIndex ?? 0}|${currency}|title`}
+            testID={`${TID.wallet.titleLabel}-${currency}`}
+            style={styles.tokenItemTitle}
+          >
+            {title}
+          </ProbeText>
+          <ProbeText
+            probeScreen="wallet"
+            probeKey={`${listIndex ?? 0}|${currency}|subtitle`}
+            style={styles.tokenItemSubtitle}
+          >
+            {subtitle}
+          </ProbeText>
         </View>
         <View style={styles.tokenItemRight}>
-          <Text style={styles.tokenItemAmount} numberOfLines={2} ellipsizeMode="tail">
+          <ProbeText
+            probeScreen="wallet"
+            probeKey={`${listIndex ?? 0}|${currency}|amount`}
+            testID={`${TID.wallet.amountLabel}-${currency}`}
+            style={styles.tokenItemAmount}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
             {amount} {suffix || ''}
-          </Text>
+          </ProbeText>
         </View>
       </TouchableOpacity>
     );
@@ -1070,7 +1118,7 @@ export const WalletScreen = () => {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t('screens.wallet.myBalance')}</Text>
-          <TouchableOpacity style={styles.addTokenButton} onPress={handleAddToken} activeOpacity={0.7}>
+          <TouchableOpacity testID={TID.wallet.addToken} style={styles.addTokenButton} onPress={handleAddToken} activeOpacity={0.7}>
             <Text style={styles.addTokenText}>{t('screens.wallet.addToken')}</Text>
             <Ionicons name="add-circle-outline" size={18} color="#000" />
           </TouchableOpacity>
@@ -1147,7 +1195,7 @@ export const WalletScreen = () => {
         animationType="fade"
         onRequestClose={() => setWalletInfoVisible(false)}
       >
-        <TouchableOpacity
+        <TouchableOpacity testID={TID.wallet.walletInfoVisible}
           style={styles.walletInfoOverlay}
           activeOpacity={1}
           onPress={() => setWalletInfoVisible(false)}
@@ -1158,7 +1206,7 @@ export const WalletScreen = () => {
               <Text style={styles.walletInfoSubtitle}>{t('screens.wallet.walletInfoSubtitle')}</Text>
             </View>
             {}
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.wallet.keyGuide}
               style={styles.walletInfoRow}
               onPress={() => {
                 setWalletInfoVisible(false);
@@ -1171,7 +1219,7 @@ export const WalletScreen = () => {
               <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletKeyGuide')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.wallet.btn2}
               style={styles.walletInfoRow}
               onPress={() => {
                 setWalletInfoVisible(false);
@@ -1184,7 +1232,7 @@ export const WalletScreen = () => {
               <Text style={styles.walletInfoRowText}>{t('screens.myInfoSettings.walletBackup')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
             </TouchableOpacity>
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.wallet.btn3}
               style={[styles.walletInfoRow, { borderBottomWidth: 0 }]}
               onPress={() => {
                 setWalletInfoVisible(false);

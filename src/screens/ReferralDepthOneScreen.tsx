@@ -10,6 +10,7 @@ import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { getMyGroup } from '../services';
 import { MyGroupItem } from '../types';
 import { SafeView } from '../components';
+import { TID } from '../testIDs';
 
 interface MemberData {
   id: string;
@@ -184,7 +185,7 @@ export const ReferralDepthOneScreen = () => {
         onBackPress={handleBack}
         showBackButton
         rightComponent={
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.referralDepthOne.close}
             style={styles.closeButton}
             onPress={handleClose}
             activeOpacity={0.7}

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Header, LanguageSelector } from '../components';
 import { COLORS, LIST_STYLES, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
+import * as Updates from 'expo-updates';
 import {
   getCurrentAppVersionNumber,
   checkServerVersion,
@@ -18,6 +19,7 @@ import {
   updateNotificationSettings,
 } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 
 export const MyInfoSettingsScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -193,7 +195,7 @@ export const MyInfoSettingsScreen = () => {
             {pushToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={TID.myInfoSettings.togglePushToggle}
                 value={pushEnabled}
                 onValueChange={handleTogglePush}
                 disabled={!memberId}
@@ -211,7 +213,7 @@ export const MyInfoSettingsScreen = () => {
             {noticeToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={TID.myInfoSettings.toggleNoticeToggle}
                 value={noticeEnabled}
                 onValueChange={handleToggleNotice}
                 disabled={!memberId || !pushEnabled}
@@ -228,7 +230,7 @@ export const MyInfoSettingsScreen = () => {
             {eventToggleLoading ? (
               <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={TID.myInfoSettings.toggleEventToggle}
                 value={eventEnabled}
                 onValueChange={handleToggleEvent}
                 disabled={!memberId || !pushEnabled}
@@ -238,7 +240,7 @@ export const MyInfoSettingsScreen = () => {
             )}
           </View>
 
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.myInfoSettings.languageSelectorVisible}
             style={styles.card}
             activeOpacity={0.85}
             onPress={() => setLanguageSelectorVisible(true)}
@@ -246,7 +248,7 @@ export const MyInfoSettingsScreen = () => {
             <Text style={styles.cardText}>{t('screens.myInfoSettings.languageSelect')}</Text>
           </TouchableOpacity>
           {}
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.myInfoSettings.navigate}
             style={styles.card}
             activeOpacity={0.85}
             onPress={() => navigate(ROUTES.myInfoCloseMembership)}
@@ -265,6 +267,21 @@ export const MyInfoSettingsScreen = () => {
                 {Platform.OS === 'android'
                   ? `Android : ${versionInfo.androidCurrent}/${versionInfo.androidLatest}`
                   : `iOS : ${versionInfo.iosCurrent}/${versionInfo.iosLatest}`}
+              </Text>
+              {
+}
+              <Text style={styles.versionText}>
+                {(() => {
+                  const id = Updates.updateId;
+                  if (!id) return 'OTA : embedded';
+                  const shortId = String(id).replace(/-/g, '').slice(0, 8);
+                  const ts = Updates.createdAt;
+                  if (!ts) return `OTA : ${shortId}`;
+                  const kst = new Date(ts.getTime() + 9 * 60 * 60 * 1000);
+                  const p = (n: number) => String(n).padStart(2, '0');
+                  const date = `${kst.getUTCFullYear()}-${p(kst.getUTCMonth() + 1)}-${p(kst.getUTCDate())} ${p(kst.getUTCHours())}:${p(kst.getUTCMinutes())}`;
+                  return `OTA : ${shortId} (${date})`;
+                })()}
               </Text>
             </TouchableOpacity>
           )}

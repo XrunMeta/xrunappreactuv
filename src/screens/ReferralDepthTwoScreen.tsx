@@ -8,6 +8,7 @@ import { Header, ReferralMemberRow } from '../components';
 import { COMMON_STYLES, SIZES, COLORS } from '../constants';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAppContext } from '../context';
+import { TID } from '../testIDs';
 
 const rows = Array.from({ length: 7 }, (_, index) => ({
   rank: index === 0 ? 2 : 1,
@@ -51,7 +52,7 @@ export const ReferralDepthTwoScreen = () => {
         showBackButton={true}
         onBackPress={handleBack}
         rightComponent={
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.referralDepthTwo.close}
             style={styles.closeButton}
             onPress={handleClose}
             activeOpacity={0.7}
