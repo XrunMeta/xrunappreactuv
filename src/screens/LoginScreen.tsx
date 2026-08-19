@@ -239,7 +239,7 @@ export const LoginScreen = () => {
       }
 
       console.log('[로그인] 이메일 인증 코드 전송 요청:', otpEmail.trim());
-      const codeSent = await sendEmailVerificationCode(otpEmail.trim(), navigate);
+      const codeSent = await sendEmailVerificationCode(otpEmail.trim(), 'login', navigate);
 
       if (!codeSent) {
         await showAlert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
@@ -371,7 +371,7 @@ export const LoginScreen = () => {
         ]);
         if (confirmed === 1 && targetEmail) {
           try {
-            const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
+            const codeSent = await sendEmailVerificationCode(targetEmail, 'login', navigate); 
             if (codeSent) {
               setVerificationEmail(targetEmail);
               setVerificationSuccessRoute(ROUTES.map);
@@ -547,7 +547,7 @@ export const LoginScreen = () => {
           );
           if (confirmed === 1 && targetEmail) {
             try {
-              const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
+              const codeSent = await sendEmailVerificationCode(targetEmail, 'login', navigate); 
               if (codeSent) {
                 setVerificationEmail(targetEmail);
                 setVerificationSuccessRoute(ROUTES.map);
@@ -734,7 +734,7 @@ export const LoginScreen = () => {
           );
           if (confirmed === 1 && targetEmail) {
             try {
-              const codeSent = await sendEmailVerificationCode(targetEmail, navigate);
+              const codeSent = await sendEmailVerificationCode(targetEmail, 'login', navigate); 
               if (codeSent) {
                 setVerificationEmail(targetEmail);
                 setVerificationSuccessRoute(ROUTES.map);

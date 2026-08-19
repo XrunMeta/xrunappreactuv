@@ -13,6 +13,7 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { checkEmailExists, sendEmailVerificationCode } from '../services';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { presentBlockedDeviceAlert } from '../utils/blockedDeviceGate';
 
 export const EmailVerificationScreen = () => {
   const { t } = useTranslation();
@@ -20,7 +21,12 @@ export const EmailVerificationScreen = () => {
   const { showAlert } = useAlertDialog();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { setVerificationSuccessRoute, setVerificationEmail, verificationSuccessRoute } = useAppContext();
+  const {
+    setVerificationSuccessRoute,
+    setVerificationEmail,
+    verificationSuccessRoute,
+    resetVerificationSuccessRoute,
+  } = useAppContext();
 
   const isSignupMode = verificationSuccessRoute === ROUTES.signup;
 
@@ -78,7 +84,7 @@ export const EmailVerificationScreen = () => {
 
       const logPrefix = isSignupMode ? '[회원가입]' : '[로그인]';
       console.log(`${logPrefix} 이메일 인증 코드 전송 요청:`, email.trim());
-      const codeSent = await sendEmailVerificationCode(email.trim(), navigate);
+      const codeSent = await sendEmailVerificationCode(email.trim(), 'signup', navigate);
 
       if (!codeSent) {
         await showAlert(t('screens.emailVerification.alerts.sendFailed'), t('screens.emailVerification.errors.sendFailed'));
@@ -96,6 +102,23 @@ export const EmailVerificationScreen = () => {
 
     } catch (error) {
       console.error('[이메일 인증] 이메일 인증 처리 중 오류:', error);
+
+      const blockResult = await presentBlockedDeviceAlert(error, showAlert, t);
+      if (blockResult.handled) {
+        if (isSignupMode) {
+          try { await AsyncStorage.removeItem('pendingSignupData'); } catch {  }
+        }
+        if (blockResult.requestUnblock) {
+          try { await AsyncStorage.setItem('deviceUnblockRequestEmail', email.trim()); } catch {  }
+          resetVerificationSuccessRoute();
+          setIsLoading(false);
+          navigate('deviceUnblockRequest');
+          return;
+        }
+        resetVerificationSuccessRoute();
+        setIsLoading(false);
+        return;
+      }
 
       if (isSignupMode) {
         try {

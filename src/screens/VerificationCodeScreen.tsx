@@ -32,6 +32,8 @@ import { signInWithApple } from '../services/appleAuth';
 import { AxiosError } from 'axios';
 import { TUTORIAL_PENDING_KEY, TUTORIAL_COMPLETED_KEY } from './walletKeyTutorialHelpers';
 import { TID } from '../testIDs';
+import { presentBlockedDeviceAlert } from '../utils/blockedDeviceGate';
+import { resolveResendPurpose } from '../utils/resendVerificationPurpose';
 
 const CODE_LENGTH = 6;
 const RESEND_SECONDS = 300;
@@ -157,31 +159,15 @@ export const VerificationCodeScreen = () => {
             signupSuccess = await signup(signupData, navigate);
           } catch (signupError) {
 
-            const respData = (signupError as any)?.response?.data;
-            const blockedDeviceReasons = ['blocked_device', 'blocked_device_used', 'blocked_device_banned'];
-            if (signupError instanceof AxiosError && signupError.response?.status === 409 && blockedDeviceReasons.includes(respData?.reason)) {
+            const blockResult = await presentBlockedDeviceAlert(signupError, showAlert, t);
+            if (blockResult.handled) {
               await AsyncStorage.removeItem('pendingSignupData');
-              if (respData?.data?.unblockRequestable) {
-                const choice = await showAlert(
-                  t('screens.deviceBinding.signupBlockedTitle'),
-                  t('screens.deviceBinding.signupBlockedBody'),
-                  [
-                    { text: t('common.buttons.confirm') || '확인', style: 'cancel' },
-                    { text: t('screens.deviceBinding.unblockRequestCta') },
-                  ],
-                );
-                if (choice === 1) {
-                  try { await AsyncStorage.setItem('deviceUnblockRequestEmail', signupData.email); } catch {  }
-                  resetVerificationSuccessRoute();
-                  setIsVerifying(false);
-                  navigate('deviceUnblockRequest');
-                  return;
-                }
-              } else {
-                await showAlert(
-                  t('screens.deviceBinding.signupBlockedTitle'),
-                  t('screens.deviceBinding.signupBlockedBody'),
-                );
+              if (blockResult.requestUnblock) {
+                try { await AsyncStorage.setItem('deviceUnblockRequestEmail', signupData.email); } catch {  }
+                resetVerificationSuccessRoute();
+                setIsVerifying(false);
+                navigate('deviceUnblockRequest');
+                return;
               }
               resetVerificationSuccessRoute();
               setIsVerifying(false);
@@ -603,7 +589,9 @@ export const VerificationCodeScreen = () => {
 
     try {
       console.log('[인증] 이메일 인증 코드 재전송 요청:', verificationEmail);
-      const codeSent = await sendEmailVerificationCode(verificationEmail, navigate);
+
+      const resendPurpose = resolveResendPurpose(verificationSuccessRoute);
+      const codeSent = await sendEmailVerificationCode(verificationEmail, resendPurpose, navigate);
 
       if (codeSent) {
         setSecondsLeft(RESEND_SECONDS);

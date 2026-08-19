@@ -36,7 +36,8 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
     if (sentOnce) return;
     (async () => {
       try {
-        await sendEmailVerificationCode(email);
+
+        await sendEmailVerificationCode(email, 'send_confirm');
         setSentOnce(true);
       } catch (e) {
         console.warn('[EmailOtpGate] send failed', e);
@@ -84,7 +85,7 @@ export const EmailOtpGate: React.FC<Props> = ({ email, onSuccess, onCancel }) =>
     setError('');
     setCode('');
     try {
-      await sendEmailVerificationCode(email);
+      await sendEmailVerificationCode(email, 'send_confirm');
       setSecondsLeft(RESEND_SECONDS);
     } catch {
       setError(t('screens.emailOtp.sendError') || '인증 코드 발송 중 오류가 발생했습니다.');

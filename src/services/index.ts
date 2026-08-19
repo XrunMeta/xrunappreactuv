@@ -1719,8 +1719,11 @@ export const loginWithMobile = async (
   }
 };
 
+export type EmailVerificationPurpose = 'signup' | 'restore' | 'email_change' | 'login' | 'send_confirm';
+
 export const sendEmailVerificationCode = async (
   email: string,
+  purpose: EmailVerificationPurpose,
   navigation?: any,
 ): Promise<boolean> => {
   try {
@@ -1736,9 +1739,20 @@ export const sendEmailVerificationCode = async (
     const request: any = {
       email,
       language: currentLang,
+      purpose,
     };
 
-    console.log('[로그인] 이메일 인증 코드 발송 요청:', email, 'lang=', currentLang);
+    if (purpose === 'signup') {
+      try {
+        const { collectDeviceSignals } = require('../utils/deviceSignals');
+        const signals = await collectDeviceSignals();
+        request.device_key = signals.device_key;
+        request.platform = signals.platform;
+        request.app_build = signals.app_build;
+      } catch {  }
+    }
+
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', email, 'lang=', currentLang, 'purpose=', purpose);
 
     const response = await axiosInstance.post<EmailVerificationResponse>(
       '/check-02-email',
