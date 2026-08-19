@@ -31,6 +31,7 @@ import type { WalletKey } from '../services/walletKeyStore';
 import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 import { TID } from '../testIDs';
 import { checkSendAmount } from '../utils/sendAmountGuard';
+import { fmtBalance } from '../utils/formatAmount';
 
 interface AddressBookItem {
   id: string;
@@ -470,7 +471,8 @@ export const WalletSendScreen = () => {
     }
   };
   const handleAvailableBalancePress = () => {
-    setSendAmount(selectedWalletAsset?.amount || '0');
+
+    setSendAmount(formatNumberWithCommas(fmtBalance(selectedWalletAsset?.amount)));
   };
 
   const handleConfirm = async () => {
@@ -645,7 +647,9 @@ export const WalletSendScreen = () => {
         {}
         <TouchableOpacity testID={TID.walletSend.availableBalance} onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
           <Text style={styles.availableBalanceLabel}>{t('screens.walletSend.availableBalance')}</Text>
-          <Text testID={TID.walletSend.amountLabel} style={styles.availableBalanceValue}>{selectedWalletAsset.amount}</Text>
+          {
+}
+          <Text testID={TID.walletSend.amountLabel} style={styles.availableBalanceValue}>{fmtBalance(selectedWalletAsset.amount)}</Text>
           {memberLimit !== null && (
             <>
               <Text testID={TID.walletSend.nameLabel2} style={styles.availableBalanceToken}> {selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>
