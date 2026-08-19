@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useFonts, Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { WalletHeaderCard } from '../../src/components/WalletHeaderCard';
 import { fmtBalance } from '../../src/utils/formatAmount';
 import { SIZES } from '../../src/constants/index';
@@ -20,6 +21,13 @@ export const BALANCE_CASES: Array<{ id: string; raw: string; symbol: string; not
 export const VIEWPORT_CASES = [320, 375, 390, 430];
 
 export default function HarnessApp() {
+
+  const [fontsLoaded] = useFonts({
+    'Roboto-Regular': Roboto_400Regular,
+    'Roboto-Bold': Roboto_700Bold,
+  });
+  if (!fontsLoaded) return <View testID="harness-fonts-loading" />;
+
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.rootContent}>
       {VIEWPORT_CASES.map((width) => (

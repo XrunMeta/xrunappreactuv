@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import { FONTS, SIZES } from '../constants';
+import { fitFontSize } from '../utils/fitFontSize';
 import { TID } from '../testIDs';
+
+const BALANCE_MAX_FONT_SIZE = FONTS.size.xxxlarge;
+const BALANCE_MIN_FONT_SIZE = 18;
+const BALANCE_LETTER_SPACING = -0.8;
 
 type QuickAction = {
   label: string;
@@ -48,6 +53,9 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
     accentTwo: 'rgba(255,255,255,0.08)',
   },
 }) => {
+
+  const [balanceWidth, setBalanceWidth] = useState(0);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={[styles.card, { backgroundColor: theme.background }, cardStyle]} activeOpacity={0.9} onPress={onPress}>
@@ -77,9 +85,30 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
 
           {}
           {mainValue ? (
-            <View style={styles.balanceContainer}>
+            <View
+              style={styles.balanceContainer}
+              onLayout={(e) => setBalanceWidth(e.nativeEvent.layout.width)}
+            >
               {mainValueLabel ? <Text style={styles.balanceLabel}>{mainValueLabel}</Text> : null}
-              <Text testID={TID.walletHeaderCard.mainValueLabel} style={styles.balanceValue}>{mainValue}</Text>
+              {
+
+}
+              <Text
+                testID={TID.walletHeaderCard.mainValueLabel}
+                numberOfLines={1}
+                style={[
+                  styles.balanceValue,
+                  {
+                    fontSize: fitFontSize({
+                      text: mainValue,
+                      availableWidth: balanceWidth,
+                      maxFontSize: BALANCE_MAX_FONT_SIZE,
+                      minFontSize: BALANCE_MIN_FONT_SIZE,
+                      letterSpacing: BALANCE_LETTER_SPACING,
+                    }),
+                  },
+                ]}
+              >{mainValue}</Text>
               {subValue ? <Text testID={TID.walletHeaderCard.subValueLabel} style={styles.subValue}>{subValue}</Text> : null}
             </View>
           ) : null}
@@ -185,13 +214,13 @@ const styles = StyleSheet.create({
 
   balanceValue: {
     marginTop: 0,
-    fontSize: FONTS.size.xxxlarge,
+
     fontFamily: 'Roboto-Bold',
     color: '#FFFFFF',
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
-    letterSpacing: -0.8,
+    letterSpacing: BALANCE_LETTER_SPACING,
   },
   subValue: {
     marginTop: 0,
