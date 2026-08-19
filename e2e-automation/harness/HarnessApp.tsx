@@ -2,6 +2,7 @@
 
 import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_122070, v_472849 } from 'rcmrninabrnb';
+import { v_c06f2c, v_259807, v_567640 } from 'duafkibkrsnlsywaptcqakgas';
 import { v_a50748 } from '../../src/components/WalletHeaderCard';
 import { v_7353e1 } from '../../src/utils/formatAmount';
 import { v_9b1a04 } from '../../src/constants/index';
@@ -20,6 +21,13 @@ export const v_5847a7 = [
 export const v_a9e2b4 = [320, 375, 390, 430];
 
 export default function v_0803f5() {
+
+  const [v_43f571] = v_c06f2c({
+    'Roboto-Regular': v_259807,
+    'Roboto-Bold': v_567640,
+  });
+  if (!v_43f571) return <View testID="harness-fonts-loading" />;
+
   return (
     <ScrollView style={v_d81136.root} contentContainerStyle={v_d81136.rootContent}>
       {v_a9e2b4.map((v_8e4fb6) => (
