@@ -75,6 +75,7 @@ import {
   v_626337,
   v_0ca15f,
   v_fad5f1,
+  v_0f76b7,
 } from './src/screens';
 import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_d997a9 } from './src/screens/AdisonOfferwallScreen';
@@ -450,6 +451,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'verificationCode') {
     return <VerificationCodeScreen />;
+  }
+
+  if (v_0f0c7b === 'deviceUnblockRequest') {
+    return <DeviceUnblockRequestScreen />;
   }
 
   if (v_0f0c7b === 'terms') {
