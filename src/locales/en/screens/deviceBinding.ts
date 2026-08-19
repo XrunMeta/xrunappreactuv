@@ -12,5 +12,14 @@ export default {
   sessionInvalidatedBody: 'You have been signed out because another device signed in.',
   signupBlockedTitle: 'Signup Restricted',
   signupBlockedBody:
-    'An account has already been created on this device. Only one account per device is allowed.',
+    'An account has already been created on this device. Please sign in with your existing account.',
+
+  unblockRequestCta: 'Request Unblock',
+  unblockScreenTitle: 'Request Unblock',
+  unblockReasonLabel: 'Tell us why (optional)',
+  unblockReasonPlaceholder: 'e.g. This is a used device I purchased / I share this device with family',
+  unblockSubmit: 'Submit Request',
+  unblockSubmitted: 'Your request has been submitted. We will follow up after review.',
+  unblockTooMany: 'Too many requests. Please try again later.',
+  unblockSubmitFailed: 'Failed to submit the request. Please try again later.',
 };

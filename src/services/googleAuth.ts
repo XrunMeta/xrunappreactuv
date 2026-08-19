@@ -162,6 +162,10 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
 
     try {
 
+      const deviceSignals = await (async () => {
+        try { const { collectDeviceSignals } = require('../utils/deviceSignals'); return await collectDeviceSignals(); } catch { return null; }
+      })();
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -170,10 +174,11 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
         },
         body: JSON.stringify({
           idToken: idToken, 
-
-          device_id: await (async () => {
-            try { const { getDeviceId } = require('../utils/deviceIdentity'); return await getDeviceId(); } catch { return null; }
-          })(),
+          device_id: deviceSignals?.device_id ?? null,
+          device_key: deviceSignals?.device_key ?? null,
+          install_uuid: deviceSignals?.install_uuid ?? null,
+          platform: deviceSignals?.platform ?? null,
+          app_build: deviceSignals?.app_build ?? null,
         }),
         signal: controller.signal,
       });

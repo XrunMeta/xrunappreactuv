@@ -158,12 +158,31 @@ export const VerificationCodeScreen = () => {
           } catch (signupError) {
 
             const respData = (signupError as any)?.response?.data;
-            if (signupError instanceof AxiosError && signupError.response?.status === 409 && respData?.reason === 'blocked_device') {
+            const blockedDeviceReasons = ['blocked_device', 'blocked_device_used', 'blocked_device_banned'];
+            if (signupError instanceof AxiosError && signupError.response?.status === 409 && blockedDeviceReasons.includes(respData?.reason)) {
               await AsyncStorage.removeItem('pendingSignupData');
-              await showAlert(
-                t('screens.deviceBinding.signupBlockedTitle'),
-                t('screens.deviceBinding.signupBlockedBody'),
-              );
+              if (respData?.data?.unblockRequestable) {
+                const choice = await showAlert(
+                  t('screens.deviceBinding.signupBlockedTitle'),
+                  t('screens.deviceBinding.signupBlockedBody'),
+                  [
+                    { text: t('common.buttons.confirm') || '확인', style: 'cancel' },
+                    { text: t('screens.deviceBinding.unblockRequestCta') },
+                  ],
+                );
+                if (choice === 1) {
+                  try { await AsyncStorage.setItem('deviceUnblockRequestEmail', signupData.email); } catch {  }
+                  resetVerificationSuccessRoute();
+                  setIsVerifying(false);
+                  navigate('deviceUnblockRequest');
+                  return;
+                }
+              } else {
+                await showAlert(
+                  t('screens.deviceBinding.signupBlockedTitle'),
+                  t('screens.deviceBinding.signupBlockedBody'),
+                );
+              }
               resetVerificationSuccessRoute();
               setIsVerifying(false);
               return;
