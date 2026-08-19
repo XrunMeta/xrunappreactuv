@@ -21,6 +21,7 @@ import { PaginationParams, PaginationResponse } from '../types/pagination';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { copyToClipboard, showToast } from '../utils';
 import { fmtBalance, fmtAmount } from '../utils/formatAmount';
+import { formatFiatValue } from '../utils/fiatValue';
 import { findEntriesForUser } from '../services/walletKeyStore';
 import { getWalletKeyATStatus } from '../services';
 import { isLocalSendEnabledForUser } from '../services/walletSendLocal';
@@ -764,29 +765,13 @@ export const WalletDetailScreen = () => {
     }
 
     try {
-      const balanceAmount = new BigNumber(displayAmount || '0');
-      const krwAmount = balanceAmount.multipliedBy(gopaxPrice); 
-      const lang = (i18n.language || 'ko').toLowerCase();
-      const kr = Number(currencyRates.KR || 0);
-      const idr = Number(currencyRates.IDR || 0);
 
-      const usdAmount = kr > 0 ? krwAmount.dividedBy(kr) : new BigNumber(0);
-
-      const fmt = (v: BigNumber, decimals: number) => {
-        const s = v.toFixed(decimals);
-        const [i, d] = s.split('.');
-        return i.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (d ? '.' + d : '');
-      };
-
-      if (lang.startsWith('ko')) {
-        return `KRW ${fmt(krwAmount, 0)}`;
-      } else if (lang.startsWith('id')) {
-
-        const idrAmount = usdAmount.multipliedBy(idr);
-        return `IDR ${fmt(idrAmount, 0)}`;
-      } else {
-        return `USD ${fmt(usdAmount, 2)}`;
-      }
+      return formatFiatValue({
+        amount: displayAmount,
+        xrunPriceKrw: gopaxPrice,
+        lang: i18n.language,
+        rates: currencyRates,
+      });
     } catch (error) {
       console.error('[WalletDetail] 통화 환산 오류:', error);
       return t('screens.walletDetail.priceUpdating');

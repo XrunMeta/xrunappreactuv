@@ -30,6 +30,8 @@ import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW, getIsTransfer
 import type { WalletKey } from '../services/walletKeyStore';
 import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 import { TID } from '../testIDs';
+import { checkSendAmount } from '../utils/sendAmountGuard';
+import { fmtBalance } from '../utils/formatAmount';
 
 interface AddressBookItem {
   id: string;
@@ -469,7 +471,8 @@ export const WalletSendScreen = () => {
     }
   };
   const handleAvailableBalancePress = () => {
-    setSendAmount(selectedWalletAsset?.amount || '0');
+
+    setSendAmount(formatNumberWithCommas(fmtBalance(selectedWalletAsset?.amount)));
   };
 
   const handleConfirm = async () => {
@@ -490,23 +493,24 @@ export const WalletSendScreen = () => {
       await showAlert(t('screens.walletSend.alerts.invalidAddress'), t('screens.walletSend.errors.invalidAddress'));
       return;
     }
-    if (!cleanAmount || new BigNumber(cleanAmount || '0').lte(0)) {
-      await showAlert(t('screens.walletSend.alerts.amountRequired'), t('screens.walletSend.errors.amountRequired'));
-      return;
-    }
 
-    const balance = new BigNumber(selectedWalletAsset?.amount || '0');
-    const amount = new BigNumber(cleanAmount || '0');
-    if (amount.gt(balance)) {
-      await showAlert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
-      return;
-    }
+    const verdict = checkSendAmount({
+      input: cleanAmount,
+      balance: selectedWalletAsset?.amount,
+      limit: memberLimit,
+    });
+    if (!verdict.ok) {
+      if (verdict.reason === 'invalidAmount') {
+        await showAlert(t('screens.walletSend.alerts.amountRequired'), t('screens.walletSend.errors.amountRequired'));
+      } else if (verdict.reason === 'overLimit') {
+        await showAlert(
+          t('screens.walletSend.alerts.insufficientBalance'),
+          `1회 송금 한도(${memberLimit?.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
+        );
+      } else {
 
-    if (memberLimit !== null && amount.gt(new BigNumber(memberLimit))) {
-      await showAlert(
-        t('screens.walletSend.alerts.insufficientBalance'),
-        `1회 송금 한도(${memberLimit.toLocaleString()} ${selectedWalletAsset?.symbol || ''})를 초과했습니다.`
-      );
+        await showAlert(t('screens.walletSend.alerts.insufficientBalance'), t('screens.walletSend.errors.insufficientBalance'));
+      }
       return;
     }
 
@@ -643,7 +647,9 @@ export const WalletSendScreen = () => {
         {}
         <TouchableOpacity testID={TID.walletSend.availableBalance} onPress={handleAvailableBalancePress} activeOpacity={0.7} style={styles.availableBalanceContainer}>
           <Text style={styles.availableBalanceLabel}>{t('screens.walletSend.availableBalance')}</Text>
-          <Text testID={TID.walletSend.amountLabel} style={styles.availableBalanceValue}>{selectedWalletAsset.amount}</Text>
+          {
+}
+          <Text testID={TID.walletSend.amountLabel} style={styles.availableBalanceValue}>{fmtBalance(selectedWalletAsset.amount)}</Text>
           {memberLimit !== null && (
             <>
               <Text testID={TID.walletSend.nameLabel2} style={styles.availableBalanceToken}> {selectedWalletAsset.symbol || selectedWalletAsset.name} {t('screens.walletSend.input')}</Text>

@@ -30,6 +30,8 @@ import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { copyToClipboard, loadCustomTokens, saveCustomTokens } from '../utils';
 import { fmtBalance } from '../utils/formatAmount';
+import { combineTokenData } from './walletAssets';
+import { convertAssetToTokenListItem, resolveDiskColors, type TokenListItemData } from './walletListItem';
 import { mergeRpcBalances, pickOkCurrencies, type RpcBalanceEntry } from '../utils/rpcBalance';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useSessionGuard } from '../hooks';
@@ -91,79 +93,6 @@ const shortenAddress = (address: string, frontChars: number, backChars: number):
     address.length - backChars,
   )}`;
 };
-
-const WALLET_LIST_DARK_DISKS = new Set(['#000000', '#111111', '#25292C', '#8347E6']);
-
-function getWalletListDiskBackground(asset: CombinedAsset): string {
-  const sym = (asset.symbol || '').toUpperCase();
-  const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
-  if (sym === 'XRUN' && sub.includes('ethereum')) {
-    return '#FFFFFF';
-  }
-  switch (asset.currency) {
-    case 1:
-      return '#000000';
-    case 2:
-      return '#EFF4F5';
-    case 11:
-      return '#EFF4F5';
-    case 16:
-      return '#8347E6';
-    case 18:
-      return '#111111';
-    case 19:
-      return '#25292C';
-    case 1900:
-
-      return '#000000';
-    default:
-      return '#EFF4F5';
-  }
-}
-
-function resolveWalletListIconSource(asset: CombinedAsset): any | null {
-  const sym = (asset.symbol || '').toUpperCase();
-  const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
-
-  if (asset.currency === 1900 || asset.currency === 19) {
-    return null;
-  }
-  if (sym === 'ETH' || asset.currency === 2) {
-    if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
-      return { uri: asset.icon.trim() };
-    }
-    return require('../../assets/images/ethereum_thumb.png');
-  }
-  if (sym === 'POL' || asset.currency === 16) {
-    return getTokenIcon('POL');
-  }
-  if (sym === 'XRUN') {
-    if (sub.includes('ethereum')) {
-      return getTokenIcon('XRUN', 'Ethereum');
-    }
-    return require('../../assets/xrun-round-logo.png');
-  }
-
-  if (typeof asset.icon === 'string' && /^https?:\/\//.test(asset.icon.trim())) {
-    return { uri: asset.icon.trim() };
-  }
-  return null;
-}
-
-interface TokenListItemData extends CombinedAsset {
-  title: string;
-  subtitle: string;
-  amount: string;
-  suffix?: string;
-  iconSource?: any;
-  fallbackLabel?: string;
-  fallbackColors?: {
-    background: string;
-    text: string;
-  };
-
-  listIndex?: number;
-}
 
 export const WalletScreen = () => {
   const { t } = useTranslation();
@@ -265,154 +194,12 @@ export const WalletScreen = () => {
     };
   }, [navigate]);
 
-  const combineTokenData = useCallback(
-    (walletData: WalletData[], customTokens: CustomToken[], adXrunAmount: number, referralAmount: number): CombinedAsset[] => {
-
-      const walletAssets: CombinedAsset[] = walletData
-        .map((item) => ({
-          id: item.currency,
-          symbol: item.symbol,
-          name: item.currencyname,
-          subCurrencyName: item.subCurrencyName,
-          amount: fmtBalance(item.Wamount || item.amount || '0'),
-          icon: item.file || '',
-          currency: item.currency,
-          isCustom: false,
-          contractAddress: item.address,
-          subcurrency: item.subcurrency,
-          originalData: item,
-        }));
-
-      const primaryPolygonAddr =
-        walletAssets.find((w) => Number(w.currency) === 1)?.contractAddress?.trim() || '';
-      if (primaryPolygonAddr) {
-        walletAssets.forEach((a) => {
-          if (![16, 18].includes(Number(a.currency))) return;
-          const cur = (a.contractAddress || '').trim();
-          if (cur) return;
-          a.contractAddress = primaryPolygonAddr;
-          if (a.originalData && typeof a.originalData === 'object') {
-            a.originalData = { ...a.originalData, address: primaryPolygonAddr };
-          }
-        });
-      }
-
-      const customAssets: CombinedAsset[] = customTokens
-        .map((token) => {
-          const matchingWalletData = walletData.find(
-            (wallet) => wallet.currency === token.currency,
-          );
-
-          return {
-            id: token.currency,
-            symbol: token.symbol,
-            name: token.name,
-            amount: fmtBalance(token.amount || '0'),
-            icon: matchingWalletData
-              ? `data:image/png;base64,${matchingWalletData.symbolimg?.replace(/(\r\n|\n|\r)/gm, '') || ''}`
-              : 'https://via.placeholder.com/24',
-            currency: token.currency,
-            subCurrencyName: token.subCurrencyName,
-            isCustom: true,
-            contractAddress: token.contractAddress,
-            decimals: token.decimals,
-            subcurrency: matchingWalletData?.subcurrency,
-            originalData: token,
-          };
-        });
-
-      const allAssets = [...walletAssets, ...customAssets];
-
-      const adXrunItem: CombinedAsset = {
-        id: 19,
-        symbol: 'XRUN',
-        name: 'AD XRUN',
-        amount: fmtBalance(adXrunAmount || 0),
-        icon: require('../../assets/ad-round-logo.png'),
-        currency: 19,
-        isCustom: false,
-        subCurrencyName: 'AD XRUN',
-        contractAddress: '',
-        subcurrency: undefined,
-        originalData: undefined,
-      };
-      allAssets.push(adXrunItem);
-
-      const rfItem: CombinedAsset = {
-        id: 1900,
-        symbol: 'XRUN',
-        name: 'REFERAL XRUN',
-        amount: fmtBalance(referralAmount || 0),
-        icon: '__RF__' as any,
-        currency: 1900,
-        isCustom: false,
-        subCurrencyName: 'REFERAL XRUN',
-        contractAddress: '',
-        subcurrency: undefined,
-        originalData: undefined,
-      };
-      allAssets.push(rfItem);
-
-      const uniqueAssets = allAssets.reduce((acc: CombinedAsset[], current: CombinedAsset) => {
-        const existingIndex = acc.findIndex((item) => {
-
-          if (!current.isCustom && !item.isCustom) {
-            return item.currency === current.currency;
-          }
-
-          if (current.isCustom && item.isCustom) {
-            return (
-              item.contractAddress?.toLowerCase() === current.contractAddress?.toLowerCase()
-            );
-          }
-
-          return (
-            item.currency === current.currency ||
-            (item.contractAddress?.toLowerCase() === current.contractAddress?.toLowerCase() &&
-              current.contractAddress &&
-              item.contractAddress)
-          );
-        });
-
-        if (existingIndex === -1) {
-          return [...acc, current];
-        } else {
-
-          if (!current.isCustom && acc[existingIndex].isCustom) {
-            acc[existingIndex] = current;
-          }
-          return acc;
-        }
-      }, []);
-
-      const sortedAssets = uniqueAssets.sort((a, b) => {
-        const priorityOrder = [18, 16, 19, 1900, 1, 2]; 
-
-        const aPriority = priorityOrder.indexOf(a.currency);
-        const bPriority = priorityOrder.indexOf(b.currency);
-
-        if (aPriority !== -1 && bPriority !== -1) {
-          return aPriority - bPriority;
-        }
-
-        if (aPriority !== -1) return -1;
-
-        if (bPriority !== -1) return 1;
-
-        return a.symbol.localeCompare(b.symbol);
-      });
-
-      return sortedAssets;
-    },
-    [],
-  );
-
   useEffect(() => {
     if (cardsData.length > 0 || customTokens.length > 0) {
       const combined = combineTokenData(cardsData, customTokens, adXrunAmount, referralAmount);
       setCombinedAssets(combined);
     }
-  }, [cardsData, customTokens, adXrunAmount, referralAmount, combineTokenData]);
+  }, [cardsData, customTokens, adXrunAmount, referralAmount]);
 
   const pushAutoNavConsumed = useRef(false);
   useEffect(() => {
@@ -875,34 +662,6 @@ export const WalletScreen = () => {
     }
   };
 
-  const convertAssetToTokenListItem = useCallback(
-    (asset: CombinedAsset): TokenListItemData => {
-      const diskBg = getWalletListDiskBackground(asset);
-      const iconSource = resolveWalletListIconSource(asset);
-      const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
-
-      return {
-        ...asset,
-        title: asset.symbol,
-        subtitle: asset.subCurrencyName || asset.name,
-
-        amount: asset.amount || '0',
-        suffix: asset.symbol,
-        iconSource,
-
-        fallbackLabel:
-          asset.currency === 1900 ? 'RF'
-          : asset.currency === 19 ? 'AD'
-          : asset.symbol.slice(0, 2).toUpperCase(),
-        fallbackColors: {
-          background: diskBg,
-          text: textOnDisk,
-        },
-      };
-    },
-    [],
-  );
-
   const fetchTokenListData = useCallback(
     async (params: PaginationParams): Promise<PaginationResponse<TokenListItemData>> => {
       let tokenListData = combinedAssets.map((asset, index) => ({
@@ -912,8 +671,7 @@ export const WalletScreen = () => {
 
       const fifthAsset = combinedAssets[4];
       if (fifthAsset && tokenListData[3]) {
-        const diskBg = getWalletListDiskBackground(fifthAsset);
-        const textOnDisk = WALLET_LIST_DARK_DISKS.has(diskBg) ? '#FFFFFF' : '#343434';
+        const { background: diskBg, text: textOnDisk } = resolveDiskColors(fifthAsset);
         tokenListData = tokenListData.map((row, i) =>
 
           i === 3 && row.currency !== 1900
@@ -961,7 +719,7 @@ export const WalletScreen = () => {
     const {
       title,
       subtitle,
-      amount,
+      amountDisplay,
       suffix,
       iconSource,
       fallbackLabel,
@@ -1052,7 +810,7 @@ export const WalletScreen = () => {
             numberOfLines={2}
             ellipsizeMode="tail"
           >
-            {amount} {suffix || ''}
+            {amountDisplay} {suffix || ''}
           </ProbeText>
         </View>
       </TouchableOpacity>

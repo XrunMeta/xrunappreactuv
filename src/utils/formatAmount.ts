@@ -18,6 +18,13 @@ function toBigNumber(value: number | string | BigNumber): BigNumber {
   return new BigNumber(raw);
 }
 
+export function parseAmount(value: number | string | BigNumber | null | undefined): BigNumber | null {
+  if (value == null) return null;
+  if (typeof value === 'string' && value.trim() === '') return null;
+  const v = toBigNumber(value);
+  return v.isNaN() ? null : v;
+}
+
 export function fmtAmount(value: number | string | BigNumber | null | undefined, maxDecimals = 4): string {
   if (value == null || value === '') return '0';
   const v = toBigNumber(value);
