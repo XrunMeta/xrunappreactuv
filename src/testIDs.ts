@@ -295,6 +295,9 @@ export const v_5401ae = {
   walletHeaderCard: {
     addressLabel: 'wallet-header-card-address-label',
     titleLabel: 'wallet-header-card-title-label',
+
+    mainValueLabel: 'wallet-header-main-value',
+    subValueLabel: 'wallet-header-sub-value',
   },
   walletKeyPinPrompt: {
     titleLabel: 'wallet-key-pin-prompt-title-label',

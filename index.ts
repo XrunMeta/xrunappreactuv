@@ -24,6 +24,15 @@ function v_fafd0c() {
 
   v_c4deb2(() => {
     const v_b66f2c = Date.now();
+
+    const v_0483af = process.env.EXPO_PUBLIC_E2E_HARNESS;
+    if (v_0483af) {
+      console.log('[E2E] 하니스 모드:', v_0483af);
+      import('./e2e-automation/harness/HarnessApp').then((v_35f85c) => {
+        v_b96ac3(() => v_35f85c.default);
+      });
+      return;
+    }
     console.log(v_9e5220, '3. App 동적 import 시작 (번들/모듈 로드 대기)');
     import('./App').then((v_35f85c) => {
       console.log(v_9e5220, '4. App 동적 import 완료 (App.tsx 및 의존 모듈 로드됨)', `${Date.now() - v_b66f2c}ms`);
