@@ -1,5 +1,17 @@
 # T-525 2단계 — 등록된 기기에서 회원가입이 막히고 해제 요청 팝업이 뜨는가
 #
+# ✅ **기능 검증은 완료됐다** (2026-08-20 KST · iOS 시뮬 + Android 실기기 · 수동 조작).
+#    가입 시도 → check-02-email 409 blocked_device_used → 인증메일 미발송 →
+#    앱 2버튼 팝업 → "차단 해제 요청" → device_unblock_requests 적재까지 양 플랫폼에서 확인했다.
+#
+# 🟡 **자동화 스크립트만 끝까지 못 돈다.** 폼 입력·약관·제출까지는 통과하지만
+#    이메일 인증 화면의 전송 버튼에서 멈춘다. 원인은 제품 버그가 아니라
+#    **iOS 비밀번호 자동완성 팝업**이 입력을 가로채는 것이다 —
+#    시뮬레이터 설정 > 암호 > 암호 옵션 > 암호 자동 완성 을 끄면 넘어갈 수 있다.
+#    이 파일은 거기까지의 폼 입력 자동화 자산으로 남긴다.
+#
+#    ⚠️ 두 줄을 헷갈리지 말 것 — 미완인 것은 **스크립트**이지 차단 기능이 아니다.
+#
 # 【검증함】 앱 UI 로 가입을 시도했을 때
 #           - 409 blocked_device_used 를 받아 팝업이 뜨는가
 #           - unblockRequestable=true 면 "차단 해제 요청" 버튼이 나오는가
@@ -49,29 +61,49 @@ appId: ${APP_ID}
 
 - tapOn:
     text: "Password"
-- inputText: "Test1234!"
+- inputText: "Test1234"
 
 - tapOn:
     text: "비밀번호를 다시.*|パスワードをもう一度入力してください.*"
-- inputText: "Test1234!"
+- inputText: "Test1234"
 
 # 가입 버튼과 약관은 스크롤 아래에 있다
 - scroll
 - scroll
 
 # 약관 3종 동의 (전부 필수)
+# ⚠️ 라벨과 체크박스가 별개 요소다. 라벨 bounds 는 x=60 부터라 텍스트를 탭하면 체크가 안 된다
+#    (탭은 COMPLETED 로 보고되지만 checked 는 false 그대로).
+#    체크박스에 testID 가 없어 좌표로 누른다 — 레이아웃이 바뀌면 여기가 먼저 깨진다.
+#    제품 코드에 testID 를 붙이는 것이 근본 해결이다.
 - tapOn:
-    text: ".*서비스 약관.*|.*XRUNサービス規約.*"
+    point: "38,623"
 - tapOn:
-    text: ".*위치정보.*|.*個人位置情報規約.*"
+    point: "38,668"
 - tapOn:
-    text: ".*개인정보.*|.*個人情報利用規約.*"
+    point: "38,712"
 
 - tapOn:
     text: "가입하기|등록하기|登録する|Sign up"
 
-# 여기서 이메일 인증 화면으로 넘어간다. 인증코드는 러너가 D1 에서 꺼내 넣는다.
+# 여기서 이메일 인증 화면으로 넘어간다.
 - extendedWaitUntil:
     notVisible:
       text: "가입하기|등록하기|登録する|Sign up"
     timeout: 30000
+
+# 인증코드 전송 → check-02-email(purpose='signup') 호출
+# 이 기기가 device_registry 에 있으면 서버가 코드를 발송하지 않고 409 를 준다.
+- extendedWaitUntil:
+    visible:
+      text: "전송|보내기|送信|Send"
+    timeout: 20000
+
+- tapOn:
+    text: "전송|보내기|送信|Send"
+
+# 차단 팝업이 뜨는지 — 이것이 이 플로우의 핵심 assertion
+- extendedWaitUntil:
+    visible:
+      text: ".*이미 계정이 생성.*|.*既に.*アカウント.*|.*회원가입 이용 제한.*|.*会員登録.*制限.*"
+    timeout: 20000
