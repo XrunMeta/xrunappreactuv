@@ -96,9 +96,10 @@ export const v_f4f851 = () => {
   const [v_381ed1, v_361e20] = v_5ab095(false);
 
   const [v_014952, v_faee70] = v_5ab095(false);
-  const { needsPinUpgrade: v_de8f06 } = v_f799e3(v_014952, v_55f663, v_9e80fd ?? 0);
+
   const [v_9e80fd, v_23fcdd] = v_5ab095<number | null>(null);
   const [v_55f663, v_edcc4f] = v_5ab095('');
+  const { needsPinUpgrade: v_de8f06 } = v_f799e3(v_014952, v_55f663, v_9e80fd ?? 0);
   const [v_e8e4ec, v_8f9fa0] = v_5ab095(false);
 
   v_a3453e.useEffect(() => {
