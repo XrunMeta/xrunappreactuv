@@ -24,6 +24,15 @@ function Root() {
 
   useEffect(() => {
     const t0 = Date.now();
+
+    const harness = process.env.EXPO_PUBLIC_E2E_HARNESS;
+    if (harness) {
+      console.log('[E2E] 하니스 모드:', harness);
+      import('./e2e-automation/harness/HarnessApp').then((m) => {
+        setAppComponent(() => m.default);
+      });
+      return;
+    }
     console.log(BOOT_SLOW, '3. App 동적 import 시작 (번들/모듈 로드 대기)');
     import('./App').then((m) => {
       console.log(BOOT_SLOW, '4. App 동적 import 완료 (App.tsx 및 의존 모듈 로드됨)', `${Date.now() - t0}ms`);

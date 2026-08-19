@@ -79,8 +79,8 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
           {mainValue ? (
             <View style={styles.balanceContainer}>
               {mainValueLabel ? <Text style={styles.balanceLabel}>{mainValueLabel}</Text> : null}
-              <Text style={styles.balanceValue}>{mainValue}</Text>
-              {subValue ? <Text style={styles.subValue}>{subValue}</Text> : null}
+              <Text testID={TID.walletHeaderCard.mainValueLabel} style={styles.balanceValue}>{mainValue}</Text>
+              {subValue ? <Text testID={TID.walletHeaderCard.subValueLabel} style={styles.subValue}>{subValue}</Text> : null}
             </View>
           ) : null}
         </View>
