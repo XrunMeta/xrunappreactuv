@@ -12,9 +12,15 @@ function withThousandsCommas(str: string): string {
   return negative ? `-${result}` : result;
 }
 
+function toBigNumber(value: number | string | BigNumber): BigNumber {
+  if (BigNumber.isBigNumber(value)) return value;
+  const raw = typeof value === 'string' ? value.replace(/,/g, '') : String(value);
+  return new BigNumber(raw);
+}
+
 export function fmtAmount(value: number | string | BigNumber | null | undefined, maxDecimals = 4): string {
   if (value == null || value === '') return '0';
-  const v = BigNumber.isBigNumber(value) ? value : new BigNumber(String(value));
+  const v = toBigNumber(value);
   if (v.isNaN()) return '0';
   if (v.isZero()) return '0';
   const str = v.toFixed(maxDecimals).replace(/\.?0+$/, '');
@@ -23,7 +29,7 @@ export function fmtAmount(value: number | string | BigNumber | null | undefined,
 
 export function fmtBalance(value: number | string | BigNumber | null | undefined): string {
   if (value == null || value === '') return '0';
-  const v = BigNumber.isBigNumber(value) ? value : new BigNumber(String(value));
+  const v = toBigNumber(value);
   if (v.isNaN() || v.isZero()) return '0';
   const abs = v.abs();
   const decimals = abs.lt(0.01) ? 6 : abs.lt(1) ? 4 : 2;
