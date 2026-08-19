@@ -25,9 +25,9 @@ import {
   v_35200c,
   v_9d2541,
   v_91bb22,
-  v_73716f,
   v_32502f,
 } from '../services';
+import { v_73716f } from '../services/googleAuth';
 import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
 import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
