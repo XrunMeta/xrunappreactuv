@@ -36,14 +36,14 @@ import {
   v_ea3493,
   v_f5ecec,
   v_8025d1,
-  v_2683ec,
   v_4c4126,
-  v_7af6c9,
   v_1fee11,
-  v_a763e6,
   v_cec605,
   v_5ed938,
 } from '../services';
+import { v_7af6c9 } from '../services/appleAuth';
+import { v_2683ec } from '../services/googleAuth';
+import { v_a763e6 } from '../services/pangle';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_700ef9 } from '../context';
