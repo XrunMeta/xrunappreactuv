@@ -158,12 +158,31 @@ export const v_667a00 = () => {
           } catch (v_788ec0) {
 
             const v_49b0b7 = (v_788ec0 as any)?.response?.data;
-            if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409 && v_49b0b7?.reason === 'blocked_device') {
+            const v_28b289 = ['blocked_device', 'blocked_device_used', 'blocked_device_banned'];
+            if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409 && v_28b289.includes(v_49b0b7?.reason)) {
               await v_e84827.removeItem('pendingSignupData');
-              await v_889fad(
-                v_8d41d7('screens.deviceBinding.signupBlockedTitle'),
-                v_8d41d7('screens.deviceBinding.signupBlockedBody'),
-              );
+              if (v_49b0b7?.data?.unblockRequestable) {
+                const v_7be387 = await v_889fad(
+                  v_8d41d7('screens.deviceBinding.signupBlockedTitle'),
+                  v_8d41d7('screens.deviceBinding.signupBlockedBody'),
+                  [
+                    { text: v_8d41d7('common.buttons.confirm') || '확인', style: 'cancel' },
+                    { text: v_8d41d7('screens.deviceBinding.unblockRequestCta') },
+                  ],
+                );
+                if (v_7be387 === 1) {
+                  try { await v_e84827.setItem('deviceUnblockRequestEmail', v_df7dab.email); } catch {  }
+                  v_036f76();
+                  v_ff0c7a(false);
+                  v_9b57fc('deviceUnblockRequest');
+                  return;
+                }
+              } else {
+                await v_889fad(
+                  v_8d41d7('screens.deviceBinding.signupBlockedTitle'),
+                  v_8d41d7('screens.deviceBinding.signupBlockedBody'),
+                );
+              }
               v_036f76();
               v_ff0c7a(false);
               return;
