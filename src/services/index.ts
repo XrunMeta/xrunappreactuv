@@ -782,9 +782,9 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
       } catch {  }
 
       try {
-        const { getDeviceId } = require('../utils/deviceIdentity');
-        const devId = await getDeviceId();
-        if (devId) config.headers['X-Device-Id'] = devId;
+        const { collectDeviceSignals } = require('../utils/deviceSignals');
+        const signals = await collectDeviceSignals();
+        if (signals.device_id) config.headers['X-Device-Id'] = signals.device_id;
       } catch {  }
 
       try {
@@ -1248,11 +1248,18 @@ export const signup = async (
       region: signupData.region,
     });
 
-    const { getDeviceId } = require('../utils/deviceIdentity');
-    const device_id = await getDeviceId();
+    const { collectDeviceSignals } = require('../utils/deviceSignals');
+    const signals = await collectDeviceSignals();
     const response = await axiosInstance.post<SignupResponse>(
       '/login-06-joinAndAccount',
-      { ...signupData, device_id },
+      {
+        ...signupData,
+        device_id: signals.device_id,
+        device_key: signals.device_key,
+        install_uuid: signals.install_uuid,
+        platform: signals.platform,
+        app_build: signals.app_build,
+      },
     );
 
     console.log('[회원가입 3단계] 회원가입 응답:', {
@@ -1345,13 +1352,18 @@ export const loginWithEmailPassword = async (
 ): Promise<LoginResponse> => {
   try {
     const axiosInstance = createAxiosInstance(navigation);
-    const { getDeviceId } = require('../utils/deviceIdentity');
-    const device_id = await getDeviceId();
+
+    const { collectDeviceSignals } = require('../utils/deviceSignals');
+    const signals = await collectDeviceSignals();
     const request: any = {
       type: 4,
       email,
       pin,
-      device_id,
+      device_id: signals.device_id,
+      device_key: signals.device_key,
+      install_uuid: signals.install_uuid,
+      platform: signals.platform,
+      app_build: signals.app_build,
     };
 
     console.log('[로그인] 이메일/비밀번호 로그인 요청:', email);
@@ -1707,8 +1719,11 @@ export const loginWithMobile = async (
   }
 };
 
+export type EmailVerificationPurpose = 'signup' | 'restore' | 'email_change' | 'login' | 'send_confirm';
+
 export const sendEmailVerificationCode = async (
   email: string,
+  purpose: EmailVerificationPurpose,
   navigation?: any,
 ): Promise<boolean> => {
   try {
@@ -1724,9 +1739,20 @@ export const sendEmailVerificationCode = async (
     const request: any = {
       email,
       language: currentLang,
+      purpose,
     };
 
-    console.log('[로그인] 이메일 인증 코드 발송 요청:', email, 'lang=', currentLang);
+    if (purpose === 'signup') {
+      try {
+        const { collectDeviceSignals } = require('../utils/deviceSignals');
+        const signals = await collectDeviceSignals();
+        request.device_key = signals.device_key;
+        request.platform = signals.platform;
+        request.app_build = signals.app_build;
+      } catch {  }
+    }
+
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', email, 'lang=', currentLang, 'purpose=', purpose);
 
     const response = await axiosInstance.post<EmailVerificationResponse>(
       '/check-02-email',
@@ -1807,11 +1833,16 @@ export const loginWithEmailAuth = async (
     const axiosInstance = createAxiosInstance(navigation, {
       baseURL: getEmailAuthApiBaseUrl(),
     });
-    const { getDeviceId } = require('../utils/deviceIdentity');
-    const device_id = await getDeviceId();
+
+    const { collectDeviceSignals } = require('../utils/deviceSignals');
+    const signals = await collectDeviceSignals();
     const request: any = {
       email,
-      device_id,
+      device_id: signals.device_id,
+      device_key: signals.device_key,
+      install_uuid: signals.install_uuid,
+      platform: signals.platform,
+      app_build: signals.app_build,
     };
 
     console.log('[로그인] 이메일 인증 로그인 요청:', email);
@@ -1867,11 +1898,15 @@ export const loginWithGoogleIdToken = async (
 
     console.log('[로그인] Google ID Token 로그인 요청');
 
-    const { getDeviceId } = require('../utils/deviceIdentity');
-    const device_id = await getDeviceId();
+    const { collectDeviceSignals } = require('../utils/deviceSignals');
+    const signals = await collectDeviceSignals();
     const response = await axiosInstance.post<LoginResponse>('/login-google', {
       idToken,
-      device_id,
+      device_id: signals.device_id,
+      device_key: signals.device_key,
+      install_uuid: signals.install_uuid,
+      platform: signals.platform,
+      app_build: signals.app_build,
     });
 
     if (response.data.status === 'success') {
@@ -7355,6 +7390,24 @@ export const resetPasswordWithCode = async (
     const data = error?.response?.data;
     return { status: 'error', code: error?.response?.status, message: data?.message || error?.message || 'failed' };
   }
+};
+
+export const requestDeviceUnblock = async (
+  email: string,
+  reasonText?: string,
+  navigation?: any,
+): Promise<{ requestId: number }> => {
+  const axiosInstance = createAxiosInstance(navigation);
+  const { collectDeviceSignals } = require('../utils/deviceSignals');
+  const signals = await collectDeviceSignals();
+  const res = await axiosInstance.post('/device-unblock-request', {
+    platform: signals.platform,
+    device_key: signals.device_key,
+    install_uuid: signals.install_uuid,
+    email,
+    reason_text: reasonText || undefined,
+  });
+  return res.data;
 };
 
 export const getNotificationSettings = async (

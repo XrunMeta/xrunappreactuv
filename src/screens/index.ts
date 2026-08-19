@@ -77,4 +77,5 @@ export { AdisonOfferwallScreen } from './AdisonOfferwallScreen';
 export { AdisonTestScreen } from './AdisonTestScreen';
 export { MyInfoPaymentPinScreen } from './MyInfoPaymentPinScreen';
 export { WalletKeyTutorialScreen } from './WalletKeyTutorialScreen';
+export { DeviceUnblockRequestScreen } from './DeviceUnblockRequestScreen';
 

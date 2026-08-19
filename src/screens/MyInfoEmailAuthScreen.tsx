@@ -54,7 +54,8 @@ export const MyInfoEmailAuthScreen = () => {
     try {
       setSending(true);
       console.log('[정보수정] 이메일 인증 코드 발송 요청:', email.trim());
-      const success = await sendEmailVerificationCode(email.trim(), navigate);
+
+      const success = await sendEmailVerificationCode(email.trim(), 'email_change', navigate);
       if (success) {
         setVerificationEmail(email.trim());
         setVerificationSuccessRoute(ROUTES.myInfoEdit);

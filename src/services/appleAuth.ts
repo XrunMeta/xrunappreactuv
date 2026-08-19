@@ -176,8 +176,8 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
         name: name,
       });
 
-      const { getDeviceId } = require('../utils/deviceIdentity');
-      const device_id = await getDeviceId();
+      const { collectDeviceSignals } = require('../utils/deviceSignals');
+      const signals = await collectDeviceSignals();
 
       const response = await axiosInstance.post(
         endpoint,
@@ -185,7 +185,11 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
           identityToken: identityToken, 
           email: email, 
           name: name, 
-          device_id,
+          device_id: signals.device_id,
+          device_key: signals.device_key,
+          install_uuid: signals.install_uuid,
+          platform: signals.platform,
+          app_build: signals.app_build,
         },
         {
           headers: {
