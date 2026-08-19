@@ -28,7 +28,12 @@ function Root() {
     const harness = process.env.EXPO_PUBLIC_E2E_HARNESS;
     if (harness) {
       console.log('[E2E] 하니스 모드:', harness);
-      import('./e2e-automation/harness/HarnessApp').then((m) => {
+
+      const loader =
+        harness === 'changed-imports'
+          ? import('./e2e-automation/harness/ChangedImportsHarness')
+          : import('./e2e-automation/harness/HarnessApp');
+      loader.then((m) => {
         setAppComponent(() => m.default);
       });
       return;
