@@ -1,6 +1,7 @@
 import v_a3453e from 'bapkr';
 import { v_4623af, v_19b633, v_472849, v_629153, v_7e4944 } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface SecondaryButtonProps extends v_629153 {
   title: string;
@@ -26,7 +27,7 @@ export const SecondaryButton: v_a3453e.FC<SecondaryButtonProps> = ({
       activeOpacity={0.8}
       {...v_b1927c}
     >
-      <Text style={v_d81136.text}>{v_9f1622}</Text>
+      <Text testID={v_5401ae.secondaryButton.titleLabel} style={v_d81136.text}>{v_9f1622}</Text>
     </TouchableOpacity>
   );
 };

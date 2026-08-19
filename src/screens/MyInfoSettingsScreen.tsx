@@ -6,6 +6,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_073f91 } from '../components';
 import { v_1bfbd0, v_704d15, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
+import * as v_087631 from 'iokyqncutdfy';
 import {
   v_650134,
   v_de7bac,
@@ -18,6 +19,7 @@ import {
   v_13c90a,
 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_5401ae } from '../testIDs';
 
 export const v_4a40b2 = () => {
   const { goBack: v_c7ac57, navigate: v_9b57fc } = v_a0daa8();
@@ -193,7 +195,7 @@ export const v_4a40b2 = () => {
             {v_b3e3c3 ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={v_5401ae.myInfoSettings.togglePushToggle}
                 value={v_1486be}
                 onValueChange={v_465139}
                 disabled={!v_717992}
@@ -211,7 +213,7 @@ export const v_4a40b2 = () => {
             {v_7aa88d ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={v_5401ae.myInfoSettings.toggleNoticeToggle}
                 value={v_be324f}
                 onValueChange={v_880ae3}
                 disabled={!v_717992 || !v_1486be}
@@ -228,7 +230,7 @@ export const v_4a40b2 = () => {
             {v_5fed92 ? (
               <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
             ) : (
-              <Switch
+              <Switch testID={v_5401ae.myInfoSettings.toggleEventToggle}
                 value={v_839078}
                 onValueChange={v_004928}
                 disabled={!v_717992 || !v_1486be}
@@ -238,7 +240,7 @@ export const v_4a40b2 = () => {
             )}
           </View>
 
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.myInfoSettings.languageSelectorVisible}
             style={v_d81136.card}
             activeOpacity={0.85}
             onPress={() => v_7f8510(true)}
@@ -246,7 +248,7 @@ export const v_4a40b2 = () => {
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
           </TouchableOpacity>
           {}
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.myInfoSettings.navigate}
             style={v_d81136.card}
             activeOpacity={0.85}
             onPress={() => v_9b57fc(v_ce4741.myInfoCloseMembership)}
@@ -265,6 +267,21 @@ export const v_4a40b2 = () => {
                 {v_326be8.OS === 'android'
                   ? `Android : ${v_ea6ee8.androidCurrent}/${v_ea6ee8.androidLatest}`
                   : `iOS : ${v_ea6ee8.iosCurrent}/${v_ea6ee8.iosLatest}`}
+              </Text>
+              {
+}
+              <Text style={v_d81136.versionText}>
+                {(() => {
+                  const v_389afb = v_087631.updateId;
+                  if (!v_389afb) return 'OTA : embedded';
+                  const v_53aa09 = String(v_389afb).replace(/-/g, '').slice(0, 8);
+                  const v_3a5fef = v_087631.createdAt;
+                  if (!v_3a5fef) return `OTA : ${v_53aa09}`;
+                  const v_a8a114 = new Date(v_3a5fef.getTime() + 9 * 60 * 60 * 1000);
+                  const v_e2a85c = (v_f4e98d) => String(v_f4e98d).padStart(2, '0');
+                  const v_8dffde = `${v_a8a114.getUTCFullYear()}-${v_e2a85c(v_a8a114.getUTCMonth() + 1)}-${v_e2a85c(v_a8a114.getUTCDate())} ${v_e2a85c(v_a8a114.getUTCHours())}:${v_e2a85c(v_a8a114.getUTCMinutes())}`;
+                  return `OTA : ${v_53aa09} (${v_8dffde})`;
+                })()}
               </Text>
             </TouchableOpacity>
           )}

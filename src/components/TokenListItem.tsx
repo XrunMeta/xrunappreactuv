@@ -9,6 +9,7 @@ import {
   v_629153,
 } from 'rcmrninabrnb';
 import { v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface TokenListItemProps extends v_629153 {
   title: string;
@@ -54,11 +55,11 @@ export const TokenListItem: v_a3453e.FC<TokenListItemProps> = ({
         {v_3fd4b5 ? <View style={v_d81136.badge}><Text style={v_d81136.badgeText}>{v_3fd4b5}</Text></View> : null}
       </View>
       <View style={v_d81136.middle}>
-        <Text style={v_d81136.title}>{v_9f1622}</Text>
+        <Text testID={v_5401ae.tokenListItem.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
         <Text style={v_d81136.subtitle}>{v_dda473}</Text>
       </View>
       <View style={v_d81136.right}>
-        <Text style={v_d81136.amount}>{v_f63e09}</Text>
+        <Text testID={v_5401ae.tokenListItem.amountLabel} style={v_d81136.amount}>{v_f63e09}</Text>
         {v_ae8e76 ? <Text style={v_d81136.suffix}>{v_ae8e76}</Text> : null}
       </View>
     </TouchableOpacity>

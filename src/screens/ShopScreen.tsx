@@ -15,6 +15,7 @@ import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
 import { v_877de8, v_885e03, v_54d016, v_81c40d, v_4d25ff, v_dd87bc } from '../services';
 import type { v_20035e } from '../types';
+import { v_5401ae } from '../testIDs';
 
 const v_10664a = require('../../assets/xplay_symbol.png');
 const v_33c40c = require('../../assets/xrun-round-logo.png');
@@ -568,7 +569,7 @@ export const v_10886b = () => {
         const v_01a739 = !!v_fafc7f;
 
         return (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.shop.productClick}
                 key={v_01bee9.id}
                 style={[v_d81136.productCard, { width: v_3af450 }]}
                 onPress={() => v_8d97ed(v_01bee9)}
@@ -593,13 +594,13 @@ export const v_10886b = () => {
                     ) : null}
                     {v_2141e0 && v_01bee9.description && (
                         <View style={v_d81136.imageDescriptionOverlay}>
-                            <Text style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
+                            <Text testID={v_5401ae.shop.descriptionLabel} style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
                         </View>
                     )}
                 </View>
                 <View style={v_d81136.productInfo}>
                     <Text style={v_d81136.productBrand}>{v_01bee9.brand || (v_01bee9.isIak ? v_8d41d7('screens.shop.iakBrand') : v_8d41d7('screens.shop.giftBrand'))}</Text>
-                    <Text style={v_d81136.productTitle} numberOfLines={2}>
+                    <Text testID={v_5401ae.shop.titleLabel} style={v_d81136.productTitle} numberOfLines={2}>
                         {v_01bee9.title}
                     </Text>
                     {}
@@ -685,7 +686,7 @@ export const v_10886b = () => {
                 {v_61d92f && (
                     <View style={v_d81136.searchBar}>
                         <Feather name="search" size={18} color="#0296f2" />
-                        <TextInput
+                        <TextInput testID={v_5401ae.shop.searchQueryInput}
                             placeholder="Search"
                             placeholderTextColor="#bcbec4"
                             style={v_d81136.searchInput}

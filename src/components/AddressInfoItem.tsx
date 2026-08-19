@@ -2,6 +2,7 @@ import v_a3453e from 'bapkr';
 import { v_3094a2, v_19b633, v_472849, v_4623af } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface AddressInfoItemProps {
     symbol: string;
@@ -37,15 +38,15 @@ export const AddressInfoItem: v_a3453e.FC<AddressInfoItemProps> = ({
         >
             <View style={v_d81136.infoContainer}>
                 <View style={v_d81136.nameContainer}>
-                    <Text style={v_d81136.name} numberOfLines={1}>{v_1833e7}</Text>
+                    <Text testID={v_5401ae.addressInfoItem.nameLabel} style={v_d81136.name} numberOfLines={1}>{v_1833e7}</Text>
                     {v_74efc1 && (
                         <View style={v_d81136.networkBadge}>
-                            <Text style={[v_d81136.networkText, { color: v_aeaf3c }]}>{v_74efc1}</Text>
+                            <Text testID={v_5401ae.addressInfoItem.networkLabel} style={[v_d81136.networkText, { color: v_aeaf3c }]}>{v_74efc1}</Text>
                             {v_ae69a0 && <Text style={v_d81136.symbolText}> • {v_ae69a0}</Text>}
                         </View>
                     )}
                 </View>
-                <Text style={v_d81136.address} numberOfLines={1} ellipsizeMode="middle">
+                <Text testID={v_5401ae.addressInfoItem.addressLabel} style={v_d81136.address} numberOfLines={1} ellipsizeMode="middle">
                     {v_685cbf(v_157c04)}
                 </Text>
             </View>

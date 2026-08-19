@@ -3,6 +3,7 @@ import { v_3094a2, v_19b633, v_472849, v_7e4944, v_961e77 } from 'rcmrninabrnb';
 import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface ReferralStatsCardProps {
   title: string;
@@ -51,7 +52,7 @@ export const ReferralStatsCard: v_a3453e.FC<ReferralStatsCardProps> = ({
                     <Ionicons name={v_9ddfab} size={20} color={v_ef160b} />
                   </View>
                 )}
-                <Text style={v_d81136.title}>{v_9f1622}</Text>
+                <Text testID={v_5401ae.referralStatsCard.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
               </View>
               {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
             </View>

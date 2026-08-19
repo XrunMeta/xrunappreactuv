@@ -7,6 +7,7 @@ import { v_570c34, v_368e80, v_cb41de, v_729608 } from '../components';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_08c9ee, v_5e332c } from '../services';
 import { v_1bfbd0, v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 type Stage = 'email' | 'code' | 'password';
 const v_683bb6 = 6;
@@ -125,14 +126,14 @@ export const v_040c8f = () => {
         {v_2ae4e7 === 'code' && (
           <>
             <View style={v_d81136.descriptionWrapper}>
-              <Text style={v_d81136.description}>{v_e0c7e8}{v_bee4c1('code.description')}</Text>
+              <Text testID={v_5401ae.forgotPassword.emailLabel} style={v_d81136.description}>{v_e0c7e8}{v_bee4c1('code.description')}</Text>
             </View>
 
             <View style={v_d81136.codeRow}>
               {Array.from({ length: v_683bb6 }).map((v_37eab7, v_a56041) => {
                 const v_5f701e = v_c99bd2[v_a56041] ?? '';
                 return (
-                  <TouchableOpacity
+                  <TouchableOpacity testID={v_5401ae.forgotPassword.hiddenInputRef}
                     key={v_a56041}
                     style={v_d81136.codeBox}
                     onPress={() => v_56c646.current?.focus()}
@@ -144,7 +145,7 @@ export const v_040c8f = () => {
               })}
             </View>
 
-            <TextInput
+            <TextInput testID={v_5401ae.forgotPassword.codeInput}
               ref={v_56c646}
               value={v_c99bd2}
               onChangeText={(v_81e2ef) => v_537cbb(v_81e2ef.replace(/\D/g, '').slice(0, v_683bb6))}

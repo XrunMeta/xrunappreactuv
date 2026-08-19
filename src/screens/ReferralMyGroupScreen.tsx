@@ -14,6 +14,7 @@ import { v_5b0045, v_ae32ae } from '../types/pagination';
 import { v_fb1936, v_08316d } from '../services';
 import { v_492864 } from '../services/referralSettlementCache';
 import { v_b0f886 } from '../types';
+import { v_5401ae } from '../testIDs';
 
 interface MemberData {
   rank: number;
@@ -240,7 +241,7 @@ export const v_58584a = () => {
       <Header
         title={v_8d41d7('screens.referralMyGroup.title')}
         rightComponent={
-          <TouchableOpacity style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
+          <TouchableOpacity testID={v_5401ae.referralMyGroup.share} style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
             <Text style={v_d81136.headerShareText}>{v_8d41d7('screens.referralMyGroup.referralLabel')}</Text>
           </TouchableOpacity>

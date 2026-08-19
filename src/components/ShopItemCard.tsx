@@ -11,6 +11,7 @@ import {
   v_39a996,
 } from 'rcmrninabrnb';
 import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 export interface ShopItemCardProps {
   title: string;
@@ -120,7 +121,7 @@ export const ShopItemCard: v_a3453e.FC<ShopItemCardProps> = ({
       </View>
 
       <View style={v_d81136.infoWrapper}>
-        <Text style={v_d81136.title}>{v_9f1622}</Text>
+        <Text testID={v_5401ae.shopItemCard.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
         {v_dda473 ? <Text style={v_d81136.subtitle}>{v_dda473}</Text> : null}
         {v_5b0162 ? <Text style={v_d81136.price}>{v_5b0162}</Text> : null}
         {v_63f02c ? (

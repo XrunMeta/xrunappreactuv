@@ -8,6 +8,7 @@ import { v_82ad38, v_981fdd } from '../services/tapjoy';
 import { v_fda57c } from '../services/appsflyer';
 import { v_cba33f } from '../utils';
 import { v_566465 } from '../services/nasmediaAd';
+import { v_5401ae } from '../testIDs';
 
 export const v_f2ecfa = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
@@ -70,7 +71,7 @@ export const v_f2ecfa = () => {
           <Text style={v_d81136.description}>
             아래 버튼을 누르면 Tapjoy 오퍼월(보상형 광고)이 표시됩니다.
           </Text>
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.tapjoyList.showAd}
             style={[v_d81136.button, v_683210 && v_d81136.buttonDisabled]}
             activeOpacity={0.8}
             onPress={() => v_7a33ab()}

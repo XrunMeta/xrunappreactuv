@@ -14,6 +14,7 @@ import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 import { v_92d279 } from '../utils/devDebugStore';
 import type { v_121170, v_2b38ef, v_59b1e9 } from '../utils/devDebugStore';
+import { v_5401ae } from '../testIDs';
 
 const v_904bda = 'API';
 const v_973d8b = '부팅';
@@ -127,7 +128,7 @@ export function v_6b4f38() {
             {v_11083e === v_973d8b && v_54f58e()}
             {v_11083e === v_ec2b4b && v_671d07()}
             <View style={[v_d81136.footer, { paddingBottom: v_747d00 }]}>
-              <TouchableOpacity style={v_d81136.copyBtn} onPress={v_ebfdcc}>
+              <TouchableOpacity testID={v_5401ae.devDebugPanel.copyCurrentTab} style={v_d81136.copyBtn} onPress={v_ebfdcc}>
                 <Text style={v_d81136.copyText}>로그 복사하기</Text>
               </TouchableOpacity>
               <TouchableOpacity style={v_d81136.clearBtn} onPress={() => v_92d279.clear()}>

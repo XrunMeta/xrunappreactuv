@@ -3,6 +3,7 @@ import { v_5f4661, v_326be8, v_405151, v_03e392 } from 'rcmrninabrnb';
 import * as v_fba5a0 from 'hfxxehldoiokdq';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import * as v_a928e1 from 'yvptvjtrs';
+import v_9c213b from 'zqqvxke';
 import { v_843337 } from './playStoreUrl';
 import { v_566465 } from '../services/nasmediaAd';
 
@@ -153,21 +154,23 @@ export const v_a3bbf0 = async (
     const v_25f202 = `https://www.xrun.run/invite?${v_400193}`;
 
     let v_b657c9 = v_8d41d7('screens.referral.share.shareText');
+
     try {
-      const v_9c213b = require('zqqvxke').default || require('zqqvxke');
-      const v_c87b30 = String(v_9c213b?.language || '').toLowerCase();
-      const v_825625 = v_c87b30 === 'ko' || v_c87b30.startsWith('ko-') ? 'ko'
-        : v_c87b30 === 'en' || v_c87b30.startsWith('en-') ? 'en' : null;
-      if (v_825625) {
-        const { createAxiosInstance: v_7488d5 } = await import('../services');
-        const v_c02583 = v_7488d5(v_c65f5d);
-        const v_8f00b9 = await v_c02583.get(`/referral-share-text?lang=${v_825625}`, { timeout: 3000 });
-        const v_133cb4 = v_8f00b9?.data?.data?.text;
-        if (v_133cb4 && typeof v_133cb4 === 'string' && v_133cb4.trim()) {
-          v_b657c9 = v_133cb4;
-        }
+      const v_c87b30 = String(v_9c213b?.language || 'ko').toLowerCase();
+      const v_825625 = v_c87b30.startsWith('en') ? 'en' : 'ko'; 
+      console.log('[shareReferralLink] server fetch lang=', v_825625);
+      const { createAxiosInstance: v_7488d5 } = await import('../services');
+      const v_c02583 = v_7488d5(v_c65f5d);
+
+      const v_8f00b9 = await v_c02583.get(`/referral-share-text?lang=${v_825625}&marker=1`, { timeout: 5000 });
+      const v_133cb4 = v_8f00b9?.data?.data?.text;
+      console.log('[shareReferralLink] serverText length:', v_133cb4?.length);
+      if (v_133cb4 && typeof v_133cb4 === 'string' && v_133cb4.trim()) {
+        v_b657c9 = v_133cb4;
       }
-    } catch (v_9e86fd) {  }
+    } catch (v_9e86fd) {
+      console.warn('[shareReferralLink] server fetch failed:', v_9e86fd?.message);
+    }
     const v_542b81 = v_8d41d7('screens.referral.share.download');
     const v_8d1ab0 = v_8d41d7('screens.referral.share.linkLabel') || 'Link';
 
@@ -185,7 +188,6 @@ export const v_a3bbf0 = async (
 
     v_4f186c = {
       message: v_a8cd21,
-      title: v_b657c9,
     };
 
     console.log('[shareReferralLink] Share API 호출 시작:', v_4f186c);

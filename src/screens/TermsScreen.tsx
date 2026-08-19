@@ -9,6 +9,7 @@ import { v_700ef9 } from '../context';
 import { v_a61db3, v_843035, v_1bfbd0 } from '../constants';
 import { v_519669 } from '../services';
 import { v_5b1062 } from '../types';
+import { v_5401ae } from '../testIDs';
 
 export const v_d3f135 = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -74,7 +75,7 @@ export const v_d3f135 = () => {
         ) : v_926463 ? (
           <View style={v_d81136.card}>
             {v_926463.title && (
-              <Text style={v_d81136.titleText}>{v_926463.title}</Text>
+              <Text testID={v_5401ae.terms.titleLabel} style={v_d81136.titleText}>{v_926463.title}</Text>
             )}
             <Text style={v_d81136.contentText}>{v_926463.content}</Text>
           </View>

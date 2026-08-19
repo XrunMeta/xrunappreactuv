@@ -15,6 +15,7 @@ import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_53d723 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_5401ae } from '../testIDs';
 
 export const v_e14579 = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -126,7 +127,7 @@ export const v_e14579 = () => {
             placeholder={v_8d41d7('screens.phoneEdit.phonePlaceholder')}
             editable={!v_e495db}
             leftAccessory={
-              <TouchableOpacity
+              <TouchableOpacity testID={v_5401ae.phoneEdit.countryCodeSelect}
                 style={v_d81136.phonePrefix}
                 onPress={v_129fff}
                 activeOpacity={0.7}

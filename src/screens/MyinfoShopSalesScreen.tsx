@@ -10,6 +10,7 @@ import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_5b0045, v_ae32ae } from '../types/pagination';
 import { v_9509e3, v_09a96d } from '../services';
 import { v_7710e3 } from '../types';
+import { v_5401ae } from '../testIDs';
 
 type PeriodOption = '1week' | '1month' | '3months' | '6months' | 'custom';
 type DatePickerTarget = 'start' | 'end' | null;
@@ -318,13 +319,13 @@ export const v_1cca63 = () => {
       <View style={v_d81136.calendarContainer}>
         {}
         <View style={v_d81136.calendarHeader}>
-          <TouchableOpacity onPress={() => v_182051(-1)} style={v_d81136.calendarNavButton}>
+          <TouchableOpacity testID={v_5401ae.myinfoShopSales.changeCalendarMonth} onPress={() => v_182051(-1)} style={v_d81136.calendarNavButton}>
             <Ionicons name="chevron-back" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={v_d81136.calendarHeaderText}>
             {v_8d41d7('screens.myinfoShopSales.yearMonth', { year: v_0eaaff, month: v_033a94 + 1 })}
           </Text>
-          <TouchableOpacity onPress={() => v_182051(1)} style={v_d81136.calendarNavButton}>
+          <TouchableOpacity testID={v_5401ae.myinfoShopSales.changeCalendarMonth2} onPress={() => v_182051(1)} style={v_d81136.calendarNavButton}>
             <Ionicons name="chevron-forward" size={24} color="#333" />
           </TouchableOpacity>
         </View>
@@ -502,7 +503,7 @@ export const v_1cca63 = () => {
           <View style={v_d81136.infoCard}>
             {}
             <View style={{ alignItems: 'center', marginBottom: 14 }}>
-              <Text
+              <Text testID={v_5401ae.myinfoShopSales.titleLabel}
                 style={[v_d81136.infoTitle, { textAlign: 'center', marginBottom: 6 }]}
                 numberOfLines={2}
                 ellipsizeMode="tail"
@@ -528,7 +529,7 @@ export const v_1cca63 = () => {
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 12, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#e5e7eb' }}>
               <View style={{ alignItems: 'center', flex: 1 }}>
                 <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{v_8d41d7('screens.myinfoShopSales.productPrice')}</Text>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#111827' }}>{Number(v_d20ab2.priceXrun ?? 0).toLocaleString('ko-KR')}</Text>
+                <Text testID={v_5401ae.myinfoShopSales.priceXrunLabel} style={{ fontSize: 14, fontWeight: '700', color: '#111827' }}>{Number(v_d20ab2.priceXrun ?? 0).toLocaleString('ko-KR')}</Text>
                 <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>XRUN</Text>
               </View>
               <View style={{ width: 1, backgroundColor: '#e5e7eb' }} />
@@ -540,13 +541,13 @@ export const v_1cca63 = () => {
               <View style={{ width: 1, backgroundColor: '#e5e7eb' }} />
               <View style={{ alignItems: 'center', flex: 1 }}>
                 <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{v_8d41d7('screens.myinfoShopSales.totalSales')}</Text>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#16a34a' }}>{(Number(v_d20ab2.priceXrun ?? 0) * Number(v_d20ab2.participantCount ?? 0)).toLocaleString('ko-KR')}</Text>
+                <Text testID={v_5401ae.myinfoShopSales.priceXrunLabel2} style={{ fontSize: 14, fontWeight: '700', color: '#16a34a' }}>{(Number(v_d20ab2.priceXrun ?? 0) * Number(v_d20ab2.participantCount ?? 0)).toLocaleString('ko-KR')}</Text>
                 <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>XRUN</Text>
               </View>
             </View>
 
             {}
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.myinfoShopSales.modifyItem}
               onPress={v_264d8b}
               activeOpacity={0.7}
               style={{ marginTop: 12, alignSelf: 'flex-end', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8, backgroundColor: '#f3f4f6', borderWidth: 1, borderColor: '#e5e7eb' }}
@@ -560,7 +561,7 @@ export const v_1cca63 = () => {
         {!v_cd31a8 && v_c5bd46 && (!v_d20ab2.title || !v_d20ab2.title.trim()) ? (
           <View style={v_d81136.emptyItemContainer}>
             <Text style={v_d81136.emptyItemDescription}>{v_8d41d7('screens.myinfoShopSales.noItemData')}</Text>
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.myinfoShopSales.navigate}
               style={v_d81136.addItemButton}
               onPress={() => v_9b57fc(v_ce4741.shopItemRegister)}
               activeOpacity={0.7}
@@ -617,7 +618,7 @@ export const v_1cca63 = () => {
               {}
               <View style={v_d81136.periodOptionsContainer}>
                 {v_4db865.map((v_0bd920) => (
-                  <TouchableOpacity
+                  <TouchableOpacity testID={v_5401ae.myinfoShopSales.periodSelect}
                     key={v_0bd920.key}
                     style={[
                       v_d81136.periodOptionButton,
@@ -638,7 +639,7 @@ export const v_1cca63 = () => {
 
               {}
               <View style={v_d81136.dateRangeContainer}>
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myinfoShopSales.dateInput}
                   style={v_d81136.dateInputContainer}
                   onPress={() => v_d8aa02('start')}
                   activeOpacity={0.7}
@@ -652,7 +653,7 @@ export const v_1cca63 = () => {
                   </View>
                 </TouchableOpacity>
                 <Text style={v_d81136.dateSeparator}>~</Text>
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myinfoShopSales.dateInput2}
                   style={v_d81136.dateInputContainer}
                   onPress={() => v_d8aa02('end')}
                   activeOpacity={0.7}
@@ -679,7 +680,7 @@ export const v_1cca63 = () => {
                 >
                   <Text style={v_d81136.cancelButtonText}>{v_8d41d7('screens.myinfoShopSales.cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                <TouchableOpacity testID={v_5401ae.myinfoShopSales.applySearch}
                   style={v_d81136.applyButton}
                   onPress={v_16cc52}
                   activeOpacity={0.7}

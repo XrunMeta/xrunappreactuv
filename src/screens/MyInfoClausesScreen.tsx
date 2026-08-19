@@ -7,6 +7,7 @@ import { v_1bfbd0, v_a61db3, v_704d15, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_9dd03c } from '../types';
+import { v_5401ae } from '../testIDs';
 
 export const v_41dfd5 = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -33,7 +34,7 @@ export const v_41dfd5 = () => {
       >
         <View style={v_d81136.inner}>
           {v_ec67b4.map((v_1b50c3) => (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.myInfoClauses.select}
               key={v_1b50c3.id}
               style={v_d81136.card}
               onPress={() => v_6121dc(v_1b50c3.id)}

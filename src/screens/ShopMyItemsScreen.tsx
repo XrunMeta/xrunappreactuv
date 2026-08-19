@@ -17,6 +17,7 @@ import { v_060fa0, v_97ad19, v_23c64e } from '../services';
 import type { v_2a3275 } from '../services';
 import type { v_a649c5 } from '../types';
 import type { v_029bad } from '../types';
+import { v_5401ae } from '../testIDs';
 
 const v_818aa7 = require('../../assets/sample_cu.png');
 
@@ -428,7 +429,7 @@ export const v_8c1d95 = () => {
                     <Text style={v_d81136.purchaseDate}>{v_8d41d7('screens.shop.purchaseDateLabel')}: {v_8c0b26.purchaseDate}</Text>
                     {v_2911e0 && v_8c0b26.type === 'xrun' && v_8c0b26.isTransferTicket === false ? (
 
-                        <TouchableOpacity
+                        <TouchableOpacity testID={v_5401ae.shopMyItems.view}
                             style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
                             activeOpacity={0.8}
                             onPress={() => {
@@ -457,7 +458,7 @@ export const v_8c1d95 = () => {
                             <Text style={[v_d81136.useButtonText, { color: '#374151' }]}>{v_8d41d7('screens.shop.thankYou')}</Text>
                         </TouchableOpacity>
                     ) : v_2911e0 ? (
-                        <TouchableOpacity
+                        <TouchableOpacity testID={v_5401ae.shopMyItems.useItem}
                             style={v_d81136.useButton}
                             onPress={() => v_09c55b(v_8c0b26)}
                             activeOpacity={0.8}
@@ -466,7 +467,7 @@ export const v_8c1d95 = () => {
                         </TouchableOpacity>
                     ) : (v_8c0b26.type === 'giftishow' && v_8c0b26.couponImgUrl) ? (
 
-                        <TouchableOpacity
+                        <TouchableOpacity testID={v_5401ae.shopMyItems.useItem2}
                             style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
                             onPress={() => v_09c55b(v_8c0b26)}
                             activeOpacity={0.8}
@@ -475,7 +476,7 @@ export const v_8c1d95 = () => {
                         </TouchableOpacity>
                     ) : v_8c0b26.type === 'iak' && (v_8c0b26.iakSn || v_8c0b26.iakRedeemLink) ? (
 
-                        <TouchableOpacity
+                        <TouchableOpacity testID={v_5401ae.shopMyItems.useItem3}
                             style={[v_d81136.useButton, { backgroundColor: '#E5E7EB' }]}
                             onPress={() => v_09c55b(v_8c0b26)}
                             activeOpacity={0.8}
@@ -542,7 +543,7 @@ export const v_8c1d95 = () => {
                 {v_61d92f && (
                     <View style={v_d81136.searchBar}>
                         <Feather name="search" size={18} color="#0296f2" />
-                        <TextInput
+                        <TextInput testID={v_5401ae.shopMyItems.searchQueryInput}
                             placeholder="Search"
                             placeholderTextColor="#bcbec4"
                             style={v_d81136.searchInput}

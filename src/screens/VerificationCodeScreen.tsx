@@ -31,6 +31,7 @@ import {
 import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
 import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
+import { v_5401ae } from '../testIDs';
 
 const v_683bb6 = 6;
 const v_ef7132 = 300;
@@ -630,7 +631,7 @@ export const v_667a00 = () => {
         </View>
 
         {}
-        <TextInput
+        <TextInput testID={v_5401ae.verificationCode.codeInput}
           ref={v_56c646}
           value={v_c99bd2}
           onChangeText={v_537cbb}

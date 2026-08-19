@@ -10,6 +10,7 @@ import {
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 type DialogAction = {
   label: string;
@@ -46,13 +47,13 @@ export const Dialog: v_a3453e.FC<DialogProps> = ({
             {v_0890f8 && v_dd943a.length === 0 ? (
               <>
                 <View style={v_d81136.closePlaceholder} />
-                <Text style={v_d81136.title}>{v_9f1622}</Text>
+                <Text testID={v_5401ae.dialog.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
                 <TouchableOpacity onPress={v_0890f8} hitSlop={v_f72698} style={v_d81136.close}>
                   <Ionicons name="close" size={24} color="#747474" />
                 </TouchableOpacity>
               </>
             ) : (
-              <Text style={v_d81136.title}>{v_9f1622}</Text>
+              <Text testID={v_5401ae.dialog.titleLabel2} style={v_d81136.title}>{v_9f1622}</Text>
             )}
           </View>
 

@@ -14,6 +14,7 @@ import { v_5f9ea4 } from '../types';
 import { v_35c0e0, v_d7e45e, v_b9db3d, v_a3bbf0 } from '../utils';
 import { v_2396c3 } from '../utils/formatAmount';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_5401ae } from '../testIDs';
 
 interface TransformedSettlementData {
   id: string;
@@ -366,7 +367,7 @@ export const v_08aac3 = () => {
       <Header
         title={v_8d41d7('screens.referralSettlement.title')}
         rightComponent={
-          <TouchableOpacity style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
+          <TouchableOpacity testID={v_5401ae.referralSettlement.share} style={v_d81136.headerShareButton} onPress={v_22cd2d} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={v_1bfbd0.headerText} />
             <Text style={v_d81136.headerShareText}>{v_8d41d7('screens.referralSettlement.referralLabel')}</Text>
           </TouchableOpacity>
