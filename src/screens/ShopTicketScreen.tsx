@@ -15,6 +15,7 @@ import { v_35c0e0, v_d7e45e, v_89f939 } from '../utils';
 import { v_858bfa } from '../utils/imageCache';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
 import * as v_759f4d from 'ssuyxdbb';
+import { v_5401ae } from '../testIDs';
 
 const v_3e6a6a = (
   item: v_20035e,
@@ -525,7 +526,7 @@ export const v_38326c = () => {
             {v_61d92f && (
               <View style={v_d81136.searchBar}>
                 <Feather name="search" size={18} color="#0296f2" />
-                <TextInput
+                <TextInput testID={v_5401ae.shopTicket.searchQueryInput}
                   style={v_d81136.searchInput}
                   placeholder={v_8d41d7('screens.shop.searchPlaceholder')}
                   placeholderTextColor="#bcbec4"
@@ -547,7 +548,7 @@ export const v_38326c = () => {
                               {v_8d41d7('screens.shop.pointsBalance', '포인트 잔액')}: {v_19c59c !== null ? v_19c59c.toLocaleString() : '-'}
                             </Text>
                           )}
-                      <TouchableOpacity
+                      <TouchableOpacity testID={v_5401ae.shopTicket.testSpend10}
                         style={[v_d81136.xplayTestButton, (v_e0d4f2 || v_476f9f || (v_19c59c !== null && v_19c59c < 10)) && v_d81136.xplayTestButtonDisabled]}
                         onPress={v_5f9181}
                         disabled={v_e0d4f2 || v_476f9f || (v_19c59c !== null && v_19c59c < 10)}

@@ -51,6 +51,7 @@ import {
 import { v_7af6c9 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
 import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
+import { v_5401ae } from '../testIDs';
 
 const v_0c96f7 = ['0', '10', '20', '30', '40', '50+'] as const;
 
@@ -1491,7 +1492,7 @@ export const v_f40fc5 = () => {
             </View>
             <View style={v_d81136.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={v_5401ae.signup.countrySearchQueryInput}
                 style={v_d81136.modalSearchInput}
                 value={v_bd30a1}
                 onChangeText={v_e03dd9}
@@ -1564,7 +1565,7 @@ export const v_f40fc5 = () => {
             </View>
             <View style={v_d81136.modalSearchBox}>
               <Ionicons name="search" size={18} color="#9ca3af" />
-              <TextInput
+              <TextInput testID={v_5401ae.signup.regionSearchQueryInput}
                 style={v_d81136.modalSearchInput}
                 value={v_7962f1}
                 onChangeText={v_6a0bf8}

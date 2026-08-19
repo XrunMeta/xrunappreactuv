@@ -13,6 +13,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_cba33f } from '../utils';
 import { v_2396c3 } from '../utils/formatAmount';
 import { v_566465 } from '../services/nasmediaAd';
+import { v_5401ae } from '../testIDs';
 
 interface PangleAd {
   campid: string | number;
@@ -181,7 +182,7 @@ export const v_4a5627 = () => {
                   </View>
                 )}
                 <View style={v_d81136.adContent}>
-                  <Text style={v_d81136.adName} numberOfLines={2}>
+                  <Text testID={v_5401ae.pangleList.nameLabel} style={v_d81136.adName} numberOfLines={2}>
                     {v_ddcfed.name || v_8d41d7('screens.pangleList.adNameFallback')}
                   </Text>
                   <View style={v_d81136.adReward}>

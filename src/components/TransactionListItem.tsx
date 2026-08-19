@@ -10,6 +10,7 @@ import {
 } from 'rcmrninabrnb';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface TransactionListItemProps extends v_629153 {
   title: string;
@@ -74,12 +75,12 @@ export const TransactionListItem: v_a3453e.FC<TransactionListItemProps> = ({
         )}
       </View>
       <View style={v_d81136.middle}>
-        <Text style={v_d81136.title}>{v_9f1622}</Text>
+        <Text testID={v_5401ae.transactionListItem.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
         <Text style={v_d81136.subtitle}>{v_dda473}</Text>
       </View>
       <View style={v_d81136.right}>
         <Text style={v_d81136.timestamp}>{v_42044e}</Text>
-        <Text style={[v_d81136.amount, v_578b11 ? { color: v_578b11 } : null]}>
+        <Text testID={v_5401ae.transactionListItem.amountLabel} style={[v_d81136.amount, v_578b11 ? { color: v_578b11 } : null]}>
           {v_ae8e76 ? `${v_f63e09} ${v_ae8e76}` : v_f63e09}
         </Text>
       </View>

@@ -10,6 +10,7 @@ import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_fb1936 } from '../services';
 import { v_b0f886 } from '../types';
 import { v_556baf } from '../components';
+import { v_5401ae } from '../testIDs';
 
 interface MemberData {
   id: string;
@@ -184,7 +185,7 @@ export const v_5b4c5a = () => {
         onBackPress={v_6ca26b}
         showBackButton
         rightComponent={
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.referralDepthOne.close}
             style={v_d81136.closeButton}
             onPress={v_7f2e65}
             activeOpacity={0.7}

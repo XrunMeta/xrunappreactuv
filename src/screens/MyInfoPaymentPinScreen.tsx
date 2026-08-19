@@ -14,6 +14,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_12a388 } from '../services';
 import { v_e4a763 } from '../utils/env';
 import { v_4b1173 } from '../context';
+import { v_5401ae } from '../testIDs';
 
 type Step = 'enter-old' | 'enter-new' | 'confirm-new';
 
@@ -164,7 +165,7 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
     <View style={v_d81136.container}>
       <Header title="결제 비밀번호" onBackPress={v_c7ac57} showBackButton />
       <View style={v_d81136.body}>
-        <Text style={v_d81136.title}>{v_9f1622}</Text>
+        <Text testID={v_5401ae.myInfoPaymentPin.titleLabel} style={v_d81136.title}>{v_9f1622}</Text>
         <View style={v_d81136.dotsRow}>
           {Array.from({ length: 6 }).map((v_37eab7, v_ebec57) => (
             <View key={v_ebec57} style={[v_d81136.dot, v_bdc450.length > v_ebec57 && v_d81136.dotFilled]} />
@@ -180,7 +181,7 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
         {}
         <View style={v_d81136.keypad}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((v_f4e98d) => (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.myInfoPaymentPin.pressDigit}
               key={v_f4e98d}
               style={v_d81136.key}
               onPress={() => v_4464f1(String(v_f4e98d))}
@@ -190,14 +191,14 @@ export const MyInfoPaymentPinScreen: v_a3453e.FC = () => {
             </TouchableOpacity>
           ))}
           <View style={[v_d81136.key, { backgroundColor: 'transparent' }]} />
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.myInfoPaymentPin.pressDigit2}
             style={v_d81136.key}
             onPress={() => v_4464f1('0')}
             disabled={v_683210}
           >
             <Text style={v_d81136.keyText}>0</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity testID={v_5401ae.myInfoPaymentPin.pressBackspace}
             style={v_d81136.key}
             onPress={v_7e2cc5}
             disabled={v_683210}

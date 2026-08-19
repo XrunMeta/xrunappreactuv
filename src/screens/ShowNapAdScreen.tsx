@@ -23,6 +23,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_4c7b5d, v_570c34 } from '../components';
 import { v_843035 } from '../constants';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
+import { v_5401ae } from '../testIDs';
 
 const SequentialDots: v_a3453e.FC = () => {
   const [v_9b82f3, v_67dd3d] = v_5ab095(0);
@@ -799,7 +800,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         <View style={[v_d81136.campaignContainer, v_bf1005 && v_d81136.modalCampaignContainer]}>
           {}
           {v_bf1005 && (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.showNapAd.close}
               onPress={v_7f2e65}
               style={{
                 position: 'absolute',
@@ -814,11 +815,11 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
             </TouchableOpacity>
           )}
           <View style={v_d81136.campaignBox}>
-            <Text style={v_d81136.campaignTitle}>
+            <Text testID={v_5401ae.showNapAd.nameLabel} style={v_d81136.campaignTitle}>
               {v_3aedd0.name || v_8d41d7('screens.showNapAd.campaignInfo')}
             </Text>
           </View>
-          <Text style={v_d81136.campaignReward}>
+          <Text testID={v_5401ae.showNapAd.priceLabel} style={v_d81136.campaignReward}>
             {v_8d41d7('screens.showNapAd.reward')} : {(() => {
               const v_6bbb57 = v_d0b6d4?.xrunPrice || 0;
               const v_123554 = parseFloat(String(v_6bbb57));
@@ -865,7 +866,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         <View style={v_d81136.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[v_d81136.webViewHeader, { paddingTop: v_033e14.top + 12 }]}>
-            <Text
+            <Text testID={v_5401ae.showNapAd.nameLabel2}
               style={v_d81136.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"

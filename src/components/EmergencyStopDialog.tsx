@@ -12,6 +12,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_a0daa8 } from '../navigation';
 import { v_ce4741 } from '../navigation';
 import { v_843035 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 interface EmergencyStopDialogProps {
   visible: boolean;
@@ -73,7 +74,7 @@ export const EmergencyStopDialog: v_a3453e.FC<EmergencyStopDialogProps> = ({
           </View>
           <Text style={v_d81136.message}>{v_a8cd21}</Text>
           {v_8dbe00 && (
-            <TouchableOpacity
+            <TouchableOpacity testID={v_5401ae.emergencyStopDialog.link}
               style={v_d81136.linkButton}
               onPress={v_4c3e84}
               activeOpacity={0.7}

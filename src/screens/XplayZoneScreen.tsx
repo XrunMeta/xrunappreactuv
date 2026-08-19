@@ -5,6 +5,7 @@ import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_ce4741 } from '../navigation';
 import { v_a61db3, v_843035, v_1bfbd0 } from '../constants';
+import { v_5401ae } from '../testIDs';
 
 let v_10664a = null;
 try {
@@ -39,7 +40,7 @@ export const v_26fe4c = () => {
         <Text style={v_d81136.title}>Xplay Zone</Text>
         <Text style={v_d81136.subtitle}>진입할 Zone을 선택하세요</Text>
 
-        <TouchableOpacity
+        <TouchableOpacity testID={v_5401ae.xplayZone.zone1}
           style={v_d81136.zoneCard}
           activeOpacity={0.8}
           onPress={v_41672c}
@@ -48,7 +49,7 @@ export const v_26fe4c = () => {
           <Text style={v_d81136.zoneDescription}>ayeT 오퍼 · Xplay 적립</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        <TouchableOpacity testID={v_5401ae.xplayZone.zone2}
           style={v_d81136.zoneCard}
           activeOpacity={0.8}
           onPress={v_7c70b9}

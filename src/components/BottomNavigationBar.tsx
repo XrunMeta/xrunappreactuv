@@ -6,6 +6,7 @@ import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_1bfbd0, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_85f2c8, v_3ca33e } from '../services';
+import { v_5401ae } from '../testIDs';
 
 let v_4eff08 = null;
 let v_f968cc = null;
@@ -207,6 +208,7 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
 
     return (
       <TouchableOpacity
+        testID={`${v_5401ae.bottomNavigationBar.item}-${v_8c0b26.id}`}
         style={[v_d81136.navItem, v_2457bf && v_d81136.navItemXplayNudge]}
         onPress={() => v_8e442f(v_8c0b26.id)}
         activeOpacity={0.7}>

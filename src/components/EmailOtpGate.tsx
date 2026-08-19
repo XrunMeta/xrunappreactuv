@@ -11,6 +11,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_cb41de, v_570c34 } from '.';
 import { v_1bfbd0, v_a61db3, v_843035 } from '../constants';
 import { v_8025d1, v_415628 } from '../services';
+import { v_5401ae } from '../testIDs';
 
 const v_683bb6 = 6;
 const v_ef7132 = 180;
@@ -101,7 +102,7 @@ export const EmailOtpGate: v_a3453e.FC<Props> = ({ email: v_e0c7e8, onSuccess: v
       />
       <SafeScrollView contentContainerStyle={v_d81136.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={v_d81136.descriptionWrapper}>
-          <Text style={v_d81136.description}>
+          <Text testID={v_5401ae.emailOtpGate.emailLabel} style={v_d81136.description}>
             {v_e0c7e8}
             {v_8d41d7('screens.verificationCode.description') || '로 발송된 인증 코드를 입력해 주세요.'}
           </Text>
@@ -111,7 +112,7 @@ export const EmailOtpGate: v_a3453e.FC<Props> = ({ email: v_e0c7e8, onSuccess: v
           {Array.from({ length: v_683bb6 }).map((v_37eab7, v_a56041) => {
             const v_5f701e = v_c99bd2[v_a56041] ?? '';
             return (
-              <TouchableOpacity
+              <TouchableOpacity testID={v_5401ae.emailOtpGate.hiddenInputRef}
                 key={v_a56041}
                 style={v_d81136.codeBox}
                 onPress={() => v_56c646.current?.focus()}
@@ -123,7 +124,7 @@ export const EmailOtpGate: v_a3453e.FC<Props> = ({ email: v_e0c7e8, onSuccess: v
           })}
         </View>
 
-        <TextInput
+        <TextInput testID={v_5401ae.emailOtpGate.codeInput}
           ref={v_56c646}
           value={v_c99bd2}
           onChangeText={(v_81e2ef) => v_537cbb(v_81e2ef.replace(/[^0-9]/g, '').slice(0, v_683bb6))}

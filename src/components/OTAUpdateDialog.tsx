@@ -4,6 +4,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_94035f from 'ryynyumnbcgyvtiickefs';
 import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
 import { v_412fbc } from './AnimatedDots';
+import { v_5401ae } from '../testIDs';
 
 export type OTAUpdateDialogProps = { isAdFinished?: boolean };
 
@@ -126,7 +127,7 @@ const OTAUpdateDialog: v_a3453e.FC<OTAUpdateDialogProps> = ({ isAdFinished: v_65
                         <Text style={v_d81136.versionText}>v{v_a2dcc0?.version}</Text>
                     </View>
 
-                    <Text style={v_d81136.fullScreenMessage}>
+                    <Text testID={v_5401ae.otaupdateDialog.descriptionLabel} style={v_d81136.fullScreenMessage}>
                         {v_a2dcc0?.description || v_8d41d7('common.versionUpdate.message')}
                     </Text>
 

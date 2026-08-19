@@ -39,6 +39,7 @@ import { v_cba33f } from '../utils';
 import { v_f3de6d } from '../utils/napApiUtils';
 import { v_2694e4 } from 'ahewcyoxtiosvtfuluxp';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
+import { v_5401ae } from '../testIDs';
 
 const { width: v_8e4fb6, height: v_c86e33 } = v_700696.get('window');
 
@@ -3071,7 +3072,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
 
                   {}
                   <View style={{ flex: 1 }}>
-                    <Text
+                    <Text testID={v_5401ae.cameraMain.coinLabel}
                       style={{
                         fontFamily: 'Roboto-Medium',
                         fontSize: v_843035.size.medium,
@@ -3186,7 +3187,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
                         <View style={v_d81136.recentItemIcon} />
                       )}
                       <View style={v_d81136.recentItemTextWrap}>
-                        <Text style={v_d81136.recentItemName} numberOfLines={1}>{v_ddcfed.name || '광고'}</Text>
+                        <Text testID={v_5401ae.cameraMain.nameLabel} style={v_d81136.recentItemName} numberOfLines={1}>{v_ddcfed.name || '광고'}</Text>
                         <Text style={v_d81136.recentItemTime}>{v_375a17}</Text>
                       </View>
                       <View style={v_d81136.recentItemOpenBtn}>
@@ -3235,7 +3236,7 @@ export const CameraMainScreen: v_a3453e.FC<CameraMainScreenProps> = ({
           }}>
             {}
             <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
-              <TouchableOpacity
+              <TouchableOpacity testID={v_5401ae.cameraMain.webviewBack}
                 onPress={() => {
                   if (v_f72439 && v_ad144f.current) {
                     v_ad144f.current.goBack();
