@@ -284,6 +284,7 @@ export const TID = {
   },
   wallet: {
     addToken: 'wallet-add-token',
+
     amountLabel: 'wallet-amount-label',
     btn2: 'wallet-btn-2',
     btn3: 'wallet-btn-3',

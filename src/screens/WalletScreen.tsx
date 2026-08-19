@@ -54,6 +54,9 @@ import { TaboolaBanner } from '../components/TaboolaBanner';
 import { LoadingText } from '../components/AnimatedDots';
 import { getTokenIcon } from '../constants/tokenMeta';
 import { TID } from '../testIDs';
+import { ProbeText } from '../components/ProbeText';
+import { probeReset } from '../services/screenProbe';
+import { startWalletScreenReporter, WalletReportContext } from '../services/walletScreenReport';
 
 const iconEtherscan = require('../../assets/icon_etherscan.png');
 
@@ -436,6 +439,28 @@ export const WalletScreen = () => {
   const refreshAllRef = useRef<(() => void) | null>(null);
 
   const [staleBalanceCurrencies, setStaleBalanceCurrencies] = useState<number[]>([]);
+
+  const reportCtxRef = useRef<WalletReportContext>({
+    isLoading: true,
+    addressMasked: null,
+    staleCurrencies: [],
+  });
+
+  reportCtxRef.current = {
+    isLoading,
+    addressMasked: publicAddress ? shortenAddress(publicAddress, 6, 6) : null,
+    staleCurrencies: staleBalanceCurrencies,
+  };
+
+  const probeSessionRef = useRef<string | null>(null);
+  if (probeSessionRef.current === null) {
+    probeSessionRef.current = probeReset('wallet');
+  }
+
+  useEffect(() => {
+    const stop = startWalletScreenReporter(() => reportCtxRef.current);
+    return stop;
+  }, []);
 
   useEffect(() => {
     if (!member) return;
@@ -999,13 +1024,35 @@ export const WalletScreen = () => {
           </View>
         </View>
         <View style={styles.tokenItemMiddle}>
-          <Text testID={TID.wallet.titleLabel} style={styles.tokenItemTitle}>{title}</Text>
-          <Text style={styles.tokenItemSubtitle}>{subtitle}</Text>
+          {
+}
+          <ProbeText
+            probeScreen="wallet"
+            probeKey={`${listIndex ?? 0}|${currency}|title`}
+            testID={`${TID.wallet.titleLabel}-${currency}`}
+            style={styles.tokenItemTitle}
+          >
+            {title}
+          </ProbeText>
+          <ProbeText
+            probeScreen="wallet"
+            probeKey={`${listIndex ?? 0}|${currency}|subtitle`}
+            style={styles.tokenItemSubtitle}
+          >
+            {subtitle}
+          </ProbeText>
         </View>
         <View style={styles.tokenItemRight}>
-          <Text testID={TID.wallet.amountLabel} style={styles.tokenItemAmount} numberOfLines={2} ellipsizeMode="tail">
+          <ProbeText
+            probeScreen="wallet"
+            probeKey={`${listIndex ?? 0}|${currency}|amount`}
+            testID={`${TID.wallet.amountLabel}-${currency}`}
+            style={styles.tokenItemAmount}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
             {amount} {suffix || ''}
-          </Text>
+          </ProbeText>
         </View>
       </TouchableOpacity>
     );
