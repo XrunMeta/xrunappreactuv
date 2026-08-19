@@ -14,7 +14,7 @@
 #
 # ⚠️ 로컬 전용. 원격 DB 를 절대 향하지 않는다 (스킬 §5).
 
-appId: run.xrun.xrunapps
+appId: ${APP_ID}
 ---
 # AsyncStorage·앱 데이터는 지우고 Keychain 만 남긴다
 - launchApp:

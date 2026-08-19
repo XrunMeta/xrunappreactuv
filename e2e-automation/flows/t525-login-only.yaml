@@ -8,7 +8,7 @@
 #
 # ⚠️ 로컬 전용 (스킬 §5).
 
-appId: run.xrun.xrunapps
+appId: ${APP_ID}
 ---
 - launchApp:
     clearState: false
@@ -51,7 +51,7 @@ appId: run.xrun.xrunapps
 
 - tapOn:
     text: "이메일을 입력해주세요.*|メールアドレスを入力してください.*"
-- inputText: "e2e-t525@example.com"
+- inputText: ${TEST_EMAIL}
 
 - tapOn:
     text: "비밀번호를 입력해주세요.*|パスワードを入力してください.*"
