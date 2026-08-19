@@ -36,14 +36,14 @@ import {
   saveSession,
   checkEmailExists,
   sendEmailVerificationCode,
-  signInWithGoogle,
   connectGoogleAccount,
-  signInWithApple,
   connectAppleAccount,
-  showNativeScreen,
   registerPushToken,
   fetchAndSaveWallets,
 } from '../services';
+import { signInWithApple } from '../services/appleAuth';
+import { signInWithGoogle } from '../services/googleAuth';
+import { showNativeScreen } from '../services/pangle';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
