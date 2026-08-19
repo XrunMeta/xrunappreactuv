@@ -96,9 +96,10 @@ export const LoginScreen = () => {
   const [successDialogVisible, setSuccessDialogVisible] = useState(false);
 
   const [didJustLogin, setDidJustLogin] = useState(false);
-  const { needsPinUpgrade } = useLegacyVaultSweep(didJustLogin, emailForUpgrade, memberIdForUpgrade ?? 0);
+
   const [memberIdForUpgrade, setMemberIdForUpgrade] = useState<number | null>(null);
   const [emailForUpgrade, setEmailForUpgrade] = useState('');
+  const { needsPinUpgrade } = useLegacyVaultSweep(didJustLogin, emailForUpgrade, memberIdForUpgrade ?? 0);
   const [pinUpgradeVisible, setPinUpgradeVisible] = useState(false);
 
   React.useEffect(() => {
