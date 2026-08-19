@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppNavigation } from '../navigation';
 import { ROUTES } from '../navigation';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 interface EmergencyStopDialogProps {
   visible: boolean;
@@ -73,7 +74,7 @@ export const EmergencyStopDialog: React.FC<EmergencyStopDialogProps> = ({
           </View>
           <Text style={styles.message}>{message}</Text>
           {link && (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.emergencyStopDialog.link}
               style={styles.linkButton}
               onPress={handleLinkPress}
               activeOpacity={0.7}

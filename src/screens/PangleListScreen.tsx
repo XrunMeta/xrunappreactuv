@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showToast } from '../utils';
 import { fmtAmount } from '../utils/formatAmount';
 import { getToastBody } from '../services/nasmediaAd';
+import { TID } from '../testIDs';
 
 interface PangleAd {
   campid: string | number;
@@ -181,7 +182,7 @@ export const PangleListScreen = () => {
                   </View>
                 )}
                 <View style={styles.adContent}>
-                  <Text style={styles.adName} numberOfLines={2}>
+                  <Text testID={TID.pangleList.nameLabel} style={styles.adName} numberOfLines={2}>
                     {ad.name || t('screens.pangleList.adNameFallback')}
                   </Text>
                   <View style={styles.adReward}>

@@ -23,6 +23,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';
 import { FONTS } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
+import { TID } from '../testIDs';
 
 const SequentialDots: React.FC = () => {
   const [activeDot, setActiveDot] = useState(0);
@@ -799,7 +800,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
         <View style={[styles.campaignContainer, isModal && styles.modalCampaignContainer]}>
           {}
           {isModal && (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.showNapAd.close}
               onPress={handleClose}
               style={{
                 position: 'absolute',
@@ -814,11 +815,11 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
             </TouchableOpacity>
           )}
           <View style={styles.campaignBox}>
-            <Text style={styles.campaignTitle}>
+            <Text testID={TID.showNapAd.nameLabel} style={styles.campaignTitle}>
               {campaignData.name || t('screens.showNapAd.campaignInfo')}
             </Text>
           </View>
-          <Text style={styles.campaignReward}>
+          <Text testID={TID.showNapAd.priceLabel} style={styles.campaignReward}>
             {t('screens.showNapAd.reward')} : {(() => {
               const price = advertisementParams?.xrunPrice || 0;
               const priceValue = parseFloat(String(price));
@@ -865,7 +866,7 @@ export const ShowNapAdScreen: React.FC<ShowNapAdScreenProps> = ({ onClose, isMod
         <View style={styles.webViewContainer}>
           <StatusBar style="dark" />
           <View style={[styles.webViewHeader, { paddingTop: insets.top + 12 }]}>
-            <Text
+            <Text testID={TID.showNapAd.nameLabel2}
               style={styles.webViewTitle}
               numberOfLines={1}
               ellipsizeMode="tail"

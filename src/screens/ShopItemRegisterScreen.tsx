@@ -27,6 +27,7 @@ import { getXRUNGopaxPrice, createItemFromApp, createAxiosInstance, deleteShopIt
 import { CreateItemFromAppRequest } from '../types';
 import { getEnv } from '../utils/env';
 import { cashingimages } from '../utils/imageCache';
+import { TID } from '../testIDs';
 
 export const ShopItemRegisterScreen = () => {
   const { t } = useTranslation();
@@ -547,7 +548,7 @@ export const ShopItemRegisterScreen = () => {
           {}
           <View style={styles.section}>
             <Text style={styles.label}>{t('screens.shopItemRegister.labelProductName')} *</Text>
-            <TextInput
+            <TextInput testID={TID.shopItemRegister.titleInput}
               style={styles.input}
               value={title}
               onChangeText={setTitle}
@@ -560,7 +561,7 @@ export const ShopItemRegisterScreen = () => {
           {}
           <View style={styles.section}>
             <Text style={styles.label}>{t('screens.shopItemRegister.description')}</Text>
-            <TextInput
+            <TextInput testID={TID.shopItemRegister.descriptionInput}
               style={[styles.input, styles.textArea]}
               value={description}
               onChangeText={setDescription}
@@ -575,7 +576,7 @@ export const ShopItemRegisterScreen = () => {
           {}
           <View style={styles.section}>
             <Text style={styles.label}>{t('screens.shopItemRegister.labelPrice')} *</Text>
-            <TextInput
+            <TextInput testID={TID.shopItemRegister.priceXrunInput}
               style={styles.input}
               value={priceXrun}
 
@@ -591,7 +592,7 @@ export const ShopItemRegisterScreen = () => {
           {}
           <View style={styles.section}>
             <Text style={styles.label}>{t('screens.shopItemRegister.maxPurchaseQty')}</Text>
-            <TextInput
+            <TextInput testID={TID.shopItemRegister.maxpurchaseInput}
               style={styles.input}
               value={maxpurchase}
               onChangeText={setMaxpurchase}
@@ -683,7 +684,7 @@ export const ShopItemRegisterScreen = () => {
           {!isEditMode && (
             <View style={styles.section}>
               <Text style={styles.label}>{t('screens.shopItemRegister.labelProductCode')}</Text>
-              <TextInput
+              <TextInput testID={TID.shopItemRegister.submitInput}
                 style={[styles.input, styles.readOnlyInput]}
                 value={generatedSdk}
                 editable={false}
@@ -697,7 +698,7 @@ export const ShopItemRegisterScreen = () => {
           {}
           {isEditMode ? (
             <View style={{ flexDirection: 'row', gap: 10, marginTop: SIZES.large }}>
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.shopItemRegister.submit}
                 style={[
                   styles.submitButton,
                   { flex: 1, marginTop: 0 },
@@ -713,7 +714,7 @@ export const ShopItemRegisterScreen = () => {
                   <Text style={styles.submitButtonText}>{t('screens.shopItemRegister.editButton')}</Text>
                 )}
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.shopItemRegister.deleteItem}
                 style={[
                   styles.submitButton,
                   { flex: 1, marginTop: 0, backgroundColor: '#ef4444' },
@@ -727,7 +728,7 @@ export const ShopItemRegisterScreen = () => {
               </TouchableOpacity>
             </View>
           ) : (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.shopItemRegister.submit2}
               style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
               onPress={handleSubmit}
               disabled={isSubmitting}

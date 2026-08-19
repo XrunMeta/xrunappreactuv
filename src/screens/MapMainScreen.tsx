@@ -58,6 +58,7 @@ import { getEnv } from '../utils/env';
 import { COMMON_STYLES, FONTS } from '../constants';
 import { collectDeviceInfo, getMinimalDeviceInfo } from '../utils/napApiUtils';
 import { showToast } from '../utils';
+import { TID } from '../testIDs';
 import {
   shouldShowTutorial,
   TUTORIAL_PENDING_KEY,
@@ -3747,7 +3748,7 @@ export const MapMainScreen: React.FC = () => {
               </View>
 
               <View style={styles.calloutRight}>
-                <Text style={styles.calloutBrand} numberOfLines={2}>
+                <Text testID={TID.mapMain.nameLabel} style={styles.calloutBrand} numberOfLines={2}>
                   {calloutData.name || calloutData.brand || 'XRUN'} 획득 가능합니다.
                 </Text>
               </View>

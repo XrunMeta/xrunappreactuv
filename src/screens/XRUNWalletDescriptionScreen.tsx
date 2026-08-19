@@ -4,6 +4,7 @@ import { SafeView } from '../components';
 import { Header } from '../components';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
+import { TID } from '../testIDs';
 
 export const XRUNWalletDescriptionScreen = () => {
   const { goBack, navigate } = useAppNavigation();
@@ -17,7 +18,7 @@ export const XRUNWalletDescriptionScreen = () => {
           XRUN으로 리워드를 획득하세요.{'\n'}
           오퍼월·퀘스트 등을 통해 XRUN을 모아 사용할 수 있습니다.
         </Text>
-        <TouchableOpacity
+        <TouchableOpacity testID={TID.xrunwalletDescription.navigate}
           style={styles.ctaButton}
           activeOpacity={0.8}
           onPress={() => navigate(ROUTES.xrunInfo)}>

@@ -8,6 +8,7 @@ import {
     GestureResponderEvent,
 } from 'react-native';
 import { COLORS, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 export interface ShopSalesMemberData {
     id: string;        
@@ -37,8 +38,8 @@ export const ShopSalesMemberRow: React.FC<ShopSalesMemberRowProps> = ({
             disabled={!onPress}
         >
             <View style={styles.leftColumn}>
-                <Text style={styles.id} numberOfLines={1}>{email}</Text>
-                <Text style={styles.name} numberOfLines={1}>{name}</Text>
+                <Text testID={TID.shopSalesMemberRow.emailLabel} style={styles.id} numberOfLines={1}>{email}</Text>
+                <Text testID={TID.shopSalesMemberRow.nameLabel} style={styles.name} numberOfLines={1}>{name}</Text>
             </View>
             <View style={styles.rightColumn}>
                 <Text style={styles.date}>{date}</Text>

@@ -19,6 +19,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
+import { TID } from '../testIDs';
 
 interface AddressBookItem {
     id: string;
@@ -152,7 +153,7 @@ export const AddWalletAddressScreen = () => {
                     <Text style={styles.inputLabel}>{t('screens.walletAddressBook.name')}</Text>
                     <View style={styles.inputContainer}>
                         <Ionicons name="person-outline" size={20} color={COLORS.headerText} style={styles.inputIcon} />
-                        <TextInput
+                        <TextInput testID={TID.addWalletAddress.nameInput}
                             style={styles.input}
                             placeholder={t('screens.walletAddressBook.namePlaceholder')}
                             placeholderTextColor="#999"
@@ -183,7 +184,7 @@ export const AddWalletAddressScreen = () => {
                     <Text style={styles.inputLabel}>{t('screens.walletAddressBook.address')}</Text>
                     <View style={styles.inputContainer}>
                         <Ionicons name="wallet-outline" size={20} color={COLORS.headerText} style={styles.inputIcon} />
-                        <TextInput
+                        <TextInput testID={TID.addWalletAddress.addressInput}
                             style={styles.input}
                             placeholder={t('screens.walletAddressBook.addressPlaceholder')}
                             placeholderTextColor="#999"
@@ -192,7 +193,7 @@ export const AddWalletAddressScreen = () => {
                             autoCapitalize="none"
                             autoCorrect={false}
                         />
-                        <TouchableOpacity
+                        <TouchableOpacity testID={TID.addWalletAddress.qrScan}
                             style={styles.qrButton}
                             onPress={handleQrScan}
                             activeOpacity={0.7}

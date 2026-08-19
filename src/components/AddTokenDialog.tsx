@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Dialog } from './Dialog';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 type TokenOption = {
   id: string;
@@ -139,7 +140,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
                 <Image source={token.icon} style={styles.tokenImage} />
               </View>
             </View>
-            <Text style={styles.tokenLabel}>{token.name}</Text>
+            <Text testID={TID.addTokenDialog.nameLabel} style={styles.tokenLabel}>{token.name}</Text>
           </TouchableOpacity>
         );
       })}
@@ -148,7 +149,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
 
   const renderContractInput = () => (
     <View style={styles.contractWrapper}>
-      <TextInput
+      <TextInput testID={TID.addTokenDialog.contractAddressInput}
         style={styles.contractInput}
         placeholder="Contract address"
         placeholderTextColor="#a6a6a6"
@@ -168,7 +169,7 @@ export const AddTokenDialog: React.FC<AddTokenDialogProps> = ({
       </View>
       <View style={styles.summaryItem}>
         <Text style={styles.summaryLabel}>Token Name</Text>
-        <Text style={styles.summaryValue}>{selectedToken?.name}</Text>
+        <Text testID={TID.addTokenDialog.nameLabel2} style={styles.summaryValue}>{selectedToken?.name}</Text>
       </View>
       <View style={styles.summaryItem}>
         <Text style={styles.summaryLabel}>Token Symbol</Text>

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType, S
 import { Ionicons } from '@expo/vector-icons';
 import { SvgXml } from 'react-native-svg';
 import { FONTS, SIZES } from '../constants';
+import { TID } from '../testIDs';
 
 type QuickAction = {
   label: string;
@@ -56,10 +57,10 @@ export const WalletHeaderCard: React.FC<WalletHeaderCardProps> = ({
         <View style={styles.cardContent}>
           {}
           <View style={styles.titleRow}>
-            <Text style={styles.cardTitle}>{title}</Text>
+            <Text testID={TID.walletHeaderCard.titleLabel} style={styles.cardTitle}>{title}</Text>
             {address ? (
               <View style={styles.addressContainer}>
-                <Text style={styles.cardAddressInline} numberOfLines={1} ellipsizeMode="middle">
+                <Text testID={TID.walletHeaderCard.addressLabel} style={styles.cardAddressInline} numberOfLines={1} ellipsizeMode="middle">
                   {address}
                 </Text>
                 <TouchableOpacity style={styles.copyButtonInline} onPress={onCopy} activeOpacity={0.7}>

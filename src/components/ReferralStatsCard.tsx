@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
+import { TID } from '../testIDs';
 
 interface ReferralStatsCardProps {
   title: string;
@@ -51,7 +52,7 @@ export const ReferralStatsCard: React.FC<ReferralStatsCardProps> = ({
                     <Ionicons name={icon} size={20} color={iconColor} />
                   </View>
                 )}
-                <Text style={styles.title}>{title}</Text>
+                <Text testID={TID.referralStatsCard.titleLabel} style={styles.title}>{title}</Text>
               </View>
               {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
             </View>

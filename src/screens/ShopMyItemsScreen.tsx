@@ -17,6 +17,7 @@ import { getMyGiftishowCoupons, getXrunPurchasedItems, getMyIakTxns } from '../s
 import type { MyIakTxnItem } from '../services';
 import type { MyGiftishowCouponItem } from '../types';
 import type { PurchasedItemData } from '../types';
+import { TID } from '../testIDs';
 
 const defaultCouponImage = require('../../assets/sample_cu.png');
 
@@ -428,7 +429,7 @@ export const ShopMyItemsScreen = () => {
                     <Text style={styles.purchaseDate}>{t('screens.shop.purchaseDateLabel')}: {item.purchaseDate}</Text>
                     {isAvailable && item.type === 'xrun' && item.isTransferTicket === false ? (
 
-                        <TouchableOpacity
+                        <TouchableOpacity testID={TID.shopMyItems.view}
                             style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
                             activeOpacity={0.8}
                             onPress={() => {
@@ -457,7 +458,7 @@ export const ShopMyItemsScreen = () => {
                             <Text style={[styles.useButtonText, { color: '#374151' }]}>{t('screens.shop.thankYou')}</Text>
                         </TouchableOpacity>
                     ) : isAvailable ? (
-                        <TouchableOpacity
+                        <TouchableOpacity testID={TID.shopMyItems.useItem}
                             style={styles.useButton}
                             onPress={() => handleUseItem(item)}
                             activeOpacity={0.8}
@@ -466,7 +467,7 @@ export const ShopMyItemsScreen = () => {
                         </TouchableOpacity>
                     ) : (item.type === 'giftishow' && item.couponImgUrl) ? (
 
-                        <TouchableOpacity
+                        <TouchableOpacity testID={TID.shopMyItems.useItem2}
                             style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
                             onPress={() => handleUseItem(item)}
                             activeOpacity={0.8}
@@ -475,7 +476,7 @@ export const ShopMyItemsScreen = () => {
                         </TouchableOpacity>
                     ) : item.type === 'iak' && (item.iakSn || item.iakRedeemLink) ? (
 
-                        <TouchableOpacity
+                        <TouchableOpacity testID={TID.shopMyItems.useItem3}
                             style={[styles.useButton, { backgroundColor: '#E5E7EB' }]}
                             onPress={() => handleUseItem(item)}
                             activeOpacity={0.8}
@@ -542,7 +543,7 @@ export const ShopMyItemsScreen = () => {
                 {showSearchBar && (
                     <View style={styles.searchBar}>
                         <Feather name="search" size={18} color="#0296f2" />
-                        <TextInput
+                        <TextInput testID={TID.shopMyItems.searchQueryInput}
                             placeholder="Search"
                             placeholderTextColor="#bcbec4"
                             style={styles.searchInput}

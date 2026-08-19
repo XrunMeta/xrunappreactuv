@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
 import { LoadingText } from './AnimatedDots';
+import { TID } from '../testIDs';
 import {
   unlockUserWallets,
   type WalletKey,
@@ -181,7 +182,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
         {}
         <View style={styles.centerBlock}>
           {}
-          <Text style={styles.title}>
+          <Text testID={TID.walletKeyPinPrompt.titleLabel} style={styles.title}>
             {step === 'confirm'
               ? (t('components.walletKeyPinPrompt.confirmTitle') || 'PIN 다시 입력')
               : (titleOverride ?? t('components.walletKeyPinPrompt.title'))}

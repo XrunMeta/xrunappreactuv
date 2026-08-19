@@ -39,6 +39,7 @@ import { showToast } from '../utils';
 import { collectDeviceInfo } from '../utils/napApiUtils';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
+import { TID } from '../testIDs';
 
 const { width, height } = Dimensions.get('window');
 
@@ -3071,7 +3072,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
 
                   {}
                   <View style={{ flex: 1 }}>
-                    <Text
+                    <Text testID={TID.cameraMain.coinLabel}
                       style={{
                         fontFamily: 'Roboto-Medium',
                         fontSize: FONTS.size.medium,
@@ -3186,7 +3187,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
                         <View style={styles.recentItemIcon} />
                       )}
                       <View style={styles.recentItemTextWrap}>
-                        <Text style={styles.recentItemName} numberOfLines={1}>{ad.name || '광고'}</Text>
+                        <Text testID={TID.cameraMain.nameLabel} style={styles.recentItemName} numberOfLines={1}>{ad.name || '광고'}</Text>
                         <Text style={styles.recentItemTime}>{timeText}</Text>
                       </View>
                       <View style={styles.recentItemOpenBtn}>
@@ -3235,7 +3236,7 @@ export const CameraMainScreen: React.FC<CameraMainScreenProps> = ({
           }}>
             {}
             <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
-              <TouchableOpacity
+              <TouchableOpacity testID={TID.cameraMain.webviewBack}
                 onPress={() => {
                   if (webViewCanGoBack && webViewModalRef.current) {
                     webViewModalRef.current.goBack();

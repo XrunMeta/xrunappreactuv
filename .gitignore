@@ -109,3 +109,6 @@ credentials.json
 google-services.json
 android/app/google-services.json
 *.keystore
+
+# E2E 실패 산출물 (커밋 대상 아님)
+e2e-automation/runs/

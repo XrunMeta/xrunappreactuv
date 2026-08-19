@@ -14,6 +14,7 @@ import { SettlementListItem } from '../types';
 import { formatXrunAmount, formatWonAmount, calculateWonEquivalent, shareReferralLink } from '../utils';
 import { fmtAmount } from '../utils/formatAmount';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 
 interface TransformedSettlementData {
   id: string;
@@ -366,7 +367,7 @@ export const ReferralSettlementScreen = () => {
       <Header
         title={t('screens.referralSettlement.title')}
         rightComponent={
-          <TouchableOpacity style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
+          <TouchableOpacity testID={TID.referralSettlement.share} style={styles.headerShareButton} onPress={handleShare} activeOpacity={0.7}>
             <Feather name="share-2" size={18} color={COLORS.headerText} />
             <Text style={styles.headerShareText}>{t('screens.referralSettlement.referralLabel')}</Text>
           </TouchableOpacity>

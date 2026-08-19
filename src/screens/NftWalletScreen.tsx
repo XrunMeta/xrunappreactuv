@@ -8,6 +8,7 @@ import { COLORS, COMMON_STYLES, FONTS } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { copyToClipboard } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 
 const WALLET_ADDRESS = '0xf9072c1c5c60c55daa7ee1ea72c8e7fed1aa63df';
 
@@ -101,7 +102,7 @@ export const NftWalletScreen = () => {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t('screens.nftWallet.history')}</Text>
-          <TouchableOpacity onPress={() => setFilterVisible(true)} activeOpacity={0.7}>
+          <TouchableOpacity testID={TID.nftWallet.filterVisible} onPress={() => setFilterVisible(true)} activeOpacity={0.7}>
             <Ionicons name="options-outline" size={20} color="#343434" />
           </TouchableOpacity>
         </View>

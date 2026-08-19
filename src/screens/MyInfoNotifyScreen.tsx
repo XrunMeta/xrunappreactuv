@@ -31,6 +31,7 @@ import {
 import { NotificationItem, NotificationType } from '../types';
 import { cashingimages } from '../utils/imageCache';
 import { getEnv } from '../utils/env';
+import { TID } from '../testIDs';
 
 const eventImage = require('../../assets/thumb_event.png');
 const chatXrun = require('../../assets/chat-xrun.png');
@@ -346,7 +347,7 @@ export const MyInfoNotifyScreen = () => {
               onLongPress={() => handleDelete(notification.board)}
               activeOpacity={0.8}
             >
-              <Text style={styles.replyText}>{notification.title}</Text>
+              <Text testID={TID.myInfoNotify.titleLabel} style={styles.replyText}>{notification.title}</Text>
             </TouchableOpacity>
             {}
           </View>
@@ -362,7 +363,7 @@ export const MyInfoNotifyScreen = () => {
           {imageUri && (
             <Image source={{ uri: imageUri }} style={styles.heroImage} resizeMode="cover" />
           )}
-          <Text style={styles.badge}>{notification.title}</Text>
+          <Text testID={TID.myInfoNotify.titleLabel2} style={styles.badge}>{notification.title}</Text>
           {}
           {notification.contents !== null && notification.type !== 9303 && (
             <View>
@@ -381,7 +382,7 @@ export const MyInfoNotifyScreen = () => {
               {}
               {}
               {isNotice && (
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myInfoNotify.open}
                   style={[styles.ctaButton, styles.ctaButtonWithMargin]}
                   onPress={async () => {
 
@@ -407,7 +408,7 @@ export const MyInfoNotifyScreen = () => {
               )}
               {}
               {isEvent && (
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myInfoNotify.openLink}
                   style={[styles.ctaButton, styles.ctaButtonWithMargin]}
                   onPress={() => openLink(buildBoardUrl('event', notification.board))}
                   activeOpacity={0.85}
@@ -477,7 +478,7 @@ export const MyInfoNotifyScreen = () => {
             showBackButton
             rightComponent={
               notifications.length > 0 ? (
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myInfoNotify.deleteAll}
                   onPress={handleDeleteAll}
                   activeOpacity={0.7}
                   style={styles.deleteAllButton}
@@ -516,7 +517,7 @@ export const MyInfoNotifyScreen = () => {
 
           <View style={styles.inputBar}>
             <View style={styles.inputWrapper}>
-              <TextInput
+              <TextInput testID={TID.myInfoNotify.questionInput}
                 style={styles.input}
                 placeholder={t('screens.myInfoNotify.placeholder')}
                 placeholderTextColor="#7d7e83"
@@ -525,7 +526,7 @@ export const MyInfoNotifyScreen = () => {
                 editable={!sending}
               />
             </View>
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.myInfoNotify.send}
               style={[styles.sendButton, sending && styles.sendButtonDisabled]}
               onPress={handleSend}
               activeOpacity={0.8}

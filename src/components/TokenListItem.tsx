@@ -9,6 +9,7 @@ import {
   TouchableOpacityProps,
 } from 'react-native';
 import { FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 interface TokenListItemProps extends TouchableOpacityProps {
   title: string;
@@ -54,11 +55,11 @@ export const TokenListItem: React.FC<TokenListItemProps> = ({
         {badgeLabel ? <View style={styles.badge}><Text style={styles.badgeText}>{badgeLabel}</Text></View> : null}
       </View>
       <View style={styles.middle}>
-        <Text style={styles.title}>{title}</Text>
+        <Text testID={TID.tokenListItem.titleLabel} style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
       <View style={styles.right}>
-        <Text style={styles.amount}>{amount}</Text>
+        <Text testID={TID.tokenListItem.amountLabel} style={styles.amount}>{amount}</Text>
         {suffix ? <Text style={styles.suffix}>{suffix}</Text> : null}
       </View>
     </TouchableOpacity>

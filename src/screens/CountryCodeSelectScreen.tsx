@@ -17,6 +17,7 @@ import { COLORS, COMMON_STYLES, COUNTRY_DIAL_CODES, REGIONS_AS_COUNTRY_DIAL_CODE
 import { CountryDialCode } from '../types';
 import { getCountries, getRegionsByCountry } from '../services';
 import { loadCountriesFromApi, loadRegionsFromApi, LoadRegionsResult } from '../utils/countryUtils';
+import { TID } from '../testIDs';
 
 export const CountryCodeSelectScreen = () => {
   console.log('CountryCodeSelectScreen');
@@ -278,7 +279,7 @@ export const CountryCodeSelectScreen = () => {
 
         <View style={styles.searchBox}>
           <Ionicons name="search" size={18} color="#9ca3af" />
-          <TextInput
+          <TextInput testID={TID.countryCodeSelect.queryInput}
             style={styles.searchInput}
             value={query}
             onChangeText={setQuery}

@@ -20,6 +20,7 @@ import { shareReferralLink } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useSessionGuard } from '../hooks';
 import { SafeScrollView, SafeView } from '../components';
+import { TID } from '../testIDs';
 
 type MenuConfig = {
   id: string;
@@ -420,7 +421,7 @@ export const MyInfoScreen = () => {
         }}
         showBackButton
         rightComponent={
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.myInfo.logout}
             onPress={handleLogout}
             style={styles.headerLogoutButton}
             activeOpacity={0.7}
@@ -445,10 +446,10 @@ export const MyInfoScreen = () => {
               <ActivityIndicator size="small" color={COLORS.headerText} />
             ) : (
               <>
-                <Text style={styles.profileName}>
+                <Text testID={TID.myInfo.nameLabel} style={styles.profileName}>
                   {userInfo.name || '사용자'}
                 </Text>
-                <Text style={styles.profileEmail}>
+                <Text testID={TID.myInfo.emailLabel} style={styles.profileEmail}>
                   {userInfo.email}
                 </Text>
               </>
@@ -461,7 +462,7 @@ export const MyInfoScreen = () => {
           <View style={styles.menuList}>
             {menuConfigs.map((menu, index) => (
               <React.Fragment key={menu.id}>
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.myInfo.menu}
                   style={styles.menuItem}
                   onPress={() => handleMenuPress(menu)}
                   activeOpacity={0.7}

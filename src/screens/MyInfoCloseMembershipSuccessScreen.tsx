@@ -8,6 +8,7 @@ import { useAppNavigation, ROUTES } from '../navigation';
 import { logout } from '../services';
 import { unbindAdisonUid } from '../services/adison';
 import { COMMON_STYLES, FONTS } from '../constants';
+import { TID } from '../testIDs';
 
 const LOGO = require('../../assets/xrun-horizontal-logo.png');
 
@@ -88,7 +89,7 @@ export const MyInfoCloseMembershipSuccessScreen = () => {
           <Text style={styles.subMessage}>
             {t('screens.myInfoCloseMembershipSuccess.subMessage')}
           </Text>
-          <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+          <TouchableOpacity testID={TID.myInfoCloseMembershipSuccess.confirm} style={styles.button} onPress={handleConfirm}>
             <Text style={styles.buttonText}>{t('screens.myInfoCloseMembershipSuccess.confirmButton')}</Text>
           </TouchableOpacity>
         </View>

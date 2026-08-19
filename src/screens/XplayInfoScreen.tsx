@@ -19,6 +19,7 @@ import { COMMON_STYLES, FONTS, COLORS, SIZES } from '../constants';
 import { fetchWalletData } from '../services';
 import { shareReferralLink } from '../utils';
 import { useTranslation } from 'react-i18next';
+import { TID } from '../testIDs';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const blurYellow = require('../../assets/images/blur_yellow.png');
@@ -134,7 +135,7 @@ export const XplayInfoScreen = () => {
 
         {}
         <View style={styles.zonesRow}>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.xplayInfo.navigate}
             style={styles.zoneCard}
             activeOpacity={0.85}
             onPress={() => navigate(ROUTES.ayetOffersXplay)}
@@ -142,7 +143,7 @@ export const XplayInfoScreen = () => {
             <Image source={zone1Image} style={styles.zoneImage} resizeMode="contain" />
             <Text style={styles.zoneCardTitle}>Xplay Zone 1</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity testID={TID.xplayInfo.navigate2}
             style={styles.zoneCard}
             activeOpacity={0.85}
             onPress={() => navigate(ROUTES.myChipsOfferwall)}
@@ -151,7 +152,7 @@ export const XplayInfoScreen = () => {
             <Text style={styles.zoneCardTitle}>Xplay Zone 2</Text>
           </TouchableOpacity>
           {SHOW_ZONE3 && (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.xplayInfo.navigate3}
               style={styles.zoneCard}
               activeOpacity={0.85}
               onPress={() => navigate(ROUTES.adisonOfferwall)}
@@ -164,7 +165,7 @@ export const XplayInfoScreen = () => {
 
         {}
         <Text style={styles.questSectionTitle}>{t('screens.xplayInfo.quest')}</Text>
-        <TouchableOpacity
+        <TouchableOpacity testID={TID.xplayInfo.questShare}
           style={styles.questCard}
           activeOpacity={0.9}
           onPress={handleQuestShare}

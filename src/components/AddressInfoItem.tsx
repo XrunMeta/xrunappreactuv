@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES } from '../constants';
+import { TID } from '../testIDs';
 
 interface AddressInfoItemProps {
     symbol: string;
@@ -37,15 +38,15 @@ export const AddressInfoItem: React.FC<AddressInfoItemProps> = ({
         >
             <View style={styles.infoContainer}>
                 <View style={styles.nameContainer}>
-                    <Text style={styles.name} numberOfLines={1}>{name}</Text>
+                    <Text testID={TID.addressInfoItem.nameLabel} style={styles.name} numberOfLines={1}>{name}</Text>
                     {network && (
                         <View style={styles.networkBadge}>
-                            <Text style={[styles.networkText, { color: networkColor }]}>{network}</Text>
+                            <Text testID={TID.addressInfoItem.networkLabel} style={[styles.networkText, { color: networkColor }]}>{network}</Text>
                             {symbol && <Text style={styles.symbolText}> • {symbol}</Text>}
                         </View>
                     )}
                 </View>
-                <Text style={styles.address} numberOfLines={1} ellipsizeMode="middle">
+                <Text testID={TID.addressInfoItem.addressLabel} style={styles.address} numberOfLines={1} ellipsizeMode="middle">
                     {shortenAddress(address)}
                 </Text>
             </View>

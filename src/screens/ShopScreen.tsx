@@ -15,6 +15,7 @@ import { getProductList } from '../services/giftishowBiz';
 import type { GiftishowProductItem } from '../services/giftishowBiz';
 import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance, getXrunBuyableItems, fetchWalletData, getXRUNGopaxPrice } from '../services';
 import type { ShopItemData } from '../types';
+import { TID } from '../testIDs';
 
 const xplaySymbol = require('../../assets/xplay_symbol.png');
 const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
@@ -568,7 +569,7 @@ export const ShopScreen = () => {
         const hasImage = !!displayImage;
 
         return (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.shop.productClick}
                 key={product.id}
                 style={[styles.productCard, { width: productCardWidth }]}
                 onPress={() => handleProductClick(product)}
@@ -593,13 +594,13 @@ export const ShopScreen = () => {
                     ) : null}
                     {isEthereum && product.description && (
                         <View style={styles.imageDescriptionOverlay}>
-                            <Text style={styles.imageDescriptionText}>{product.description}</Text>
+                            <Text testID={TID.shop.descriptionLabel} style={styles.imageDescriptionText}>{product.description}</Text>
                         </View>
                     )}
                 </View>
                 <View style={styles.productInfo}>
                     <Text style={styles.productBrand}>{product.brand || (product.isIak ? t('screens.shop.iakBrand') : t('screens.shop.giftBrand'))}</Text>
-                    <Text style={styles.productTitle} numberOfLines={2}>
+                    <Text testID={TID.shop.titleLabel} style={styles.productTitle} numberOfLines={2}>
                         {product.title}
                     </Text>
                     {}
@@ -685,7 +686,7 @@ export const ShopScreen = () => {
                 {showSearchBar && (
                     <View style={styles.searchBar}>
                         <Feather name="search" size={18} color="#0296f2" />
-                        <TextInput
+                        <TextInput testID={TID.shop.searchQueryInput}
                             placeholder="Search"
                             placeholderTextColor="#bcbec4"
                             style={styles.searchInput}

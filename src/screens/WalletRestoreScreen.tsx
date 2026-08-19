@@ -32,6 +32,7 @@ import { COLORS, FONTS, SIZES, COMMON_STYLES, FORM_STYLES } from '../constants';
 import { sendEmailVerificationCode } from '../services';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { useAlertDialog } from '../context/AlertDialogContext';
+import { TID } from '../testIDs';
 import {
   jwtPayloadSub,
   decryptBackupJson,
@@ -812,7 +813,7 @@ export const WalletRestoreScreen = () => {
           autoAdjustKeyboardPadding={true}
         >
           <View style={restoreStyles.otpDescriptionWrapper}>
-            <Text style={restoreStyles.otpDescription}>
+            <Text testID={TID.walletRestore.emailLabel} style={restoreStyles.otpDescription}>
               {(email || '이메일') + (t('screens.verificationCode.description') || ' 로 인증번호를 발송했어요. 6자리 번호를 입력해주세요.')}
             </Text>
           </View>
@@ -821,7 +822,7 @@ export const WalletRestoreScreen = () => {
             {Array.from({ length: OTP_LENGTH }).map((_, index) => {
               const digit = otpInput[index] ?? '';
               return (
-                <TouchableOpacity
+                <TouchableOpacity testID={TID.walletRestore.otpHiddenInputRef}
                   key={index}
                   style={restoreStyles.otpCodeBox}
                   onPress={() => otpHiddenInputRef.current?.focus()}
@@ -895,7 +896,7 @@ export const WalletRestoreScreen = () => {
             앱이 만든 백업 파일만 표시됩니다. 복원할 파일을 선택해주세요.
           </Text>
           {driveFiles.map((f) => (
-            <TouchableOpacity
+            <TouchableOpacity testID={TID.walletRestore.pickDriveFile}
               key={f.id}
               style={styles.optionCard}
               activeOpacity={0.85}
@@ -963,7 +964,7 @@ export const WalletRestoreScreen = () => {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity
+        <TouchableOpacity testID={TID.walletRestore.restoreFromGdrive}
           style={[styles.optionCard, stage === 'busy' && styles.optionCardDisabled]}
           activeOpacity={0.85}
           onPress={handleRestoreFromGDrive}
