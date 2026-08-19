@@ -13,6 +13,7 @@ import { v_ce4741, v_a0daa8 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_f5ecec, v_8025d1 } from '../services';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_b0eb02 } from '../utils/blockedDeviceGate';
 
 export const v_a82b55 = () => {
   const { t: v_8d41d7 } = v_772971();
@@ -20,7 +21,12 @@ export const v_a82b55 = () => {
   const { showAlert: v_889fad } = v_4b1173();
   const [v_e0c7e8, v_fedf34] = v_5ab095('');
   const [v_cd31a8, v_deef62] = v_5ab095(false);
-  const { setVerificationSuccessRoute: v_8f89f3, setVerificationEmail: v_b572c3, verificationSuccessRoute: v_e6976c } = v_700ef9();
+  const {
+    setVerificationSuccessRoute: v_8f89f3,
+    setVerificationEmail: v_b572c3,
+    verificationSuccessRoute: v_e6976c,
+    resetVerificationSuccessRoute: v_036f76,
+  } = v_700ef9();
 
   const v_9d6cc7 = v_e6976c === v_ce4741.signup;
 
@@ -78,7 +84,7 @@ export const v_a82b55 = () => {
 
       const v_95b5c1 = v_9d6cc7 ? '[회원가입]' : '[로그인]';
       console.log(`${v_95b5c1} 이메일 인증 코드 전송 요청:`, v_e0c7e8.trim());
-      const v_f438c1 = await v_8025d1(v_e0c7e8.trim(), v_9b57fc);
+      const v_f438c1 = await v_8025d1(v_e0c7e8.trim(), 'signup', v_9b57fc);
 
       if (!v_f438c1) {
         await v_889fad(v_8d41d7('screens.emailVerification.alerts.sendFailed'), v_8d41d7('screens.emailVerification.errors.sendFailed'));
@@ -96,6 +102,23 @@ export const v_a82b55 = () => {
 
     } catch (v_5e9bfe) {
       console.error('[이메일 인증] 이메일 인증 처리 중 오류:', v_5e9bfe);
+
+      const v_d1e508 = await v_b0eb02(v_5e9bfe, v_889fad, v_8d41d7);
+      if (v_d1e508.handled) {
+        if (v_9d6cc7) {
+          try { await v_e84827.removeItem('pendingSignupData'); } catch {  }
+        }
+        if (v_d1e508.requestUnblock) {
+          try { await v_e84827.setItem('deviceUnblockRequestEmail', v_e0c7e8.trim()); } catch {  }
+          v_036f76();
+          v_deef62(false);
+          v_9b57fc('deviceUnblockRequest');
+          return;
+        }
+        v_036f76();
+        v_deef62(false);
+        return;
+      }
 
       if (v_9d6cc7) {
         try {
