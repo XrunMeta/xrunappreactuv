@@ -1313,7 +1313,8 @@ export const v_cdb169 = () => {
       }
       try {
         console.log('[정보수정] 이메일 인증 코드 발송 요청:', v_e0c7e8);
-        const v_593e63 = await v_8025d1(v_e0c7e8, v_9b57fc);
+
+        const v_593e63 = await v_8025d1(v_e0c7e8, 'email_change', v_9b57fc);
         if (v_593e63) {
           v_b572c3(v_e0c7e8);
           v_8f89f3(v_ce4741.myInfoPhoneEdit);

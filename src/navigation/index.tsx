@@ -92,6 +92,8 @@ export const v_ce4741 = {
   adisonTest: 'adisonTest',
   walletKeyTutorial: 'walletKeyTutorial',
   walletKeyGuide: 'walletKeyGuide',
+
+  deviceUnblockRequest: 'deviceUnblockRequest',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;

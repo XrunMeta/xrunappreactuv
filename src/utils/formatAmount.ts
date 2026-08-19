@@ -18,6 +18,13 @@ function v_f07fbe(value: number | string | v_12cf3e): v_12cf3e {
   return new v_12cf3e(v_479f05);
 }
 
+export function v_9e6c84(value: number | string | v_12cf3e | null | undefined): v_12cf3e | null {
+  if (v_3b402b == null) return null;
+  if (typeof v_3b402b === 'string' && v_3b402b.trim() === '') return null;
+  const v_81e2ef = v_f07fbe(v_3b402b);
+  return v_81e2ef.isNaN() ? null : v_81e2ef;
+}
+
 export function v_2396c3(value: number | string | v_12cf3e | null | undefined, v_9a62b2 = 4): string {
   if (v_3b402b == null || v_3b402b === '') return '0';
   const v_81e2ef = v_f07fbe(v_3b402b);

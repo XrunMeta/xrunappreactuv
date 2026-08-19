@@ -36,7 +36,8 @@ export const EmailOtpGate: v_a3453e.FC<Props> = ({ email: v_e0c7e8, onSuccess: v
     if (v_9dc9e2) return;
     (async () => {
       try {
-        await v_8025d1(v_e0c7e8);
+
+        await v_8025d1(v_e0c7e8, 'send_confirm');
         v_ad85ac(true);
       } catch (v_9e86fd) {
         console.warn('[EmailOtpGate] send failed', v_9e86fd);
@@ -84,7 +85,7 @@ export const EmailOtpGate: v_a3453e.FC<Props> = ({ email: v_e0c7e8, onSuccess: v
     v_3a7d09('');
     v_537cbb('');
     try {
-      await v_8025d1(v_e0c7e8);
+      await v_8025d1(v_e0c7e8, 'send_confirm');
       v_83fe8f(v_ef7132);
     } catch {
       v_3a7d09(v_8d41d7('screens.emailOtp.sendError') || '인증 코드 발송 중 오류가 발생했습니다.');
