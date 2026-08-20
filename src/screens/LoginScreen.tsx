@@ -36,14 +36,14 @@ import {
   saveSession,
   checkEmailExists,
   sendEmailVerificationCode,
-  signInWithGoogle,
   connectGoogleAccount,
-  signInWithApple,
   connectAppleAccount,
-  showNativeScreen,
   registerPushToken,
   fetchAndSaveWallets,
 } from '../services';
+import { signInWithApple } from '../services/appleAuth';
+import { signInWithGoogle } from '../services/googleAuth';
+import { showNativeScreen } from '../services/pangle';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
@@ -96,9 +96,10 @@ export const LoginScreen = () => {
   const [successDialogVisible, setSuccessDialogVisible] = useState(false);
 
   const [didJustLogin, setDidJustLogin] = useState(false);
-  const { needsPinUpgrade } = useLegacyVaultSweep(didJustLogin, emailForUpgrade, memberIdForUpgrade ?? 0);
+
   const [memberIdForUpgrade, setMemberIdForUpgrade] = useState<number | null>(null);
   const [emailForUpgrade, setEmailForUpgrade] = useState('');
+  const { needsPinUpgrade } = useLegacyVaultSweep(didJustLogin, emailForUpgrade, memberIdForUpgrade ?? 0);
   const [pinUpgradeVisible, setPinUpgradeVisible] = useState(false);
 
   React.useEffect(() => {
@@ -389,6 +390,12 @@ export const LoginScreen = () => {
           try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
         }
 
+      } else if (respData?.reason === 'account_banned') {
+
+        try {
+          await AsyncStorage.removeItem('jwt');
+          await AsyncStorage.removeItem('isLoggedIn');
+        } catch {  }
       } else {
 
         try {
@@ -563,6 +570,11 @@ export const LoginScreen = () => {
 
             try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
+          setIsLoading(false);
+          return;
+        }
+
+        if (result.code === 'ACCOUNT_BANNED') {
           setIsLoading(false);
           return;
         }
@@ -746,6 +758,11 @@ export const LoginScreen = () => {
               console.warn('[애플 로그인] device mismatch OTP 전송 실패:', e);
             }
           }
+          setIsLoading(false);
+          return;
+        }
+
+        if (result.code === 'ACCOUNT_BANNED') {
           setIsLoading(false);
           return;
         }

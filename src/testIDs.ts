@@ -301,6 +301,10 @@ export const TID = {
   },
   walletKeyPinPrompt: {
     titleLabel: 'wallet-key-pin-prompt-title-label',
+
+    key: 'wallet-key-pin-prompt-key',
+    cancel: 'wallet-key-pin-prompt-cancel',
+    backspace: 'wallet-key-pin-prompt-backspace',
   },
   walletKeyTutorial: {
     titleLabel: 'wallet-key-tutorial-title-label',

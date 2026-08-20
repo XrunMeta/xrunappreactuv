@@ -22,9 +22,10 @@ describe('walletKeyTutorialHelpers', () => {
     expect(canFinish(1, true)).toBe(false);
   });
 
-  it('shouldShowTutorial: pending true & completed false 일 때만 true', () => {
+  it('shouldShowTutorial: pending 만 본다 (completed 는 무시)', () => {
     expect(shouldShowTutorial('true', null)).toBe(true);
-    expect(shouldShowTutorial('true', 'true')).toBe(false);
+
+    expect(shouldShowTutorial('true', 'true')).toBe(true);
     expect(shouldShowTutorial(null, null)).toBe(false);
     expect(shouldShowTutorial(null, 'true')).toBe(false);
   });
