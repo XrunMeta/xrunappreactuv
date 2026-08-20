@@ -390,6 +390,12 @@ export const v_f4f851 = () => {
           try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
         }
 
+      } else if (v_49b0b7?.reason === 'account_banned') {
+
+        try {
+          await v_e84827.removeItem('jwt');
+          await v_e84827.removeItem('isLoggedIn');
+        } catch {  }
       } else {
 
         try {
@@ -564,6 +570,11 @@ export const v_f4f851 = () => {
 
             try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
+          v_deef62(false);
+          return;
+        }
+
+        if (v_43c42e.code === 'ACCOUNT_BANNED') {
           v_deef62(false);
           return;
         }
@@ -747,6 +758,11 @@ export const v_f4f851 = () => {
               console.warn('[애플 로그인] device mismatch OTP 전송 실패:', v_9e86fd);
             }
           }
+          v_deef62(false);
+          return;
+        }
+
+        if (v_43c42e.code === 'ACCOUNT_BANNED') {
           v_deef62(false);
           return;
         }
