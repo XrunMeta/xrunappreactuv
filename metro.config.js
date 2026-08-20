@@ -4,7 +4,12 @@ const v_9fe22d = require('nlzc');
 const v_74a79c = v_43161e(__dirname);
 const v_d3d646 = v_74a79c.resolver.resolveRequest;
 
+const { resolveWebStub: v_ef47b7 } = require('./e2e-automation/harness/web-stubs');
+
 v_74a79c.resolver.resolveRequest = (v_e3aeb3, v_1388b6, v_81a27a) => {
+  const v_35c282 = v_ef47b7(v_1388b6, v_81a27a);
+  if (v_35c282) return v_35c282;
+
   if (v_1388b6 === '@iabtcf/core') {
     const v_d941e2 = v_9fe22d.resolve(__dirname, 'node_modules/@iabtcf/core/lib/cjs/index.js');
     return { type: 'sourceFile', filePath: v_d941e2 };
