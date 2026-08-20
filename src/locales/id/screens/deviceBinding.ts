@@ -13,4 +13,10 @@ export default {
   signupBlockedTitle: 'Pendaftaran Dibatasi',
   signupBlockedBody:
     'Akun sudah dibuat di perangkat ini. Hanya satu akun per perangkat yang diperbolehkan.',
+
+  accountBannedTitle: 'Pemberitahuan Pembatasan Permanen Akun',
+  accountBannedBodyWithDate:
+    'Penggunaan layanan akun ini telah dibatasi secara permanen karena pelanggaran serius terhadap Ketentuan Layanan dan kebijakan operasional.\n\nTanggal berlaku: {{date}}\n\nAlasan pembatasan: Penggunaan program tidak sah / pelanggaran ketentuan yang serius, dll.\n\nJika Anda ingin mengajukan keberatan atau penjelasan, silakan hubungi layanan pelanggan atau oth-staff@example.invalid.',
+  accountBannedBodyNoDate:
+    'Penggunaan layanan akun ini telah dibatasi secara permanen karena pelanggaran serius terhadap Ketentuan Layanan dan kebijakan operasional.\n\nAlasan pembatasan: Penggunaan program tidak sah / pelanggaran ketentuan yang serius, dll.\n\nJika Anda ingin mengajukan keberatan atau penjelasan, silakan hubungi layanan pelanggan atau oth-staff@example.invalid.',
 };
