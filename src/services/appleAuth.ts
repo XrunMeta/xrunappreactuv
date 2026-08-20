@@ -292,6 +292,23 @@ export async function signInWithApple(navigation?: any): Promise<AppleAuthResult
           };
         }
 
+        if (fetchError.response?.status === 403 && fetchError.response?.data?.reason === 'account_banned') {
+          try {
+            const i18n = require('i18next').default || require('i18next');
+            const { getGlobalShowAlert } = require('../context/AlertDialogContext');
+            const { presentAccountBannedAlert } = require('../utils/accountBanned');
+            const showAlertFn = getGlobalShowAlert?.();
+            if (showAlertFn) {
+              await presentAccountBannedAlert(fetchError.response?.data?.bannedAt, showAlertFn, (key: string, opts?: any) => i18n.t(key, opts));
+            }
+          } catch {  }
+          return {
+            success: false,
+            code: 'ACCOUNT_BANNED',
+            message: fetchError.response?.data?.message ?? '',
+          };
+        }
+
         console.error('[애플 로그인] API 에러:', {
           message: fetchError.message,
           response: fetchError.response?.data,

@@ -390,6 +390,12 @@ export const LoginScreen = () => {
           try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
         }
 
+      } else if (respData?.reason === 'account_banned') {
+
+        try {
+          await AsyncStorage.removeItem('jwt');
+          await AsyncStorage.removeItem('isLoggedIn');
+        } catch {  }
       } else {
 
         try {
@@ -564,6 +570,11 @@ export const LoginScreen = () => {
 
             try { await AsyncStorage.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
+          setIsLoading(false);
+          return;
+        }
+
+        if (result.code === 'ACCOUNT_BANNED') {
           setIsLoading(false);
           return;
         }
@@ -747,6 +758,11 @@ export const LoginScreen = () => {
               console.warn('[애플 로그인] device mismatch OTP 전송 실패:', e);
             }
           }
+          setIsLoading(false);
+          return;
+        }
+
+        if (result.code === 'ACCOUNT_BANNED') {
           setIsLoading(false);
           return;
         }
