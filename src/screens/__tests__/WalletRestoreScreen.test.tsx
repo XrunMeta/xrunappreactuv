@@ -54,7 +54,7 @@ jest.mock('../../context/AlertDialogContext', () => ({
 }));
 
 jest.mock('../../components', () => {
-  const { View, Text, TouchableOpacity } = require('react-native');
+  const { View, Text, TextInput, TouchableOpacity } = require('react-native');
   const React = require('react');
   return {
     Header: ({ title }: any) => React.createElement(Text, null, title),
@@ -63,6 +63,14 @@ jest.mock('../../components', () => {
       React.createElement(View, { style: contentContainerStyle }, children),
     WalletKeyPinPromptModal: ({ visible }: any) =>
       visible ? React.createElement(View, { testID: 'pin-prompt-modal' }) : null,
+    FormField: ({ testID, value, onChangeText, placeholder, secureTextEntry }: any) =>
+      React.createElement(TextInput, { testID, value, onChangeText, placeholder, secureTextEntry }),
+    PrimaryButton: ({ testID, title, onPress, disabled }: any) =>
+      React.createElement(
+        TouchableOpacity,
+        { testID, onPress, disabled, accessibilityState: { disabled: !!disabled } },
+        React.createElement(Text, null, title),
+      ),
   };
 });
 

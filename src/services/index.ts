@@ -232,13 +232,6 @@ export async function getWalletKeyATStatus(): Promise<{ at: boolean; at_at: stri
 
 export const getEmailAuthApiBaseUrl = (): string => getApiBaseUrl();
 
-export * from './googleAuth';
-
-export * from './appleAuth';
-
-export * from './pangle';
-export { sendPangleCallback } from './pangle';
-export { logRewardedAdCompleted, getAppsFlyerAdNetworkFromCompany } from './appsflyer';
 import {
   AliveResponse,
   KeepAliveServerResponse,
@@ -1056,17 +1049,26 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
             if (respReason === 'session_invalidated' || respReason === 'device_mismatch_apiguard') {
               try {
                 const i18n = require('i18next').default || require('i18next');
-                const { getGlobalShowAlert } = require('../context/AlertDialogContext');
-                const showAlertFn = getGlobalShowAlert?.();
-                if (showAlertFn) {
 
-                  void showAlertFn(
-                    i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
-                    i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
-                    [{ text: i18n.t('common.buttons.confirm') || '확인' }],
-                    { hideCloseButton: true },
-                  );
-                }
+                const { resolveShowAlert } = require('../utils/alertFallback');
+                const showAlertFn = resolveShowAlert();
+
+                void showAlertFn(
+                  i18n.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
+                  i18n.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                  [{ text: i18n.t('common.buttons.confirm') || '확인' }],
+                  { hideCloseButton: true },
+                );
+              } catch {  }
+            } else if (respReason === 'account_banned') {
+
+              try {
+                const i18n = require('i18next').default || require('i18next');
+                const { resolveShowAlert } = require('../utils/alertFallback');
+                const { presentAccountBannedAlert } = require('../utils/accountBanned');
+                const showAlertFn = resolveShowAlert();
+                const bannedAt = (error.response?.data as any)?.bannedAt;
+                void presentAccountBannedAlert(bannedAt, showAlertFn, (key: string, opts?: any) => i18n.t(key, opts));
               } catch {  }
             }
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', url);
@@ -1103,6 +1105,22 @@ export const createAxiosInstance = (navigation?: any, options?: CreateAxiosInsta
           } else if (navigation?.navigate) {
             try { navigation.navigate('login'); } catch {  }
           }
+        }
+      }
+
+      {
+        const status403 = error.response?.status;
+        const reason403 = (error.response?.data as any)?.reason;
+        if (status403 === 403 && reason403 === 'account_banned') {
+          try {
+            const i18n = require('i18next').default || require('i18next');
+
+            const { resolveShowAlert } = require('../utils/alertFallback');
+            const { presentAccountBannedAlert } = require('../utils/accountBanned');
+            const showAlertFn = resolveShowAlert();
+            const bannedAt = (error.response?.data as any)?.bannedAt;
+            void presentAccountBannedAlert(bannedAt, showAlertFn, (key: string, opts?: any) => i18n.t(key, opts));
+          } catch {  }
         }
       }
 
@@ -7326,8 +7344,6 @@ export const deleteShopItem = async (
     throw error;
   }
 };
-
-export * from './pangle';
 
 export const createItemFromApp = async (
   request: CreateItemFromAppRequest,

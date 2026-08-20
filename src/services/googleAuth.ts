@@ -227,6 +227,23 @@ export async function signInWithGoogle(navigation?: any): Promise<GoogleAuthResu
         } as any;
       }
 
+      if (data.code === 403 && data.reason === 'account_banned') {
+        try {
+          const i18n = require('i18next').default || require('i18next');
+          const { getGlobalShowAlert } = require('../context/AlertDialogContext');
+          const { presentAccountBannedAlert } = require('../utils/accountBanned');
+          const showAlertFn = getGlobalShowAlert?.();
+          if (showAlertFn) {
+            await presentAccountBannedAlert(data.bannedAt, showAlertFn, (key: string, opts?: any) => i18n.t(key, opts));
+          }
+        } catch {  }
+        return {
+          success: false,
+          code: 'ACCOUNT_BANNED',
+          message: data.message ?? '',
+        };
+      }
+
       if (data.code === 216) {
         const confirmationToken = getConfirmationToken(data.data);
         console.log('[구글 로그인] 계정 연동 필요 (216), confirmationToken 존재:', !!confirmationToken, 'data.data 키:', data.data ? Object.keys(data.data) : []);

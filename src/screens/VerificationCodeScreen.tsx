@@ -25,9 +25,9 @@ import {
   signup,
   checkLogin,
   SignupHelpers,
-  getGoogleIdToken,
   loginWithGoogleIdToken,
 } from '../services';
+import { getGoogleIdToken } from '../services/googleAuth';
 import { signInWithApple } from '../services/appleAuth';
 import { AxiosError } from 'axios';
 import { TUTORIAL_PENDING_KEY, TUTORIAL_COMPLETED_KEY } from './walletKeyTutorialHelpers';
