@@ -36,14 +36,14 @@ import {
   v_ea3493,
   v_f5ecec,
   v_8025d1,
-  v_2683ec,
   v_4c4126,
-  v_7af6c9,
   v_1fee11,
-  v_a763e6,
   v_cec605,
   v_5ed938,
 } from '../services';
+import { v_7af6c9 } from '../services/appleAuth';
+import { v_2683ec } from '../services/googleAuth';
+import { v_a763e6 } from '../services/pangle';
 import { v_96abff } from '../utils';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_700ef9 } from '../context';
@@ -96,9 +96,10 @@ export const v_f4f851 = () => {
   const [v_381ed1, v_361e20] = v_5ab095(false);
 
   const [v_014952, v_faee70] = v_5ab095(false);
-  const { needsPinUpgrade: v_de8f06 } = v_f799e3(v_014952, v_55f663, v_9e80fd ?? 0);
+
   const [v_9e80fd, v_23fcdd] = v_5ab095<number | null>(null);
   const [v_55f663, v_edcc4f] = v_5ab095('');
+  const { needsPinUpgrade: v_de8f06 } = v_f799e3(v_014952, v_55f663, v_9e80fd ?? 0);
   const [v_e8e4ec, v_8f9fa0] = v_5ab095(false);
 
   v_a3453e.useEffect(() => {
@@ -389,6 +390,12 @@ export const v_f4f851 = () => {
           try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
         }
 
+      } else if (v_49b0b7?.reason === 'account_banned') {
+
+        try {
+          await v_e84827.removeItem('jwt');
+          await v_e84827.removeItem('isLoggedIn');
+        } catch {  }
       } else {
 
         try {
@@ -563,6 +570,11 @@ export const v_f4f851 = () => {
 
             try { await v_e84827.removeItem('pendingDeviceChangeFlow'); } catch {  }
           }
+          v_deef62(false);
+          return;
+        }
+
+        if (v_43c42e.code === 'ACCOUNT_BANNED') {
           v_deef62(false);
           return;
         }
@@ -746,6 +758,11 @@ export const v_f4f851 = () => {
               console.warn('[애플 로그인] device mismatch OTP 전송 실패:', v_9e86fd);
             }
           }
+          v_deef62(false);
+          return;
+        }
+
+        if (v_43c42e.code === 'ACCOUNT_BANNED') {
           v_deef62(false);
           return;
         }
