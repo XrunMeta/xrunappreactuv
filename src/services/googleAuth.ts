@@ -227,6 +227,23 @@ export async function v_2683ec(v_c65f5d): Promise<GoogleAuthResult> {
         } as any;
       }
 
+      if (v_9390e8.code === 403 && v_9390e8.reason === 'account_banned') {
+        try {
+          const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+          const { getGlobalShowAlert: v_c551a1 } = require('../context/AlertDialogContext');
+          const { presentAccountBannedAlert: v_00f25c } = require('../utils/accountBanned');
+          const v_15357a = v_c551a1?.();
+          if (v_15357a) {
+            await v_00f25c(v_9390e8.bannedAt, v_15357a, (v_b24339, v_328259) => v_9c213b.t(v_b24339, v_328259));
+          }
+        } catch {  }
+        return {
+          success: false,
+          code: 'ACCOUNT_BANNED',
+          message: v_9390e8.message ?? '',
+        };
+      }
+
       if (v_9390e8.code === 216) {
         const v_94604b = v_f63ca7(v_9390e8.data);
         console.log('[구글 로그인] 계정 연동 필요 (216), confirmationToken 존재:', !!v_94604b, 'data.data 키:', v_9390e8.data ? Object.keys(v_9390e8.data) : []);

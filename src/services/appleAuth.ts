@@ -292,6 +292,23 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
           };
         }
 
+        if (v_690fe1.response?.status === 403 && v_690fe1.response?.data?.reason === 'account_banned') {
+          try {
+            const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+            const { getGlobalShowAlert: v_c551a1 } = require('../context/AlertDialogContext');
+            const { presentAccountBannedAlert: v_00f25c } = require('../utils/accountBanned');
+            const v_15357a = v_c551a1?.();
+            if (v_15357a) {
+              await v_00f25c(v_690fe1.response?.data?.bannedAt, v_15357a, (v_b24339, v_328259) => v_9c213b.t(v_b24339, v_328259));
+            }
+          } catch {  }
+          return {
+            success: false,
+            code: 'ACCOUNT_BANNED',
+            message: v_690fe1.response?.data?.message ?? '',
+          };
+        }
+
         console.error('[애플 로그인] API 에러:', {
           message: v_690fe1.message,
           response: v_690fe1.response?.data,

@@ -13,4 +13,10 @@ export default {
   signupBlockedTitle: '会員登録の制限',
   signupBlockedBody:
     'この端末では既にアカウントが作成されています。1つの端末につき1つのアカウントのみ使用できます。',
+
+  accountBannedTitle: 'アカウント永久利用制限のお知らせ',
+  accountBannedBodyWithDate:
+    '利用規約および運営ポリシーに著しく違反したため、当該アカウントのサービス利用が永久に制限されました。\n\n適用日時: {{date}}\n\n制限理由: 不正プログラムの使用 / 重大な規約違反など\n\n異議申し立てや釈明が必要な場合は、カスタマーセンターまたはoth-staff@example.invalidまでご連絡ください。',
+  accountBannedBodyNoDate:
+    '利用規約および運営ポリシーに著しく違反したため、当該アカウントのサービス利用が永久に制限されました。\n\n制限理由: 不正プログラムの使用 / 重大な規約違反など\n\n異議申し立てや釈明が必要な場合は、カスタマーセンターまたはoth-staff@example.invalidまでご連絡ください。',
 };

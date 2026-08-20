@@ -23,4 +23,10 @@ export default {
   unblockSubmitted: '해제 요청이 접수되었습니다. 검토 후 안내드리겠습니다.',
   unblockTooMany: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
   unblockSubmitFailed: '요청 접수에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+
+  accountBannedTitle: '계정 영구 이용 제한 안내',
+  accountBannedBodyWithDate:
+    '이용약관 및 운영정책을 심각하게 위반하여 해당 계정의 서비스 이용이 영구 제한되었습니다.\n\n적용 일시: {{date}}\n\n제한 사유: 부정 프로그램 사용 / 중대 약관 위반 등\n\n이의 제기나 소명이 필요하신 경우 고객센터나 oth-staff@example.invalid 접수해 주시기 바랍니다.',
+  accountBannedBodyNoDate:
+    '이용약관 및 운영정책을 심각하게 위반하여 해당 계정의 서비스 이용이 영구 제한되었습니다.\n\n제한 사유: 부정 프로그램 사용 / 중대 약관 위반 등\n\n이의 제기나 소명이 필요하신 경우 고객센터나 oth-staff@example.invalid 접수해 주시기 바랍니다.',
 };

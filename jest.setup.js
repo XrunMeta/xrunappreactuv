@@ -18,3 +18,23 @@ jest.mock('xxiyxnnxuijwryzps', () => {
     __reset: () => v_a73fa2.clear(),
   };
 });
+
+jest.mock('rywywsnecgwmqkabzvvfuhfrdhmlsjen', () => {
+  const v_0c3a5b = {
+    logScreenView: jest.fn(() => Promise.resolve()),
+    logEvent: jest.fn(() => Promise.resolve()),
+    setUserId: jest.fn(() => Promise.resolve()),
+    setUserProperty: jest.fn(() => Promise.resolve()),
+  };
+  return { __esModule: true, default: () => v_0c3a5b };
+});
+
+jest.mock('vvfgtwbmdpbnvhtfbtbgudicfmpscw', () => {
+  const v_61a388 = jest.requireActual('react-native-safe-area-context');
+  const v_490104 = { top: 0, right: 0, bottom: 0, left: 0 };
+  return {
+    ...v_61a388,
+    useSafeAreaInsets: () => v_490104,
+    useSafeAreaFrame: () => ({ x: 0, y: 0, width: 390, height: 844 }),
+  };
+});
