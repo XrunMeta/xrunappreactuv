@@ -17,7 +17,17 @@ import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getNasmobAds, sendNasmobCallback, processAdReward, getPockAds, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
+import {
+  getNasmobAds,
+  sendNasmobCallback,
+  processAdReward,
+  getPockAds,
+  removeAdFromTopAd5,
+  getCompletedAds,
+  getTopAd5,
+  addToCompletedAdsCache,
+} from '../services';
+import { logRewardedAdCompleted } from '../services/appsflyer';
 import { NAP_CONFIG } from '../config/napConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';

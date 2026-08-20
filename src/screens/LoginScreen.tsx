@@ -36,14 +36,14 @@ import {
   saveSession,
   checkEmailExists,
   sendEmailVerificationCode,
-  signInWithGoogle,
   connectGoogleAccount,
-  signInWithApple,
   connectAppleAccount,
-  showNativeScreen,
   registerPushToken,
   fetchAndSaveWallets,
 } from '../services';
+import { signInWithApple } from '../services/appleAuth';
+import { signInWithGoogle } from '../services/googleAuth';
+import { showNativeScreen } from '../services/pangle';
 import { filterAsciiPrintable } from '../utils';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppContext } from '../context';
@@ -96,9 +96,10 @@ export const LoginScreen = () => {
   const [successDialogVisible, setSuccessDialogVisible] = useState(false);
 
   const [didJustLogin, setDidJustLogin] = useState(false);
-  const { needsPinUpgrade } = useLegacyVaultSweep(didJustLogin, emailForUpgrade, memberIdForUpgrade ?? 0);
+
   const [memberIdForUpgrade, setMemberIdForUpgrade] = useState<number | null>(null);
   const [emailForUpgrade, setEmailForUpgrade] = useState('');
+  const { needsPinUpgrade } = useLegacyVaultSweep(didJustLogin, emailForUpgrade, memberIdForUpgrade ?? 0);
   const [pinUpgradeVisible, setPinUpgradeVisible] = useState(false);
 
   React.useEffect(() => {

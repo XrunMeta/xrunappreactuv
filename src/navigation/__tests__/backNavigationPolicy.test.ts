@@ -1,22 +1,22 @@
 import { resolveBackAction } from '../backNavigationPolicy';
 
 describe('resolveBackAction — 추천(referral) 화면', () => {
-  it('헤더 뒤로가기: 스택이 남아있으면 이전 화면으로 돌아간다', () => {
+  it('헤더 뒤로가기: 스택이 남아있어도 지갑으로 리셋한다', () => {
     expect(
       resolveBackAction({ screen: 'referralMyGroup', canGoBack: true, source: 'header' }),
-    ).toBe('goBack');
+    ).toBe('resetWallet');
   });
 
-  it('하드웨어 백키: 스택이 남아있으면 이전 화면으로 돌아간다', () => {
+  it('하드웨어 백키: 스택이 남아있어도 지갑으로 리셋한다', () => {
     expect(
       resolveBackAction({ screen: 'referralSettlement', canGoBack: true, source: 'hardware' }),
-    ).toBe('goBack');
+    ).toBe('resetWallet');
   });
 
-  it('스택이 비어 있으면 맵으로 리셋한다', () => {
+  it('스택이 비어 있어도 (맵이 아니라) 지갑으로 리셋한다', () => {
     expect(
       resolveBackAction({ screen: 'referralRank', canGoBack: false, source: 'hardware' }),
-    ).toBe('resetMap');
+    ).toBe('resetWallet');
   });
 });
 

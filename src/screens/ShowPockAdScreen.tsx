@@ -19,7 +19,16 @@ import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
 import { useAppNavigation, ROUTES } from '../navigation';
 import { collectDeviceInfo } from '../utils/napApiUtils';
-import { getPockAds, getPointClickAds, processAdReward, removeAdFromTopAd5, getCompletedAds, getTopAd5, addToCompletedAdsCache, logRewardedAdCompleted } from '../services';
+import {
+  getPockAds,
+  getPointClickAds,
+  processAdReward,
+  removeAdFromTopAd5,
+  getCompletedAds,
+  getTopAd5,
+  addToCompletedAdsCache,
+} from '../services';
+import { logRewardedAdCompleted } from '../services/appsflyer';
 import { showToast } from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TaboolaBanner, SafeScrollView } from '../components';

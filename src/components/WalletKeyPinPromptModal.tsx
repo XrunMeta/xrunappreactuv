@@ -249,6 +249,7 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <TouchableOpacity
                 key={n}
+                testID={`${TID.walletKeyPinPrompt.key}-${n}`}
                 style={styles.key}
                 onPress={() => onPressDigit(String(n))}
               >
@@ -256,16 +257,17 @@ export const WalletKeyPinPromptModal: React.FC<Props> = ({
               </TouchableOpacity>
             ))}
             {}
-            <TouchableOpacity style={styles.key} onPress={onCancel}>
+            <TouchableOpacity testID={TID.walletKeyPinPrompt.cancel} style={styles.key} onPress={onCancel}>
               <Text style={[styles.keyText, { fontSize: 14, color: COLORS.darkGray }]}>{t('components.walletKeyPinPrompt.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              testID={`${TID.walletKeyPinPrompt.key}-0`}
               style={styles.key}
               onPress={() => onPressDigit('0')}
             >
               <Text style={styles.keyText}>0</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.key} onPress={onPressBackspace}>
+            <TouchableOpacity testID={TID.walletKeyPinPrompt.backspace} style={styles.key} onPress={onPressBackspace}>
               <Text style={[styles.keyText, { fontSize: 18 }]}>{'<'}</Text>
             </TouchableOpacity>
         </View>
