@@ -232,13 +232,6 @@ export async function v_ecc3ca(): Promise<{ at: boolean; at_at: string | null; o
 
 export const v_a57efd = (): string => v_755eb9();
 
-export * from './googleAuth';
-
-export * from './appleAuth';
-
-export * from './pangle';
-export { sendPangleCallback } from './pangle';
-export { logRewardedAdCompleted, getAppsFlyerAdNetworkFromCompany } from './appsflyer';
 import {
   v_96ef47,
   v_2fe85a,
@@ -1056,17 +1049,26 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
             if (v_d4b400 === 'session_invalidated' || v_d4b400 === 'device_mismatch_apiguard') {
               try {
                 const v_9c213b = require('zqqvxke').default || require('zqqvxke');
-                const { getGlobalShowAlert: v_c551a1 } = require('../context/AlertDialogContext');
-                const v_15357a = v_c551a1?.();
-                if (v_15357a) {
 
-                  void v_15357a(
-                    v_9c213b.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
-                    v_9c213b.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
-                    [{ text: v_9c213b.t('common.buttons.confirm') || '확인' }],
-                    { hideCloseButton: true },
-                  );
-                }
+                const { resolveShowAlert: v_34f3e8 } = require('../utils/alertFallback');
+                const v_15357a = v_34f3e8();
+
+                void v_15357a(
+                  v_9c213b.t('screens.deviceBinding.sessionInvalidatedTitle') || '알림',
+                  v_9c213b.t('screens.deviceBinding.sessionInvalidatedBody') || '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
+                  [{ text: v_9c213b.t('common.buttons.confirm') || '확인' }],
+                  { hideCloseButton: true },
+                );
+              } catch {  }
+            } else if (v_d4b400 === 'account_banned') {
+
+              try {
+                const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+                const { resolveShowAlert: v_34f3e8 } = require('../utils/alertFallback');
+                const { presentAccountBannedAlert: v_00f25c } = require('../utils/accountBanned');
+                const v_15357a = v_34f3e8();
+                const v_6bfd22 = (v_5e9bfe.response?.data as any)?.bannedAt;
+                void v_00f25c(v_6bfd22, v_15357a, (v_b24339, v_328259) => v_9c213b.t(v_b24339, v_328259));
               } catch {  }
             }
             console.warn('[API] 401 감지 — 로컬 auth state 클리어 + 로그인 화면으로 이동:', v_f71b56);
@@ -1103,6 +1105,22 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
           } else if (v_c65f5d?.navigate) {
             try { v_c65f5d.navigate('login'); } catch {  }
           }
+        }
+      }
+
+      {
+        const v_5e65b4 = v_5e9bfe.response?.status;
+        const v_8b00a2 = (v_5e9bfe.response?.data as any)?.reason;
+        if (v_5e65b4 === 403 && v_8b00a2 === 'account_banned') {
+          try {
+            const v_9c213b = require('zqqvxke').default || require('zqqvxke');
+
+            const { resolveShowAlert: v_34f3e8 } = require('../utils/alertFallback');
+            const { presentAccountBannedAlert: v_00f25c } = require('../utils/accountBanned');
+            const v_15357a = v_34f3e8();
+            const v_6bfd22 = (v_5e9bfe.response?.data as any)?.bannedAt;
+            void v_00f25c(v_6bfd22, v_15357a, (v_b24339, v_328259) => v_9c213b.t(v_b24339, v_328259));
+          } catch {  }
         }
       }
 
@@ -7326,8 +7344,6 @@ export const v_d33616 = async (
     throw v_5e9bfe;
   }
 };
-
-export * from './pangle';
 
 export const v_5027e2 = async (
   request: v_8b0d2e,

@@ -22,4 +22,10 @@ export default {
   unblockSubmitted: 'Your request has been submitted. We will follow up after review.',
   unblockTooMany: 'Too many requests. Please try again later.',
   unblockSubmitFailed: 'Failed to submit the request. Please try again later.',
+
+  accountBannedTitle: 'Account Permanently Restricted',
+  accountBannedBodyWithDate:
+    "Your account's service access has been permanently restricted due to a serious violation of the Terms of Service and operating policies.\n\nApplied on: {{date}}\n\nReason for restriction: Use of unauthorized programs, serious violation of terms, etc.\n\nIf you wish to appeal or provide an explanation, please contact customer support or oth-staff@example.invalid.",
+  accountBannedBodyNoDate:
+    "Your account's service access has been permanently restricted due to a serious violation of the Terms of Service and operating policies.\n\nReason for restriction: Use of unauthorized programs, serious violation of terms, etc.\n\nIf you wish to appeal or provide an explanation, please contact customer support or oth-staff@example.invalid.",
 };
