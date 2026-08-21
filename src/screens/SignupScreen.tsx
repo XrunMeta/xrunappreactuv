@@ -1405,6 +1405,7 @@ export const v_f40fc5 = () => {
               checked={v_471e49}
               onToggle={() => v_7f4d53((v_ba2215) => !v_ba2215)}
               variant="square"
+              testID={v_5401ae.signup.termsServiceCheckbox}
             />
             <Text style={v_d81136.termsText}>
               <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('service')}>
@@ -1420,6 +1421,7 @@ export const v_f40fc5 = () => {
               checked={v_68a5a9}
               onToggle={() => v_8e53ad((v_ba2215) => !v_ba2215)}
               variant="square"
+              testID={v_5401ae.signup.termsLocationCheckbox}
             />
             <Text style={v_d81136.termsText}>
               <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('location')}>
@@ -1435,6 +1437,7 @@ export const v_f40fc5 = () => {
               checked={v_e55f34}
               onToggle={() => v_f932c8((v_ba2215) => !v_ba2215)}
               variant="square"
+              testID={v_5401ae.signup.termsPrivacyCheckbox}
             />
             <Text style={v_d81136.termsText}>
               <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('personal')}>
