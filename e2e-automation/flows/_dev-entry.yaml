@@ -1,0 +1,59 @@
+# 공용 서브플로우 — dev 빌드 진입 장애물 걷어내기
+#
+# expo-dev-client 로 만든 개발 빌드에서만 나오는 관문 3종을 순서대로 치운다.
+# 프로덕션 빌드에는 하나도 없다. 여기 있는 단계가 실패해도 제품 문제가 아니다.
+#
+# 각 플로우에서 launchApp 직후에 부른다:
+#   - runFlow: _dev-entry.yaml
+#
+# ⚠️ 이 파일을 각 플로우에 복사해 쓰지 말 것. 실제로 두 플로우에 따로 넣었다가
+#    한쪽만 고쳐서 다른 쪽이 깨졌다.
+
+appId: ${APP_ID}
+---
+# 1. clearState 는 expo-dev-client 가 기억하던 번들 URL 까지 지운다.
+#    그래서 앱이 아니라 "DEVELOPMENT SERVERS" 런처 화면으로 뜬다.
+- runFlow:
+    when:
+      visible: "DEVELOPMENT SERVERS"
+    commands:
+      - tapOn:
+          text: "http://localhost:8081"
+      - extendedWaitUntil:
+          notVisible: "DEVELOPMENT SERVERS"
+          timeout: 60000
+
+# 2. 개발자 메뉴가 이미 열려 있으면 닫는다.
+- runFlow:
+    when:
+      visible:
+        id: "xmark"
+    commands:
+      - tapOn:
+          id: "xmark"
+
+# 3. 개발자 메뉴 안내 모달이 화면을 덮는다. 요소는 계층에 멀쩡히 있는데 탭이 모달에 먹힌다.
+#    ⚠️ "Continue" 는 안내를 닫는 버튼이 아니라 **메뉴 본체를 여는** 버튼이다 — 눌렀으면 다시 닫아야 한다.
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+      - runFlow:
+          when:
+            visible:
+              id: "xmark"
+          commands:
+            - tapOn:
+                id: "xmark"
+
+# 4. RN dev 빌드의 Console Error 오버레이가 화면 전체를 덮는다.
+#    console.error 한 줄이면 뜨므로 제품 버그가 아닌 것에도 뜬다.
+#    실측 사례: 시뮬레이터에 위치 좌표가 없어 getCurrentPositionAsync 가 실패
+#    → 오버레이가 가입 버튼 탭을 통째로 먹었다 (플로우는 "탭 COMPLETED" 로 보고하는데 화면은 그대로).
+#    근본 대응은 시뮬레이터에 좌표를 넣는 것: xcrun simctl location <udid> set 37.5665,126.9780
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"

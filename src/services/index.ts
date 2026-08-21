@@ -775,9 +775,9 @@ export const v_7488d5 = (v_c65f5d, v_b36f96) => {
       } catch {  }
 
       try {
-        const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
-        const v_5c807b = await v_863c7f();
-        if (v_5c807b) v_74a79c.headers['X-Device-Id'] = v_5c807b;
+        const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+        const v_146485 = await v_716927();
+        if (v_146485.device_id) v_74a79c.headers['X-Device-Id'] = v_146485.device_id;
       } catch {  }
 
       try {
@@ -1241,11 +1241,18 @@ export const v_35200c = async (
       region: v_df7dab.region,
     });
 
-    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
-    const v_b6d4b8 = await v_863c7f();
+    const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+    const v_146485 = await v_716927();
     const v_3393e3 = await v_9f42a4.post<v_2c1a39>(
       '/login-06-joinAndAccount',
-      { ...v_df7dab, device_id: v_b6d4b8 },
+      {
+        ...v_df7dab,
+        device_id: v_146485.device_id,
+        device_key: v_146485.device_key,
+        install_uuid: v_146485.install_uuid,
+        platform: v_146485.platform,
+        app_build: v_146485.app_build,
+      },
     );
 
     console.log('[회원가입 3단계] 회원가입 응답:', {
@@ -1338,13 +1345,18 @@ export const v_b699a9 = async (
 ): Promise<v_74e8fc> => {
   try {
     const v_9f42a4 = v_7488d5(v_c65f5d);
-    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
-    const v_b6d4b8 = await v_863c7f();
+
+    const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+    const v_146485 = await v_716927();
     const v_576f5a = {
       type: 4,
       email: v_e0c7e8,
       pin: v_6bee94,
-      device_id: v_b6d4b8,
+      device_id: v_146485.device_id,
+      device_key: v_146485.device_key,
+      install_uuid: v_146485.install_uuid,
+      platform: v_146485.platform,
+      app_build: v_146485.app_build,
     };
 
     console.log('[로그인] 이메일/비밀번호 로그인 요청:', v_e0c7e8);
@@ -1700,8 +1712,11 @@ export const v_7e0a86 = async (
   }
 };
 
+export type EmailVerificationPurpose = 'signup' | 'restore' | 'email_change' | 'login' | 'send_confirm';
+
 export const v_8025d1 = async (
   v_e0c7e8,
+  v_fa63e0,
   v_c65f5d,
 ): Promise<boolean> => {
   try {
@@ -1717,9 +1732,20 @@ export const v_8025d1 = async (
     const v_576f5a = {
       email: v_e0c7e8,
       language: v_677f64,
+      purpose: v_fa63e0,
     };
 
-    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8, 'lang=', v_677f64);
+    if (v_fa63e0 === 'signup') {
+      try {
+        const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+        const v_146485 = await v_716927();
+        v_576f5a.device_key = v_146485.device_key;
+        v_576f5a.platform = v_146485.platform;
+        v_576f5a.app_build = v_146485.app_build;
+      } catch {  }
+    }
+
+    console.log('[로그인] 이메일 인증 코드 발송 요청:', v_e0c7e8, 'lang=', v_677f64, 'purpose=', v_fa63e0);
 
     const v_3393e3 = await v_9f42a4.post<v_3eb2f0>(
       '/check-02-email',
@@ -1800,11 +1826,16 @@ export const v_a81308 = async (
     const v_9f42a4 = v_7488d5(v_c65f5d, {
       baseURL: v_a57efd(),
     });
-    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
-    const v_b6d4b8 = await v_863c7f();
+
+    const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+    const v_146485 = await v_716927();
     const v_576f5a = {
       email: v_e0c7e8,
-      device_id: v_b6d4b8,
+      device_id: v_146485.device_id,
+      device_key: v_146485.device_key,
+      install_uuid: v_146485.install_uuid,
+      platform: v_146485.platform,
+      app_build: v_146485.app_build,
     };
 
     console.log('[로그인] 이메일 인증 로그인 요청:', v_e0c7e8);
@@ -1860,11 +1891,15 @@ export const v_32502f = async (
 
     console.log('[로그인] Google ID Token 로그인 요청');
 
-    const { getDeviceId: v_863c7f } = require('../utils/deviceIdentity');
-    const v_b6d4b8 = await v_863c7f();
+    const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+    const v_146485 = await v_716927();
     const v_3393e3 = await v_9f42a4.post<v_74e8fc>('/login-google', {
       idToken: v_b50834,
-      device_id: v_b6d4b8,
+      device_id: v_146485.device_id,
+      device_key: v_146485.device_key,
+      install_uuid: v_146485.install_uuid,
+      platform: v_146485.platform,
+      app_build: v_146485.app_build,
     });
 
     if (v_3393e3.data.status === 'success') {
@@ -7346,6 +7381,24 @@ export const v_5e332c = async (
     const v_9390e8 = v_5e9bfe?.response?.data;
     return { status: 'error', code: v_5e9bfe?.response?.status, message: v_9390e8?.message || v_5e9bfe?.message || 'failed' };
   }
+};
+
+export const v_dbd583 = async (
+  v_e0c7e8,
+  v_dd6d25,
+  v_c65f5d,
+): Promise<{ requestId: number }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+  const v_146485 = await v_716927();
+  const v_8f00b9 = await v_9f42a4.post('/device-unblock-request', {
+    platform: v_146485.platform,
+    device_key: v_146485.device_key,
+    install_uuid: v_146485.install_uuid,
+    email: v_e0c7e8,
+    reason_text: v_dd6d25 || undefined,
+  });
+  return v_8f00b9.data;
 };
 
 export const v_c07be3 = async (
