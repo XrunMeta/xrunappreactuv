@@ -1,0 +1,27 @@
+# T-547 — 정상 이메일 가입 E2E · 2편 (인증코드 입력 → 가입 확정 → 완료 확인)
+#
+# 1편이 끝난 그 화면 상태에서 이어 돌린다 — launchApp 을 절대 넣지 않는다
+# (재시작하면 인메모리 인증 컨텍스트가 날아가 pendingSignupData 흐름이 끊긴다).
+#
+# 필수 -e 파라미터: OTP_CODE (러너가 D1 Txn action=9712 extrastr2 에서 읽어 넘긴다)
+appId: run.xrun.xrunapps
+---
+# 숨은 TextInput 은 접근성 트리에 노출되지 않는다 (실측 — 계층 덤프에 부재).
+# 6칸 박스 첫 칸을 좌표로 탭해 포커스를 주고 입력한다.
+- tapOn:
+    point: "15%,28%"
+- inputText: ${OTP_CODE}
+
+# 확인(검증) 버튼 — ja 헤더는 '認証コードを入力してください' 라 '確認' 과 겹치지 않는다
+- tapOn:
+    text: "확인|確認|Verify"
+
+# 가입 완료 알림 = 성공 판정. 서버 가입(login-06)까지 끝나야 뜬다.
+- extendedWaitUntil:
+    visible:
+      text: "회원가입 완료|会員登録完了|Registration Complete"
+    timeout: 60000
+    label: "가입 완료 알림이 뜨지 않았다. 스크린샷 확인 — (a) 코드 불일치 알림이면 OTP 만료/오독 (b) 차단 문구면 서버 게이트(기기·전화·약관), 감사 로그 outcome 을 볼 것"
+- takeScreenshot: e2e-automation/screenshots/t547-signup/04-가입완료
+- tapOn:
+    text: "확인|確認|Confirm"

@@ -1,0 +1,168 @@
+# T-547 — 정상 이메일 가입 E2E · 1편 (입력 → 약관 동의 → OTP 발송 → 인증코드 화면 도달)
+#
+# 【검증함】 가입 폼 완주가 가능한가 — 필수 입력·약관 3종 체크·OTP 발송 요청까지 실제 UI 로
+# 【확인 못 함】 인증코드 자체 — 메일함을 못 읽으므로 러너가 D1 Txn(9712) 에서 코드를 읽어
+#               2편(t547-signup-part2.yaml)에 넘긴다. 1·2편 사이에 앱을 재시작하면 안 된다.
+#
+# ⚠️ 이 플로우는 실서버(preview 워커 + 운영 D1)를 상대로 가입 1건을 실제로 만든다.
+#    스킬 §5(로컬 전용)의 명시적 예외 — 히즈키 지시로 T-547 마킹 계정을 실환경에 남기는 검증.
+#    실행 1회 = 계정 1건 + device_registry 1건. 같은 시뮬레이터로 재실행하면 기기 중복
+#    게이트(blocked_device_used)에 걸리는 것이 정상이다.
+#
+# 필수 -e 파라미터 (env: 블록에 두지 않는다 — 빈 문자열이 -e 를 이기는 함정):
+#   SIGNUP_NAME · SIGNUP_EMAIL · SIGNUP_PW · SIGNUP_PHONE
+appId: run.xrun.xrunapps
+---
+- launchApp:
+    clearState: true
+
+# ── dev 빌드 함정 3종 (specs/t525-device-registry.md) ──────────────────────
+- runFlow:
+    when:
+      visible: "DEVELOPMENT SERVERS"
+    commands:
+      - tapOn: "http://localhost:8081"
+- runFlow:
+    when:
+      visible:
+        id: "xmark"
+    commands:
+      - tapOn:
+          id: "xmark"
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+      - runFlow:
+          when:
+            visible:
+              id: "xmark"
+          commands:
+            - tapOn:
+                id: "xmark"
+
+# ── 랜딩 → 회원가입 ────────────────────────────────────────────────────────
+
+# dev LogBox(콘솔 에러 오버레이)가 떠 있으면 걷어낸다 — VersionCheck 가 로컬 8787(미기동)을
+# 찔러 내는 Network request failed. 가입 API(preview)와 무관한 dev 전용 소음이다 (실측).
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"
+- extendedWaitUntil:
+    visible:
+      text: "회원가입|会員登録|Sign Up"
+    timeout: 60000
+    label: "랜딩 화면에 도달하지 못했다. (a) DEVELOPMENT SERVERS 화면이면 번들 URL 유실 (b) 빈 화면이면 Metro 미기동"
+- tapOn:
+    text: "회원가입|会員登録|Sign Up"
+
+# ── 가입 폼 입력 ───────────────────────────────────────────────────────────
+# ⚠️ 숫자 패드(전화)가 열리면 다른 필드 탭이 포커스를 못 옮긴다 (실측 — 이름이 전화 필드에
+#   이어붙었다). 그래서 전화를 UI 순서대로 마지막에 넣는다. 열린 패드는 닫지 않는다 —
+#   hideKeyboard 는 HW 키보드 설정 탓에 실패(실측, t525 함정 5 재확인). 제출은 아래
+#   스와이프 전략으로 패드 위에 버튼을 올려 해결한다.
+- extendedWaitUntil:
+    visible:
+      text: "이름을 입력해주세요|名を入力してください|Please enter your given name"
+    timeout: 20000
+
+- tapOn:
+    text: "이름을 입력해주세요|名を入力してください|Please enter your given name"
+- inputText: ${SIGNUP_NAME}
+
+- tapOn:
+    text: "이메일 주소를 입력해주세요|メールアドレスを入力してください|Enter your email address"
+- inputText: ${SIGNUP_EMAIL}
+
+- tapOn:
+    text: "비밀번호를 입력해주세요|^Password$"
+- inputText: ${SIGNUP_PW}
+
+- tapOn:
+    text: "비밀번호를 한 번 더 입력해주세요|パスワードをもう一度入力してください|Re-enter your password"
+- inputText: ${SIGNUP_PW}
+
+- tapOn:
+    text: "휴대폰 번호를 입력해주세요.*|電話番号を入力してください.*|Please enter your phone number.*"
+- inputText: ${SIGNUP_PHONE}
+
+# ── 약관 3종 동의 (T-544 게이트 — 하나라도 빠지면 서버가 거부한다) ─────────
+- scrollUntilVisible:
+    element:
+      id: "signup-terms-service-checkbox"
+    direction: DOWN
+- tapOn:
+    id: "signup-terms-service-checkbox"
+- tapOn:
+    id: "signup-terms-location-checkbox"
+- tapOn:
+    id: "signup-terms-privacy-checkbox"
+
+- takeScreenshot: e2e-automation/screenshots/t547-signup/01-폼입력-약관동의완료
+
+# ── 제출 → 이메일 인증 ────────────────────────────────────────────────────
+# 헤더(회원가입|会員登録|Sign Up)와 겹치지 않는 제출 문구를 우선하되, en 은 겹치므로 index 로 방어하지 않고
+# ko/ja 고유 문구를 앞세운다 (시뮬 시스템 언어 = 일본어 실측).
+# ⚠️ 숫자 패드는 닫을 수 없고(hideKeyboard 는 HW 키보드 설정 탓에 실패, 다른 필드 탭은
+#    포커스를 못 뺏는다 — 전부 실측), 키보드는 별도 윈도라 scrollUntilVisible 은 버튼이
+#    "이미 보인다" 며 스크롤하지 않는다. SafeScrollView 가 키보드 높이만큼 paddingBottom 을
+#    더해주므로, 명시적 스와이프로 컨텐츠를 끝까지 올리면 버튼이 키보드 위로 올라온다.
+- swipe:
+    start: "50%, 55%"
+    end: "50%, 20%"
+- swipe:
+    start: "50%, 55%"
+    end: "50%, 20%"
+- tapOn:
+    text: "가입하기|登録する|Sign Up"
+
+# 추천인 미입력 확인 다이얼로그 (실측) — "입력하지 않으면 랜덤 추천인 배정" 안내. 確認 으로 계속.
+- extendedWaitUntil:
+    visible:
+      text: "추천인 확인|紹介確認|Referral Confirmation"
+    timeout: 15000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        text: "추천인 확인|紹介確認|Referral Confirmation"
+    commands:
+      - tapOn:
+          text: "확인|確認|Confirm"
+
+# dev LogBox(콘솔 에러 오버레이)가 떠 있으면 걷어낸다 — VersionCheck 가 로컬 8787(미기동)을
+# 찔러 내는 Network request failed. 가입 API(preview)와 무관한 dev 전용 소음이다 (실측).
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"
+- extendedWaitUntil:
+    visible:
+      text: "전송|送信|Send"
+    timeout: 30000
+    label: "이메일 인증 화면에 도달하지 못했다. 스크린샷 확인 — 입력 검증 알림(비밀번호 정책 등)이 떠 있으면 폼 값 문제다"
+- takeScreenshot: e2e-automation/screenshots/t547-signup/02-이메일인증화면
+- tapOn:
+    text: "전송|送信|Send"
+
+# dev LogBox(콘솔 에러 오버레이)가 떠 있으면 걷어낸다 — VersionCheck 가 로컬 8787(미기동)을
+# 찔러 내는 Network request failed. 가입 API(preview)와 무관한 dev 전용 소음이다 (실측).
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"
+
+# ── 인증코드 화면 도달 = 1편 성공 (OTP 는 러너가 D1 에서 읽는다) ───────────
+# ⚠️ TID.verificationCode.codeInput 의 TextInput 은 숨김(6칸 박스 UI 뒤) 처리라
+#    접근성 트리에 아예 없다 (실측 — 계층 덤프 부재). 헤더 문구로 판정한다.
+- extendedWaitUntil:
+    visible:
+      text: "인증코드를 입력하세요|認証コードを入力してください|Enter Verification Code"
+    timeout: 30000
+    label: "인증코드 화면에 도달하지 못했다. (a) 발송 실패 알림이 떠 있으면 서버/게이트 차단 (b) 그대로면 전송 버튼 미탭"
+- takeScreenshot: e2e-automation/screenshots/t547-signup/03-인증코드화면-도달
