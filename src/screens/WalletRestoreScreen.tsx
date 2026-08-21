@@ -327,7 +327,8 @@ export const WalletRestoreScreen = () => {
     }
     try {
       setOtpSending(true);
-      await sendEmailVerificationCode(email);
+
+      await sendEmailVerificationCode(email, 'restore');
       setOtpSending(false);
       setOtpInput('');
       setOtpModalVisible(true);
@@ -780,7 +781,8 @@ export const WalletRestoreScreen = () => {
     if (!email) return;
     try {
       setOtpSending(true);
-      const ok = await sendEmailVerificationCode(email);
+
+      const ok = await sendEmailVerificationCode(email, 'restore');
       setOtpSending(false);
       if (ok) {
         setOtpSecondsLeft(300);

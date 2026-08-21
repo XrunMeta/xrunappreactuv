@@ -1,0 +1,104 @@
+# T-525 2단계 — 등록된 기기에서 회원가입이 막히고 해제 요청 팝업이 뜨는가
+#
+# 🟡 상태: **미완주** (2026-08-20 KST). 가입 폼 입력·약관·제출까지는 통과하지만
+#    이메일 인증 화면의 전송 버튼에서 멈춘다. 원인은 제품 버그가 아니라
+#    **iOS 비밀번호 자동완성 팝업**이 입력을 가로채는 것 —
+#    시뮬레이터 설정 > 암호 > 암호 옵션 > 암호 자동 완성 을 끄면 넘어갈 수 있다.
+#    실제 검증은 히즈키가 수동 조작으로 완료했다(409 → 2버튼 팝업 → 해제요청 적재).
+#    이 플로우는 폼 입력 자동화 자산으로 남긴다. 완주시키려면 위 설정부터 끌 것.
+#
+# 【검증함】 앱 UI 로 가입을 시도했을 때
+#           - 409 blocked_device_used 를 받아 팝업이 뜨는가
+#           - unblockRequestable=true 면 "차단 해제 요청" 버튼이 나오는가
+# 【확인 못 함】 서버 판정 자체 — 그건 API 직접 호출과 vitest 로 검증한다.
+#              device_unblock_requests 적재 — 러너가 로컬 D1 을 조회해 판정한다.
+#
+# 전제:
+#   1. 이 기기의 device_key 가 이미 device_registry 에 있어야 한다
+#      (t525-login-only.yaml 을 먼저 돌려 등록시킨다)
+#   2. 로컬 wrangler dev 8790 기동 · 마이그 108·109 적용
+#
+# 인증코드는 로컬 D1 의 Txn(action=9712, extrastr=이메일, extrastr2=코드)에 남는다.
+# 이 플로우는 코드를 스스로 알 수 없다 — 러너가 꺼내 다음 단계에 넘긴다.
+#
+# 셀렉터 메모: 라벨과 입력 필드가 별개다. 플레이스홀더 문구를 타깃으로 한다.
+#   앱 언어가 시뮬 시스템 언어를 따르므로(clearState 후 일본어) 언어에 묶지 않는다.
+#
+# ⚠️ 로컬 전용 (스킬 §5).
+
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+
+- runFlow: _dev-entry.yaml
+
+- extendedWaitUntil:
+    visible:
+      text: "회원가입|会員登録|Sign up"
+    timeout: 60000
+
+- tapOn:
+    text: "회원가입|会員登録|Sign up"
+
+- extendedWaitUntil:
+    visible:
+      text: "이름을 입력.*|名を入力してください.*"
+    timeout: 20000
+
+- tapOn:
+    text: "이름을 입력.*|名を入力してください.*"
+- inputText: "E2E Block"
+
+- tapOn:
+    text: "이메일을 입력.*|メールアドレスを入力してください.*"
+- inputText: ${SIGNUP_EMAIL}
+
+- tapOn:
+    text: "Password"
+- inputText: "Test1234"
+
+- tapOn:
+    text: "비밀번호를 다시.*|パスワードをもう一度入力してください.*"
+- inputText: "Test1234"
+
+# 가입 버튼과 약관은 스크롤 아래에 있다
+- scroll
+- scroll
+
+# 약관 3종 동의 (전부 필수)
+# ⚠️ 라벨과 체크박스가 별개 요소다. 라벨 bounds 는 x=60 부터라 텍스트를 탭하면 체크가 안 된다
+#    (탭은 COMPLETED 로 보고되지만 checked 는 false 그대로).
+#    체크박스에 testID 가 없어 좌표로 누른다 — 레이아웃이 바뀌면 여기가 먼저 깨진다.
+#    제품 코드에 testID 를 붙이는 것이 근본 해결이다.
+- tapOn:
+    point: "38,623"
+- tapOn:
+    point: "38,668"
+- tapOn:
+    point: "38,712"
+
+- tapOn:
+    text: "가입하기|등록하기|登録する|Sign up"
+
+# 여기서 이메일 인증 화면으로 넘어간다.
+- extendedWaitUntil:
+    notVisible:
+      text: "가입하기|등록하기|登録する|Sign up"
+    timeout: 30000
+
+# 인증코드 전송 → check-02-email(purpose='signup') 호출
+# 이 기기가 device_registry 에 있으면 서버가 코드를 발송하지 않고 409 를 준다.
+- extendedWaitUntil:
+    visible:
+      text: "전송|보내기|送信|Send"
+    timeout: 20000
+
+- tapOn:
+    text: "전송|보내기|送信|Send"
+
+# 차단 팝업이 뜨는지 — 이것이 이 플로우의 핵심 assertion
+- extendedWaitUntil:
+    visible:
+      text: ".*이미 계정이 생성.*|.*既に.*アカウント.*|.*회원가입 이용 제한.*|.*会員登録.*制限.*"
+    timeout: 20000

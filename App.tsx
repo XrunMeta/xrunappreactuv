@@ -75,6 +75,7 @@ import {
   WalletRestoreScreen,
   MyChipsOfferwallScreen,
   WalletKeyTutorialScreen,
+  DeviceUnblockRequestScreen,
 } from './src/screens';
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
@@ -450,6 +451,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'verificationCode') {
     return <VerificationCodeScreen />;
+  }
+
+  if (currentScreen === 'deviceUnblockRequest') {
+    return <DeviceUnblockRequestScreen />;
   }
 
   if (currentScreen === 'terms') {

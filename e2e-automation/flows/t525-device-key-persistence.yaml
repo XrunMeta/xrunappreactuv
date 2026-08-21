@@ -1,0 +1,92 @@
+# T-525 2단계 — 앱 데이터 삭제 후에도 device_key 가 유지되는가 (SecureStore/Keychain 지속성)
+#
+# 이 플로우가 검증하는 설계 전제:
+#   "iOS Keychain 은 앱 데이터를 지워도 남는다" → 그래서 iOS 는 SecureStore UUID 를
+#   device_key 로 쓸 수 있다 (스펙 6-2 표).
+#
+# 【검증함】 clearState 후 재로그인해도 서버가 받는 device_key 가 동일한가
+#           (동일하면 device_registry 행 수가 늘지 않고 last_seen 만 갱신된다)
+# 【확인 못 함】 팩토리 리셋·기기 이전 — 시뮬레이터로 만들 수 없는 상태.
+#
+# 판정은 러너가 로컬 D1 을 조회해서 한다:
+#   실행 전 행 수 == 실행 후 행 수  AND  last_seen 갱신됨  → 통과
+#   행이 하나 더 생겼다 → SecureStore 가 안 남은 것 → 설계 전제 붕괴
+#
+# ⚠️ 로컬 전용. 원격 DB 를 절대 향하지 않는다 (스킬 §5).
+
+appId: ${APP_ID}
+---
+# AsyncStorage·앱 데이터는 지우고 Keychain 만 남긴다
+- launchApp:
+    clearState: true
+
+# ⚠️ dev 빌드 함정 — clearState 는 expo-dev-client 가 기억하던 번들 URL 까지 지운다.
+#    그래서 앱이 아니라 "DEVELOPMENT SERVERS" 런처 화면으로 뜬다.
+#    프로덕션 빌드에는 없는 단계지만, 로컬 dev 검증에서는 반드시 거쳐야 한다.
+- runFlow:
+    when:
+      visible: "DEVELOPMENT SERVERS"
+    commands:
+      - tapOn:
+          text: "http://localhost:8081"
+      - extendedWaitUntil:
+          notVisible: "DEVELOPMENT SERVERS"
+          timeout: 60000
+
+# ⚠️ dev 빌드 함정 2 — 개발자 메뉴 안내 모달이 첫 실행에서 화면을 덮는다.
+#    요소는 계층에 멀쩡히 있는데 탭이 모달에 먹힌다 (app-maestro.md 의 "가리는 모달" 케이스).
+# ⚠️ dev 빌드 함정 3 — "Continue" 는 안내를 닫는 버튼이 아니라 **개발자 메뉴 본체를 여는** 버튼이다.
+#    누르면 Reload·TOOLS 목록이 뜨므로 xmark 로 다시 닫아야 한다.
+- runFlow:
+    when:
+      visible:
+        id: "xmark"
+    commands:
+      - tapOn:
+          id: "xmark"
+
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+      - runFlow:
+          when:
+            visible:
+              id: "xmark"
+          commands:
+            - tapOn:
+                id: "xmark"
+
+# ⚠️ dev 빌드 함정 3 — clearState 로 앱 언어 설정이 초기화되면
+#    시뮬레이터 시스템 언어(여기서는 일본어)를 따른다. 셀렉터를 언어에 묶지 않는다.
+- extendedWaitUntil:
+    visible:
+      text: "로그인|ログイン|Login"
+    timeout: 60000
+
+- tapOn:
+    text: "로그인|ログイン|Login"
+
+- extendedWaitUntil:
+    visible:
+      text: "이메일을 입력해주세요.|メールアドレスを入力してください。"
+    timeout: 15000
+
+- tapOn:
+    text: "이메일을 입력해주세요.|メールアドレスを入力してください。"
+- inputText: ${TEST_EMAIL}
+
+- tapOn:
+    text: "비밀번호를 입력해주세요.|パスワードを入力してください。"
+- inputText: "1234"
+
+# 헤더 타이틀이 아닌 제출 버튼
+- tapOn:
+    text: "로그인|ログイン|Login"
+    index: 1
+
+- extendedWaitUntil:
+    notVisible:
+      text: "비밀번호를 입력해주세요.|パスワードを入力してください。"
+    timeout: 30000
