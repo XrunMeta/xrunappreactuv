@@ -13,5 +13,14 @@ export default {
   sessionInvalidatedBody: '다른 기기에서 로그인되어 자동 로그아웃되었습니다.',
   signupBlockedTitle: '회원가입 이용 제한',
   signupBlockedBody:
-    '이 기기에서는 이미 계정이 생성되었습니다. 하나의 기기당 하나의 계정만 사용할 수 있습니다.',
+    '이 기기에서는 이미 계정이 생성되었습니다. 기존 계정으로 로그인해 주세요.',
+
+  unblockRequestCta: '차단 해제 요청',
+  unblockScreenTitle: '차단 해제 요청',
+  unblockReasonLabel: '사유를 알려주세요 (선택)',
+  unblockReasonPlaceholder: '예: 중고로 구매한 기기입니다 / 가족과 기기를 함께 씁니다',
+  unblockSubmit: '요청 제출',
+  unblockSubmitted: '해제 요청이 접수되었습니다. 검토 후 안내드리겠습니다.',
+  unblockTooMany: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  unblockSubmitFailed: '요청 접수에 실패했습니다. 잠시 후 다시 시도해 주세요.',
 };

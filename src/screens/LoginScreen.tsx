@@ -240,7 +240,7 @@ export const v_f4f851 = () => {
       }
 
       console.log('[로그인] 이메일 인증 코드 전송 요청:', v_808660.trim());
-      const v_f438c1 = await v_8025d1(v_808660.trim(), v_9b57fc);
+      const v_f438c1 = await v_8025d1(v_808660.trim(), 'login', v_9b57fc);
 
       if (!v_f438c1) {
         await v_889fad(v_8d41d7('screens.emailVerification.alerts.sendFailed'), v_8d41d7('screens.emailVerification.errors.sendFailed'));
@@ -372,7 +372,7 @@ export const v_f4f851 = () => {
         ]);
         if (v_aa96a3 === 1 && v_55c887) {
           try {
-            const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
+            const v_f438c1 = await v_8025d1(v_55c887, 'login', v_9b57fc); 
             if (v_f438c1) {
               v_b572c3(v_55c887);
               v_8f89f3(v_ce4741.map);
@@ -548,7 +548,7 @@ export const v_f4f851 = () => {
           );
           if (v_aa96a3 === 1 && v_55c887) {
             try {
-              const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
+              const v_f438c1 = await v_8025d1(v_55c887, 'login', v_9b57fc); 
               if (v_f438c1) {
                 v_b572c3(v_55c887);
                 v_8f89f3(v_ce4741.map);
@@ -735,7 +735,7 @@ export const v_f4f851 = () => {
           );
           if (v_aa96a3 === 1 && v_55c887) {
             try {
-              const v_f438c1 = await v_8025d1(v_55c887, v_9b57fc);
+              const v_f438c1 = await v_8025d1(v_55c887, 'login', v_9b57fc); 
               if (v_f438c1) {
                 v_b572c3(v_55c887);
                 v_8f89f3(v_ce4741.map);
