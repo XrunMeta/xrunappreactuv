@@ -1405,6 +1405,7 @@ export const SignupScreen = () => {
               checked={serviceTermsAccepted}
               onToggle={() => setServiceTermsAccepted((prev) => !prev)}
               variant="square"
+              testID={TID.signup.termsServiceCheckbox}
             />
             <Text style={styles.termsText}>
               <Text style={styles.termsHighlight} onPress={() => openClauseDialog('service')}>
@@ -1420,6 +1421,7 @@ export const SignupScreen = () => {
               checked={locationTermsAccepted}
               onToggle={() => setLocationTermsAccepted((prev) => !prev)}
               variant="square"
+              testID={TID.signup.termsLocationCheckbox}
             />
             <Text style={styles.termsText}>
               <Text style={styles.termsHighlight} onPress={() => openClauseDialog('location')}>
@@ -1435,6 +1437,7 @@ export const SignupScreen = () => {
               checked={privacyTermsAccepted}
               onToggle={() => setPrivacyTermsAccepted((prev) => !prev)}
               variant="square"
+              testID={TID.signup.termsPrivacyCheckbox}
             />
             <Text style={styles.termsText}>
               <Text style={styles.termsHighlight} onPress={() => openClauseDialog('personal')}>

@@ -264,6 +264,10 @@ export const TID = {
   signup: {
     countrySearchQueryInput: 'signup-country-search-query-input',
     regionSearchQueryInput: 'signup-region-search-query-input',
+
+    termsServiceCheckbox: 'signup-terms-service-checkbox',
+    termsLocationCheckbox: 'signup-terms-location-checkbox',
+    termsPrivacyCheckbox: 'signup-terms-privacy-checkbox',
   },
   tapjoyList: {
     showAd: 'tapjoy-list-show-ad',
