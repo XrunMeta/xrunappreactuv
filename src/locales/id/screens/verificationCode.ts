@@ -6,7 +6,7 @@ export default {
   errors: {
     emailNotFound: 'Informasi email tidak ditemukan',
     codeRequired: 'Masukkan kode verifikasi 6 digit',
-    verificationFailed: 'Kode verifikasi tidak benar. Silakan periksa lagi',
+    verificationFailed: 'Kode verifikasi salah atau permintaan ini telah kedaluwarsa. Silakan minta kode baru lalu coba lagi.',
     loginFailed: 'Login gagal. Silakan coba lagi',
     userDataNotFound: 'Tidak dapat mengambil informasi pengguna',
     error: 'Terjadi kesalahan selama verifikasi',
