@@ -6,7 +6,7 @@ export default {
   errors: {
     emailNotFound: 'Email information not found',
     codeRequired: 'Please enter the 6-digit verification code',
-    verificationFailed: 'The verification code is incorrect. Please check again',
+    verificationFailed: 'The verification code is invalid or this request has expired. Please request a new code and try again.',
     loginFailed: 'Login failed. Please try again',
     userDataNotFound: 'Unable to retrieve user information',
     error: 'An error occurred during verification',

@@ -175,6 +175,13 @@ export const v_667a00 = () => {
             }
 
             if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409) {
+
+              const v_695a92 = v_788ec0.response?.data as { title?: string; message?: string } | undefined;
+              if (v_695a92?.title && typeof v_695a92.title === 'string') {
+                await v_889fad(v_695a92.title, typeof v_695a92.message === 'string' ? v_695a92.message : '');
+                v_ff0c7a(false);
+                return;
+              }
               console.log('[회원가입] 이미 사용중인 이메일 (409) - 회원가입이 이미 완료된 것으로 간주, 로그인 화면으로 이동');
 
               await v_e84827.removeItem('pendingSignupData');
