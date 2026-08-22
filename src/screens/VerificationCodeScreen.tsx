@@ -175,6 +175,13 @@ export const VerificationCodeScreen = () => {
             }
 
             if (signupError instanceof AxiosError && signupError.response?.status === 409) {
+
+              const dup409 = signupError.response?.data as { title?: string; message?: string } | undefined;
+              if (dup409?.title && typeof dup409.title === 'string') {
+                await showAlert(dup409.title, typeof dup409.message === 'string' ? dup409.message : '');
+                setIsVerifying(false);
+                return;
+              }
               console.log('[회원가입] 이미 사용중인 이메일 (409) - 회원가입이 이미 완료된 것으로 간주, 로그인 화면으로 이동');
 
               await AsyncStorage.removeItem('pendingSignupData');

@@ -6,7 +6,7 @@ export default {
   errors: {
     emailNotFound: 'Không tìm thấy thông tin email',
     codeRequired: 'Vui lòng nhập mã xác minh 6 chữ số',
-    verificationFailed: 'Mã xác minh không đúng. Vui lòng kiểm tra lại',
+    verificationFailed: 'Mã xác minh không đúng hoặc yêu cầu đã hết hạn. Vui lòng lấy mã mới và thử lại.',
     loginFailed: 'Đăng nhập thất bại. Vui lòng thử lại',
     userDataNotFound: 'Không thể lấy thông tin người dùng',
     error: 'Đã xảy ra lỗi trong quá trình xác minh',

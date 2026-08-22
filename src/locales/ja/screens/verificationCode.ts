@@ -6,7 +6,7 @@ export default {
   errors: {
     emailNotFound: 'メール情報が見つかりません',
     codeRequired: '6桁の認証コードを入力してください',
-    verificationFailed: '認証コードが正しくありません。再度確認してください',
+    verificationFailed: '認証コードが正しくないか、期限切れのリクエストです。コードを再取得してお試しください。',
     loginFailed: 'ログインに失敗しました。もう一度お試しください',
     userDataNotFound: 'ユーザー情報を取得できません',
     error: '認証処理中にエラーが発生しました',

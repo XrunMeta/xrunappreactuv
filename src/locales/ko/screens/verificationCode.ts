@@ -6,7 +6,7 @@ export default {
   errors: {
     emailNotFound: '이메일 정보를 찾을 수 없습니다.',
     codeRequired: '6자리 인증 코드를 입력해주세요.',
-    verificationFailed: '인증 코드가 올바르지 않습니다. 다시 확인해주세요.',
+    verificationFailed: '인증 코드가 올바르지 않거나 만료된 요청입니다. 코드를 다시 받아 시도해주세요.',
     loginFailed: '로그인에 실패했습니다. 다시 시도해주세요.',
     userDataNotFound: '사용자 정보를 가져올 수 없습니다.',
     error: '인증 처리 중 오류가 발생했습니다.',

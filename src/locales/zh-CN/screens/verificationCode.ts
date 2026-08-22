@@ -6,7 +6,7 @@ export default {
   errors: {
     emailNotFound: '找不到邮箱信息',
     codeRequired: '请输入6位验证码',
-    verificationFailed: '验证码不正确，请重新确认',
+    verificationFailed: '验证码不正确或请求已过期。请重新获取验证码后再试。',
     loginFailed: '登录失败，请重试',
     userDataNotFound: '无法获取用户信息',
     error: '验证处理过程中发生错误',
