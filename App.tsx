@@ -80,6 +80,7 @@ import {
 import { v_c034ae } from './src/screens/AyetOffersScreen';
 import { v_d997a9 } from './src/screens/AdisonOfferwallScreen';
 import { v_e90247 } from './src/screens/AdisonTestScreen';
+import v_5320dd from './src/screens/AfterlifeGiftsScreen';
 
 import { v_00e8f9, v_a0daa8, v_ce4741 } from './src/navigation';
 import { v_22de27, v_ded979 } from './src/services/analytics';
@@ -473,6 +474,10 @@ const v_c0dbdf = () => {
 
   if (v_0f0c7b === 'deviceUnblockRequest') {
     return <DeviceUnblockRequestScreen />;
+  }
+
+  if (v_0f0c7b === 'afterlifeGifts') {
+    return <AfterlifeGiftsScreen />;
   }
 
   if (v_0f0c7b === 'terms') {

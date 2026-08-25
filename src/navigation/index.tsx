@@ -94,6 +94,8 @@ export const v_ce4741 = {
   walletKeyGuide: 'walletKeyGuide',
 
   deviceUnblockRequest: 'deviceUnblockRequest',
+
+  afterlifeGifts: 'afterlifeGifts',
 } as const;
 
 export type ScreenName = keyof typeof v_ce4741;
