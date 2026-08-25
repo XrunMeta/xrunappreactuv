@@ -92,6 +92,7 @@ import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 import { v_116c93, v_1f4a13 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0 } from './src/services/ayet';
+import { v_f5ecec } from './src/services';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
 import { v_83e499 } from './src/services/googleAuth';
@@ -206,7 +207,7 @@ const v_c0dbdf = () => {
 
   v_c4deb2(() => {
 
-    const v_90a7e8 = (v_f71b56) => {
+    const v_90a7e8 = async (v_f71b56) => {
 
       if (v_435733) {
         console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기');
@@ -243,12 +244,29 @@ const v_c0dbdf = () => {
 
         if (v_fc7051) {
           console.log('[딥링크] 레퍼럴 코드 추출:', v_fc7051);
-
           v_308260 = v_f71b56;
 
-          v_eee6b0({ referralEmail: v_fc7051 });
+          const v_ac70b8 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v_fc7051);
+          if (v_ac70b8) {
+            try {
+              const v_c3c3b0 = await v_f5ecec(v_fc7051.trim(), v_9b57fc);
+              if (v_c3c3b0) {
+                console.log('[딥링크] 기존 회원 이메일 감지 → 로그인 화면(이메일 자동입력)');
+                await v_e84827.setItem('pendingPrefillEmail', v_fc7051.trim());
+                v_9b57fc('login');
+                return;
+              }
+            } catch (v_9363e2) {
+              console.warn('[딥링크] checkEmailExists 실패, 회원가입으로 진행:', v_9363e2);
+            }
+          }
 
-          console.log('[딥링크] 회원가입 화면으로 이동');
+          v_eee6b0({ referralEmail: v_fc7051 });
+          if (v_ac70b8) {
+
+            v_e84827.setItem('pendingSignupEmail', v_fc7051.trim()).catch(() => {});
+          }
+          console.log('[딥링크] 신규 회원 → 회원가입 화면으로 이동');
           v_9b57fc('signup');
         } else if (v_d136d6 && v_764189) {
           v_308260 = v_f71b56;
