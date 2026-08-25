@@ -36,6 +36,7 @@ export * from './env';
 export { getPlayStoreUrl, ANDROID_PACKAGE_ID } from './playStoreUrl';
 
 export * from './imageCache';
+export { isAfterlifeEnabled } from './afterlifeWhitelist';
 
 export * from './input';
 
