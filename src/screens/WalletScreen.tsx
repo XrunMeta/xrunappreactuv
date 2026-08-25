@@ -196,10 +196,10 @@ export const WalletScreen = () => {
 
   useEffect(() => {
     if (cardsData.length > 0 || customTokens.length > 0) {
-      const combined = combineTokenData(cardsData, customTokens, adXrunAmount, referralAmount);
+      const combined = combineTokenData(cardsData, customTokens, adXrunAmount, referralAmount, userData?.email);
       setCombinedAssets(combined);
     }
-  }, [cardsData, customTokens, adXrunAmount, referralAmount]);
+  }, [cardsData, customTokens, adXrunAmount, referralAmount, userData?.email]);
 
   const pushAutoNavConsumed = useRef(false);
   useEffect(() => {
@@ -703,6 +703,9 @@ export const WalletScreen = () => {
       if (currency === 19) {
 
         navigate(ROUTES.adHistory);
+      } else if (currency === 1901) {
+
+        Alert.alert('애프터라이프', '받은 꽃 목록 화면 준비 중입니다.\n\n곧 광고를 보면 사용 가능한 꽃 개수가 늘어나는 기능이 추가됩니다.');
       } else if (currency === 1900) {
 
         navigate(ROUTES.referralMyGroup);

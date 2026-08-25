@@ -1,6 +1,9 @@
 
 
 import type { CombinedAsset, CustomToken, WalletData } from '../types';
+import { isAfterlifeEnabled } from '../utils/afterlifeWhitelist';
+
+export const AFTERLIFE_CURRENCY = 1901;
 
 function pickRawAmount(...candidates: Array<string | number | null | undefined>): string {
   for (const c of candidates) {
@@ -16,6 +19,7 @@ export function combineTokenData(
   customTokens: CustomToken[],
   adXrunAmount: number,
   referralAmount: number,
+  userEmail?: string | null,
 ): CombinedAsset[] {
 
   const walletAssets: CombinedAsset[] = walletData.map((item) => ({
@@ -99,6 +103,23 @@ export function combineTokenData(
   };
   allAssets.push(rfItem);
 
+  if (isAfterlifeEnabled(userEmail)) {
+    const afterlifeItem: CombinedAsset = {
+      id: AFTERLIFE_CURRENCY,
+      symbol: 'Afterlife',
+      name: 'Afterlife',
+      amount: '0',
+      icon: '__AL__' as any,
+      currency: AFTERLIFE_CURRENCY,
+      isCustom: false,
+      subCurrencyName: 'Afterlife',
+      contractAddress: '',
+      subcurrency: undefined,
+      originalData: undefined,
+    };
+    allAssets.push(afterlifeItem);
+  }
+
   const uniqueAssets = allAssets.reduce((acc: CombinedAsset[], current: CombinedAsset) => {
     const existingIndex = acc.findIndex((item) => {
 
@@ -130,7 +151,7 @@ export function combineTokenData(
   }, []);
 
   const sortedAssets = uniqueAssets.sort((a, b) => {
-    const priorityOrder = [18, 16, 19, 1900, 1, 2]; 
+    const priorityOrder = [18, 16, 19, 1900, AFTERLIFE_CURRENCY, 1, 2]; 
 
     const aPriority = priorityOrder.indexOf(a.currency);
     const bPriority = priorityOrder.indexOf(b.currency);
