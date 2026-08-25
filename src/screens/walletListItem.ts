@@ -3,8 +3,9 @@
 import type { CombinedAsset } from '../types';
 import { getTokenIcon } from '../constants/tokenMeta';
 import { fmtBalance } from '../utils/formatAmount';
+import { AFTERLIFE_CURRENCY } from './walletAssets';
 
-const WALLET_LIST_DARK_DISKS = new Set(['#000000', '#111111', '#25292C', '#8347E6']);
+const WALLET_LIST_DARK_DISKS = new Set(['#000000', '#111111', '#25292C', '#8347E6', '#E8368F']);
 
 function getWalletListDiskBackground(asset: CombinedAsset): string {
   const sym = (asset.symbol || '').toUpperCase();
@@ -28,6 +29,9 @@ function getWalletListDiskBackground(asset: CombinedAsset): string {
     case 1900:
 
       return '#000000';
+    case AFTERLIFE_CURRENCY:
+
+      return '#E8368F';
     default:
       return '#EFF4F5';
   }
@@ -37,7 +41,7 @@ function resolveWalletListIconSource(asset: CombinedAsset): any | null {
   const sym = (asset.symbol || '').toUpperCase();
   const sub = (asset.subCurrencyName || asset.name || '').toLowerCase();
 
-  if (asset.currency === 1900 || asset.currency === 19) {
+  if (asset.currency === 1900 || asset.currency === 19 || asset.currency === AFTERLIFE_CURRENCY) {
     return null;
   }
   if (sym === 'ETH' || asset.currency === 2) {
@@ -98,6 +102,7 @@ export function convertAssetToTokenListItem(asset: CombinedAsset): TokenListItem
     fallbackLabel:
       asset.currency === 1900 ? 'RF'
       : asset.currency === 19 ? 'AD'
+      : asset.currency === AFTERLIFE_CURRENCY ? '🌸'
       : asset.symbol.slice(0, 2).toUpperCase(),
     fallbackColors: {
       background: diskBg,
