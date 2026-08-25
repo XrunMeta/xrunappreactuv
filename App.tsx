@@ -92,6 +92,7 @@ import appsFlyer from 'react-native-appsflyer';
 import { initI18nSync, applyStoredLanguageAsync } from './src/locales';
 import { initializeTaboola } from './src/services/taboola';
 import { setAyetUserId } from './src/services/ayet';
+import { checkEmailExists } from './src/services';
 import { initializePangle, loadAndShowAppOpenAd } from './src/services/pangle';
 import { getTopAd5, getXRUNGopaxPrice, getUsersBalanceUpdateV2 } from './src/services';
 import { initGoogleSignIn } from './src/services/googleAuth';
@@ -206,7 +207,7 @@ const ScreenHost = () => {
 
   useEffect(() => {
 
-    const handleDeepLink = (url: string) => {
+    const handleDeepLink = async (url: string) => {
 
       if (isDeepLinkProcessing) {
         console.log('[딥링크] 이미 처리 중인 딥링크, 건너뛰기');
@@ -243,12 +244,29 @@ const ScreenHost = () => {
 
         if (referral) {
           console.log('[딥링크] 레퍼럴 코드 추출:', referral);
-
           processedDeepLinkUrl = url;
 
-          setSignupFormData({ referralEmail: referral });
+          const isEmailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(referral);
+          if (isEmailFormat) {
+            try {
+              const exists = await checkEmailExists(referral.trim(), navigate);
+              if (exists) {
+                console.log('[딥링크] 기존 회원 이메일 감지 → 로그인 화면(이메일 자동입력)');
+                await AsyncStorage.setItem('pendingPrefillEmail', referral.trim());
+                navigate('login');
+                return;
+              }
+            } catch (checkErr) {
+              console.warn('[딥링크] checkEmailExists 실패, 회원가입으로 진행:', checkErr);
+            }
+          }
 
-          console.log('[딥링크] 회원가입 화면으로 이동');
+          setSignupFormData({ referralEmail: referral });
+          if (isEmailFormat) {
+
+            AsyncStorage.setItem('pendingSignupEmail', referral.trim()).catch(() => {});
+          }
+          console.log('[딥링크] 신규 회원 → 회원가입 화면으로 이동');
           navigate('signup');
         } else if (prefillEmail && wantSignup) {
           processedDeepLinkUrl = url;
