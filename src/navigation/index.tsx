@@ -94,6 +94,8 @@ export const ROUTES = {
   walletKeyGuide: 'walletKeyGuide',
 
   deviceUnblockRequest: 'deviceUnblockRequest',
+
+  afterlifeGifts: 'afterlifeGifts',
 } as const;
 
 export type ScreenName = keyof typeof ROUTES;

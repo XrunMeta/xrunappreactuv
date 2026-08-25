@@ -80,6 +80,7 @@ import {
 import { AyetOffersScreen } from './src/screens/AyetOffersScreen';
 import { AdisonOfferwallScreen } from './src/screens/AdisonOfferwallScreen';
 import { AdisonTestScreen } from './src/screens/AdisonTestScreen';
+import AfterlifeGiftsScreen from './src/screens/AfterlifeGiftsScreen';
 
 import { NavigationProvider, useAppNavigation, ROUTES } from './src/navigation';
 import { logScreen, setAnalyticsUserId } from './src/services/analytics';
@@ -473,6 +474,10 @@ const ScreenHost = () => {
 
   if (currentScreen === 'deviceUnblockRequest') {
     return <DeviceUnblockRequestScreen />;
+  }
+
+  if (currentScreen === 'afterlifeGifts') {
+    return <AfterlifeGiftsScreen />;
   }
 
   if (currentScreen === 'terms') {

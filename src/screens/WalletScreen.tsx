@@ -705,7 +705,7 @@ export const WalletScreen = () => {
         navigate(ROUTES.adHistory);
       } else if (currency === 1901) {
 
-        Alert.alert('애프터라이프', '받은 꽃 목록 화면 준비 중입니다.\n\n곧 광고를 보면 사용 가능한 꽃 개수가 늘어나는 기능이 추가됩니다.');
+        navigate(ROUTES.afterlifeGifts);
       } else if (currency === 1900) {
 
         navigate(ROUTES.referralMyGroup);
