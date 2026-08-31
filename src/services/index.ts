@@ -6384,7 +6384,7 @@ export const v_76d832 = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${v_36dd9e}`,
+        Authorization: await v_23dd22(),
       },
       body: JSON.stringify(v_4d33b2),
     }, v_c65f5d);
@@ -6420,8 +6420,6 @@ export const v_8ab17b = async (
   v_f63e09,
   v_c65f5d,
 ): Promise<TransferLimitCheckResult> => {
-  const v_c9c489 = v_e4a763();
-  const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
   const v_4d33b2 = { member: Number(v_660822), currency: v_a832b3, amount: String(v_f63e09) };
   console.log('[transferLimitCheck] 요청:', v_4d33b2);
   const v_3393e3 = await v_12a388(
@@ -6430,7 +6428,8 @@ export const v_8ab17b = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${v_36dd9e}`,
+
+        Authorization: await v_23dd22(),
       },
       body: JSON.stringify(v_4d33b2),
     },
