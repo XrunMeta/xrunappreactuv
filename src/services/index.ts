@@ -6406,6 +6406,52 @@ export const v_76d832 = async (
   }
 };
 
+export interface TransferLimitCheckResult {
+  allowed: boolean;
+  limit: number;
+  requested: number;
+  reason: string | null;
+  gateStage: 'off' | 'log_only' | 'enforce';
+}
+
+export const v_8ab17b = async (
+  v_660822,
+  v_a832b3,
+  v_f63e09,
+  v_c65f5d,
+): Promise<TransferLimitCheckResult> => {
+  const v_c9c489 = v_e4a763();
+  const v_36dd9e = v_c9c489.GATEWAY_AUTH_CODE;
+  const v_4d33b2 = { member: Number(v_660822), currency: v_a832b3, amount: String(v_f63e09) };
+  console.log('[transferLimitCheck] 요청:', v_4d33b2);
+  const v_3393e3 = await v_12a388(
+    '/postTransferLimitCheck',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${v_36dd9e}`,
+      },
+      body: JSON.stringify(v_4d33b2),
+    },
+    v_c65f5d,
+  );
+  if (!v_3393e3.ok) {
+    throw new Error(`transferLimitCheck HTTP ${v_3393e3.status}`);
+  }
+  const v_7ecfd1 = await v_3393e3.json().catch(() => ({}));
+  const v_9390e8 = v_7ecfd1?.data ?? {};
+  return {
+    allowed: Boolean(v_9390e8.allowed),
+    limit: Number(v_9390e8.limit ?? 0),
+    requested: Number(v_9390e8.requested ?? v_f63e09),
+    reason: v_9390e8.reason ?? null,
+    gateStage: (v_9390e8.gateStage === 'off' || v_9390e8.gateStage === 'log_only' || v_9390e8.gateStage === 'enforce')
+      ? v_9390e8.gateStage
+      : 'log_only', 
+  };
+};
+
 export const v_143c62 = async (
   v_660822,
   v_c65f5d,
