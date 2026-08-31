@@ -460,6 +460,11 @@ export const MapMainScreen: React.FC = () => {
 
         const normEmail = emailRaw.toLowerCase().trim();
 
+        if (normEmail === 'oth-test@example.invalid') {
+          console.log('[MapMain] dev 계정 oth-test@example.invalid — PIN 셋업/복원 게이트 skip');
+          return;
+        }
+
         const entries = await findEntriesForUser(emailRaw, memberId);
         const needPinSetup = (e: { s: string; h?: string } | null) =>
           e !== null && e.s === 's0' && !e.h;
