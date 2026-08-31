@@ -140,6 +140,30 @@ const ScreenHost = () => {
   const { setSignupFormData } = useAppContext();
 
   useEffect(() => {
+    if (__DEV__) return;
+    let cancelled = false;
+    (async () => {
+      try {
+
+        await new Promise((r) => setTimeout(r, 1500));
+        if (cancelled) return;
+        const Updates = require('expo-updates');
+        const check = await Updates.checkForUpdateAsync();
+        if (cancelled || !check?.isAvailable) return;
+        console.log('[OTA] 새 업데이트 감지 → fetch');
+        await Updates.fetchUpdateAsync();
+        if (cancelled) return;
+        console.log('[OTA] fetch 완료 → reload');
+        await Updates.reloadAsync();
+      } catch (err: any) {
+
+        console.warn('[OTA] runtime check/apply 실패:', err?.message ?? err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
