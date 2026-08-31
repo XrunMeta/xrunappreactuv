@@ -142,25 +142,42 @@ const v_c0dbdf = () => {
   v_c4deb2(() => {
     if (__DEV__) return;
     let v_2008a4 = false;
-    (async () => {
-      try {
+    let v_8d779a = false;
+    let v_ca94a2 = null;
 
-        await new Promise((v_cb35cb) => setTimeout(v_cb35cb, 1500));
-        if (v_2008a4) return;
+    const v_405bdd = async (v_2869c1) => {
+      if (v_2008a4 || v_8d779a) return;
+      v_8d779a = true;
+      try {
         const v_087631 = require('iokyqncutdfy');
         const v_de130a = await v_087631.checkForUpdateAsync();
         if (v_2008a4 || !v_de130a?.isAvailable) return;
-        console.log('[OTA] 새 업데이트 감지 → fetch');
+        console.log(`[OTA] (${v_2869c1}) 새 업데이트 감지 → fetch`);
         await v_087631.fetchUpdateAsync();
         if (v_2008a4) return;
-        console.log('[OTA] fetch 완료 → reload');
+        console.log(`[OTA] (${v_2869c1}) fetch 완료 → reload`);
         await v_087631.reloadAsync();
       } catch (v_49263d) {
-
-        console.warn('[OTA] runtime check/apply 실패:', v_49263d?.message ?? v_49263d);
+        console.warn(`[OTA] (${v_2869c1}) check/apply 실패:`, v_49263d?.message ?? v_49263d);
+      } finally {
+        v_8d779a = false;
       }
-    })();
-    return () => { v_2008a4 = true; };
+    };
+
+    const v_7c7016 = setTimeout(() => v_405bdd('boot'), 1500);
+
+    const v_1ae212 = v_6b5698.addEventListener('change', (v_b6e533) => {
+      if (v_b6e533 === 'active') void v_405bdd('foreground');
+    });
+
+    v_ca94a2 = setInterval(() => void v_405bdd('interval'), 5 * 60 * 1000);
+
+    return () => {
+      v_2008a4 = true;
+      clearTimeout(v_7c7016);
+      if (v_ca94a2) clearInterval(v_ca94a2);
+      v_1ae212.remove();
+    };
   }, []);
 
   v_c4deb2(() => {
