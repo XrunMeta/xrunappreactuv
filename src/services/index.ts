@@ -6384,7 +6384,7 @@ export const postTransferNew = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authCode}`,
+        Authorization: await getAuthHeader(),
       },
       body: JSON.stringify(body),
     }, navigation);
@@ -6420,8 +6420,6 @@ export const postTransferLimitCheck = async (
   amount: string | number,
   navigation?: any,
 ): Promise<TransferLimitCheckResult> => {
-  const env = getEnv();
-  const authCode = env.GATEWAY_AUTH_CODE;
   const body = { member: Number(member), currency, amount: String(amount) };
   console.log('[transferLimitCheck] 요청:', body);
   const response = await nodeGatewayRequest(
@@ -6430,7 +6428,8 @@ export const postTransferLimitCheck = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authCode}`,
+
+        Authorization: await getAuthHeader(),
       },
       body: JSON.stringify(body),
     },
