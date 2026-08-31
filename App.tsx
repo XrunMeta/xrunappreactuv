@@ -143,7 +143,11 @@ const ScreenHost = () => {
     if (__DEV__) return;
     let cancelled = false;
     let checking = false;
+    let lastCheckAt = 0;
     let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    const INTERVAL_LOGGED_IN_MS = 5 * 60 * 1000; 
+    const INTERVAL_LOGGED_OUT_MS = 500;          
 
     const runCheck = async (label: string) => {
       if (cancelled || checking) return;
@@ -161,6 +165,7 @@ const ScreenHost = () => {
         console.warn(`[OTA] (${label}) check/apply 실패:`, err?.message ?? err);
       } finally {
         checking = false;
+        lastCheckAt = Date.now();
       }
     };
 
@@ -170,7 +175,18 @@ const ScreenHost = () => {
       if (state === 'active') void runCheck('foreground');
     });
 
-    intervalId = setInterval(() => void runCheck('interval'), 5 * 60 * 1000);
+    intervalId = setInterval(async () => {
+      if (cancelled || checking) return;
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        const isLoggedOut = !userDataStr;
+        const minInterval = isLoggedOut ? INTERVAL_LOGGED_OUT_MS : INTERVAL_LOGGED_IN_MS;
+        if (Date.now() - lastCheckAt < minInterval) return;
+        await runCheck(isLoggedOut ? 'interval-loggedout' : 'interval-loggedin');
+      } catch {
+
+      }
+    }, INTERVAL_LOGGED_OUT_MS);
 
     return () => {
       cancelled = true;
