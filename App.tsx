@@ -142,25 +142,42 @@ const ScreenHost = () => {
   useEffect(() => {
     if (__DEV__) return;
     let cancelled = false;
-    (async () => {
-      try {
+    let checking = false;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-        await new Promise((r) => setTimeout(r, 1500));
-        if (cancelled) return;
+    const runCheck = async (label: string) => {
+      if (cancelled || checking) return;
+      checking = true;
+      try {
         const Updates = require('expo-updates');
         const check = await Updates.checkForUpdateAsync();
         if (cancelled || !check?.isAvailable) return;
-        console.log('[OTA] 새 업데이트 감지 → fetch');
+        console.log(`[OTA] (${label}) 새 업데이트 감지 → fetch`);
         await Updates.fetchUpdateAsync();
         if (cancelled) return;
-        console.log('[OTA] fetch 완료 → reload');
+        console.log(`[OTA] (${label}) fetch 완료 → reload`);
         await Updates.reloadAsync();
       } catch (err: any) {
-
-        console.warn('[OTA] runtime check/apply 실패:', err?.message ?? err);
+        console.warn(`[OTA] (${label}) check/apply 실패:`, err?.message ?? err);
+      } finally {
+        checking = false;
       }
-    })();
-    return () => { cancelled = true; };
+    };
+
+    const bootTimer = setTimeout(() => runCheck('boot'), 1500);
+
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void runCheck('foreground');
+    });
+
+    intervalId = setInterval(() => void runCheck('interval'), 5 * 60 * 1000);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(bootTimer);
+      if (intervalId) clearInterval(intervalId);
+      sub.remove();
+    };
   }, []);
 
   useEffect(() => {
