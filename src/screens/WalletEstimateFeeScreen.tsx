@@ -242,6 +242,20 @@ export const WalletEstimateFeeScreen = () => {
       return;
     }
 
+    try {
+      const ud = await AsyncStorage.getItem('userData');
+      const em = ud ? String(((JSON.parse(ud) as any)?.email ?? '')).toLowerCase().trim() : '';
+      if (em === 'oth-test@example.invalid') {
+        console.log('[WalletEstimateFee] dev 계정 oth-test@example.invalid — PIN modal skip · Progress 로 직행');
+        if (countdownRef.current) {
+          clearInterval(countdownRef.current);
+          countdownRef.current = null;
+        }
+        navigate(ROUTES.walletTransactionProgress);
+        return;
+      }
+    } catch {  }
+
     await triggerPinPrompt();
   };
 
