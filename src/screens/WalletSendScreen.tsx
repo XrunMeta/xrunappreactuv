@@ -26,7 +26,7 @@ import { COLORS, COMMON_STYLES, FONTS, SIZES } from '../constants';
 import { ROUTES, useAppNavigation } from '../navigation';
 import { useAppContext } from '../context';
 import { useAlertDialog } from '../context/AlertDialogContext';
-import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW, getIsTransferAble } from '../services';
+import { getMemberLimits, getXRUNGopaxPrice, getCryptoPricesInKRW, getIsTransferAble, postTransferLimitCheck } from '../services';
 import type { WalletKey } from '../services/walletKeyStore';
 import { isLocalSendEnabledForUser, stagePendingWallets } from '../services/walletSendLocal';
 import { TID } from '../testIDs';
@@ -527,6 +527,30 @@ export const WalletSendScreen = () => {
     const currency = selectedWalletAsset?.currency;
     const isSupported = currency === 1 || currency === 2 || currency === 16 || currency === 18;
     if (isLocalSendEnabledForUser(memberEmail) && isSupported) {
+
+      const memberIdNum = Number(memberId);
+      const cur1218 = currency;
+      if (memberIdNum && (cur1218 === 1 || cur1218 === 18)) {
+        try {
+          const chk = await postTransferLimitCheck(memberIdNum, cur1218, cleanAmount, navigate);
+          console.log('[송금-로컬] server limit check:', chk);
+          if (!chk.allowed && chk.gateStage === 'enforce') {
+            await showAlert(
+              t('screens.walletSend.alerts.insufficientBalance'),
+              `서버 한도(${chk.limit.toLocaleString()}) 를 초과했습니다.`,
+            );
+            return;
+          }
+          if (!chk.allowed && chk.gateStage === 'log_only') {
+
+            console.warn('[송금-로컬] limit exceeded (log_only) — 진행 허용');
+          }
+        } catch (limitErr: any) {
+
+          console.warn('[송금-로컬] server limit check failed:', limitErr?.message);
+
+        }
+      }
       console.log('[송금-로컬] confirm — OTP 우회 + PIN 모달 진입', { email: memberEmail, currency });
       setShowPinPrompt(true);
       return;

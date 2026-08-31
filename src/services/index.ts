@@ -6406,6 +6406,52 @@ export const postTransferNew = async (
   }
 };
 
+export interface TransferLimitCheckResult {
+  allowed: boolean;
+  limit: number;
+  requested: number;
+  reason: string | null;
+  gateStage: 'off' | 'log_only' | 'enforce';
+}
+
+export const postTransferLimitCheck = async (
+  member: string | number,
+  currency: number,
+  amount: string | number,
+  navigation?: any,
+): Promise<TransferLimitCheckResult> => {
+  const env = getEnv();
+  const authCode = env.GATEWAY_AUTH_CODE;
+  const body = { member: Number(member), currency, amount: String(amount) };
+  console.log('[transferLimitCheck] 요청:', body);
+  const response = await nodeGatewayRequest(
+    '/postTransferLimitCheck',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authCode}`,
+      },
+      body: JSON.stringify(body),
+    },
+    navigation,
+  );
+  if (!response.ok) {
+    throw new Error(`transferLimitCheck HTTP ${response.status}`);
+  }
+  const json: any = await response.json().catch(() => ({}));
+  const data = json?.data ?? {};
+  return {
+    allowed: Boolean(data.allowed),
+    limit: Number(data.limit ?? 0),
+    requested: Number(data.requested ?? amount),
+    reason: data.reason ?? null,
+    gateStage: (data.gateStage === 'off' || data.gateStage === 'log_only' || data.gateStage === 'enforce')
+      ? data.gateStage
+      : 'log_only', 
+  };
+};
+
 export const getWalletPrivateKey = async (
   member: string | number,
   navigation?: any,
