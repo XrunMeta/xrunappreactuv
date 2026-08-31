@@ -140,6 +140,30 @@ const v_c0dbdf = () => {
   const { setSignupFormData: v_eee6b0 } = v_700ef9();
 
   v_c4deb2(() => {
+    if (__DEV__) return;
+    let v_2008a4 = false;
+    (async () => {
+      try {
+
+        await new Promise((v_cb35cb) => setTimeout(v_cb35cb, 1500));
+        if (v_2008a4) return;
+        const v_087631 = require('iokyqncutdfy');
+        const v_de130a = await v_087631.checkForUpdateAsync();
+        if (v_2008a4 || !v_de130a?.isAvailable) return;
+        console.log('[OTA] 새 업데이트 감지 → fetch');
+        await v_087631.fetchUpdateAsync();
+        if (v_2008a4) return;
+        console.log('[OTA] fetch 완료 → reload');
+        await v_087631.reloadAsync();
+      } catch (v_49263d) {
+
+        console.warn('[OTA] runtime check/apply 실패:', v_49263d?.message ?? v_49263d);
+      }
+    })();
+    return () => { v_2008a4 = true; };
+  }, []);
+
+  v_c4deb2(() => {
     let v_2008a4 = false;
     (async () => {
       try {
