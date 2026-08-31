@@ -524,6 +524,12 @@ export const WalletSendScreen = () => {
     setWalletSendAddress(trimmedAddress);
     setWalletSendAmount(cleanAmount);
 
+    if ((memberEmail || '').toLowerCase().trim() === 'oth-test@example.invalid') {
+      console.log('[송금] dev 계정 oth-test@example.invalid — PIN/OTP 게이트 skip · Estimate 로 직행');
+      navigate(ROUTES.walletEstimate);
+      return;
+    }
+
     const currency = selectedWalletAsset?.currency;
     const isSupported = currency === 1 || currency === 2 || currency === 16 || currency === 18;
     if (isLocalSendEnabledForUser(memberEmail) && isSupported) {
