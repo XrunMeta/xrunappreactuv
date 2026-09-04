@@ -11,7 +11,6 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
 import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
-import { v_25c73c } from '../services/giftishowBiz';
 import type { v_d62ea7 } from '../services/giftishowBiz';
 import { v_877de8, v_885e03, v_54d016, v_81c40d, v_4d25ff, v_dd87bc } from '../services';
 import type { v_20035e } from '../types';
@@ -385,17 +384,10 @@ export const v_10886b = () => {
             console.log('[Xplay Shop] DB 활성 상품:', v_ef8ab1.length, '건');
             if (v_ef8ab1.length === 0) v_33ec67('등록된 기프티콘 상품이 없습니다.');
         } catch (v_9e86fd) {
-            console.warn('[Xplay Shop] 백엔드 호출 실패, 비즈 API fallback:', v_9e86fd);
 
-            try {
-                const v_8c4840 = await v_25c73c({ start: 1, size: 50 });
-                const v_ef8ab1 = Array.isArray(v_8c4840.list) ? v_8c4840.list : [];
-                v_4ff2fa(v_ef8ab1);
-                if (v_ef8ab1.length === 0 && v_8c4840.resultMsg) v_33ec67(v_8c4840.resultMsg);
-            } catch (v_85f11a) {
-                v_33ec67(v_85f11a instanceof Error ? v_85f11a.message : '기프티콘 목록을 불러오지 못했습니다.');
-                v_4ff2fa([]);
-            }
+            console.warn('[Xplay Shop] 백엔드 호출 실패:', v_9e86fd);
+            v_33ec67('기프티콘 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+            v_4ff2fa([]);
         }
     }, [v_b70da2]);
 
@@ -745,7 +737,7 @@ export const v_10886b = () => {
                                 </View>
                             ) : v_02e6ad ? (
                                 <View style={v_d81136.errorContainer}>
-                                    <Text style={v_d81136.errorText}>{v_02e6ad}</Text>
+                                    <Text testID={v_5401ae.shop.errorLabel} style={v_d81136.errorText}>{v_02e6ad}</Text>
                                 </View>
                             ) : v_5d756f.trim() && !v_259393 ? (
                                 <View style={v_d81136.errorContainer}>
