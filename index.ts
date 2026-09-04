@@ -34,7 +34,9 @@ function v_fafd0c() {
           ? import('./e2e-automation/harness/ChangedImportsHarness')
           : v_0483af === 'wallet-migration'
             ? import('./e2e-automation/harness/WalletMigrationHarness')
-            : import('./e2e-automation/harness/HarnessApp');
+            : v_0483af === 'shop-server-only'
+              ? import('./e2e-automation/harness/ShopServerOnlyHarness')
+              : import('./e2e-automation/harness/HarnessApp');
       v_b3a075.then((v_35f85c) => {
         v_b96ac3(() => v_35f85c.default);
       });
