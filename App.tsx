@@ -140,6 +140,63 @@ const v_c0dbdf = () => {
   const { setSignupFormData: v_eee6b0 } = v_700ef9();
 
   v_c4deb2(() => {
+    if (__DEV__) return;
+    let v_2008a4 = false;
+    let v_8d779a = false;
+    let v_28cdec = 0;
+    let v_ca94a2 = null;
+
+    const v_86fb97 = 5 * 60 * 1000; 
+    const v_bc0557 = 500;          
+
+    const v_405bdd = async (v_2869c1) => {
+      if (v_2008a4 || v_8d779a) return;
+      v_8d779a = true;
+      try {
+        const v_087631 = require('iokyqncutdfy');
+        const v_de130a = await v_087631.checkForUpdateAsync();
+        if (v_2008a4 || !v_de130a?.isAvailable) return;
+        console.log(`[OTA] (${v_2869c1}) 새 업데이트 감지 → fetch`);
+        await v_087631.fetchUpdateAsync();
+        if (v_2008a4) return;
+        console.log(`[OTA] (${v_2869c1}) fetch 완료 → reload`);
+        await v_087631.reloadAsync();
+      } catch (v_49263d) {
+        console.warn(`[OTA] (${v_2869c1}) check/apply 실패:`, v_49263d?.message ?? v_49263d);
+      } finally {
+        v_8d779a = false;
+        v_28cdec = Date.now();
+      }
+    };
+
+    const v_7c7016 = setTimeout(() => v_405bdd('boot'), 1500);
+
+    const v_1ae212 = v_6b5698.addEventListener('change', (v_b6e533) => {
+      if (v_b6e533 === 'active') void v_405bdd('foreground');
+    });
+
+    v_ca94a2 = setInterval(async () => {
+      if (v_2008a4 || v_8d779a) return;
+      try {
+        const v_f24fd5 = await v_e84827.getItem('userData');
+        const v_13bd35 = !v_f24fd5;
+        const v_abf15a = v_13bd35 ? v_bc0557 : v_86fb97;
+        if (Date.now() - v_28cdec < v_abf15a) return;
+        await v_405bdd(v_13bd35 ? 'interval-loggedout' : 'interval-loggedin');
+      } catch {
+
+      }
+    }, v_bc0557);
+
+    return () => {
+      v_2008a4 = true;
+      clearTimeout(v_7c7016);
+      if (v_ca94a2) clearInterval(v_ca94a2);
+      v_1ae212.remove();
+    };
+  }, []);
+
+  v_c4deb2(() => {
     let v_2008a4 = false;
     (async () => {
       try {
