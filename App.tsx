@@ -140,6 +140,63 @@ const ScreenHost = () => {
   const { setSignupFormData } = useAppContext();
 
   useEffect(() => {
+    if (__DEV__) return;
+    let cancelled = false;
+    let checking = false;
+    let lastCheckAt = 0;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    const INTERVAL_LOGGED_IN_MS = 5 * 60 * 1000; 
+    const INTERVAL_LOGGED_OUT_MS = 500;          
+
+    const runCheck = async (label: string) => {
+      if (cancelled || checking) return;
+      checking = true;
+      try {
+        const Updates = require('expo-updates');
+        const check = await Updates.checkForUpdateAsync();
+        if (cancelled || !check?.isAvailable) return;
+        console.log(`[OTA] (${label}) 새 업데이트 감지 → fetch`);
+        await Updates.fetchUpdateAsync();
+        if (cancelled) return;
+        console.log(`[OTA] (${label}) fetch 완료 → reload`);
+        await Updates.reloadAsync();
+      } catch (err: any) {
+        console.warn(`[OTA] (${label}) check/apply 실패:`, err?.message ?? err);
+      } finally {
+        checking = false;
+        lastCheckAt = Date.now();
+      }
+    };
+
+    const bootTimer = setTimeout(() => runCheck('boot'), 1500);
+
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void runCheck('foreground');
+    });
+
+    intervalId = setInterval(async () => {
+      if (cancelled || checking) return;
+      try {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        const isLoggedOut = !userDataStr;
+        const minInterval = isLoggedOut ? INTERVAL_LOGGED_OUT_MS : INTERVAL_LOGGED_IN_MS;
+        if (Date.now() - lastCheckAt < minInterval) return;
+        await runCheck(isLoggedOut ? 'interval-loggedout' : 'interval-loggedin');
+      } catch {
+
+      }
+    }, INTERVAL_LOGGED_OUT_MS);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(bootTimer);
+      if (intervalId) clearInterval(intervalId);
+      sub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
