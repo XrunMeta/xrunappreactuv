@@ -81,7 +81,7 @@
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 294,
+      "versionCode": 297,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -177,7 +177,7 @@
     "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/98780521-4749-4507-8e3a-62a2b3a80783",
-      "checkAutomatically": "ON_LOAD",
+      "checkAutomatically": "ON_ERROR_RECOVERY",
       "fallbackToCacheTimeout": 0
     }
   }
