@@ -1,8 +1,10 @@
 
 
 import v_a3453e, { v_af12cb, v_de06a3, v_76a8a9, v_e662ae, v_5ab095 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_39a996 } from 'rcmrninabrnb';
+import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
+import * as v_94035f from 'ryynyumnbcgyvtiickefs';
+import { v_8cbe29 } from 'iokyqncutdfy';
 import { v_412fbc } from '../components/AnimatedDots';
 import { v_5401ae } from '../testIDs';
 
@@ -36,6 +38,8 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const { t: v_8d41d7 } = v_772971();
   const [v_cf55be, v_72f90e] = v_5ab095(false);
   const [v_5fafb0, v_0fa862] = v_5ab095(false);
+  const { downloadProgress: v_ef2000 } = v_8cbe29();
+  const v_a63fde = Math.max(0, Math.min(1, v_ef2000 ?? 0));
   const v_61f9b6 = v_e662ae(false);
   const v_8f61c0 = v_e662ae(false);
 
@@ -93,7 +97,15 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
               </Text>
               {v_5fafb0 ? (
                 <View style={v_d81136.progressContainer}>
-                  <ActivityIndicator size="large" color="#4A90E2" />
+                  <Text style={v_d81136.progressText}>{Math.round(v_a63fde * 100)}%</Text>
+                  <Progress.Bar
+                    progress={v_a63fde}
+                    width={250}
+                    color="#4A90E2"
+                    unfilledColor="#E0E0E0"
+                    borderWidth={0}
+                    height={10}
+                  />
                   <LoadingText text={v_8d41d7('common.messages.loading')} style={v_d81136.downloadingText} />
                 </View>
               ) : (
@@ -139,6 +151,12 @@ const v_d81136 = v_472849.create({
     width: '100%',
     alignItems: 'center',
     marginVertical: 20,
+  },
+  progressText: {
+    marginBottom: 10,
+    fontSize: 20,
+    color: '#4A90E2',
+    fontWeight: 'bold',
   },
   downloadingText: {
     marginTop: 10,

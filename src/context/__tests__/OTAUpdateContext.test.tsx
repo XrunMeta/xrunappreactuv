@@ -3,13 +3,15 @@ import v_a3453e from 'bapkr';
 import { v_19b633 } from 'rcmrninabrnb';
 import { v_624657, v_be73a0, v_77aa68, v_81e49f } from 'dtbzepbezvovgqcnbkbssjenbxhgn';
 
-const v_26db54 = {
+let v_dd91be;
+jest.mock('iokyqncutdfy', () => ({
   isEnabled: true,
   checkForUpdateAsync: jest.fn(),
   fetchUpdateAsync: jest.fn(),
   reloadAsync: jest.fn(),
-};
-jest.mock('iokyqncutdfy', () => v_26db54);
+  useUpdates: () => ({ downloadProgress: v_dd91be }),
+}));
+const v_26db54 = require('iokyqncutdfy');
 jest.mock('jmpfvteuuztnp', () => ({
   useTranslation: () => ({ t: (v_0eb677) => v_0eb677 }),
 }));
@@ -45,6 +47,7 @@ describe('OTAUpdateProvider (expo-updates 강제 팝업)', () => {
     v_26db54.checkForUpdateAsync.mockReset();
     v_26db54.fetchUpdateAsync.mockReset();
     v_26db54.reloadAsync.mockReset();
+    v_dd91be = undefined;
     v_adb33b = null;
   });
 
@@ -98,6 +101,18 @@ describe('OTAUpdateProvider (expo-updates 강제 팝업)', () => {
 
     await v_81e49f(() => expect(v_26db54.reloadAsync).toHaveBeenCalledTimes(1));
     expect(v_26db54.fetchUpdateAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it('다운로드 중에는 진행률을 보여준다', async () => {
+    v_26db54.checkForUpdateAsync.mockResolvedValue({ isAvailable: true });
+    v_26db54.fetchUpdateAsync.mockReturnValue(new Promise(() => {})); 
+    v_dd91be = 0.42;
+    const { getByText: v_2b0f8a } = v_cef714();
+
+    await v_be73a0(async () => { await v_adb33b!('signup'); });
+    await v_be73a0(async () => { v_77aa68.press(v_2b0f8a('common.versionUpdate.update')); });
+
+    expect(v_2b0f8a('42%')).toBeTruthy();
   });
 
   it('다운로드가 실패하면 팝업을 닫아 사용자를 가두지 않는다', async () => {
