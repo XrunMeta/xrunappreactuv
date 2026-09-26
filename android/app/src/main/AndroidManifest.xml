@@ -26,7 +26,7 @@
     <meta-data android:name="com.bytedance.sdk.openadsdk.DEBUG" android:value="false"/>
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="oth-secret"/>
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="true"/>
-    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ERROR_RECOVERY_ONLY"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://u.expo.dev/98780521-4749-4507-8e3a-62a2b3a80783"/>
     <meta-data android:name="expo.modules.updates.EXPO_RUNTIME_VERSION" android:value="@string/expo_runtime_version"/>
