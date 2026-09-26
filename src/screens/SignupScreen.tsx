@@ -30,7 +30,7 @@ import {
 import { v_412fbc } from '../components/AnimatedDots';
 import { v_1bfbd0, v_9b1a04, v_843035 } from '../constants';
 import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_700ef9 } from '../context';
+import { v_700ef9, v_ba5086 } from '../context';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_9553a4, v_6946fd, v_369014, v_789afd, v_a61db3, v_bae512, v_52495e, v_1bd8ad } from '../constants';
 import { v_da1883 } from '../types';
@@ -74,6 +74,11 @@ export const v_f40fc5 = () => {
     setVerificationEmail: v_b572c3,
     setVerificationSuccessRoute: v_8f89f3,
   } = v_700ef9();
+
+  const { checkForUpdate: v_7e5bd3 } = v_ba5086();
+  v_c4deb2(() => {
+    void v_7e5bd3('signup');
+  }, [v_7e5bd3]);
 
   const [v_f142d8, v_6dde2f] = v_5ab095(v_8d7bc8.familyName);
   const [v_a7c7b7, v_15ded5] = v_5ab095(v_8d7bc8.givenName);

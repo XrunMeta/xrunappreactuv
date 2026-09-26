@@ -1,15 +1,14 @@
 
 
-import v_a3453e, { v_af12cb, v_de06a3, v_76a8a9, v_5ab095 } from 'bapkr';
-import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_326be8, v_1ed974, v_39a996, v_80fa10 } from 'rcmrninabrnb';
+import v_a3453e, { v_af12cb, v_de06a3, v_76a8a9, v_e662ae, v_5ab095 } from 'bapkr';
+import { v_3094a2, v_19b633, v_472849, v_aa7413, v_4623af, v_03e392, v_39a996 } from 'rcmrninabrnb';
 import { v_772971 } from 'jmpfvteuuztnp';
-import * as v_94035f from 'ryynyumnbcgyvtiickefs';
-import { v_dc21b6, v_f2f2dd, v_8b3997, v_3e029d } from '../services/otaCheck';
 import { v_412fbc } from '../components/AnimatedDots';
 import { v_5401ae } from '../testIDs';
 
 type OTAUpdateContextValue = {
-  checkForUpdate: () => Promise<void>;
+
+  checkForUpdate: (label?: string) => Promise<boolean>;
 };
 
 const v_969f21 = v_af12cb<OTAUpdateContextValue | undefined>(undefined);
@@ -22,58 +21,58 @@ export const v_ba5086 = (): OTAUpdateContextValue => {
   return v_16e2dd;
 };
 
+const v_7d5358 = 5000;
+
+const v_b5ae43 = <T,>(v_e2a85c, v_d799e2): Promise<T> =>
+  new Promise<T>((v_6f7712, v_bad6f3) => {
+    const v_cb36b1 = setTimeout(() => v_bad6f3(new Error(`timeout ${v_d799e2}ms`)), v_d799e2);
+    v_e2a85c.then(
+      (v_81e2ef) => { clearTimeout(v_cb36b1); v_6f7712(v_81e2ef); },
+      (v_9e86fd) => { clearTimeout(v_cb36b1); v_bad6f3(v_9e86fd); },
+    );
+  });
+
 export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode }) => {
   const { t: v_8d41d7 } = v_772971();
   const [v_cf55be, v_72f90e] = v_5ab095(false);
-  const [v_a63fde, v_6306c3] = v_5ab095(0);
   const [v_5fafb0, v_0fa862] = v_5ab095(false);
-  const [v_a2dcc0, v_c90ab1] = v_5ab095<v_3e029d | null>(null);
-  const [v_3cc252, v_39ad29] = v_5ab095(false);
+  const v_61f9b6 = v_e662ae(false);
+  const v_8f61c0 = v_e662ae(false);
 
-  const v_7e5bd3 = v_de06a3(async () => {
-    if (__DEV__) return;
-    const v_34d5e3 = await v_dc21b6();
-    if (v_34d5e3) {
-      v_c90ab1(v_34d5e3);
+  const v_7e5bd3 = v_de06a3(async (v_2869c1 = 'manual'): Promise<boolean> => {
+    if (__DEV__) return false;
+    if (v_8f61c0.current) return true;
+    if (v_61f9b6.current) return false;
+    v_61f9b6.current = true;
+    try {
+      const v_087631 = require('iokyqncutdfy');
+      if (!v_087631.isEnabled) return false;
+      const v_43c42e = await v_b5ae43<{ isAvailable?: boolean }>(v_087631.checkForUpdateAsync(), v_7d5358);
+      if (!v_43c42e?.isAvailable) return false;
+      console.log(`[OTA] (${v_2869c1}) 새 업데이트 감지 → 강제 업데이트 팝업`);
+      v_8f61c0.current = true;
       v_72f90e(true);
+      return true;
+    } catch (v_49263d) {
+      console.warn(`[OTA] (${v_2869c1}) 확인 실패 — 팝업 없이 진행:`, v_49263d?.message ?? v_49263d);
+      return false;
+    } finally {
+      v_61f9b6.current = false;
     }
   }, []);
 
   const v_02f61c = async () => {
-    if (!v_a2dcc0) return;
+    if (v_5fafb0) return;
     v_0fa862(true);
-    v_6306c3(0);
-
-    const v_593e63 = await v_f2f2dd(v_a2dcc0.url, (v_e2a85c) => v_6306c3(v_e2a85c));
-
-    if (v_593e63) {
-      await v_8b3997(v_a2dcc0.version);
+    try {
+      const v_087631 = require('iokyqncutdfy');
+      await v_087631.fetchUpdateAsync();
+      await v_087631.reloadAsync();
+    } catch (v_49263d) {
+      console.warn('[OTA] 업데이트 다운로드/적용 실패:', v_49263d?.message ?? v_49263d);
       v_0fa862(false);
-      v_6306c3(1);
-
-      if (v_326be8.OS === 'android') {
-        v_03e392.alert(
-          v_8d41d7('common.versionUpdate.updateComplete'),
-          v_8d41d7('common.versionUpdate.restartMessage'),
-          [{
-            text: v_8d41d7('common.versionUpdate.confirm'),
-            onPress: () => {
-
-              const v_4b4bb9 = (v_80fa10 as any).ForceKill;
-              if (v_4b4bb9?.killProcess) {
-                v_4b4bb9.killProcess();
-              } else {
-                v_1ed974.exitApp();
-              }
-            },
-          }],
-          { cancelable: false }
-        );
-      } else {
-        v_39ad29(true);
-      }
-    } else {
-      v_0fa862(false);
+      v_8f61c0.current = false;
+      v_72f90e(false);
       v_03e392.alert(v_8d41d7('common.messages.error'), v_8d41d7('common.versionUpdate.downloadFailed'));
     }
   };
@@ -84,33 +83,17 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     <OTAUpdateContext.Provider value={v_3b402b}>
       {v_21f619}
 
-      {!v_cf55be ? null : v_3cc252 ? (
-        <Modal visible transparent={false} animationType="fade">
-          <View style={v_d81136.fullScreenContainer}>
-            <ActivityIndicator size="large" color="#4A90E2" style={{ marginBottom: 30, transform: [{ scale: 1.5 }] }} />
-            <Text style={v_d81136.fullScreenTitle}>{v_8d41d7('common.versionUpdate.updateComplete')}</Text>
-            <Text style={v_d81136.fullScreenMessage}>{v_8d41d7('common.versionUpdate.restartRequired')}</Text>
-          </View>
-        </Modal>
-      ) : (
-        <Modal visible animationType="slide" transparent={false}>
+      {v_cf55be && (
+        <Modal visible animationType="fade" transparent={false} onRequestClose={() => {  }}>
           <View style={v_d81136.fullScreenContainer}>
             <View style={v_d81136.contentContainer}>
               <Text style={v_d81136.fullScreenTitle}>{v_8d41d7('common.versionUpdate.title')}</Text>
               <Text testID={v_5401ae.otaupdateContext.descriptionLabel} style={v_d81136.fullScreenMessage}>
-                {v_a2dcc0?.description || v_8d41d7('common.versionUpdate.message')}
+                {v_8d41d7('common.versionUpdate.message')}
               </Text>
               {v_5fafb0 ? (
                 <View style={v_d81136.progressContainer}>
-                  <Text style={v_d81136.progressText}>{Math.round(v_a63fde * 100)}%</Text>
-                  <Progress.Bar
-                    progress={v_a63fde}
-                    width={250}
-                    color="#4A90E2"
-                    unfilledColor="#E0E0E0"
-                    borderWidth={0}
-                    height={10}
-                  />
+                  <ActivityIndicator size="large" color="#4A90E2" />
                   <LoadingText text={v_8d41d7('common.messages.loading')} style={v_d81136.downloadingText} />
                 </View>
               ) : (
@@ -156,12 +139,6 @@ const v_d81136 = v_472849.create({
     width: '100%',
     alignItems: 'center',
     marginVertical: 20,
-  },
-  progressText: {
-    marginBottom: 10,
-    fontSize: 20,
-    color: '#4A90E2',
-    fontWeight: 'bold',
   },
   downloadingText: {
     marginTop: 10,
