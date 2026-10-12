@@ -460,7 +460,7 @@ export const MapMainScreen: v_a3453e.FC = () => {
 
         const v_dabeaa = v_b4e012.toLowerCase().trim();
 
-        if (v_dabeaa === 'oth-test@example.invalid') {
+        if (__DEV__ && v_dabeaa === 'oth-test@example.invalid') {
           console.log('[MapMain] dev 계정 oth-test@example.invalid — PIN 셋업/복원 게이트 skip');
           return;
         }
