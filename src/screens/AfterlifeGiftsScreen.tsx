@@ -263,22 +263,6 @@ export default function v_5320dd() {
           ))}
 
         {}
-        {!v_683210 && !v_49263d && v_b6c820 > 0 && (
-          <View style={v_d81136.card}>
-            <View style={v_d81136.cardBadge}>
-              <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
-            </View>
-            <Text style={v_d81136.cardTitle}>
-              꽃 {v_b6c820}
-              {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
-            </Text>
-            <Text style={v_d81136.cardSubWarn}>
-              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_7b190b })}
-            </Text>
-          </View>
-        )}
-
-        {}
         {!v_683210 &&
           !v_49263d &&
           v_94c412 > 0 &&
@@ -300,6 +284,22 @@ export default function v_5320dd() {
               </View>
             </View>
           ))}
+
+        {}
+        {!v_683210 && !v_49263d && v_b6c820 > 0 && (
+          <View style={v_d81136.card}>
+            <View style={v_d81136.cardBadge}>
+              <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
+            </View>
+            <Text style={v_d81136.cardTitle}>
+              꽃 {v_b6c820}
+              {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+            </Text>
+            <Text style={v_d81136.cardSubWarn}>
+              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_7b190b })}
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </SafeView>
   );
