@@ -168,7 +168,7 @@ export default function v_5320dd() {
 
   return (
     <SafeView style={v_d81136.container} backgroundColor={'#f7f7fb'}>
-      <Header title="애프터라이프 받은 꽃" />
+      <Header title="애프터라이프" />
 
       <ScrollView
         contentContainerStyle={v_d81136.scroll}
