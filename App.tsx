@@ -401,27 +401,8 @@ const v_c0dbdf = () => {
             const v_9bf12c = decodeURIComponent(v_2c9a0c);
             console.log('[Install Referrer] 추천인 이메일:', v_9bf12c);
             await v_e84827.setItem('processed_install_referrer', v_23b320);
-
-            const v_ac70b8 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v_9bf12c);
-            if (v_ac70b8) {
-              try {
-                const v_c3c3b0 = await v_f5ecec(v_9bf12c, v_9b57fc);
-                if (v_c3c3b0) {
-                  console.log('[Install Referrer] 기존 회원 → 로그인 화면(이메일 자동입력)');
-                  await v_e84827.setItem('pendingPrefillEmail', v_9bf12c);
-                  v_9b57fc('login');
-                  return;
-                }
-              } catch (v_9363e2) {
-                console.warn('[Install Referrer] checkEmailExists 실패, 회원가입으로 fallback:', v_9363e2);
-              }
-            }
-
             v_eee6b0({ referralEmail: v_9bf12c });
-            if (v_ac70b8) {
-              await v_e84827.setItem('pendingSignupEmail', v_9bf12c);
-            }
-            console.log('[Install Referrer] 신규 회원 → 회원가입 화면으로 이동');
+            console.log('[Install Referrer] 회원가입 화면으로 이동');
             v_9b57fc('signup');
           } else if (v_a560de === 'afterlife_signup' && v_2c9a0c && !v_70d95d) {
 
