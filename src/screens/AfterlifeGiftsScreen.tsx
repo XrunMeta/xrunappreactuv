@@ -314,7 +314,7 @@ export default function v_5320dd() {
               {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
             </Text>
             <Text style={v_d81136.cardSubWarn}>
-              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: neededForNext })}
+              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: Math.max(0, v_458d1d - v_b6c820) })}
             </Text>
           </TouchableOpacity>
         )}
