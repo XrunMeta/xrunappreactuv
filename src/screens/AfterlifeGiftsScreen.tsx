@@ -113,10 +113,7 @@ export default function v_5320dd() {
   const v_f541e7 = v_1cd9cf * v_197916;
   const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_f541e7, v_beea9d) : 0;
 
-  const v_2e0e88 =
-    v_f541e7 > 0
-      ? `${v_f541e7.toFixed(2)} XRUN · ${v_d7e45e(v_f02564)}`
-      : `0 XRUN · ${v_d7e45e(0)}`;
+  const v_2e0e88 = `${v_f541e7.toFixed(2)} XRUN\n${v_d7e45e(v_f02564)}`;
 
   const v_f51415 = v_de06a3(async () => {
     if (v_cb38bc || !v_e0c7e8 || !v_fcb9a4) return;
@@ -227,35 +224,33 @@ export default function v_5320dd() {
         )}
 
         {!v_683210 && !v_49263d && v_ccd7bf > 0 && (
-          <View style={v_d81136.card}>
-            <View style={{ flex: 1 }}>
-              <Text style={v_d81136.cardTitle}>
-                {v_8d41d7('screens.afterlifeGifts.summaryLabel')} {v_ccd7bf}
-                {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+          <TouchableOpacity
+            style={v_d81136.card}
+            onPress={v_f51415}
+            disabled={!v_4f2dac || v_cb38bc}
+            activeOpacity={v_4f2dac ? 0.75 : 1}
+          >
+            <Text style={v_d81136.cardTitle}>
+              꽃 {v_ccd7bf}
+              {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+            </Text>
+            {!v_4f2dac && (
+              <Text style={v_d81136.cardSubWarn}>
+                {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_d2d720 })}
               </Text>
-              {v_4f2dac ? (
-                <Text style={v_d81136.cardSub}>
-                  {v_8d41d7('screens.afterlifeGifts.exchangeAmount')}  {v_197916} XRUN
-                </Text>
+            )}
+            <View style={v_d81136.divider} />
+            <View style={v_d81136.cardFooter}>
+              <Text style={v_d81136.cardFooterLabel}>{v_8d41d7('screens.afterlifeGifts.exchangeAmount')}</Text>
+              {v_cb38bc ? (
+                <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
               ) : (
-                <Text style={[v_d81136.cardSub, v_d81136.cardSubWarn]}>
-                  {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_d2d720 })}
+                <Text style={[v_d81136.cardFooterValue, !v_4f2dac && v_d81136.cardFooterValueDim]}>
+                  {v_197916} XRUN
                 </Text>
               )}
             </View>
-            <TouchableOpacity
-              style={[v_d81136.actionPill, !v_4f2dac && v_d81136.actionPillDisabled]}
-              onPress={v_f51415}
-              disabled={!v_4f2dac || v_cb38bc}
-              activeOpacity={0.75}
-            >
-              {v_cb38bc ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <Text style={v_d81136.actionPillText}>{v_8d41d7('screens.afterlifeGifts.exchange')}</Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         )}
       </ScrollView>
     </SafeView>
@@ -287,27 +282,25 @@ const v_d81136 = v_472849.create({
   emptyText: { fontSize: 15, fontWeight: '700', color: '#333' },
   emptySub: { fontSize: 12, color: '#888', marginTop: 8, textAlign: 'center', lineHeight: 17 },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: v_1bfbd0.white,
     borderWidth: 1,
     borderColor: '#EEF0F6',
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
   },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: v_1bfbd0.headerText },
-  cardSub: { fontSize: 12, color: '#666', marginTop: 4 },
-  cardSubWarn: { color: '#B91C1C' },
-  actionPill: {
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 999,
-    backgroundColor: v_1bfbd0.buttonPrimary,
-    minWidth: 72,
+  cardTitle: { fontSize: 20, fontWeight: '700', color: v_1bfbd0.headerText },
+  cardSubWarn: { fontSize: 12, color: '#B91C1C', marginTop: 6 },
+  divider: {
+    height: v_472849.hairlineWidth,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 20,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  actionPillDisabled: {
-    backgroundColor: '#C7CBD9',
-  },
-  actionPillText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
+  cardFooterLabel: { fontSize: 13, color: '#666', fontWeight: '500' },
+  cardFooterValue: { fontSize: 16, fontWeight: '800', color: v_1bfbd0.headerText },
+  cardFooterValueDim: { color: '#C7CBD9' },
 });
