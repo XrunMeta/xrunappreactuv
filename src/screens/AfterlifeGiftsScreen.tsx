@@ -20,8 +20,6 @@ import { v_4b1173 } from '../context/AlertDialogContext';
 import {
   v_8cbcd6,
   v_9c38e3,
-  v_83b42a,
-  v_197916,
   type v_b24e94,
 } from '../services/afterlifeBridge';
 import { v_18f201 } from '../services/pangle';
@@ -35,6 +33,9 @@ export default function v_5320dd() {
   const { showAlert: v_889fad } = v_4b1173();
   const [v_e0c7e8, v_fedf34] = v_5ab095<string | null>(null);
   const [v_4622b9, v_fa923c] = v_5ab095<v_b24e94[]>([]);
+
+  const [v_2cb731, v_f29f08] = v_5ab095<number>(0);
+  const [v_458d1d, v_19718e] = v_5ab095<number>(11); 
   const [v_683210, v_34a50a] = v_5ab095(true);
   const [v_612e9f, v_575aad] = v_5ab095(false);
   const [v_cb38bc, v_b8069a] = v_5ab095(false);
@@ -58,10 +59,13 @@ export default function v_5320dd() {
       const v_8f00b9 = await v_8cbcd6(v_131f0d);
       if (!v_8f00b9.userFound) {
         v_fa923c([]);
+        v_f29f08(0);
         v_8a5996(v_8d41d7('screens.afterlifeGifts.errors.notRegistered'));
         return;
       }
       v_fa923c(v_8f00b9.items);
+      v_f29f08(Number(v_8f00b9.totalBagValue ?? 0));
+      if (v_8f00b9.exchangeUnit && v_8f00b9.exchangeUnit > 0) v_19718e(v_8f00b9.exchangeUnit);
 
       try {
         const v_479f05 = await v_e84827.getItem(v_bd0aa2(v_131f0d));
@@ -115,23 +119,23 @@ export default function v_5320dd() {
   );
 
   const v_fcb9a4 = v_df9f57(
-    () => v_4622b9.find((v_23805a) => v_23805a.count >= v_83b42a) ?? null,
-    [v_4622b9],
+    () =>
+      v_4622b9.find(
+        (v_23805a) => v_23805a.count >= (v_23805a.exchangeUnit ?? v_458d1d) && v_23805a.nextRedeemPayout != null,
+      ) ?? null,
+    [v_4622b9, v_458d1d],
   );
   const v_4f2dac = !!v_fcb9a4;
 
-  const v_287adb = 0.01;
-  const v_567ea6 = v_83b42a - 1; 
-  const v_812264 = v_567ea6 * v_287adb; 
-  const v_616667 = Math.floor(v_ccd7bf / v_83b42a);
-  const v_825d02 = v_616667 * v_83b42a;      
-  const v_72c7bc = String(+v_812264.toFixed(2));            
-  const v_b6c820 = v_ccd7bf - v_825d02;               
-  const v_7b190b = v_83b42a - v_b6c820;        
+  const v_616667 = Math.floor(v_ccd7bf / v_458d1d);
+  const v_825d02 = v_616667 * v_458d1d;
+  const v_b6c820 = v_ccd7bf - v_825d02;
 
-  const v_f541e7 = v_ccd7bf * v_287adb;
-  const v_a03a29 = String(+v_f541e7.toFixed(2));
-  const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_f541e7, v_beea9d) : 0;
+  const v_16efc3 = v_fcb9a4?.nextRedeemPayout ?? 0;
+  const v_f0f889 = v_16efc3 > 0 ? String(+v_16efc3.toFixed(8)) : '-';
+
+  const v_a03a29 = String(+v_2cb731.toFixed(8));
+  const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_2cb731, v_beea9d) : 0;
 
   const v_f51415 = v_de06a3(async () => {
     if (v_cb38bc || !v_e0c7e8 || !v_fcb9a4) return;
@@ -152,12 +156,14 @@ export default function v_5320dd() {
             return;
           }
           try {
-            await v_9c38e3(v_e0c7e8, v_fcb9a4.giftId);
+            const v_ef0c84 = await v_9c38e3(v_e0c7e8, v_fcb9a4.giftId);
+            const v_87d05f = v_ef0c84.burned ?? v_fcb9a4.exchangeUnit ?? v_458d1d;
+            const v_3beb3e = v_ef0c84.xrunAmount ?? v_16efc3;
             v_fa923c((v_ba2215) =>
               v_ba2215
                 .map((v_206b88) =>
                   v_206b88.giftId === v_fcb9a4.giftId
-                    ? { ...v_206b88, count: Math.max(0, v_206b88.count - v_83b42a) }
+                    ? { ...v_206b88, count: Math.max(0, v_206b88.count - v_87d05f) }
                     : v_206b88,
                 )
                 .filter((v_206b88) => v_206b88.count > 0),
@@ -167,9 +173,11 @@ export default function v_5320dd() {
               v_e84827.setItem(v_bd0aa2(v_e0c7e8), String(v_a448ad)).catch(() => {});
               return v_a448ad;
             });
+
+            void v_f6f5de();
             await v_889fad(
               '교환 완료',
-              '꽃 11송이가 0.1 XRUN 으로 바뀌었어요.\nXRUN 지갑에서 확인해보세요.',
+              `꽃 ${v_87d05f}송이가 ${v_3beb3e} XRUN 으로 바뀌었어요.\nXRUN 지갑에서 확인해보세요.`,
             );
           } catch (v_1753dd) {
             console.warn('[AfterlifeGifts] redeem failed:', v_1753dd?.message);
@@ -189,9 +197,9 @@ export default function v_5320dd() {
       await v_889fad('광고 표시 실패', '잠시 후 다시 시도해주세요.');
       v_b8069a(false);
     }
-  }, [v_cb38bc, v_e0c7e8, v_fcb9a4, v_8d41d7, v_889fad]);
+  }, [v_cb38bc, v_e0c7e8, v_fcb9a4, v_458d1d, v_16efc3, v_f6f5de, v_8d41d7, v_889fad]);
 
-  const v_d2d720 = Math.max(0, v_83b42a - v_ccd7bf);
+  const v_d2d720 = Math.max(0, v_458d1d - v_ccd7bf);
 
   const v_7f243f = v_de06a3(async () => {
     try {
@@ -257,7 +265,7 @@ export default function v_5320dd() {
                 <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
               </View>
               <Text style={v_d81136.cardTitle}>
-                꽃 {v_83b42a}
+                꽃 {v_458d1d}
                 {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
               </Text>
               <View style={v_d81136.divider} />
@@ -266,7 +274,7 @@ export default function v_5320dd() {
                 {v_cb38bc ? (
                   <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
                 ) : (
-                  <Text style={v_d81136.cardFooterValue}>{v_72c7bc} XRUN</Text>
+                  <Text style={v_d81136.cardFooterValue}>{v_f0f889} XRUN</Text>
                 )}
               </View>
             </TouchableOpacity>
@@ -282,7 +290,7 @@ export default function v_5320dd() {
                 <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>교환 완료</Text>
               </View>
               <Text style={[v_d81136.cardTitle, v_d81136.cardTitleDone]}>
-                꽃 {v_83b42a}
+                꽃 {v_458d1d}
                 {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
               </Text>
               <View style={v_d81136.divider} />
@@ -290,7 +298,7 @@ export default function v_5320dd() {
                 <Text style={[v_d81136.cardFooterLabel, v_d81136.cardTitleDone]}>
                   {v_8d41d7('screens.afterlifeGifts.exchangeAmount')}
                 </Text>
-                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>{v_72c7bc} XRUN</Text>
+                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>-</Text>
               </View>
             </View>
           ))}
@@ -306,7 +314,7 @@ export default function v_5320dd() {
               {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
             </Text>
             <Text style={v_d81136.cardSubWarn}>
-              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_7b190b })}
+              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: neededForNext })}
             </Text>
           </TouchableOpacity>
         )}
