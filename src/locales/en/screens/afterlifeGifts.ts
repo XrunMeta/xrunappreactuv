@@ -1,5 +1,7 @@
 export default {
   title: 'Afterlife',
+  walletSubtitle: 'My received gifts',
+  flowerUnit: 'flowers',
   summaryLabel: 'Flowers received',
   summaryValueSuffix: '',
   retry: 'Retry',

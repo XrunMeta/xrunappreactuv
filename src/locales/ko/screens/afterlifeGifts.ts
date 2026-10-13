@@ -1,5 +1,7 @@
 export default {
   title: '애프터라이프',
+  walletSubtitle: '내가 받은 선물',
+  flowerUnit: '송이',
   summaryLabel: '받은 꽃 개수',
   summaryValueSuffix: '송이',
   retry: '다시 시도',
