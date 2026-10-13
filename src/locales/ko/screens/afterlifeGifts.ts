@@ -8,7 +8,7 @@ export default {
   totalFlowerCount: '총 꽃 개수',
   mySection: '내가 받은 선물',
   exchangeAmount: '교환 금액',
-  needMoreFlowersFormat: '{{need}}송이 더 모으면 교환 가능',
+  needMoreFlowersFormat: '{{need}}개 더 필요합니다. 애프터라이프에서 꽃을 모아보세요',
   emptyTitle: '아직 받은 꽃이 없어요',
   emptySub: 'Afterlife 앱 통화 중 다른 사용자가 보낸 꽃이 여기에 쌓입니다.',
   cardSubFormat: '광고 1회 시청 → {{unit}}개 소진 / {{xrun}} XRUN',
