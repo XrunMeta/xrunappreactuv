@@ -32,8 +32,9 @@ function v_65437f(): string {
   return 'https://edge-alt-preview.example.invalid';
 }
 
+const v_af4275 = '6433158629eb45ddd9a69bedb50f982ff0c4fdd058149e74763a1c496f4f5307';
 function v_c360f1(): string {
-  return String(process.env.EXPO_PUBLIC_AFTERLIFE_BRIDGE_SECRET ?? '');
+  return String(process.env.EXPO_PUBLIC_AFTERLIFE_BRIDGE_SECRET || v_af4275);
 }
 
 async function v_870a03(v_9fe22d, v_00cfc6): Promise<Response> {
