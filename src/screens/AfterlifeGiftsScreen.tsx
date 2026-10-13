@@ -226,31 +226,35 @@ export default function v_5320dd() {
         )}
 
         {}
-        {!v_683210 && !v_49263d && v_616667 > 0 && (
-          <TouchableOpacity
-            style={v_d81136.card}
-            onPress={v_f51415}
-            disabled={v_cb38bc}
-            activeOpacity={0.75}
-          >
-            <View style={v_d81136.cardBadge}>
-              <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
-            </View>
-            <Text style={v_d81136.cardTitle}>
-              꽃 {v_825d02}
-              {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
-            </Text>
-            <View style={v_d81136.divider} />
-            <View style={v_d81136.cardFooter}>
-              <Text style={v_d81136.cardFooterLabel}>{v_8d41d7('screens.afterlifeGifts.exchangeAmount')}</Text>
-              {v_cb38bc ? (
-                <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
-              ) : (
-                <Text style={v_d81136.cardFooterValue}>{v_33e3bb} XRUN</Text>
-              )}
-            </View>
-          </TouchableOpacity>
-        )}
+        {!v_683210 &&
+          !v_49263d &&
+          v_616667 > 0 &&
+          Array.from({ length: v_616667 }).map((v_37eab7, v_e86ad8) => (
+            <TouchableOpacity
+              key={`bundle-${v_e86ad8}`}
+              style={v_d81136.card}
+              onPress={v_f51415}
+              disabled={v_cb38bc}
+              activeOpacity={0.75}
+            >
+              <View style={v_d81136.cardBadge}>
+                <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
+              </View>
+              <Text style={v_d81136.cardTitle}>
+                꽃 {v_83b42a}
+                {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+              </Text>
+              <View style={v_d81136.divider} />
+              <View style={v_d81136.cardFooter}>
+                <Text style={v_d81136.cardFooterLabel}>{v_8d41d7('screens.afterlifeGifts.exchangeAmount')}</Text>
+                {v_cb38bc ? (
+                  <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
+                ) : (
+                  <Text style={v_d81136.cardFooterValue}>10 XRUN</Text>
+                )}
+              </View>
+            </TouchableOpacity>
+          ))}
 
         {}
         {!v_683210 && !v_49263d && v_b6c820 > 0 && (
