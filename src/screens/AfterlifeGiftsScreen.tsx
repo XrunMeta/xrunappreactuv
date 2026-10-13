@@ -18,6 +18,7 @@ import { v_a0daa8 } from '../navigation';
 import {
   v_8cbcd6,
   v_9c38e3,
+  v_83b42a,
   type v_b24e94,
 } from '../services/afterlifeBridge';
 import { v_18f201 } from '../services/pangle';
@@ -100,6 +101,14 @@ export default function v_5320dd() {
   const v_f51415 = v_de06a3(
     async (v_8c0b26) => {
       if (v_aca593 || !v_e0c7e8) return;
+
+      if (v_8c0b26.count < v_83b42a) {
+        v_03e392.alert(
+          '교환 불가',
+          `꽃 ${v_83b42a}개부터 교환 가능해요.\n(현재 ${v_8c0b26.count}개 — ${v_83b42a - v_8c0b26.count}개 더 모아주세요)`,
+        );
+        return;
+      }
       v_b5f8bb(v_8c0b26.key);
       try {
 
@@ -123,12 +132,16 @@ export default function v_5320dd() {
 
               v_fa923c((v_ba2215) =>
                 v_ba2215
-                  .map((v_206b88) => (v_206b88.giftId === v_8c0b26.giftId ? { ...v_206b88, count: Math.max(0, v_206b88.count - 1) } : v_206b88))
+                  .map((v_206b88) =>
+                    v_206b88.giftId === v_8c0b26.giftId
+                      ? { ...v_206b88, count: Math.max(0, v_206b88.count - v_83b42a) }
+                      : v_206b88,
+                  )
                   .filter((v_206b88) => v_206b88.count > 0),
               );
               v_03e392.alert(
                 '교환 완료',
-                `${v_8c0b26.emoji} ${v_8c0b26.name} 1송이 → 사용 가능한 꽃으로 전환됐어요!\nAfterlife 통화 화면 선물 시트에서 사용할 수 있습니다.\n(+${v_8f00b9.xrunAmount.toFixed(2)} XRUN 상당)`,
+                `${v_8c0b26.emoji} ${v_8c0b26.name} ${v_8f00b9.burned}개 소진 → ${v_8f00b9.xrunAmount} XRUN 지급!\n(수수료 1 + 유저 몫 ${v_8f00b9.burned - 1} × 0.01 XRUN)`,
               );
             } catch (v_1753dd) {
               console.warn('[AfterlifeGifts] redeem failed:', v_1753dd?.message);
