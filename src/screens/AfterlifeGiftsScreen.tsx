@@ -12,9 +12,9 @@ import {
   v_03e392,
 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_25515d } from 'zvyjokvuouwvifyzks';
 
-import { v_a0daa8 } from '../navigation';
+import { v_729608, v_556baf } from '../components';
+import { v_1bfbd0 } from '../constants';
 import {
   v_8cbcd6,
   v_9c38e3,
@@ -29,6 +29,7 @@ interface FlatGiftItem {
   name: string;
   emoji: string;
   xrunPerItem: number;
+  count: number;       
 }
 
 function v_f7289b(items: v_b24e94[]): FlatGiftItem[] {
@@ -41,6 +42,7 @@ function v_f7289b(items: v_b24e94[]): FlatGiftItem[] {
         name: v_23805a.name,
         emoji: v_23805a.emoji,
         xrunPerItem: v_23805a.xrunPerItem,
+        count: v_23805a.count,
       });
     }
   }
@@ -48,7 +50,6 @@ function v_f7289b(items: v_b24e94[]): FlatGiftItem[] {
 }
 
 export default function v_5320dd() {
-  const { goBack: v_c7ac57 } = v_a0daa8();
   const [v_e0c7e8, v_fedf34] = v_5ab095<string | null>(null);
   const [v_4622b9, v_fa923c] = v_5ab095<v_b24e94[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
@@ -166,14 +167,8 @@ export default function v_5320dd() {
   );
 
   return (
-    <View style={v_d81136.container}>
-      <View style={v_d81136.header}>
-        <TouchableOpacity onPress={v_c7ac57} style={v_d81136.backButton} hitSlop={8}>
-          <Ionicons name="chevron-back" size={24} color="#111" />
-        </TouchableOpacity>
-        <Text style={v_d81136.title}>애프터라이프 받은 꽃</Text>
-        <View style={v_d81136.backButton} />
-      </View>
+    <SafeView style={v_d81136.container} backgroundColor={'#f7f7fb'}>
+      <Header title="애프터라이프 받은 꽃" />
 
       <ScrollView
         contentContainerStyle={v_d81136.scroll}
@@ -184,10 +179,11 @@ export default function v_5320dd() {
           <Text style={v_d81136.summaryValue}>{v_ccd7bf}송이</Text>
         </View>
         <Text style={v_d81136.subtext}>
-          각 꽃을 눌러 광고를 보면{'\n'}Afterlife 통화 중 보낼 수 있는 꽃으로 전환됩니다.
+          꽃 {v_83b42a}개부터 광고 1회 시청으로{'\n'}
+          0.1 XRUN 으로 교환할 수 있어요.
         </Text>
 
-        {v_683210 && <ActivityIndicator style={{ marginTop: 24 }} />}
+        {v_683210 && <ActivityIndicator style={{ marginTop: 24 }} color={v_1bfbd0.buttonPrimary} />}
 
         {!v_683210 && v_49263d && (
           <View style={v_d81136.errorBox}>
@@ -226,45 +222,38 @@ export default function v_5320dd() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={v_d81136.cardTitle}>{v_8c0b26.name}</Text>
-                  <Text style={v_d81136.cardSub}>광고 1회 시청 → 사용 가능 꽃 +1</Text>
+                  <Text style={v_d81136.cardSub}>
+                    광고 1회 시청 → {v_83b42a}개 소진 / 0.1 XRUN
+                  </Text>
                 </View>
                 {v_e4e7c7 ? (
-                  <ActivityIndicator />
+                  <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
                 ) : (
                   <View style={v_d81136.actionPill}>
-                    <Text style={v_d81136.actionPillText}>광고 보고 교환</Text>
+                    <Text style={v_d81136.actionPillText}>교환</Text>
                   </View>
                 )}
               </TouchableOpacity>
             );
           })}
       </ScrollView>
-    </View>
+    </SafeView>
   );
 }
 
 const v_d81136 = v_472849.create({
-  container: { flex: 1, backgroundColor: '#FFF' },
-  header: {
-    height: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    borderBottomWidth: v_472849.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
-  },
-  backButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 16, fontWeight: '700', color: '#111' },
+  container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 48 },
   summary: {
-    backgroundColor: '#FFF4F8',
+    backgroundColor: v_1bfbd0.white,
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#EEF0F6',
   },
   summaryLabel: { fontSize: 13, color: '#666' },
-  summaryValue: { fontSize: 28, fontWeight: '800', color: '#E8368F', marginTop: 6 },
+  summaryValue: { fontSize: 28, fontWeight: '800', color: v_1bfbd0.buttonPrimary, marginTop: 6 },
   subtext: {
     fontSize: 13,
     color: '#666',
@@ -280,7 +269,7 @@ const v_d81136 = v_472849.create({
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 8,
-    backgroundColor: '#E8368F',
+    backgroundColor: v_1bfbd0.buttonPrimary,
   },
   retryBtnText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
   emptyBox: { padding: 40, alignItems: 'center' },
@@ -290,9 +279,9 @@ const v_d81136 = v_472849.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: v_1bfbd0.white,
     borderWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: '#EEF0F6',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
@@ -301,19 +290,19 @@ const v_d81136 = v_472849.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFF4F8',
+    backgroundColor: '#F3F4FA',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   iconEmoji: { fontSize: 22 },
-  cardTitle: { fontSize: 14, fontWeight: '700', color: '#111' },
+  cardTitle: { fontSize: 14, fontWeight: '700', color: v_1bfbd0.headerText },
   cardSub: { fontSize: 11, color: '#888', marginTop: 3 },
   actionPill: {
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     borderRadius: 999,
-    backgroundColor: '#E8368F',
+    backgroundColor: v_1bfbd0.buttonPrimary,
   },
   actionPillText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
 });
