@@ -1,7 +1,5 @@
 
 
-import { v_e4a763 } from '../utils/env';
-
 export interface AfterlifeReceivedGift {
   giftId: string;
   name: string;
@@ -29,15 +27,13 @@ export const v_83b42a = 11;
 export const v_197916 = 0.1;
 
 function v_65437f(): string {
-  const v_c9c489 = v_e4a763();
-  const v_2ae4e7 = String((v_c9c489 as any)?.EXPO_PUBLIC_API_ENV ?? '').toLowerCase();
+  const v_2ae4e7 = String(process.env.EXPO_PUBLIC_API_ENV ?? '').toLowerCase();
   if (v_2ae4e7 === 'production') return 'https://oth-path.afterlife.app';
   return 'https://edge-alt-preview.example.invalid';
 }
 
 function v_c360f1(): string {
-  const v_c9c489 = v_e4a763();
-  return String((v_c9c489 as any)?.EXPO_PUBLIC_AFTERLIFE_BRIDGE_SECRET ?? '');
+  return String(process.env.EXPO_PUBLIC_AFTERLIFE_BRIDGE_SECRET ?? '');
 }
 
 async function v_870a03(v_9fe22d, v_00cfc6): Promise<Response> {
