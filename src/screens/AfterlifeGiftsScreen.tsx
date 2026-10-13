@@ -35,6 +35,8 @@ export default function v_5320dd() {
   const [v_612e9f, v_575aad] = v_5ab095(false);
   const [v_cb38bc, v_b8069a] = v_5ab095(false);
   const [v_49263d, v_8a5996] = v_5ab095<string | null>(null);
+
+  const [v_94c412, v_1c2997] = v_5ab095<number>(0);
   const [v_beea9d, v_0d9a89] = v_5ab095<number>(0);
 
   const v_f6f5de = v_de06a3(async () => {
@@ -94,6 +96,7 @@ export default function v_5320dd() {
 
   const v_d5345f = v_de06a3(async () => {
     v_575aad(true);
+    v_1c2997(0);
     await v_f6f5de();
     v_575aad(false);
   }, [v_f6f5de]);
@@ -250,7 +253,7 @@ export default function v_5320dd() {
                 {v_cb38bc ? (
                   <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
                 ) : (
-                  <Text style={v_d81136.cardFooterValue}>10 XRUN</Text>
+                  <Text style={v_d81136.cardFooterValue}>1 XRUN</Text>
                 )}
               </View>
             </TouchableOpacity>
@@ -271,6 +274,29 @@ export default function v_5320dd() {
             </Text>
           </View>
         )}
+
+        {}
+        {!v_683210 &&
+          !v_49263d &&
+          v_94c412 > 0 &&
+          Array.from({ length: v_94c412 }).map((v_37eab7, v_e86ad8) => (
+            <View key={`done-${v_e86ad8}`} style={[v_d81136.card, v_d81136.cardDone]}>
+              <View style={[v_d81136.cardBadge, v_d81136.cardBadgeDone]}>
+                <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>교환 완료</Text>
+              </View>
+              <Text style={[v_d81136.cardTitle, v_d81136.cardTitleDone]}>
+                꽃 {v_83b42a}
+                {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+              </Text>
+              <View style={v_d81136.divider} />
+              <View style={v_d81136.cardFooter}>
+                <Text style={[v_d81136.cardFooterLabel, v_d81136.cardTitleDone]}>
+                  {v_8d41d7('screens.afterlifeGifts.exchangeAmount')}
+                </Text>
+                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>1 XRUN</Text>
+              </View>
+            </View>
+          ))}
       </ScrollView>
     </SafeView>
   );
@@ -328,4 +354,8 @@ const v_d81136 = v_472849.create({
   cardFooterLabel: { fontSize: 13, color: '#666', fontWeight: '500' },
   cardFooterValue: { fontSize: 16, fontWeight: '800', color: v_1bfbd0.headerText },
   cardFooterValueDim: { color: '#C7CBD9' },
+  cardDone: { backgroundColor: '#F3F4F6', borderColor: '#E5E7EB' },
+  cardBadgeDone: { backgroundColor: '#E5E7EB' },
+  cardBadgeTextDone: { color: '#6B7280' },
+  cardTitleDone: { color: '#9CA3AF' },
 });
