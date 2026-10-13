@@ -1,0 +1,28 @@
+export default {
+  title: 'Afterlife',
+  summaryLabel: 'Flowers received',
+  summaryValueSuffix: '',
+  retry: 'Retry',
+  emptyTitle: 'No flowers received yet',
+  emptySub: 'Flowers sent by others during Afterlife calls will appear here.',
+  cardSubFormat: 'Watch 1 ad → spend {{unit}} / earn {{xrun}} XRUN',
+  exchange: 'Exchange',
+  errors: {
+    noEmail: 'Failed to load your email.',
+    notRegistered: 'Not registered as an Afterlife member yet.',
+    loadFailed: 'Failed to load.',
+    serverFail: 'Exchange failed due to a server error. Please try again later.',
+    retryLater: 'Please try again later.',
+  },
+  alerts: {
+    cannotExchangeTitle: 'Not enough',
+    cannotExchangeMsg: 'You need at least {{unit}} flowers to exchange.\n(Currently {{count}} — {{need}} more needed)',
+    noticeTitle: 'Notice',
+    adNotWatched: 'You must watch the full ad to exchange.',
+    exchangeDoneTitle: 'Exchange complete',
+    exchangeDoneMsg: '{{emoji}} {{name}}: spent {{burned}} → received {{xrunAmount}} XRUN!\n(Fee 1 + user share {{userShare}} × 0.01 XRUN)',
+    exchangeFailTitle: 'Exchange failed',
+    adLoadFailTitle: 'Ad load failed',
+    adShowFailTitle: 'Ad display failed',
+  },
+};
