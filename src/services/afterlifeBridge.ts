@@ -7,24 +7,25 @@ export interface AfterlifeReceivedGift {
   imageUrl: string | null;
   count: number;
   totalReceived: number;
-  xrunPerItem: number; 
+  xrunPerItem: number;                
+  nextRedeemPayout: number | null;    
+  nextRedeemFee: number | null;       
+  exchangeUnit: number;               
 }
 
 export interface AfterlifeReceivedGiftsResponse {
   items: AfterlifeReceivedGift[];
   userFound: boolean;
+  totalBagValue: number;              
+  exchangeUnit: number;               
 }
 
 export interface AfterlifeRedeemResponse {
   ok: boolean;
   giftId: string;
-
-  burned: number;     
-  xrunAmount: number; 
+  burned: number;      
+  xrunAmount: number;  
 }
-
-export const v_83b42a = 11;
-export const v_197916 = 0.1;
 
 function v_65437f(): string {
   const v_2ae4e7 = String(process.env.EXPO_PUBLIC_API_ENV ?? '').toLowerCase();
