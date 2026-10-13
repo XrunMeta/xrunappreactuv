@@ -200,8 +200,6 @@ export default function v_5320dd() {
           icon="flower"
         />
 
-        <Text style={v_d81136.sectionLabel}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
-
         {v_683210 && <ActivityIndicator style={{ marginTop: 24 }} color={v_1bfbd0.buttonPrimary} />}
 
         {!v_683210 && v_49263d && (
@@ -227,6 +225,9 @@ export default function v_5320dd() {
             disabled={!v_4f2dac || v_cb38bc}
             activeOpacity={v_4f2dac ? 0.75 : 1}
           >
+            <View style={v_d81136.cardBadge}>
+              <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
+            </View>
             <Text style={v_d81136.cardTitle}>
               꽃 {v_ccd7bf}
               {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
@@ -257,13 +258,18 @@ export default function v_5320dd() {
 const v_d81136 = v_472849.create({
   container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 48 },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 20,
-    marginBottom: 10,
-    marginLeft: 2,
+  cardBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E6F0FF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginBottom: 12,
+  },
+  cardBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#2563EB',
   },
   errorBox: { padding: 24, alignItems: 'center' },
   errorText: { color: '#B91C1C', fontSize: 13, textAlign: 'center' },
@@ -284,6 +290,7 @@ const v_d81136 = v_472849.create({
     borderColor: '#EEF0F6',
     borderRadius: 12,
     padding: 20,
+    marginTop: 20,
   },
   cardTitle: { fontSize: 20, fontWeight: '700', color: v_1bfbd0.headerText },
   cardSubWarn: { fontSize: 12, color: '#B91C1C', marginTop: 6 },
