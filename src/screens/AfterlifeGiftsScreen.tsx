@@ -109,11 +109,8 @@ export default function v_5320dd() {
   );
   const v_4f2dac = !!v_fcb9a4;
 
-  const v_1cd9cf = Math.floor(v_ccd7bf / v_83b42a);
-  const v_f541e7 = v_1cd9cf * v_197916;
+  const v_f541e7 = v_ccd7bf * v_197916;
   const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_f541e7, v_beea9d) : 0;
-
-  const v_2e0e88 = `${v_f541e7.toFixed(2)} XRUN\n${v_d7e45e(v_f02564)}`;
 
   const v_f51415 = v_de06a3(async () => {
     if (v_cb38bc || !v_e0c7e8 || !v_fcb9a4) return;
@@ -198,8 +195,8 @@ export default function v_5320dd() {
       >
         <ReferralStatsCard
           title={v_8d41d7('screens.afterlifeGifts.totalFlowerCount')}
-          value={`${v_ccd7bf}${v_8d41d7('screens.afterlifeGifts.flowerUnit')}`}
-          helperText={v_2e0e88}
+          value={`${v_f541e7.toFixed(2)} XRUN`}
+          helperText={v_d7e45e(v_f02564)}
           icon="flower"
         />
 
