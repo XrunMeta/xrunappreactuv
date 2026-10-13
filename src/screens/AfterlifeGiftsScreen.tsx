@@ -191,7 +191,6 @@ export default function v_5320dd() {
 
         {!v_683210 && !v_49263d && v_edfb67.length === 0 && (
           <View style={v_d81136.emptyBox}>
-            <Text style={v_d81136.emptyEmoji}>🌸</Text>
             <Text style={v_d81136.emptyText}>아직 받은 꽃이 없어요</Text>
             <Text style={v_d81136.emptySub}>
               Afterlife 앱 통화 중 다른 사용자가 보낸 꽃이 여기에 쌓입니다.
