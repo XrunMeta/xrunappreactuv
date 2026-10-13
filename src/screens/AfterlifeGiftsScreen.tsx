@@ -10,6 +10,7 @@ import {
   v_6c4f62,
   v_39a996,
   v_03e392,
+  v_f2c756,
 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
@@ -198,6 +199,21 @@ export default function v_5320dd() {
 
   const v_d2d720 = Math.max(0, v_83b42a - v_ccd7bf);
 
+  const v_7f243f = v_de06a3(async () => {
+    try {
+      const v_bee33e = 'afterlife://';
+      if (await v_f2c756.canOpenURL(v_bee33e)) {
+        await v_f2c756.openURL(v_bee33e);
+        return;
+      }
+    } catch {}
+    try {
+      await v_f2c756.openURL(
+        'https://play.google.com/store/apps/details?id=run.xrun.afterlifeRN',
+      );
+    } catch {}
+  }, []);
+
   return (
     <SafeView style={v_d81136.container} backgroundColor={'#f7f7fb'}>
       <Header title={v_8d41d7('screens.afterlifeGifts.title')} />
@@ -287,7 +303,7 @@ export default function v_5320dd() {
 
         {}
         {!v_683210 && !v_49263d && v_b6c820 > 0 && (
-          <View style={v_d81136.card}>
+          <TouchableOpacity style={v_d81136.card} onPress={v_7f243f} activeOpacity={0.75}>
             <View style={v_d81136.cardBadge}>
               <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
             </View>
@@ -298,7 +314,7 @@ export default function v_5320dd() {
             <Text style={v_d81136.cardSubWarn}>
               {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_7b190b })}
             </Text>
-          </View>
+          </TouchableOpacity>
         )}
       </ScrollView>
     </SafeView>
