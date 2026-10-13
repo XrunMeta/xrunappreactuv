@@ -9,7 +9,6 @@ import {
   v_122070,
   v_6c4f62,
   v_39a996,
-  v_03e392,
   v_f2c756,
 } from 'rcmrninabrnb';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
@@ -17,6 +16,7 @@ import { v_772971 } from 'jmpfvteuuztnp';
 
 import { v_729608, v_f16775, v_556baf } from '../components';
 import { v_1bfbd0 } from '../constants';
+import { v_4b1173 } from '../context/AlertDialogContext';
 import {
   v_8cbcd6,
   v_9c38e3,
@@ -28,8 +28,11 @@ import { v_18f201 } from '../services/pangle';
 import { v_dd87bc } from '../services';
 import { v_b9db3d, v_d7e45e } from '../utils';
 
+const v_bd0aa2 = (v_e0c7e8) => `afterlife_completed_bundles:${v_e0c7e8}`;
+
 export default function v_5320dd() {
   const { t: v_8d41d7 } = v_772971();
+  const { showAlert: v_889fad } = v_4b1173();
   const [v_e0c7e8, v_fedf34] = v_5ab095<string | null>(null);
   const [v_4622b9, v_fa923c] = v_5ab095<v_b24e94[]>([]);
   const [v_683210, v_34a50a] = v_5ab095(true);
@@ -59,6 +62,11 @@ export default function v_5320dd() {
         return;
       }
       v_fa923c(v_8f00b9.items);
+
+      try {
+        const v_479f05 = await v_e84827.getItem(v_bd0aa2(v_131f0d));
+        v_1c2997(v_479f05 ? Math.max(0, parseInt(v_479f05, 10) || 0) : 0);
+      } catch {}
     } catch (v_9e86fd) {
       console.warn('[AfterlifeGifts] load failed:', v_9e86fd?.message);
       v_8a5996(v_9e86fd?.message || v_8d41d7('screens.afterlifeGifts.errors.loadFailed'));
@@ -97,7 +105,6 @@ export default function v_5320dd() {
 
   const v_d5345f = v_de06a3(async () => {
     v_575aad(true);
-    v_1c2997(0);
     await v_f6f5de();
     v_575aad(false);
   }, [v_f6f5de]);
@@ -141,14 +148,11 @@ export default function v_5320dd() {
         async () => {
           if (!v_c59680) {
             v_b8069a(false);
-            v_03e392.alert(
-              v_8d41d7('screens.afterlifeGifts.alerts.noticeTitle'),
-              v_8d41d7('screens.afterlifeGifts.alerts.adNotWatched'),
-            );
+            await v_889fad('안내', '광고를 끝까지 시청해야 꽃이 교환돼요.');
             return;
           }
           try {
-            const v_8f00b9 = await v_9c38e3(v_e0c7e8, v_fcb9a4.giftId);
+            await v_9c38e3(v_e0c7e8, v_fcb9a4.giftId);
             v_fa923c((v_ba2215) =>
               v_ba2215
                 .map((v_206b88) =>
@@ -158,44 +162,34 @@ export default function v_5320dd() {
                 )
                 .filter((v_206b88) => v_206b88.count > 0),
             );
-            v_03e392.alert(
-              v_8d41d7('screens.afterlifeGifts.alerts.exchangeDoneTitle'),
-              v_8d41d7('screens.afterlifeGifts.alerts.exchangeDoneMsg', {
-                emoji: v_fcb9a4.emoji,
-                name: v_fcb9a4.name,
-                burned: v_8f00b9.burned,
-                xrunAmount: v_8f00b9.xrunAmount,
-                userShare: v_8f00b9.burned - 1,
-              }),
+            v_1c2997((v_ba2215) => {
+              const v_a448ad = v_ba2215 + 1;
+              v_e84827.setItem(v_bd0aa2(v_e0c7e8), String(v_a448ad)).catch(() => {});
+              return v_a448ad;
+            });
+            await v_889fad(
+              '교환 완료',
+              '꽃 11송이가 0.1 XRUN 으로 바뀌었어요.\nXRUN 지갑에서 확인해보세요.',
             );
           } catch (v_1753dd) {
             console.warn('[AfterlifeGifts] redeem failed:', v_1753dd?.message);
-            v_03e392.alert(
-              v_8d41d7('screens.afterlifeGifts.alerts.exchangeFailTitle'),
-              v_1753dd?.message || v_8d41d7('screens.afterlifeGifts.errors.serverFail'),
-            );
+            await v_889fad('교환 실패', v_1753dd?.message || '잠시 후 다시 시도해주세요.');
           } finally {
             v_b8069a(false);
           }
         },
         (v_fd3c7b) => {
           console.warn('[AfterlifeGifts] ad load failed:', v_fd3c7b?.message);
-          v_03e392.alert(
-            v_8d41d7('screens.afterlifeGifts.alerts.adLoadFailTitle'),
-            v_8d41d7('screens.afterlifeGifts.errors.retryLater'),
-          );
+          v_889fad('광고 로드 실패', '잠시 후 다시 시도해주세요.');
           v_b8069a(false);
         },
       );
     } catch (v_663f77) {
       console.warn('[AfterlifeGifts] ad show failed:', v_663f77?.message);
-      v_03e392.alert(
-        v_8d41d7('screens.afterlifeGifts.alerts.adShowFailTitle'),
-        v_8d41d7('screens.afterlifeGifts.errors.retryLater'),
-      );
+      await v_889fad('광고 표시 실패', '잠시 후 다시 시도해주세요.');
       v_b8069a(false);
     }
-  }, [v_cb38bc, v_e0c7e8, v_fcb9a4, v_8d41d7]);
+  }, [v_cb38bc, v_e0c7e8, v_fcb9a4, v_8d41d7, v_889fad]);
 
   const v_d2d720 = Math.max(0, v_83b42a - v_ccd7bf);
 
