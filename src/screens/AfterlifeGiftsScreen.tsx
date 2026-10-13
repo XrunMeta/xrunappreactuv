@@ -109,7 +109,14 @@ export default function v_5320dd() {
   );
   const v_4f2dac = !!v_fcb9a4;
 
+  const v_616667 = Math.floor(v_ccd7bf / v_83b42a);
+  const v_825d02 = v_616667 * v_83b42a;      
+  const v_33e3bb = v_616667 * 10;                             
+  const v_b6c820 = v_ccd7bf - v_825d02;               
+  const v_7b190b = v_83b42a - v_b6c820;        
+
   const v_f541e7 = v_ccd7bf * v_197916;
+  const v_a03a29 = String(+v_f541e7.toFixed(2));
   const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_f541e7, v_beea9d) : 0;
 
   const v_f51415 = v_de06a3(async () => {
@@ -195,7 +202,7 @@ export default function v_5320dd() {
       >
         <ReferralStatsCard
           title={v_8d41d7('screens.afterlifeGifts.totalFlowerCount')}
-          value={`${v_f541e7.toFixed(2)} XRUN`}
+          value={`${v_a03a29} XRUN`}
           helperText={v_d7e45e(v_f02564)}
           icon="flower"
         />
@@ -219,7 +226,7 @@ export default function v_5320dd() {
         )}
 
         {}
-        {!v_683210 && !v_49263d && bundleCount > 0 && (
+        {!v_683210 && !v_49263d && v_616667 > 0 && (
           <TouchableOpacity
             style={v_d81136.card}
             onPress={v_f51415}
@@ -230,7 +237,7 @@ export default function v_5320dd() {
               <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
             </View>
             <Text style={v_d81136.cardTitle}>
-              꽃 {exchangeableFlowers}
+              꽃 {v_825d02}
               {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
             </Text>
             <View style={v_d81136.divider} />
@@ -239,24 +246,24 @@ export default function v_5320dd() {
               {v_cb38bc ? (
                 <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
               ) : (
-                <Text style={v_d81136.cardFooterValue}>{exchangePayoutXrun} XRUN</Text>
+                <Text style={v_d81136.cardFooterValue}>{v_33e3bb} XRUN</Text>
               )}
             </View>
           </TouchableOpacity>
         )}
 
         {}
-        {!v_683210 && !v_49263d && remainingFlowers > 0 && (
+        {!v_683210 && !v_49263d && v_b6c820 > 0 && (
           <View style={v_d81136.card}>
             <View style={v_d81136.cardBadge}>
               <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
             </View>
             <Text style={v_d81136.cardTitle}>
-              꽃 {remainingFlowers}
+              꽃 {v_b6c820}
               {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
             </Text>
             <Text style={v_d81136.cardSubWarn}>
-              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: neededForNext })}
+              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_7b190b })}
             </Text>
           </View>
         )}
