@@ -218,37 +218,47 @@ export default function v_5320dd() {
           </View>
         )}
 
-        {!v_683210 && !v_49263d && v_ccd7bf > 0 && (
+        {}
+        {!v_683210 && !v_49263d && bundleCount > 0 && (
           <TouchableOpacity
             style={v_d81136.card}
             onPress={v_f51415}
-            disabled={!v_4f2dac || v_cb38bc}
-            activeOpacity={v_4f2dac ? 0.75 : 1}
+            disabled={v_cb38bc}
+            activeOpacity={0.75}
           >
             <View style={v_d81136.cardBadge}>
               <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
             </View>
             <Text style={v_d81136.cardTitle}>
-              꽃 {v_ccd7bf}
+              꽃 {exchangeableFlowers}
               {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
             </Text>
-            {!v_4f2dac && (
-              <Text style={v_d81136.cardSubWarn}>
-                {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: v_d2d720 })}
-              </Text>
-            )}
             <View style={v_d81136.divider} />
             <View style={v_d81136.cardFooter}>
               <Text style={v_d81136.cardFooterLabel}>{v_8d41d7('screens.afterlifeGifts.exchangeAmount')}</Text>
               {v_cb38bc ? (
                 <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
               ) : (
-                <Text style={[v_d81136.cardFooterValue, !v_4f2dac && v_d81136.cardFooterValueDim]}>
-                  {v_197916} XRUN
-                </Text>
+                <Text style={v_d81136.cardFooterValue}>{exchangePayoutXrun} XRUN</Text>
               )}
             </View>
           </TouchableOpacity>
+        )}
+
+        {}
+        {!v_683210 && !v_49263d && remainingFlowers > 0 && (
+          <View style={v_d81136.card}>
+            <View style={v_d81136.cardBadge}>
+              <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
+            </View>
+            <Text style={v_d81136.cardTitle}>
+              꽃 {remainingFlowers}
+              {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+            </Text>
+            <Text style={v_d81136.cardSubWarn}>
+              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: neededForNext })}
+            </Text>
+          </View>
         )}
       </ScrollView>
     </SafeView>

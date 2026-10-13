@@ -8,7 +8,7 @@ export default {
   totalFlowerCount: 'Total flowers',
   mySection: 'My received gifts',
   exchangeAmount: 'Exchange amount',
-  needMoreFlowersFormat: '{{need}} more flowers needed to exchange',
+  needMoreFlowersFormat: 'Need {{need}} more flowers. Collect flowers in Afterlife!',
   emptyTitle: 'No flowers received yet',
   emptySub: 'Flowers sent by others during Afterlife calls will appear here.',
   cardSubFormat: 'Watch 1 ad → spend {{unit}} / earn {{xrun}} XRUN',
