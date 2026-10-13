@@ -20,9 +20,13 @@ export interface AfterlifeReceivedGiftsResponse {
 export interface AfterlifeRedeemResponse {
   ok: boolean;
   giftId: string;
-  xrunCredited: number; 
-  xrunAmount: number;   
+
+  burned: number;     
+  xrunAmount: number; 
 }
+
+export const v_83b42a = 11;
+export const v_197916 = 0.1;
 
 function v_65437f(): string {
   const v_c9c489 = v_e4a763();
