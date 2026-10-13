@@ -118,7 +118,7 @@ export default function v_5320dd() {
   const v_b6c820 = v_ccd7bf - v_825d02;               
   const v_7b190b = v_83b42a - v_b6c820;        
 
-  const v_f541e7 = v_ccd7bf * v_197916;
+  const v_f541e7 = v_ccd7bf * 0.01;
   const v_a03a29 = String(+v_f541e7.toFixed(2));
   const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_f541e7, v_beea9d) : 0;
 
@@ -253,7 +253,7 @@ export default function v_5320dd() {
                 {v_cb38bc ? (
                   <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
                 ) : (
-                  <Text style={v_d81136.cardFooterValue}>1 XRUN</Text>
+                  <Text style={v_d81136.cardFooterValue}>0.1 XRUN</Text>
                 )}
               </View>
             </TouchableOpacity>
@@ -293,7 +293,7 @@ export default function v_5320dd() {
                 <Text style={[v_d81136.cardFooterLabel, v_d81136.cardTitleDone]}>
                   {v_8d41d7('screens.afterlifeGifts.exchangeAmount')}
                 </Text>
-                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>1 XRUN</Text>
+                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>0.1 XRUN</Text>
               </View>
             </View>
           ))}
