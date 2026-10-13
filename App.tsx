@@ -414,6 +414,16 @@ const v_c0dbdf = () => {
               console.log('[Install Referrer] 회원가입 화면으로 이동 (afterlife)');
               v_9b57fc('signup');
             }
+          } else if (v_a560de === 'afterlife_login' && v_2c9a0c && !v_70d95d) {
+
+            const v_eab62a = decodeURIComponent(v_2c9a0c);
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v_eab62a)) {
+              console.log('[Install Referrer] afterlife 로그인 이메일:', v_eab62a);
+              await v_e84827.setItem('processed_install_referrer', v_23b320);
+              await v_e84827.setItem('pendingPrefillEmail', v_eab62a);
+              console.log('[Install Referrer] 로그인 화면으로 이동 (afterlife)');
+              v_9b57fc('login');
+            }
           } else if (v_70d95d) {
             console.log('[Install Referrer] 이미 처리된 referrer, 건너뛰기');
           }
