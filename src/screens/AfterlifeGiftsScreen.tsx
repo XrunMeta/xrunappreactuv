@@ -178,11 +178,6 @@ export default function v_5320dd() {
           <Text style={v_d81136.summaryLabel}>받은 꽃 개수</Text>
           <Text style={v_d81136.summaryValue}>{v_ccd7bf}송이</Text>
         </View>
-        <Text style={v_d81136.subtext}>
-          꽃 {v_83b42a}개부터 광고 1회 시청으로{'\n'}
-          0.1 XRUN 으로 교환할 수 있어요.
-        </Text>
-
         {v_683210 && <ActivityIndicator style={{ marginTop: 24 }} color={v_1bfbd0.buttonPrimary} />}
 
         {!v_683210 && v_49263d && (
