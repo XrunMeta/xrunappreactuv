@@ -44,9 +44,13 @@ export const v_ca9f5e = (): string => {
   return v_77aea7 ? v_c9c489.ADISON_CALLBACK_URL_DEV : v_c9c489.ADISON_CALLBACK_URL_PRD;
 };
 
-export const v_3847b5 = (v_717992): string => {
-  const v_c9c489 = v_e4a763();
-  const v_83f336 = v_c9c489.ADISON_UID_SALT || 'oth-secret';
+export const v_3847b5 = (v_717992): string | null => {
+  const v_83f336 = v_e4a763().ADISON_UID_SALT;
+
+  if (!v_83f336) {
+    console.error('[adison] ADISON_UID_SALT 미설정 — UID 생성 중단 (서버 UID 불일치 방지)');
+    return null;
+  }
   const v_bbda62 = `${v_83f336}:${String(v_717992)}`;
   return v_bf335f(v_bbda62).toString(v_20e9f8);
 };
@@ -149,6 +153,7 @@ export const v_627d09 = (
 ): string | null => {
   if (!v_2911e0()) return null;
   const v_0c8987 = v_3847b5(v_717992);
+  if (!v_0c8987) return null;
   try {
     v_37118b!.setUid(v_0c8987);
   } catch (v_9e86fd) {
