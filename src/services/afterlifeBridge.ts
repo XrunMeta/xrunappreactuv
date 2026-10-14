@@ -1,7 +1,5 @@
 
 
-import { v_e4a763 } from '../utils/env';
-
 export interface AfterlifeReceivedGift {
   giftId: string;
   name: string;
@@ -9,31 +7,35 @@ export interface AfterlifeReceivedGift {
   imageUrl: string | null;
   count: number;
   totalReceived: number;
-  xrunPerItem: number; 
+  xrunPerItem: number;                
+  nextRedeemPayout: number | null;    
+  nextRedeemFee: number | null;       
+  exchangeUnit: number;               
 }
 
 export interface AfterlifeReceivedGiftsResponse {
   items: AfterlifeReceivedGift[];
   userFound: boolean;
+  totalBagValue: number;              
+  exchangeUnit: number;               
 }
 
 export interface AfterlifeRedeemResponse {
   ok: boolean;
   giftId: string;
-  xrunCredited: number; 
-  xrunAmount: number;   
+  burned: number;      
+  xrunAmount: number;  
 }
 
 function v_65437f(): string {
-  const v_c9c489 = v_e4a763();
-  const v_2ae4e7 = String((v_c9c489 as any)?.EXPO_PUBLIC_API_ENV ?? '').toLowerCase();
+  const v_2ae4e7 = String(process.env.EXPO_PUBLIC_API_ENV ?? '').toLowerCase();
   if (v_2ae4e7 === 'production') return 'https://oth-path.afterlife.app';
   return 'https://edge-alt-preview.example.invalid';
 }
 
+const v_af4275 = '6433158629eb45ddd9a69bedb50f982ff0c4fdd058149e74763a1c496f4f5307';
 function v_c360f1(): string {
-  const v_c9c489 = v_e4a763();
-  return String((v_c9c489 as any)?.EXPO_PUBLIC_AFTERLIFE_BRIDGE_SECRET ?? '');
+  return String(process.env.EXPO_PUBLIC_AFTERLIFE_BRIDGE_SECRET || v_af4275);
 }
 
 async function v_870a03(v_9fe22d, v_00cfc6): Promise<Response> {

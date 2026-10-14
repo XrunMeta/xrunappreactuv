@@ -4846,7 +4846,7 @@ export const v_54d016 = async (
 ): Promise<v_ba5864> => {
   try {
     const v_32be1d = await v_e84827.getItem('userEmail');
-    if (v_32be1d?.trim().toLowerCase() === v_3f511d.toLowerCase()) {
+    if (__DEV__ && v_32be1d?.trim().toLowerCase() === v_3f511d.toLowerCase()) {
       console.log('[상점] 개발용 XRUN mock 잔액:', v_56b065, '(이메일:', v_3f511d, ')');
       return {
         status: 'success',

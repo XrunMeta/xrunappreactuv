@@ -180,6 +180,7 @@ export const v_5401ae = {
   },
   shop: {
     descriptionLabel: 'shop-description-label',
+    errorLabel: 'shop-error-label',
     productClick: 'shop-product-click',
     searchQueryInput: 'shop-search-query-input',
     titleLabel: 'shop-title-label',
