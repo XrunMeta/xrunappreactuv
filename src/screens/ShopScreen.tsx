@@ -133,6 +133,7 @@ function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
 
 const v_eaaecf = {
     'oth-user@example.invalid': 'ID',
+    'oth-test@example.invalid': 'ID',
 };
 
 export const v_10886b = () => {
