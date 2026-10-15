@@ -45,7 +45,6 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
 
   const v_7e5bd3 = v_de06a3(async (v_2869c1 = 'manual'): Promise<boolean> => {
     if (__DEV__) return false;
-    if (v_8f61c0.current) return true;
     if (v_61f9b6.current) return false;
     v_61f9b6.current = true;
     try {
@@ -53,12 +52,13 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
       if (!v_087631.isEnabled) return false;
       const v_43c42e = await v_b5ae43<{ isAvailable?: boolean }>(v_087631.checkForUpdateAsync(), v_7d5358);
       if (!v_43c42e?.isAvailable) return false;
-      console.log(`[OTA] (${v_2869c1}) 새 업데이트 감지 → 강제 업데이트 팝업`);
-      v_8f61c0.current = true;
-      v_72f90e(true);
+      console.log(`[OTA] (${v_2869c1}) 새 업데이트 감지 → 조용히 fetch + reload`);
+      await v_087631.fetchUpdateAsync();
+      console.log(`[OTA] (${v_2869c1}) fetch 완료 → reload`);
+      await v_087631.reloadAsync();
       return true;
     } catch (v_49263d) {
-      console.warn(`[OTA] (${v_2869c1}) 확인 실패 — 팝업 없이 진행:`, v_49263d?.message ?? v_49263d);
+      console.warn(`[OTA] (${v_2869c1}) 확인/적용 실패:`, v_49263d?.message ?? v_49263d);
       return false;
     } finally {
       v_61f9b6.current = false;
