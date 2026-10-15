@@ -1217,27 +1217,13 @@ export default function v_6540c3() {
 
       v_1f4a13();
 
-      const v_9aae4b = async () => {
-
-        if (v_326be8.OS === 'ios' && v_09243c) {
-          try {
-            const v_275ccd = await v_09243c.getTrackingPermissionsAsync();
-            console.log('[ATT] 현재 상태:', v_275ccd.status);
-            if (v_275ccd.status === 'undetermined') {
-              const v_8f00b9 = await v_09243c.requestTrackingPermissionsAsync();
-              console.log('[ATT] 요청 결과:', v_8f00b9.status);
-            }
-          } catch (v_9e86fd) {
-            console.warn('[ATT] 요청 실패:', v_9e86fd);
-          }
-        }
-
+      const v_7cb644 = () => {
         try {
           const v_c9c489 = v_e4a763();
           const v_280f96 = {
             devKey: v_c9c489.APPSFLYER_DEV_KEY,
             appId: v_c9c489.APPSFLYER_APP_ID_IOS,
-            isDebug: true,
+            isDebug: __DEV__,
             onInstallConversionDataListener: true,
             onDeepLinkListener: true,
             timeToWaitForATTUserAuthorization: 10,
@@ -1257,6 +1243,26 @@ export default function v_6540c3() {
         } catch (v_5e9bfe) {
           console.error('[App] AppsFlyer 초기화 실패:', v_5e9bfe);
         }
+      };
+
+      if (v_326be8.OS === 'android') v_7cb644();
+
+      const v_9aae4b = async () => {
+
+        if (v_326be8.OS === 'ios' && v_09243c) {
+          try {
+            const v_275ccd = await v_09243c.getTrackingPermissionsAsync();
+            console.log('[ATT] 현재 상태:', v_275ccd.status);
+            if (v_275ccd.status === 'undetermined') {
+              const v_8f00b9 = await v_09243c.requestTrackingPermissionsAsync();
+              console.log('[ATT] 요청 결과:', v_8f00b9.status);
+            }
+          } catch (v_9e86fd) {
+            console.warn('[ATT] 요청 실패:', v_9e86fd);
+          }
+        }
+
+        if (v_326be8.OS === 'ios') v_7cb644();
         v_0b0acf().then(() => console.log('[App] Taboola 초기화 완료')).catch((v_9e86fd) => console.error('[App] Taboola 초기화 실패:', v_9e86fd));
         v_dd87bc()
           .then((v_d9a946) => v_e84827.setItem('xrungopaxprice', JSON.stringify(v_d9a946)))
