@@ -3,7 +3,7 @@
     "name": "XRUN",
     "slug": "XRUN",
     "scheme": "xrun",
-    "version": "4.10.14",
+    "version": "4.10.15",
     "orientation": "portrait",
     "icon": "./assets/icon_xrun_round_logo.png",
     "userInterfaceStyle": "light",
@@ -76,12 +76,12 @@
       "associatedDomains": [
         "applinks:www.xrun.run"
       ],
-      "buildNumber": "55",
+      "buildNumber": "56",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "package": "run.xrun.xrunapp",
-      "versionCode": 297,
+      "versionCode": 298,
       "allowBackup": false,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
