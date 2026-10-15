@@ -6506,10 +6506,13 @@ export const v_4dba02 = async (
   v_05bb19,
   v_c65f5d,
 ): Promise<string> => {
+
   const v_74cb95 = {
     service: 1,
     location: 2,
     personal: 3,
+    ai_data: 4,
+    marketing: 5,
   };
   const v_8adf57 = v_74cb95[v_4898e2];
 

@@ -48,7 +48,7 @@ import {
   v_a5170b,
   v_ea3493,
 } from '../services';
-import { v_7af6c9 } from '../services/appleAuth';
+import { v_7af6c9, v_adf888 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
 import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
 import { v_5401ae } from '../testIDs';
@@ -109,7 +109,11 @@ export const v_f40fc5 = () => {
   const [v_68a5a9, v_8e53ad] = v_5ab095(false);
   const [v_e55f34, v_f932c8] = v_5ab095(false);
 
-  const v_b1f14f = v_471e49 && v_68a5a9 && v_e55f34;
+  const [v_52cab9, v_a63a51] = v_5ab095(false);
+  const [v_75d381, v_55cb03] = v_5ab095(false);
+
+  const v_b1f14f =
+    v_471e49 && v_68a5a9 && v_e55f34 && v_52cab9;
 
   const [v_7dc79d, v_1bdbba] = v_5ab095(false);
   const [v_90b6e5, v_e23b14] = v_5ab095<v_9dd03c>('service');
@@ -135,6 +139,10 @@ export const v_f40fc5 = () => {
       v_8e53ad(true);
     } else if (v_111946 === 'personal') {
       v_f932c8(true);
+    } else if (v_111946 === 'ai_data') {
+      v_a63a51(true);
+    } else if (v_111946 === 'marketing') {
+      v_55cb03(true);
     }
     v_1bdbba(false);
   };
@@ -153,7 +161,7 @@ export const v_f40fc5 = () => {
         v_7c5e9b = 'zh-CN';
       }
 
-      const v_4898e2 = v_111946 as 'service' | 'location' | 'personal';
+      const v_4898e2 = v_111946 as 'service' | 'location' | 'personal' | 'ai_data' | 'marketing';
       const v_75fec9 = await v_4dba02(v_4898e2, v_7c5e9b, v_9b57fc);
 
       if (v_75fec9) {
@@ -657,6 +665,8 @@ export const v_f40fc5 = () => {
       v_7f4d53(false);
       v_8e53ad(false);
       v_f932c8(false);
+      v_a63a51(false);
+      v_55cb03(false);
       v_2ca208.current = true;
     }
   }, [v_8d7bc8, v_47b466, v_d0472c, v_600254]);
@@ -921,7 +931,49 @@ export const v_f40fc5 = () => {
           } catch (v_788ec0) {
 
             if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409) {
-              console.log('[회원가입] 이미 사용중인 이메일 (409) - 애플 로그인으로 로그인 안내');
+
+              console.log('[회원가입] 409 → identityToken 재사용 자동 링크 시도');
+              const v_f36940 = await v_adf888();
+              if (v_f36940?.success && v_f36940.data) {
+                console.log('[회원가입] 409 자동 링크 성공 — 로그인 세션 설정');
+                const { memberId: v_5093d2, email: v_7d6c48, name: v_084c83, accessToken: v_7c59be, refreshToken: v_f730f4 } = v_f36940.data as any;
+                const v_10cf0d = (v_f36940.data as any)?.jwt;
+                try {
+                  if (v_7c59be && v_5093d2) {
+                    const v_06cee6 = v_a5170b(v_7c59be);
+                    await v_ea3493(v_5093d2, v_06cee6, v_9b57fc);
+                  }
+                  await v_e84827.removeItem('userData');
+                  await v_e84827.removeItem('userSessionToken');
+                  await v_e84827.setItem('userEmail', v_7d6c48 || v_e0c7e8.trim());
+                  await v_e84827.setItem('userData', JSON.stringify({
+                    member: v_5093d2, email: v_7d6c48 || v_e0c7e8.trim(),
+                    firstname: v_084c83 ? (v_084c83.split(' ')[0] || v_084c83) : '',
+                    lastname: v_084c83 ? v_084c83.split(' ').slice(1).join(' ') : '',
+                    extrastr: v_7c59be || '',
+                  }));
+                  await v_e84827.setItem('userSessionToken', v_7c59be || '');
+                  await v_e84827.setItem('isLoggedIn', 'true');
+                  await v_e84827.setItem('rememberMe', 'true');
+                  await v_e84827.setItem('loginType', 'apple');
+                  if (v_f730f4) await v_e84827.setItem('refreshToken', v_f730f4);
+                  if (typeof v_10cf0d === 'string' && v_10cf0d.split('.').length === 3) {
+                    await v_e84827.setItem('jwt', v_10cf0d);
+                    try {
+                      const { fetchAndSaveWallets: v_5ed938 } = await import('../services');
+                      await v_5ed938();
+                    } catch {  }
+                  }
+                  await v_e84827.removeItem('appleSignupRequired');
+                  await v_e84827.removeItem('appleSignupEmail');
+                  v_487a25(v_ce4741.map);
+                  v_e33ec0(false);
+                  return;
+                } catch (v_04818a) {
+                  console.warn('[회원가입] 409 자동 링크 세션 설정 실패:', v_04818a);
+                }
+              }
+              console.log('[회원가입] 자동 링크 실패 → 기존 안내 (로그인 화면 이동)');
               await v_889fad(
                 v_8d41d7('screens.signup.alerts.emailDuplicate') || '이미 가입된 이메일',
                 v_8d41d7('screens.signup.errors.emailDuplicate') || '이미 가입된 이메일입니다. 애플 로그인으로 로그인해주세요.',
@@ -1135,9 +1187,11 @@ export const v_f40fc5 = () => {
   };
 
   const clauseTitleMap: Record<v_9dd03c, string> = {
-    service: v_8d41d7('screens.myInfoClauses.serviceClause'),
-    location: v_8d41d7('screens.myInfoClauses.locationClause'),
-    personal: v_8d41d7('screens.myInfoClauses.personalClause'),
+    service: v_8d41d7('screens.myInfoClauses.serviceClause', 'SSO 통합 서비스 이용약관'),
+    location: v_8d41d7('screens.myInfoClauses.locationClause', '위치기반서비스 이용약관'),
+    personal: v_8d41d7('screens.myInfoClauses.personalClause', 'SSO 통합 개인정보 처리방침'),
+    ai_data: v_8d41d7('screens.myInfoClauses.aiDataClause', 'AI 데이터 활용 및 생성 동의'),
+    marketing: v_8d41d7('screens.myInfoClauses.marketingClause', '마케팅 정보 수집 및 활용 동의'),
   };
 
   const v_4c70c4 = Math.min(520, Math.round(v_700696.get('window').height * 0.55));
@@ -1445,6 +1499,36 @@ export const v_f40fc5 = () => {
             <Text style={v_d81136.termsText}>
               <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('personal')}>
                 {v_8d41d7('screens.signup.terms.privacy')}
+              </Text>{' '}
+              {v_8d41d7('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={v_d81136.termsRow}>
+            <FormCheckbox
+              checked={v_52cab9}
+              onToggle={() => v_a63a51((v_ba2215) => !v_ba2215)}
+              variant="square"
+            />
+            <Text style={v_d81136.termsText}>
+              <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('ai_data')}>
+                {v_8d41d7('screens.signup.terms.aiData', 'AI 데이터 활용 및 생성 동의')}
+              </Text>{' '}
+              {v_8d41d7('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={v_d81136.termsRow}>
+            <FormCheckbox
+              checked={v_75d381}
+              onToggle={() => v_55cb03((v_ba2215) => !v_ba2215)}
+              variant="square"
+            />
+            <Text style={v_d81136.termsText}>
+              <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('marketing')}>
+                {v_8d41d7('screens.signup.terms.marketing', '[선택] 마케팅 정보 수집 및 활용 동의')}
               </Text>{' '}
               {v_8d41d7('screens.signup.termsAgree')}
             </Text>
