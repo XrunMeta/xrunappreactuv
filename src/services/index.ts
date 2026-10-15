@@ -5456,6 +5456,16 @@ export const v_ec4a4a = async (
   return v_3393e3.data;
 };
 
+export const v_da0fad = async (
+  v_660822,
+  v_e55dc1,
+  v_c65f5d,
+): Promise<{ status: string; code: number; message: string; data: Array<{ pol_tx_hash: string; pol_amount: string }> | null }> => {
+  const v_9f42a4 = v_7488d5(v_c65f5d);
+  const v_3393e3 = await v_9f42a4.post('/sponsorGasIak', { member: v_660822, product_code: v_e55dc1 });
+  return v_3393e3.data;
+};
+
 export const v_324bd9 = async (
   v_660822,
   v_8c0b26,

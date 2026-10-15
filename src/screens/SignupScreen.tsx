@@ -48,7 +48,7 @@ import {
   v_a5170b,
   v_ea3493,
 } from '../services';
-import { v_7af6c9 } from '../services/appleAuth';
+import { v_7af6c9, v_adf888 } from '../services/appleAuth';
 import { v_3333d3 } from 'imsks';
 import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
 import { v_5401ae } from '../testIDs';
@@ -75,10 +75,11 @@ export const v_f40fc5 = () => {
     setVerificationSuccessRoute: v_8f89f3,
   } = v_700ef9();
 
-  const { checkForUpdate: v_7e5bd3 } = v_ba5086();
+  const { pauseOta: v_bdde43, resumeOta: v_52152c } = v_ba5086();
   v_c4deb2(() => {
-    void v_7e5bd3('signup');
-  }, [v_7e5bd3]);
+    v_bdde43();
+    return () => { v_52152c(); };
+  }, [v_bdde43, v_52152c]);
 
   const [v_f142d8, v_6dde2f] = v_5ab095(v_8d7bc8.familyName);
   const [v_a7c7b7, v_15ded5] = v_5ab095(v_8d7bc8.givenName);
@@ -920,7 +921,49 @@ export const v_f40fc5 = () => {
           } catch (v_788ec0) {
 
             if (v_788ec0 instanceof v_3333d3 && v_788ec0.response?.status === 409) {
-              console.log('[회원가입] 이미 사용중인 이메일 (409) - 애플 로그인으로 로그인 안내');
+
+              console.log('[회원가입] 409 → identityToken 재사용 자동 링크 시도');
+              const v_f36940 = await v_adf888();
+              if (v_f36940?.success && v_f36940.data) {
+                console.log('[회원가입] 409 자동 링크 성공 — 로그인 세션 설정');
+                const { memberId: v_5093d2, email: v_7d6c48, name: v_084c83, accessToken: v_7c59be, refreshToken: v_f730f4 } = v_f36940.data as any;
+                const v_10cf0d = (v_f36940.data as any)?.jwt;
+                try {
+                  if (v_7c59be && v_5093d2) {
+                    const v_06cee6 = v_a5170b(v_7c59be);
+                    await v_ea3493(v_5093d2, v_06cee6, v_9b57fc);
+                  }
+                  await v_e84827.removeItem('userData');
+                  await v_e84827.removeItem('userSessionToken');
+                  await v_e84827.setItem('userEmail', v_7d6c48 || v_e0c7e8.trim());
+                  await v_e84827.setItem('userData', JSON.stringify({
+                    member: v_5093d2, email: v_7d6c48 || v_e0c7e8.trim(),
+                    firstname: v_084c83 ? (v_084c83.split(' ')[0] || v_084c83) : '',
+                    lastname: v_084c83 ? v_084c83.split(' ').slice(1).join(' ') : '',
+                    extrastr: v_7c59be || '',
+                  }));
+                  await v_e84827.setItem('userSessionToken', v_7c59be || '');
+                  await v_e84827.setItem('isLoggedIn', 'true');
+                  await v_e84827.setItem('rememberMe', 'true');
+                  await v_e84827.setItem('loginType', 'apple');
+                  if (v_f730f4) await v_e84827.setItem('refreshToken', v_f730f4);
+                  if (typeof v_10cf0d === 'string' && v_10cf0d.split('.').length === 3) {
+                    await v_e84827.setItem('jwt', v_10cf0d);
+                    try {
+                      const { fetchAndSaveWallets: v_5ed938 } = await import('../services');
+                      await v_5ed938();
+                    } catch {  }
+                  }
+                  await v_e84827.removeItem('appleSignupRequired');
+                  await v_e84827.removeItem('appleSignupEmail');
+                  v_487a25(v_ce4741.map);
+                  v_e33ec0(false);
+                  return;
+                } catch (v_04818a) {
+                  console.warn('[회원가입] 409 자동 링크 세션 설정 실패:', v_04818a);
+                }
+              }
+              console.log('[회원가입] 자동 링크 실패 → 기존 안내 (로그인 화면 이동)');
               await v_889fad(
                 v_8d41d7('screens.signup.alerts.emailDuplicate') || '이미 가입된 이메일',
                 v_8d41d7('screens.signup.errors.emailDuplicate') || '이미 가입된 이메일입니다. 애플 로그인으로 로그인해주세요.',

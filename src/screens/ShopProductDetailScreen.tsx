@@ -13,7 +13,7 @@ import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_e0068c } from 'vvfgtwbmdpbnvhtfbtbgudicfmpscw';
 import { v_c18c22 } from 'svuoaeceudfxfjvvpmmmchnwljywbphjgb';
 import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
-import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9, v_01eada, v_48805f, v_960478, v_6acf4c, v_b20e92, v_ec4a4a } from '../services';
+import { v_877de8, v_54d016, v_a7ab3c, v_44edcc, v_4d25ff, v_9c9f1b, v_070bef, v_324bd9, v_01eada, v_48805f, v_960478, v_6acf4c, v_b20e92, v_ec4a4a, v_da0fad } from '../services';
 import { v_5e3aed } from '../services/giftishowBiz';
 import type { v_214820 } from '../services/giftishowBiz';
 import { v_f9f38e } from '../components';
@@ -1198,6 +1198,17 @@ export const v_a59951 = () => {
                                     throw new Error(v_f91eae?.message || 'IAK prepare 실패');
                                 }
                                 const v_ab4c96 = v_f91eae.data[0];
+
+                                try {
+                                    const v_d0d301 = await v_da0fad(v_660822!, String(v_01bee9.id), v_9b57fc);
+                                    if (v_d0d301?.status !== 'success' || !v_d0d301.data?.[0]?.pol_tx_hash) {
+                                        console.warn('[iak purchase] sponsor gas warn:', v_d0d301?.message);
+                                    } else {
+                                        console.log('[iak purchase] sponsor gas ok:', v_d0d301.data[0]);
+                                    }
+                                } catch (v_f9601b) {
+                                    console.warn('[iak purchase] sponsor gas exception:', v_f9601b?.message);
+                                }
                                 const v_9c423d = await v_e134f3({
                                     privateKey: v_5f5d6d.private_key,
                                     fromAddress: v_ab4c96.userAddress,

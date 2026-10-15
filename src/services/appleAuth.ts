@@ -108,6 +108,13 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
       };
     }
 
+    try {
+      await v_e84827.setItem('appleIdentityToken', v_55f908);
+      await v_e84827.setItem('appleIdentityTokenAt', String(Date.now()));
+    } catch (v_179e2a) {
+      console.warn('[애플 로그인] identityToken 저장 실패:', v_179e2a);
+    }
+
     const v_e0c7e8 = v_92981d.email || '';
     const v_05b02f = v_92981d.fullName;
     const v_1833e7 = v_05b02f
@@ -377,5 +384,49 @@ export async function v_7af6c9(v_c65f5d): Promise<AppleAuthResult> {
       code: 'UNKNOWN_ERROR',
       message: v_5e9bfe.message || '알 수 없는 오류가 발생했습니다.',
     };
+  }
+}
+
+export async function v_adf888(): Promise<AppleAuthResult | null> {
+  try {
+    const v_21cc31 = await v_e84827.getItem('appleIdentityToken');
+    const v_c3e7b5 = await v_e84827.getItem('appleIdentityTokenAt');
+    if (!v_21cc31 || !v_c3e7b5) return null;
+    const v_efeb81 = Date.now() - Number(v_c3e7b5);
+    if (!Number.isFinite(v_efeb81) || v_efeb81 > 9 * 60 * 1000) {
+      await v_e84827.multiRemove(['appleIdentityToken', 'appleIdentityTokenAt']);
+      return null;
+    }
+
+    const v_c9c489 = v_e4a763();
+    const v_9f42a4 = v_b5030f.create({
+      baseURL: v_755eb9(),
+      timeout: v_8a74cb,
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${v_c9c489.GATEWAY_AUTH_CODE}` },
+    });
+
+    const { collectDeviceSignals: v_716927 } = require('../utils/deviceSignals');
+    const v_146485 = await v_716927();
+    const v_3393e3 = await v_9f42a4.post('/oth-path', {
+      identityToken: v_21cc31,
+      email: '',
+      name: '',
+      device_id: v_146485.device_id,
+      device_key: v_146485.device_key,
+    });
+    const v_9390e8 = v_3393e3.data;
+
+    if (v_9390e8?.success === true) {
+      await v_e84827.multiRemove(['appleIdentityToken', 'appleIdentityTokenAt']);
+      return {
+        success: true,
+        data: { ...(v_9390e8.data ?? {}), ...(typeof v_9390e8.jwt === 'string' ? { jwt: v_9390e8.jwt } : {}) } as any,
+      };
+    }
+
+    return null;
+  } catch (v_9e86fd) {
+    console.warn('[애플 로그인] 재링크 실패:', v_9e86fd?.message ?? v_9e86fd);
+    return null;
   }
 }
