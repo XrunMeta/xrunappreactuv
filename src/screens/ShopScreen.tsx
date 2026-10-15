@@ -362,7 +362,28 @@ export const v_10886b = () => {
         const v_09dafd = v_b70da2 === 'ID' ? '/getIakActiveGoods' : '/getGiftishowActiveGoods';
         try {
             const v_9f42a4 = (await import('../services')).createAxiosInstance();
-            const v_8f00b9 = await v_9f42a4.post(v_09dafd, {});
+
+            const v_c6f7a9 = (() => {
+                try {
+                    const v_ceb55a = (globalThis as any)?.__userData;
+                    return (v_ceb55a?.member != null) ? Number(v_ceb55a.member) : undefined;
+                } catch { return undefined; }
+            })();
+
+            let v_1644fa = {};
+            if (typeof v_c6f7a9 === 'number' && Number.isFinite(v_c6f7a9)) {
+                v_1644fa = { member: v_c6f7a9 };
+            } else {
+                try {
+                    const v_e84827 = (await import('bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv')).default;
+                    const v_5dd688 = await v_e84827.getItem('userData');
+                    if (v_5dd688) {
+                        const v_f21c33 = JSON.parse(v_5dd688);
+                        if (v_f21c33?.member != null) v_1644fa = { member: Number(v_f21c33.member) };
+                    }
+                } catch {  }
+            }
+            const v_8f00b9 = await v_9f42a4.post(v_09dafd, v_1644fa);
             const v_479f05 = Array.isArray(v_8f00b9.data?.data?.list) ? v_8f00b9.data.data.list as any[] : [];
 
             v_180395(typeof v_8f00b9.data?.data?.default_image === 'string' ? v_8f00b9.data.data.default_image : null);
