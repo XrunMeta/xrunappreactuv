@@ -75,10 +75,11 @@ export const v_f40fc5 = () => {
     setVerificationSuccessRoute: v_8f89f3,
   } = v_700ef9();
 
-  const { checkForUpdate: v_7e5bd3 } = v_ba5086();
+  const { pauseOta: v_bdde43, resumeOta: v_52152c } = v_ba5086();
   v_c4deb2(() => {
-    void v_7e5bd3('signup');
-  }, [v_7e5bd3]);
+    v_bdde43();
+    return () => { v_52152c(); };
+  }, [v_bdde43, v_52152c]);
 
   const [v_f142d8, v_6dde2f] = v_5ab095(v_8d7bc8.familyName);
   const [v_a7c7b7, v_15ded5] = v_5ab095(v_8d7bc8.givenName);
