@@ -1,5 +1,6 @@
 
-export type ClauseId = 'service' | 'location' | 'personal';
+
+export type ClauseId = 'service' | 'location' | 'personal' | 'ai_data' | 'marketing';
 
 export type AgreementType = 'service' | 'location' | 'personal';
 

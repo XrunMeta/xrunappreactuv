@@ -109,7 +109,11 @@ export const v_f40fc5 = () => {
   const [v_68a5a9, v_8e53ad] = v_5ab095(false);
   const [v_e55f34, v_f932c8] = v_5ab095(false);
 
-  const v_b1f14f = v_471e49 && v_68a5a9 && v_e55f34;
+  const [v_52cab9, v_a63a51] = v_5ab095(false);
+  const [v_75d381, v_55cb03] = v_5ab095(false);
+
+  const v_b1f14f =
+    v_471e49 && v_68a5a9 && v_e55f34 && v_52cab9;
 
   const [v_7dc79d, v_1bdbba] = v_5ab095(false);
   const [v_90b6e5, v_e23b14] = v_5ab095<v_9dd03c>('service');
@@ -135,6 +139,10 @@ export const v_f40fc5 = () => {
       v_8e53ad(true);
     } else if (v_111946 === 'personal') {
       v_f932c8(true);
+    } else if (v_111946 === 'ai_data') {
+      v_a63a51(true);
+    } else if (v_111946 === 'marketing') {
+      v_55cb03(true);
     }
     v_1bdbba(false);
   };
@@ -153,7 +161,7 @@ export const v_f40fc5 = () => {
         v_7c5e9b = 'zh-CN';
       }
 
-      const v_4898e2 = v_111946 as 'service' | 'location' | 'personal';
+      const v_4898e2 = v_111946 as 'service' | 'location' | 'personal' | 'ai_data' | 'marketing';
       const v_75fec9 = await v_4dba02(v_4898e2, v_7c5e9b, v_9b57fc);
 
       if (v_75fec9) {
@@ -657,6 +665,8 @@ export const v_f40fc5 = () => {
       v_7f4d53(false);
       v_8e53ad(false);
       v_f932c8(false);
+      v_a63a51(false);
+      v_55cb03(false);
       v_2ca208.current = true;
     }
   }, [v_8d7bc8, v_47b466, v_d0472c, v_600254]);
@@ -1177,9 +1187,11 @@ export const v_f40fc5 = () => {
   };
 
   const clauseTitleMap: Record<v_9dd03c, string> = {
-    service: v_8d41d7('screens.myInfoClauses.serviceClause'),
-    location: v_8d41d7('screens.myInfoClauses.locationClause'),
-    personal: v_8d41d7('screens.myInfoClauses.personalClause'),
+    service: v_8d41d7('screens.myInfoClauses.serviceClause', 'SSO 통합 서비스 이용약관'),
+    location: v_8d41d7('screens.myInfoClauses.locationClause', '위치기반서비스 이용약관'),
+    personal: v_8d41d7('screens.myInfoClauses.personalClause', 'SSO 통합 개인정보 처리방침'),
+    ai_data: v_8d41d7('screens.myInfoClauses.aiDataClause', 'AI 데이터 활용 및 생성 동의'),
+    marketing: v_8d41d7('screens.myInfoClauses.marketingClause', '마케팅 정보 수집 및 활용 동의'),
   };
 
   const v_4c70c4 = Math.min(520, Math.round(v_700696.get('window').height * 0.55));
@@ -1487,6 +1499,36 @@ export const v_f40fc5 = () => {
             <Text style={v_d81136.termsText}>
               <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('personal')}>
                 {v_8d41d7('screens.signup.terms.privacy')}
+              </Text>{' '}
+              {v_8d41d7('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={v_d81136.termsRow}>
+            <FormCheckbox
+              checked={v_52cab9}
+              onToggle={() => v_a63a51((v_ba2215) => !v_ba2215)}
+              variant="square"
+            />
+            <Text style={v_d81136.termsText}>
+              <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('ai_data')}>
+                {v_8d41d7('screens.signup.terms.aiData', 'AI 데이터 활용 및 생성 동의')}
+              </Text>{' '}
+              {v_8d41d7('screens.signup.termsAgree')}
+            </Text>
+          </View>
+
+          {}
+          <View style={v_d81136.termsRow}>
+            <FormCheckbox
+              checked={v_75d381}
+              onToggle={() => v_55cb03((v_ba2215) => !v_ba2215)}
+              variant="square"
+            />
+            <Text style={v_d81136.termsText}>
+              <Text style={v_d81136.termsHighlight} onPress={() => v_ccb639('marketing')}>
+                {v_8d41d7('screens.signup.terms.marketing', '[선택] 마케팅 정보 수집 및 활용 동의')}
               </Text>{' '}
               {v_8d41d7('screens.signup.termsAgree')}
             </Text>
