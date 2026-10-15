@@ -11,6 +11,9 @@ import { v_5401ae } from '../testIDs';
 type OTAUpdateContextValue = {
 
   checkForUpdate: (label?: string) => Promise<boolean>;
+
+  pauseOta: () => void;
+  resumeOta: () => void;
 };
 
 const v_969f21 = v_af12cb<OTAUpdateContextValue | undefined>(undefined);
@@ -43,22 +46,45 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
   const v_61f9b6 = v_e662ae(false);
   const v_8f61c0 = v_e662ae(false);
 
+  const v_e5b70c = v_e662ae(0);
+  const v_bdde43 = v_de06a3(() => {
+    v_e5b70c.current += 1;
+    console.log(`[OTA] paused (count=${v_e5b70c.current})`);
+  }, []);
+  const v_52152c = v_de06a3(() => {
+    v_e5b70c.current = Math.max(0, v_e5b70c.current - 1);
+    console.log(`[OTA] resumed (count=${v_e5b70c.current})`);
+  }, []);
+
   const v_7e5bd3 = v_de06a3(async (v_2869c1 = 'manual'): Promise<boolean> => {
     if (__DEV__) return false;
-    if (v_8f61c0.current) return true;
     if (v_61f9b6.current) return false;
+    if (v_e5b70c.current > 0) {
+
+      return false;
+    }
     v_61f9b6.current = true;
     try {
       const v_087631 = require('iokyqncutdfy');
       if (!v_087631.isEnabled) return false;
       const v_43c42e = await v_b5ae43<{ isAvailable?: boolean }>(v_087631.checkForUpdateAsync(), v_7d5358);
       if (!v_43c42e?.isAvailable) return false;
-      console.log(`[OTA] (${v_2869c1}) 새 업데이트 감지 → 강제 업데이트 팝업`);
-      v_8f61c0.current = true;
-      v_72f90e(true);
+
+      if (v_e5b70c.current > 0) {
+        console.log(`[OTA] (${v_2869c1}) 업데이트 감지됐으나 pause 중 — 다음 체크 때 재시도`);
+        return false;
+      }
+      console.log(`[OTA] (${v_2869c1}) 새 업데이트 감지 → 조용히 fetch + reload`);
+      await v_087631.fetchUpdateAsync();
+      if (v_e5b70c.current > 0) {
+        console.log(`[OTA] (${v_2869c1}) fetch 완료했으나 pause 중 — reload 보류`);
+        return false;
+      }
+      console.log(`[OTA] (${v_2869c1}) fetch 완료 → reload`);
+      await v_087631.reloadAsync();
       return true;
     } catch (v_49263d) {
-      console.warn(`[OTA] (${v_2869c1}) 확인 실패 — 팝업 없이 진행:`, v_49263d?.message ?? v_49263d);
+      console.warn(`[OTA] (${v_2869c1}) 확인/적용 실패:`, v_49263d?.message ?? v_49263d);
       return false;
     } finally {
       v_61f9b6.current = false;
@@ -81,7 +107,7 @@ export const v_ad0e9f = ({ children: v_21f619 }: { children: v_a3453e.ReactNode 
     }
   };
 
-  const v_3b402b = { checkForUpdate: v_7e5bd3 };
+  const v_3b402b = { checkForUpdate: v_7e5bd3, pauseOta: v_bdde43, resumeOta: v_52152c };
 
   return (
     <OTAUpdateContext.Provider value={v_3b402b}>

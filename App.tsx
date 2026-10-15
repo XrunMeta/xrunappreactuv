@@ -142,32 +142,36 @@ const v_c0dbdf = () => {
   const { checkForUpdate: v_7e5bd3 } = v_ba5086();
   v_c4deb2(() => {
     let v_28cdec = 0;
+    let v_ca94a2 = null;
     const v_86fb97 = 5 * 60 * 1000; 
+    const v_bc0557 = 500;          
 
     const v_405bdd = async (v_2869c1) => {
       v_28cdec = Date.now();
       await v_7e5bd3(v_2869c1);
     };
 
-    void v_405bdd('boot');
+    const v_7c7016 = setTimeout(() => void v_405bdd('boot'), 1500);
 
     const v_1ae212 = v_6b5698.addEventListener('change', (v_b6e533) => {
       if (v_b6e533 === 'active') void v_405bdd('foreground');
     });
 
-    const v_ca94a2 = setInterval(async () => {
-      if (Date.now() - v_28cdec < v_86fb97) return;
+    v_ca94a2 = setInterval(async () => {
       try {
         const v_f24fd5 = await v_e84827.getItem('userData');
-        if (!v_f24fd5) return;
-        await v_405bdd('interval-loggedin');
+        const v_13bd35 = !v_f24fd5;
+        const v_abf15a = v_13bd35 ? v_bc0557 : v_86fb97;
+        if (Date.now() - v_28cdec < v_abf15a) return;
+        await v_405bdd(v_13bd35 ? 'interval-loggedout' : 'interval-loggedin');
       } catch {
 
       }
-    }, 30 * 1000);
+    }, v_bc0557);
 
     return () => {
-      clearInterval(v_ca94a2);
+      clearTimeout(v_7c7016);
+      if (v_ca94a2) clearInterval(v_ca94a2);
       v_1ae212.remove();
     };
   }, [v_7e5bd3]);
