@@ -113,6 +113,8 @@ export const BottomNavigationBar: v_a3453e.FC<BottomNavigationBarProps> = ({
   const v_8e442f = (v_6e55b1) => {
     if (v_6e55b1 === 'wallet') {
       if (v_9e28f7) {
+
+        void v_e84827.removeItem('pendingPushWalletNav').catch(() => {});
         v_9b57fc(v_ce4741.wallet);
       } else {
         v_9b57fc(v_ce4741.xrunInfo);
