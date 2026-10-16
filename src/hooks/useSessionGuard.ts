@@ -28,13 +28,6 @@ export async function v_7195bf(): Promise<boolean> {
   try {
     const v_042a8b = await v_e84827.getItem('isLoggedIn');
     if (v_042a8b !== 'true') return false;
-
-    const v_56b352 = await v_e84827.getItem('jwt');
-    if (!v_56b352) {
-
-      return true;
-    }
-    if (v_ed1ab8(v_56b352)) return false;
     return true;
   } catch (v_9e86fd) {
 
