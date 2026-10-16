@@ -1,4 +1,5 @@
 import v_a3453e, { v_af12cb, v_76a8a9, v_e662ae, v_4a8ba2, v_5ab095, v_c4deb2 } from 'bapkr';
+
 import { v_772971 } from 'jmpfvteuuztnp';
 import { v_3a67b0, v_eaf177 } from '../components/ChoiceDialog';
 import { v_c2fdd1 } from '../components/Dialog';
@@ -39,6 +40,8 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
     onB1: () => void;
   } | null>(null);
   const [v_502f8f, v_391672] = v_5ab095(false);
+
+  const v_0cef4d = v_e662ae<ReturnType<typeof setTimeout> | null>(null);
   const [v_4519dd, v_af9459] = v_5ab095<{
     title: string;
     message?: string;
@@ -66,9 +69,17 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
         v_b8817e(false);
         v_af9459(null);
 
+        if (v_0cef4d.current) {
+          clearTimeout(v_0cef4d.current);
+          v_0cef4d.current = null;
+        }
+
         const v_764c58 = () => {
           v_391672(false);
-          setTimeout(() => v_50c81e(null), 300);
+          v_0cef4d.current = setTimeout(() => {
+            v_50c81e(null);
+            v_0cef4d.current = null;
+          }, 300);
         };
         v_50c81e({
           title: v_9f1622,
@@ -221,8 +232,10 @@ export const v_0c450d = ({ children: v_21f619 }: { children: v_4a8ba2 }) => {
         onClose={v_777770}
       />
       {}
+      {
+}
       <Dialog
-        visible={v_502f8f}
+        visible={v_502f8f && !!v_f5dc05?.title}
         title={v_f5dc05?.title || ''}
         onClose={() => { v_f5dc05?.onB0(); }}
         actions={v_f5dc05 ? [
