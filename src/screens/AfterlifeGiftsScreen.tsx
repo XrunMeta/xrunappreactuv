@@ -27,8 +27,10 @@ import { v_18f201 } from '../services/pangle';
 import { v_dd87bc } from '../services';
 import { v_b9db3d, v_d7e45e } from '../utils';
 import { v_5f124d } from '../utils/walletEvents';
+import { v_02d115 } from '../services/afterlifeRelogin';
 
 export const v_ccfe3c = 'pendingAfterlifeExpectedMember';
+export const v_64d35b = 'pendingAfterlifeExpectedEmail';
 
 function v_e065e5(v_fd5f43): string {
   if (!v_fd5f43) return '';
@@ -40,7 +42,7 @@ function v_e065e5(v_fd5f43): string {
 export default function v_5320dd() {
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
-  const { navigate: v_9b57fc } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
   const [v_483de2, v_266e0d] = v_5ab095<v_922496[]>([]);
   const [v_0a2cd1, v_3bc8b6] = v_5ab095<v_922496[]>([]);
   const [v_30ea43, v_06b04b] = v_5ab095(0);
@@ -75,7 +77,8 @@ export default function v_5320dd() {
     try {
       const v_505a6d = await v_e84827.getItem(v_ccfe3c);
       if (!v_505a6d) return;
-      await v_e84827.removeItem(v_ccfe3c);
+      const v_2513b6 = await v_e84827.getItem(v_64d35b);
+      await v_e84827.multiRemove([v_ccfe3c, v_64d35b]);
       const v_479f05 = await v_e84827.getItem('userData');
       const v_b32680 = v_479f05 ? Number(JSON.parse(v_479f05)?.member) : 0;
       if (v_b32680 && Number(v_505a6d) > 0 && Number(v_505a6d) !== v_b32680) {
@@ -88,15 +91,19 @@ export default function v_5320dd() {
             { text: v_8d41d7('screens.afterlifeGifts.cancel', { defaultValue: '취소' }), style: 'cancel' },
             {
               text: v_8d41d7('screens.afterlifeGifts.relogin', { defaultValue: '다시 로그인' }),
-              onPress: () => v_9b57fc(v_ce4741.myInfo as any),
+
+              onPress: async () => {
+                await v_02d115(v_2513b6, v_9b57fc);
+                v_487a25(v_ce4741.login);
+              },
             },
           ],
         );
       }
     } catch {
 
-      }
-  }, [v_9b57fc, v_889fad, v_8d41d7]);
+    }
+  }, [v_9b57fc, v_487a25, v_889fad, v_8d41d7]);
 
   v_c4deb2(() => {
     void v_835a23();
