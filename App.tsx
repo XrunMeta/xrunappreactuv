@@ -121,6 +121,7 @@ import { v_f84ef5, v_cec605 } from './src/services';
 import { v_f16a74, v_deac27, v_763f0d, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
 import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_2b7a17 from 'bpebbcghaffswkrsep';
+import { v_ccfe3c } from './src/screens/AfterlifeGiftsScreen';
 
 v_2b7a17.setNotificationHandler({
   handleNotification: async () => ({
@@ -134,6 +135,12 @@ v_2b7a17.setNotificationHandler({
 
 let v_308260 = null;
 let v_435733 = false;
+
+function v_bd4f82(v_8decf8): boolean {
+  const v_e11752 = String(v_8decf8.hostname ?? '').toLowerCase();
+  const v_9fe22d = String(v_8decf8.path ?? '').toLowerCase().replace(/^\/+/, '');
+  return (v_e11752 === 'wallet' && v_9fe22d === 'afterlife') || v_9fe22d === 'wallet/afterlife';
+}
 
 const v_c0dbdf = () => {
   const { currentScreen: v_0f0c7b, navigate: v_9b57fc } = v_a0daa8();
@@ -211,6 +218,11 @@ const v_c0dbdf = () => {
           return;
         }
 
+        if (v_3b27d9 === 'afterlife_reward') {
+          v_9b57fc(v_ce4741.afterlifeGifts);
+          return;
+        }
+
         v_e84827.setItem('pendingPushWalletNav', 'xrun_pol').catch(() => {});
         v_9b57fc(v_ce4741.wallet);
       } catch (v_9e86fd) {
@@ -263,6 +275,14 @@ const v_c0dbdf = () => {
 
         const v_8decf8 = v_f2c756.parse(v_f71b56);
         console.log('[딥링크] 파싱된 URL:', v_8decf8);
+
+        if (v_bd4f82(v_8decf8)) {
+          v_308260 = v_f71b56;
+          const v_35f85c = v_8decf8.queryParams?.m as string | undefined;
+          if (v_35f85c) await v_e84827.setItem(v_ccfe3c, String(v_35f85c)).catch(() => {});
+          v_9b57fc(v_ce4741.afterlifeGifts);
+          return;
+        }
 
         console.log('parsed.queryParams:', v_8decf8.queryParams);
 
@@ -331,6 +351,11 @@ const v_c0dbdf = () => {
     const v_442744 = async () => {
       try {
         const v_7b9c4e = await v_f2c756.getInitialURL();
+
+        if (v_7b9c4e && v_bd4f82(v_f2c756.parse(v_7b9c4e))) {
+          v_90a7e8(v_7b9c4e);
+          return;
+        }
         if (v_7b9c4e) {
           const v_f24fd5 = await v_e84827.getItem('userData');
           if (v_f24fd5) {
