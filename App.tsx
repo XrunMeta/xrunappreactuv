@@ -122,6 +122,7 @@ import { v_f16a74, v_deac27, v_763f0d, v_790b4f, v_5ee4ec } from './src/services
 import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_2b7a17 from 'bpebbcghaffswkrsep';
 import { v_ccfe3c } from './src/screens/AfterlifeGiftsScreen';
+import { v_ef924b } from './src/utils/afterlifeWhitelist';
 
 v_2b7a17.setNotificationHandler({
   handleNotification: async () => ({
@@ -140,6 +141,15 @@ function v_bd4f82(v_8decf8): boolean {
   const v_e11752 = String(v_8decf8.hostname ?? '').toLowerCase();
   const v_9fe22d = String(v_8decf8.path ?? '').toLowerCase().replace(/^\/+/, '');
   return (v_e11752 === 'wallet' && v_9fe22d === 'afterlife') || v_9fe22d === 'wallet/afterlife';
+}
+
+async function v_eb6a21(): Promise<boolean> {
+  try {
+    const v_479f05 = await v_e84827.getItem('userData');
+    return v_ef924b(v_479f05 ? JSON.parse(v_479f05)?.email : null);
+  } catch {
+    return false;
+  }
 }
 
 const v_c0dbdf = () => {
@@ -219,7 +229,7 @@ const v_c0dbdf = () => {
         }
 
         if (v_3b27d9 === 'afterlife_reward') {
-          v_9b57fc(v_ce4741.afterlifeGifts);
+          void v_eb6a21().then((v_3ed4c3) => v_9b57fc(v_3ed4c3 ? v_ce4741.afterlifeGifts : v_ce4741.wallet));
           return;
         }
 
@@ -278,6 +288,10 @@ const v_c0dbdf = () => {
 
         if (v_bd4f82(v_8decf8)) {
           v_308260 = v_f71b56;
+          if (!(await v_eb6a21())) {
+            v_9b57fc(v_ce4741.wallet);
+            return;
+          }
           const v_35f85c = v_8decf8.queryParams?.m as string | undefined;
           if (v_35f85c) await v_e84827.setItem(v_ccfe3c, String(v_35f85c)).catch(() => {});
           v_9b57fc(v_ce4741.afterlifeGifts);
