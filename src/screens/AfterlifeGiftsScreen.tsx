@@ -26,6 +26,7 @@ import {
 import { v_18f201 } from '../services/pangle';
 import { v_dd87bc } from '../services';
 import { v_b9db3d, v_d7e45e } from '../utils';
+import { v_5f124d } from '../utils/walletEvents';
 
 export const v_ccfe3c = 'pendingAfterlifeExpectedMember';
 
@@ -70,34 +71,45 @@ export default function v_5320dd() {
     })();
   }, [v_f6f5de]);
 
-  v_c4deb2(() => {
-    void (async () => {
-      try {
-        const v_505a6d = await v_e84827.getItem(v_ccfe3c);
-        if (!v_505a6d) return;
-        await v_e84827.removeItem(v_ccfe3c);
-        const v_479f05 = await v_e84827.getItem('userData');
-        const v_b32680 = v_479f05 ? Number(JSON.parse(v_479f05)?.member) : 0;
-        if (v_b32680 && Number(v_505a6d) > 0 && Number(v_505a6d) !== v_b32680) {
-          await v_889fad(
-            v_8d41d7('screens.afterlifeGifts.p5Title', { defaultValue: '다른 계정으로 로그인되어 있어요' }),
-            v_8d41d7('screens.afterlifeGifts.p5Body', {
-              defaultValue: 'XRUN에 로그인된 계정이 Afterlife 계정과 달라요. 같은 계정으로 다시 로그인해주세요.',
-            }),
-            [
-              { text: v_8d41d7('screens.afterlifeGifts.cancel', { defaultValue: '취소' }), style: 'cancel' },
-              {
-                text: v_8d41d7('screens.afterlifeGifts.relogin', { defaultValue: '다시 로그인' }),
-                onPress: () => v_9b57fc(v_ce4741.myInfo as any),
-              },
-            ],
-          );
-        }
-      } catch {
+  const v_835a23 = v_de06a3(async () => {
+    try {
+      const v_505a6d = await v_e84827.getItem(v_ccfe3c);
+      if (!v_505a6d) return;
+      await v_e84827.removeItem(v_ccfe3c);
+      const v_479f05 = await v_e84827.getItem('userData');
+      const v_b32680 = v_479f05 ? Number(JSON.parse(v_479f05)?.member) : 0;
+      if (v_b32680 && Number(v_505a6d) > 0 && Number(v_505a6d) !== v_b32680) {
+        await v_889fad(
+          v_8d41d7('screens.afterlifeGifts.p5Title', { defaultValue: '다른 계정으로 로그인되어 있어요' }),
+          v_8d41d7('screens.afterlifeGifts.p5Body', {
+            defaultValue: 'XRUN에 로그인된 계정이 Afterlife 계정과 달라요. 같은 계정으로 다시 로그인해주세요.',
+          }),
+          [
+            { text: v_8d41d7('screens.afterlifeGifts.cancel', { defaultValue: '취소' }), style: 'cancel' },
+            {
+              text: v_8d41d7('screens.afterlifeGifts.relogin', { defaultValue: '다시 로그인' }),
+              onPress: () => v_9b57fc(v_ce4741.myInfo as any),
+            },
+          ],
+        );
+      }
+    } catch {
 
       }
-    })();
   }, [v_9b57fc, v_889fad, v_8d41d7]);
+
+  v_c4deb2(() => {
+    void v_835a23();
+  }, [v_835a23]);
+
+  v_c4deb2(
+    () =>
+      v_5f124d(() => {
+        void v_f6f5de();
+        void v_835a23();
+      }),
+    [v_f6f5de, v_835a23],
+  );
 
   v_c4deb2(() => {
     (async () => {
