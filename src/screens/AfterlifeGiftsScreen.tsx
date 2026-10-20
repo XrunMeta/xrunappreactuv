@@ -1,6 +1,6 @@
 
 
-import v_a3453e, { v_de06a3, v_c4deb2, v_df9f57, v_5ab095 } from 'bapkr';
+import v_a3453e, { v_de06a3, v_c4deb2, v_5ab095 } from 'bapkr';
 import {
   v_3094a2,
   v_19b633,
@@ -17,65 +17,50 @@ import { v_772971 } from 'jmpfvteuuztnp';
 import { v_729608, v_f16775, v_556baf } from '../components';
 import { v_1bfbd0 } from '../constants';
 import { v_4b1173 } from '../context/AlertDialogContext';
+import { v_a0daa8, v_ce4741 } from '../navigation';
 import {
-  v_8cbcd6,
-  v_9c38e3,
-  type v_b24e94,
-} from '../services/afterlifeBridge';
+  v_925786,
+  v_921d50,
+  type v_922496,
+} from '../services/afterlifeRewards';
 import { v_18f201 } from '../services/pangle';
 import { v_dd87bc } from '../services';
 import { v_b9db3d, v_d7e45e } from '../utils';
 
-const v_bd0aa2 = (v_e0c7e8) => `afterlife_completed_bundles:${v_e0c7e8}`;
+export const v_ccfe3c = 'pendingAfterlifeExpectedMember';
+
+function v_e065e5(v_fd5f43): string {
+  if (!v_fd5f43) return '';
+  const v_d5dda0 = new Date(`${v_fd5f43.replace(' ', 'T')}Z`);
+  if (Number.isNaN(v_d5dda0.getTime())) return '';
+  return `${v_d5dda0.getMonth() + 1}월 ${v_d5dda0.getDate()}일 ${String(v_d5dda0.getHours()).padStart(2, '0')}:${String(v_d5dda0.getMinutes()).padStart(2, '0')}`;
+}
 
 export default function v_5320dd() {
   const { t: v_8d41d7 } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
-  const [v_e0c7e8, v_fedf34] = v_5ab095<string | null>(null);
-  const [v_4622b9, v_fa923c] = v_5ab095<v_b24e94[]>([]);
-
-  const [v_2cb731, v_f29f08] = v_5ab095<number>(0);
-  const [v_458d1d, v_19718e] = v_5ab095<number>(11); 
+  const { navigate: v_9b57fc } = v_a0daa8();
+  const [v_483de2, v_266e0d] = v_5ab095<v_922496[]>([]);
+  const [v_0a2cd1, v_3bc8b6] = v_5ab095<v_922496[]>([]);
+  const [v_30ea43, v_06b04b] = v_5ab095(0);
   const [v_683210, v_34a50a] = v_5ab095(true);
   const [v_612e9f, v_575aad] = v_5ab095(false);
-  const [v_cb38bc, v_b8069a] = v_5ab095(false);
+  const [v_56eae3, v_0141c0] = v_5ab095<number | null>(null);
   const [v_49263d, v_8a5996] = v_5ab095<string | null>(null);
-
-  const [v_94c412, v_1c2997] = v_5ab095<number>(0);
   const [v_beea9d, v_0d9a89] = v_5ab095<number>(0);
 
   const v_f6f5de = v_de06a3(async () => {
     v_8a5996(null);
     try {
-      const v_479f05 = await v_e84827.getItem('userData');
-      const v_8decf8 = v_479f05 ? JSON.parse(v_479f05) : null;
-      const v_131f0d = String(v_8decf8?.email ?? '').trim();
-      v_fedf34(v_131f0d);
-      if (!v_131f0d) {
-        v_fa923c([]);
-        v_8a5996(v_8d41d7('screens.afterlifeGifts.errors.noEmail'));
-        return;
-      }
-      const v_8f00b9 = await v_8cbcd6(v_131f0d);
-      if (!v_8f00b9.userFound) {
-        v_fa923c([]);
-        v_f29f08(0);
-        v_8a5996(v_8d41d7('screens.afterlifeGifts.errors.notRegistered'));
-        return;
-      }
-      v_fa923c(v_8f00b9.items);
-      v_f29f08(Number(v_8f00b9.totalBagValue ?? 0));
-      if (v_8f00b9.exchangeUnit && v_8f00b9.exchangeUnit > 0) v_19718e(v_8f00b9.exchangeUnit);
-
-      try {
-        const v_479f05 = await v_e84827.getItem(v_bd0aa2(v_131f0d));
-        v_1c2997(v_479f05 ? Math.max(0, parseInt(v_479f05, 10) || 0) : 0);
-      } catch {}
+      const v_8f00b9 = await v_925786(v_9b57fc);
+      v_266e0d(v_8f00b9.pending);
+      v_3bc8b6(v_8f00b9.claimed);
+      v_06b04b(v_8f00b9.pendingTotal);
     } catch (v_9e86fd) {
-      console.warn('[AfterlifeGifts] load failed:', v_9e86fd?.message);
-      v_8a5996(v_9e86fd?.message || v_8d41d7('screens.afterlifeGifts.errors.loadFailed'));
+      console.warn('[AfterlifeRewards] load failed:', v_9e86fd?.message);
+      v_8a5996(v_8d41d7('screens.afterlifeGifts.errors.loadFailed'));
     }
-  }, [v_8d41d7]);
+  }, [v_9b57fc, v_8d41d7]);
 
   v_c4deb2(() => {
     void (async () => {
@@ -84,6 +69,35 @@ export default function v_5320dd() {
       v_34a50a(false);
     })();
   }, [v_f6f5de]);
+
+  v_c4deb2(() => {
+    void (async () => {
+      try {
+        const v_505a6d = await v_e84827.getItem(v_ccfe3c);
+        if (!v_505a6d) return;
+        await v_e84827.removeItem(v_ccfe3c);
+        const v_479f05 = await v_e84827.getItem('userData');
+        const v_b32680 = v_479f05 ? Number(JSON.parse(v_479f05)?.member) : 0;
+        if (v_b32680 && Number(v_505a6d) > 0 && Number(v_505a6d) !== v_b32680) {
+          await v_889fad(
+            v_8d41d7('screens.afterlifeGifts.p5Title', { defaultValue: '다른 계정으로 로그인되어 있어요' }),
+            v_8d41d7('screens.afterlifeGifts.p5Body', {
+              defaultValue: 'XRUN에 로그인된 계정이 Afterlife 계정과 달라요. 같은 계정으로 다시 로그인해주세요.',
+            }),
+            [
+              { text: v_8d41d7('screens.afterlifeGifts.cancel', { defaultValue: '취소' }), style: 'cancel' },
+              {
+                text: v_8d41d7('screens.afterlifeGifts.relogin', { defaultValue: '다시 로그인' }),
+                onPress: () => v_9b57fc(v_ce4741.myInfo as any),
+              },
+            ],
+          );
+        }
+      } catch {
+
+      }
+    })();
+  }, [v_9b57fc, v_889fad, v_8d41d7]);
 
   v_c4deb2(() => {
     (async () => {
@@ -99,8 +113,7 @@ export default function v_5320dd() {
       try {
         const v_e2a6a6 = await v_e84827.getItem('xrungopaxprice');
         if (v_e2a6a6) {
-          const v_9390e8 = JSON.parse(v_e2a6a6);
-          const v_6bbb57 = Number(v_9390e8?.data?.gopaxPrice ?? 0);
+          const v_6bbb57 = Number(JSON.parse(v_e2a6a6)?.data?.gopaxPrice ?? 0);
           if (v_6bbb57 > 0) v_0d9a89(v_6bbb57);
         }
       } catch {}
@@ -113,93 +126,66 @@ export default function v_5320dd() {
     v_575aad(false);
   }, [v_f6f5de]);
 
-  const v_ccd7bf = v_df9f57(
-    () => v_4622b9.reduce((v_fd5f43, v_23805a) => v_fd5f43 + (v_23805a.count || 0), 0),
-    [v_4622b9],
+  const v_3249c2 = v_de06a3(
+    async (item: v_922496) => {
+      if (v_56eae3 !== null) return;
+      v_0141c0(v_8c0b26.id);
+      try {
+        let v_c59680 = false;
+        await v_18f201(
+          undefined,
+          undefined,
+          undefined,
+          () => {
+            v_c59680 = true;
+          },
+          async () => {
+            if (!v_c59680) {
+              v_0141c0(null);
+              await v_889fad(
+                v_8d41d7('screens.afterlifeGifts.alerts.noticeTitle'),
+                v_8d41d7('screens.afterlifeGifts.adNotWatchedReward', { defaultValue: '광고를 끝까지 시청해야 보상을 받을 수 있어요.' }),
+              );
+              return;
+            }
+            try {
+              await v_921d50(v_8c0b26.id, v_9b57fc);
+              void v_f6f5de();
+              await v_889fad(
+                v_8d41d7('screens.afterlifeGifts.claimDoneTitle', { defaultValue: '보상을 받았어요' }),
+                v_8d41d7('screens.afterlifeGifts.claimDoneMsg', {
+                  defaultValue: `${v_8c0b26.xrunAmount} XRUN이 지갑에 입금됐어요.`,
+                  xrun: v_8c0b26.xrunAmount,
+                }),
+              );
+            } catch (v_59289a) {
+              const v_d308b5 = v_59289a?.response?.status;
+              console.warn('[AfterlifeRewards] claim failed:', v_d308b5, v_59289a?.message);
+              void v_f6f5de();
+              await v_889fad(
+                v_8d41d7('screens.afterlifeGifts.claimFailTitle', { defaultValue: '받지 못했어요' }),
+                v_d308b5 === 409
+                  ? v_8d41d7('screens.afterlifeGifts.alreadyClaimed', { defaultValue: '이미 받은 보상이에요.' })
+                  : v_8d41d7('screens.afterlifeGifts.errors.retryLater'),
+              );
+            } finally {
+              v_0141c0(null);
+            }
+          },
+          (v_fd3c7b) => {
+            console.warn('[AfterlifeRewards] ad load failed:', v_fd3c7b?.message);
+            v_889fad(v_8d41d7('screens.afterlifeGifts.alerts.adLoadFailTitle'), v_8d41d7('screens.afterlifeGifts.errors.retryLater'));
+            v_0141c0(null);
+          },
+        );
+      } catch (v_663f77) {
+        console.warn('[AfterlifeRewards] ad show failed:', v_663f77?.message);
+        await v_889fad(v_8d41d7('screens.afterlifeGifts.alerts.adShowFailTitle'), v_8d41d7('screens.afterlifeGifts.errors.retryLater'));
+        v_0141c0(null);
+      }
+    },
+    [v_56eae3, v_f6f5de, v_9b57fc, v_889fad, v_8d41d7],
   );
-
-  const v_fcb9a4 = v_df9f57(
-    () =>
-      v_4622b9.find(
-        (v_23805a) => v_23805a.count >= (v_23805a.exchangeUnit ?? v_458d1d) && v_23805a.nextRedeemPayout != null,
-      ) ?? null,
-    [v_4622b9, v_458d1d],
-  );
-  const v_4f2dac = !!v_fcb9a4;
-
-  const v_616667 = Math.floor(v_ccd7bf / v_458d1d);
-  const v_825d02 = v_616667 * v_458d1d;
-  const v_b6c820 = v_ccd7bf - v_825d02;
-
-  const v_16efc3 = v_fcb9a4?.nextRedeemPayout ?? 0;
-  const v_f0f889 = v_16efc3 > 0 ? String(+v_16efc3.toFixed(8)) : '-';
-
-  const v_a03a29 = String(+v_2cb731.toFixed(8));
-  const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_2cb731, v_beea9d) : 0;
-
-  const v_f51415 = v_de06a3(async () => {
-    if (v_cb38bc || !v_e0c7e8 || !v_fcb9a4) return;
-    v_b8069a(true);
-    try {
-      let v_c59680 = false;
-      await v_18f201(
-        undefined,
-        undefined,
-        undefined,
-        () => {
-          v_c59680 = true;
-        },
-        async () => {
-          if (!v_c59680) {
-            v_b8069a(false);
-            await v_889fad('안내', '광고를 끝까지 시청해야 꽃이 교환돼요.');
-            return;
-          }
-          try {
-            const v_ef0c84 = await v_9c38e3(v_e0c7e8, v_fcb9a4.giftId);
-            const v_87d05f = v_ef0c84.burned ?? v_fcb9a4.exchangeUnit ?? v_458d1d;
-            const v_3beb3e = v_ef0c84.xrunAmount ?? v_16efc3;
-            v_fa923c((v_ba2215) =>
-              v_ba2215
-                .map((v_206b88) =>
-                  v_206b88.giftId === v_fcb9a4.giftId
-                    ? { ...v_206b88, count: Math.max(0, v_206b88.count - v_87d05f) }
-                    : v_206b88,
-                )
-                .filter((v_206b88) => v_206b88.count > 0),
-            );
-            v_1c2997((v_ba2215) => {
-              const v_a448ad = v_ba2215 + 1;
-              v_e84827.setItem(v_bd0aa2(v_e0c7e8), String(v_a448ad)).catch(() => {});
-              return v_a448ad;
-            });
-
-            void v_f6f5de();
-            await v_889fad(
-              '교환 완료',
-              `꽃 ${v_87d05f}송이가 ${v_3beb3e} XRUN 으로 바뀌었어요.\nXRUN 지갑에서 확인해보세요.`,
-            );
-          } catch (v_1753dd) {
-            console.warn('[AfterlifeGifts] redeem failed:', v_1753dd?.message);
-            await v_889fad('교환 실패', v_1753dd?.message || '잠시 후 다시 시도해주세요.');
-          } finally {
-            v_b8069a(false);
-          }
-        },
-        (v_fd3c7b) => {
-          console.warn('[AfterlifeGifts] ad load failed:', v_fd3c7b?.message);
-          v_889fad('광고 로드 실패', '잠시 후 다시 시도해주세요.');
-          v_b8069a(false);
-        },
-      );
-    } catch (v_663f77) {
-      console.warn('[AfterlifeGifts] ad show failed:', v_663f77?.message);
-      await v_889fad('광고 표시 실패', '잠시 후 다시 시도해주세요.');
-      v_b8069a(false);
-    }
-  }, [v_cb38bc, v_e0c7e8, v_fcb9a4, v_458d1d, v_16efc3, v_f6f5de, v_8d41d7, v_889fad]);
-
-  const v_d2d720 = Math.max(0, v_458d1d - v_ccd7bf);
 
   const v_7f243f = v_de06a3(async () => {
     try {
@@ -210,11 +196,13 @@ export default function v_5320dd() {
       }
     } catch {}
     try {
-      await v_f2c756.openURL(
-        'https://play.google.com/store/apps/details?id=run.xrun.afterlifeRN',
-      );
+      await v_f2c756.openURL('https://play.google.com/store/apps/details?id=run.xrun.afterlifeRN');
     } catch {}
   }, []);
+
+  const v_039fee = String(+v_30ea43.toFixed(8));
+  const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_30ea43, v_beea9d) : 0;
+  const v_80cae9 = v_8d41d7('screens.afterlifeGifts.flowerUnit');
 
   return (
     <SafeView style={v_d81136.container} backgroundColor={'#f7f7fb'}>
@@ -225,8 +213,8 @@ export default function v_5320dd() {
         refreshControl={<RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />}
       >
         <ReferralStatsCard
-          title={v_8d41d7('screens.afterlifeGifts.totalFlowerCount')}
-          value={`${v_a03a29} XRUN`}
+          title={v_8d41d7('screens.afterlifeGifts.pendingTotal', { defaultValue: '받을 보상' })}
+          value={`${v_039fee} XRUN`}
           helperText={v_d7e45e(v_f02564)}
           icon="flower"
         />
@@ -242,39 +230,49 @@ export default function v_5320dd() {
           </View>
         )}
 
-        {!v_683210 && !v_49263d && v_ccd7bf === 0 && (
-          <View style={v_d81136.emptyBox}>
-            <Text style={v_d81136.emptyText}>{v_8d41d7('screens.afterlifeGifts.emptyTitle')}</Text>
-            <Text style={v_d81136.emptySub}>{v_8d41d7('screens.afterlifeGifts.emptySub')}</Text>
-          </View>
+        {!v_683210 && !v_49263d && v_483de2.length === 0 && (
+          <TouchableOpacity style={v_d81136.emptyBox} onPress={v_7f243f} activeOpacity={0.75}>
+            <Text style={v_d81136.emptyText}>
+              {v_8d41d7('screens.afterlifeGifts.emptyRewardTitle', { defaultValue: '받을 보상이 없어요' })}
+            </Text>
+            <Text style={v_d81136.emptySub}>
+              {v_8d41d7('screens.afterlifeGifts.emptyRewardSub', {
+                defaultValue: '애프터라이프 앱 선물함에서 받은 선물을 교환하면 여기서 XRUN으로 받을 수 있어요.',
+              })}
+            </Text>
+          </TouchableOpacity>
         )}
 
         {}
         {!v_683210 &&
           !v_49263d &&
-          v_616667 > 0 &&
-          Array.from({ length: v_616667 }).map((v_37eab7, v_e86ad8) => (
+          v_483de2.map((v_8c0b26) => (
             <TouchableOpacity
-              key={`bundle-${v_e86ad8}`}
+              key={`p-${v_8c0b26.id}`}
               style={v_d81136.card}
-              onPress={v_f51415}
-              disabled={v_cb38bc}
+              onPress={() => void v_3249c2(v_8c0b26)}
+              disabled={v_56eae3 !== null}
               activeOpacity={0.75}
             >
               <View style={v_d81136.cardBadge}>
-                <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
+                <Text style={v_d81136.cardBadgeText}>
+                  {v_8d41d7('screens.afterlifeGifts.exchangeBadge', { defaultValue: '애프터라이프 교환' })}
+                </Text>
               </View>
               <Text style={v_d81136.cardTitle}>
-                꽃 {v_458d1d}
-                {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+                {v_8c0b26.giftName ?? '선물'} {v_8c0b26.qty ?? ''}
+                {v_8c0b26.qty ? v_80cae9 : ''}
               </Text>
+              <Text style={v_d81136.cardSub}>{v_e065e5(v_8c0b26.createdAt)}</Text>
               <View style={v_d81136.divider} />
               <View style={v_d81136.cardFooter}>
-                <Text style={v_d81136.cardFooterLabel}>{v_8d41d7('screens.afterlifeGifts.exchangeAmount')}</Text>
-                {v_cb38bc ? (
+                <Text style={v_d81136.cardFooterLabel}>
+                  {v_8d41d7('screens.afterlifeGifts.tapToReceive', { defaultValue: '광고 보고 받기' })}
+                </Text>
+                {v_56eae3 === v_8c0b26.id ? (
                   <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
                 ) : (
-                  <Text style={v_d81136.cardFooterValue}>{v_f0f889} XRUN</Text>
+                  <Text style={v_d81136.cardFooterValue}>{v_8c0b26.xrunAmount} XRUN</Text>
                 )}
               </View>
             </TouchableOpacity>
@@ -283,41 +281,27 @@ export default function v_5320dd() {
         {}
         {!v_683210 &&
           !v_49263d &&
-          v_94c412 > 0 &&
-          Array.from({ length: v_94c412 }).map((v_37eab7, v_e86ad8) => (
-            <View key={`done-${v_e86ad8}`} style={[v_d81136.card, v_d81136.cardDone]}>
+          v_0a2cd1.map((v_8c0b26) => (
+            <View key={`c-${v_8c0b26.id}`} style={[v_d81136.card, v_d81136.cardDone]}>
               <View style={[v_d81136.cardBadge, v_d81136.cardBadgeDone]}>
-                <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>교환 완료</Text>
+                <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>
+                  {v_8d41d7('screens.afterlifeGifts.claimedBadge', { defaultValue: '받기 완료' })}
+                </Text>
               </View>
               <Text style={[v_d81136.cardTitle, v_d81136.cardTitleDone]}>
-                꽃 {v_458d1d}
-                {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
+                {v_8c0b26.giftName ?? '선물'} {v_8c0b26.qty ?? ''}
+                {v_8c0b26.qty ? v_80cae9 : ''}
               </Text>
+              <Text style={[v_d81136.cardSub, v_d81136.cardTitleDone]}>{v_e065e5(v_8c0b26.claimedAt)}</Text>
               <View style={v_d81136.divider} />
               <View style={v_d81136.cardFooter}>
                 <Text style={[v_d81136.cardFooterLabel, v_d81136.cardTitleDone]}>
-                  {v_8d41d7('screens.afterlifeGifts.exchangeAmount')}
+                  {v_8d41d7('screens.afterlifeGifts.received', { defaultValue: '입금 완료' })}
                 </Text>
-                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>-</Text>
+                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>{v_8c0b26.xrunAmount} XRUN</Text>
               </View>
             </View>
           ))}
-
-        {}
-        {!v_683210 && !v_49263d && v_b6c820 > 0 && (
-          <TouchableOpacity style={v_d81136.card} onPress={v_7f243f} activeOpacity={0.75}>
-            <View style={v_d81136.cardBadge}>
-              <Text style={v_d81136.cardBadgeText}>{v_8d41d7('screens.afterlifeGifts.mySection')}</Text>
-            </View>
-            <Text style={v_d81136.cardTitle}>
-              꽃 {v_b6c820}
-              {v_8d41d7('screens.afterlifeGifts.flowerUnit')}
-            </Text>
-            <Text style={v_d81136.cardSubWarn}>
-              {v_8d41d7('screens.afterlifeGifts.needMoreFlowersFormat', { need: Math.max(0, v_458d1d - v_b6c820) })}
-            </Text>
-          </TouchableOpacity>
-        )}
       </ScrollView>
     </SafeView>
   );
@@ -361,7 +345,7 @@ const v_d81136 = v_472849.create({
     marginTop: 20,
   },
   cardTitle: { fontSize: 20, fontWeight: '700', color: v_1bfbd0.headerText },
-  cardSubWarn: { fontSize: 12, color: '#B91C1C', marginTop: 6 },
+  cardSub: { fontSize: 12, color: '#888', marginTop: 4 },
   divider: {
     height: v_472849.hairlineWidth,
     backgroundColor: '#E5E7EB',
@@ -374,7 +358,6 @@ const v_d81136 = v_472849.create({
   },
   cardFooterLabel: { fontSize: 13, color: '#666', fontWeight: '500' },
   cardFooterValue: { fontSize: 16, fontWeight: '800', color: v_1bfbd0.headerText },
-  cardFooterValueDim: { color: '#C7CBD9' },
   cardDone: { backgroundColor: '#F3F4F6', borderColor: '#E5E7EB' },
   cardBadgeDone: { backgroundColor: '#E5E7EB' },
   cardBadgeTextDone: { color: '#6B7280' },
