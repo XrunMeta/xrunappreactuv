@@ -13,6 +13,7 @@ export default {
   emptySub: 'Flowers sent by others during Afterlife calls will appear here.',
   cardSubFormat: 'Watch 1 ad → spend {{unit}} / earn {{xrun}} XRUN',
   exchange: 'Exchange',
+  showMore: 'Show more ({{count}})',
   errors: {
     noEmail: 'Failed to load your email.',
     notRegistered: 'Not registered as an Afterlife member yet.',

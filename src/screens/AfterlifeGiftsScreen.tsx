@@ -49,6 +49,8 @@ export default function v_5320dd() {
   const [v_49263d, v_8a5996] = v_5ab095<string | null>(null);
   const [v_beea9d, v_0d9a89] = v_5ab095<number>(0);
 
+  const [v_12d8d3, v_cb24a1] = v_5ab095(false);
+
   const v_f6f5de = v_de06a3(async () => {
     v_8a5996(null);
     try {
@@ -204,6 +206,10 @@ export default function v_5320dd() {
   const v_f02564 = v_beea9d > 0 ? v_b9db3d(v_30ea43, v_beea9d) : 0;
   const v_80cae9 = v_8d41d7('screens.afterlifeGifts.flowerUnit');
 
+  const v_4b4f12 = 10;
+  const v_aa143b = v_12d8d3 ? v_0a2cd1 : v_0a2cd1.slice(0, v_4b4f12);
+  const v_bf5a04 = !v_12d8d3 && v_0a2cd1.length > v_4b4f12;
+
   return (
     <SafeView style={v_d81136.container} backgroundColor={'#f7f7fb'}>
       <Header title={v_8d41d7('screens.afterlifeGifts.title')} />
@@ -281,7 +287,7 @@ export default function v_5320dd() {
         {}
         {!v_683210 &&
           !v_49263d &&
-          v_0a2cd1.map((v_8c0b26) => (
+          v_aa143b.map((v_8c0b26) => (
             <View key={`c-${v_8c0b26.id}`} style={[v_d81136.card, v_d81136.cardDone]}>
               <View style={[v_d81136.cardBadge, v_d81136.cardBadgeDone]}>
                 <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>
@@ -302,6 +308,21 @@ export default function v_5320dd() {
               </View>
             </View>
           ))}
+
+        {!v_683210 && !v_49263d && v_bf5a04 && (
+          <TouchableOpacity
+            style={v_d81136.moreBtn}
+            onPress={() => v_cb24a1(true)}
+            activeOpacity={0.75}
+          >
+            <Text style={v_d81136.moreBtnText}>
+              {v_8d41d7('screens.afterlifeGifts.showMore', {
+                defaultValue: '더보기 ({{count}})',
+                count: v_0a2cd1.length - v_4b4f12,
+              })}
+            </Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeView>
   );
@@ -362,4 +383,14 @@ const v_d81136 = v_472849.create({
   cardBadgeDone: { backgroundColor: '#E5E7EB' },
   cardBadgeTextDone: { color: '#6B7280' },
   cardTitleDone: { color: '#9CA3AF' },
+  moreBtn: {
+    marginTop: 20,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: v_1bfbd0.white,
+    alignItems: 'center',
+  },
+  moreBtnText: { fontSize: 14, fontWeight: '600', color: '#4B5563' },
 });
