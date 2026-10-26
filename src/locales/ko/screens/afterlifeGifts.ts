@@ -13,6 +13,7 @@ export default {
   emptySub: 'Afterlife 앱 통화 중 다른 사용자가 보낸 꽃이 여기에 쌓입니다.',
   cardSubFormat: '광고 1회 시청 → {{unit}}개 소진 / {{xrun}} XRUN',
   exchange: '교환',
+  showMore: '더보기 ({{count}})',
   errors: {
     noEmail: '이메일 정보를 불러오지 못했습니다.',
     notRegistered: '아직 Afterlife 회원으로 등록되지 않았습니다.',
