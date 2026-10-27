@@ -6,6 +6,10 @@ RCT_EXTERN_METHOD(setUserId:(NSString *)userId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(setAge:(nonnull NSNumber *)age)
+
+RCT_EXTERN_METHOD(setGender:(NSString *)gender)
+
 RCT_EXTERN_METHOD(showOfferwall:(NSString *)adSlotName
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)

@@ -26,6 +26,37 @@ class AyetOfferwallModule: NSObject {
   }
 
   @objc
+  func setAge(_ age: NSNumber) {
+    let value = age.intValue
+    guard value > 0, value <= 100 else {
+      NSLog("[ayeT] setAge skipped: out of range age=%d", value)
+      return
+    }
+    AyetSDK.shared.setAge(value)
+    NSLog("[ayeT] setAge: %d", value)
+  }
+
+  @objc
+  func setGender(_ gender: NSString) {
+    let normalized = (gender as String).uppercased()
+    let enumValue: AyetSDK.Gender?
+    switch normalized {
+    case "MALE", "M": enumValue = .male
+    case "FEMALE", "F": enumValue = .female
+    case "NON_BINARY", "N", "O":
+
+      enumValue = nil
+    default: enumValue = nil
+    }
+    guard let value = enumValue else {
+      NSLog("[ayeT] setGender skipped: value=%{public}@", normalized)
+      return
+    }
+    AyetSDK.shared.setGender(value)
+    NSLog("[ayeT] setGender: %{public}@", normalized)
+  }
+
+  @objc
   func showOfferwall(_ adSlotName: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     NSLog("[ayeT] showOfferwall called with adSlotName=%{public}@", adSlotName)
     Task { @MainActor in
