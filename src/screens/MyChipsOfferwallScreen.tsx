@@ -17,11 +17,32 @@ const v_0625de = v_326be8.OS === 'ios'
   ? 'fe775420-0581-4fe7-b732-85d4ef03c367'
   : '93a7b6fa-d336-41d9-a653-cd657802faf2';
 
+const v_affdca = (v_c99bd2): number | undefined => {
+  switch (v_c99bd2) {
+    case 2210: return 15;
+    case 2220: return 25;
+    case 2230: return 35;
+    case 2240: return 45;
+    case 2250: return 55;
+    default: return undefined;
+  }
+};
+
+const v_0e49b9 = (v_c99bd2): string | undefined => {
+  switch (v_c99bd2) {
+    case 2110: return 'm';
+    case 2111: return 'f';
+    default: return undefined;
+  }
+};
+
 export const v_0ca15f = () => {
   const { goBack: v_c7ac57 } = v_a0daa8();
   const v_033e14 = v_e0068c();
   const v_35f830 = v_e662ae<v_2694e4>(null);
   const [v_43e90c, v_688dd2] = v_5ab095<string>('');
+  const [v_3e2d7c, v_691c65] = v_5ab095<number | undefined>(undefined);
+  const [v_77da43, v_607def] = v_5ab095<string | undefined>(undefined);
   const [v_cd31a8, v_deef62] = v_5ab095(true);
 
   v_c4deb2(() => {
@@ -32,6 +53,13 @@ export const v_0ca15f = () => {
           const v_8decf8 = JSON.parse(v_e5066f);
           if (v_8decf8.member) {
             v_688dd2(String(v_8decf8.member));
+          }
+
+          if (typeof v_8decf8?.age === 'number') {
+            v_691c65(v_affdca(v_8decf8.age));
+          }
+          if (typeof v_8decf8?.gender === 'number') {
+            v_607def(v_0e49b9(v_8decf8.gender));
           }
         }
       } catch (v_9e86fd) {
@@ -60,7 +88,16 @@ export const v_0ca15f = () => {
     return () => v_269481.remove();
   }, []);
 
-  const v_6da94b = `https://sdk.mychips.io/content?content_id=${v_0625de}&user_id=${v_43e90c}&gender=&age=`;
+  const v_6da94b = (() => {
+    const v_24baff = [
+      `content_id=${v_0625de}`,
+      `user_id=${encodeURIComponent(v_43e90c)}`,
+      `webview=1`,
+    ];
+    if (v_77da43) v_24baff.push(`gender=${v_77da43}`);
+    if (v_3e2d7c != null) v_24baff.push(`age=${v_3e2d7c}`);
+    return `https://sdk.mychips.io/content?${v_24baff.join('&')}`;
+  })();
 
   const v_0a35c3 = v_033e14.bottom;
 

@@ -14,7 +14,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_729608 } from '../components';
 import { v_a0daa8 } from '../navigation';
 import { v_a61db3, v_1bfbd0 } from '../constants';
-import { v_5e4f0b } from '../services/ayet';
+import { v_5e4f0b, v_a0b9d7 } from '../services/ayet';
 import { v_8a1e5d } from '../utils';
 
 const v_e56d32 = v_326be8.OS === 'ios' ? '25755' : '25617';
@@ -35,9 +35,13 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
       try {
         const v_e5066f = await v_e84827.getItem('userData');
         let v_717992 = '';
+        let v_2d2cbc;
+        let v_d199d8;
         if (v_e5066f) {
           const v_8decf8 = JSON.parse(v_e5066f);
           if (v_8decf8?.member != null) v_717992 = String(v_8decf8.member);
+          if (typeof v_8decf8?.age === 'number') v_2d2cbc = v_8decf8.age;
+          if (typeof v_8decf8?.gender === 'number') v_d199d8 = v_8decf8.gender;
         }
         v_688dd2(v_717992);
         v_deef62(false);
@@ -46,6 +50,8 @@ export const AyetOffersScreen: v_a3453e.FC = () => {
           v_5e4f0b(v_717992).catch((v_9e86fd) => {
             console.warn('[ayeT] setAyetUserIdAsync 실패(백그라운드):', v_9e86fd);
           });
+
+          v_a0b9d7(v_2d2cbc, v_d199d8);
         }
       } catch (v_9e86fd) {
         console.warn('[ayeT] userData 로드 실패:', v_9e86fd);
