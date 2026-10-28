@@ -11,11 +11,13 @@ import {
   v_39a996,
   v_f2c756,
 } from 'rcmrninabrnb';
+import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
+import { v_25515d } from 'zvyjokvuouwvifyzks';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 
-import { v_729608, v_f16775, v_556baf } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_729608, v_556baf } from '../components';
+import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import {
@@ -25,24 +27,67 @@ import {
 } from '../services/afterlifeRewards';
 import { v_18f201 } from '../services/pangle';
 import { v_dd87bc } from '../services';
-import { v_b9db3d, v_d7e45e } from '../utils';
+import { v_b9db3d } from '../utils';
+
+function v_aa9295(v_f63e09): string {
+  const v_0ad8c5 = parseFloat(String(v_f63e09));
+  if (isNaN(v_0ad8c5) || v_0ad8c5 === 0) return 'KRW 0';
+  const v_f52086 = Math.round(v_0ad8c5);
+  const v_2294ac = String(v_f52086).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return `KRW ${v_2294ac}`;
+}
 import { v_5f124d } from '../utils/walletEvents';
 import { v_02d115 } from '../services/afterlifeRelogin';
 
 export const v_ccfe3c = 'pendingAfterlifeExpectedMember';
 export const v_64d35b = 'pendingAfterlifeExpectedEmail';
 
-function v_e065e5(v_fd5f43): string {
-  if (!v_fd5f43) return '';
-  const v_d5dda0 = new Date(`${v_fd5f43.replace(' ', 'T')}Z`);
-  if (Number.isNaN(v_d5dda0.getTime())) return '';
-  return `${v_d5dda0.getMonth() + 1}월 ${v_d5dda0.getDate()}일 ${String(v_d5dda0.getHours()).padStart(2, '0')}:${String(v_d5dda0.getMinutes()).padStart(2, '0')}`;
+function v_e065e5(v_562f33, v_05bb19 = 'ko'): string {
+  if (!v_562f33) return '-';
+  try {
+    let v_2e53ec = v_562f33.trim();
+    const v_2f628d = /^\d{4}-\d{2}$/;
+    if (v_2f628d.test(v_2e53ec)) return v_2e53ec;
+
+    const v_641853 =
+      v_2e53ec.endsWith('Z') ||
+      v_2e53ec.includes('+') ||
+      (v_2e53ec.length > 10 && v_2e53ec.slice(10).includes('-'));
+
+    if (!v_641853) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(v_2e53ec)) {
+        v_2e53ec = `${v_2e53ec}T00:00:00Z`;
+      } else if (!v_2e53ec.includes('T')) {
+        v_2e53ec = v_2e53ec.replace(' ', 'T');
+        if (!v_2e53ec.includes(':')) v_2e53ec += 'T00:00:00';
+        v_2e53ec += 'Z';
+      } else {
+        v_2e53ec += 'Z';
+      }
+    }
+
+    const v_6453eb = new Date(v_2e53ec);
+    if (Number.isNaN(v_6453eb.getTime())) return '-';
+
+    const v_0eaaff = v_6453eb.getFullYear();
+    const v_033a94 = String(v_6453eb.getMonth() + 1).padStart(2, '0');
+    const v_087ffc = String(v_6453eb.getDate()).padStart(2, '0');
+    const v_12ebc1 = String(v_6453eb.getHours()).padStart(2, '0');
+    const v_ef3543 = String(v_6453eb.getMinutes()).padStart(2, '0');
+
+    if ((v_05bb19 || 'ko').startsWith('ko')) {
+      return `${v_0eaaff}.${v_033a94}.${v_087ffc} ${v_12ebc1}:${v_ef3543}`;
+    }
+    return `${v_033a94}/${v_087ffc}/${v_0eaaff} ${v_12ebc1}:${v_ef3543}`;
+  } catch {
+    return '-';
+  }
 }
 
 export default function v_5320dd() {
-  const { t: v_8d41d7 } = v_772971();
+  const { t: v_8d41d7, i18n: v_9c213b } = v_772971();
   const { showAlert: v_889fad } = v_4b1173();
-  const { navigate: v_9b57fc, reset: v_487a25 } = v_a0daa8();
+  const { navigate: v_9b57fc, reset: v_487a25, goBack: v_c7ac57 } = v_a0daa8();
   const [v_483de2, v_266e0d] = v_5ab095<v_922496[]>([]);
   const [v_0a2cd1, v_3bc8b6] = v_5ab095<v_922496[]>([]);
   const [v_30ea43, v_06b04b] = v_5ab095(0);
@@ -231,20 +276,41 @@ export default function v_5320dd() {
 
   return (
     <SafeView style={v_d81136.container} backgroundColor={'#f7f7fb'}>
-      <Header title={v_8d41d7('screens.afterlifeGifts.title')} />
+      <Header title={v_8d41d7('screens.afterlifeGifts.title')} onBackPress={v_c7ac57} showBackButton />
 
       <ScrollView
         contentContainerStyle={v_d81136.scroll}
         refreshControl={<RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />}
       >
-        <ReferralStatsCard
-          title={v_8d41d7('screens.afterlifeGifts.pendingTotal', { defaultValue: '받을 보상' })}
-          value={`${v_039fee} XRUN`}
-          helperText={v_d7e45e(v_f02564)}
-          icon="flower"
-        />
+        {}
+        <View style={v_d81136.summaryCard}>
+          <LinearGradient
+            colors={['#6366F1', '#8B5CF6', '#A855F7']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={v_d81136.gradient}
+          >
+            <View style={v_d81136.backgroundIcon}>
+              <Ionicons name="flower" size={120} color="#FFFFFF" style={v_d81136.iconStyle} />
+            </View>
+            <View style={v_d81136.summaryContent}>
+              <View style={v_d81136.summaryTitleRow}>
+                <View style={v_d81136.summaryTitleLeft}>
+                  <View style={v_d81136.iconContainer}>
+                    <Ionicons name="flower" size={20} color="#FFFFFF" />
+                  </View>
+                  <Text style={v_d81136.summaryLabel}>
+                    {v_8d41d7('screens.afterlifeGifts.pendingTotal', { defaultValue: 'SWAP' })}
+                  </Text>
+                </View>
+              </View>
+              <Text style={v_d81136.summaryValue}>{`${v_039fee} XRUN`}</Text>
+              <Text style={v_d81136.summaryExtra}>{v_aa9295(v_f02564)}</Text>
+            </View>
+          </LinearGradient>
+        </View>
 
-        {v_683210 && <ActivityIndicator style={{ marginTop: 24 }} color={v_1bfbd0.buttonPrimary} />}
+        {v_683210 && <ActivityIndicator style={{ marginTop: v_9b1a04.large }} color={v_1bfbd0.buttonPrimary} />}
 
         {!v_683210 && v_49263d && (
           <View style={v_d81136.errorBox}>
@@ -279,25 +345,25 @@ export default function v_5320dd() {
               disabled={v_56eae3 !== null}
               activeOpacity={0.75}
             >
-              <View style={v_d81136.cardBadge}>
-                <Text style={v_d81136.cardBadgeText}>
-                  {v_8d41d7('screens.afterlifeGifts.exchangeBadge', { defaultValue: '애프터라이프 교환' })}
+              <View style={v_d81136.cardHeader}>
+                <Text style={v_d81136.cardStatus}>
+                  {v_8d41d7('screens.afterlifeGifts.exchangeBadge', { defaultValue: 'SWAP' })}
                 </Text>
+                <Text style={v_d81136.cardDate}>{v_e065e5(v_8c0b26.createdAt, v_9c213b.language)}</Text>
               </View>
-              <Text style={v_d81136.cardTitle}>
+              {}
+              <Text style={v_d81136.cardName} numberOfLines={1} ellipsizeMode="tail">
                 {v_8c0b26.giftName ?? '선물'} {v_8c0b26.qty ?? ''}
                 {v_8c0b26.qty ? v_80cae9 : ''}
               </Text>
-              <Text style={v_d81136.cardSub}>{v_e065e5(v_8c0b26.createdAt)}</Text>
-              <View style={v_d81136.divider} />
-              <View style={v_d81136.cardFooter}>
-                <Text style={v_d81136.cardFooterLabel}>
+              <View style={v_d81136.cardRow}>
+                <Text style={v_d81136.cardRowLabel}>
                   {v_8d41d7('screens.afterlifeGifts.tapToReceive', { defaultValue: '광고 보고 받기' })}
                 </Text>
                 {v_56eae3 === v_8c0b26.id ? (
                   <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
                 ) : (
-                  <Text style={v_d81136.cardFooterValue}>{v_8c0b26.xrunAmount} XRUN</Text>
+                  <Text style={[v_d81136.cardRowAmount, { color: '#707070' }]}>{v_8c0b26.xrunAmount} XRUN</Text>
                 )}
               </View>
             </TouchableOpacity>
@@ -307,23 +373,22 @@ export default function v_5320dd() {
         {!v_683210 &&
           !v_49263d &&
           v_aa143b.map((v_8c0b26) => (
-            <View key={`c-${v_8c0b26.id}`} style={[v_d81136.card, v_d81136.cardDone]}>
-              <View style={[v_d81136.cardBadge, v_d81136.cardBadgeDone]}>
-                <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>
-                  {v_8d41d7('screens.afterlifeGifts.claimedBadge', { defaultValue: '받기 완료' })}
+            <View key={`c-${v_8c0b26.id}`} style={v_d81136.card}>
+              <View style={v_d81136.cardHeader}>
+                <Text style={[v_d81136.cardStatus, v_d81136.cardStatusDone]}>
+                  {v_8d41d7('screens.afterlifeGifts.claimedBadge', { defaultValue: 'SWAP' })}
                 </Text>
+                <Text style={v_d81136.cardDate}>{v_e065e5(v_8c0b26.claimedAt, v_9c213b.language)}</Text>
               </View>
-              <Text style={[v_d81136.cardTitle, v_d81136.cardTitleDone]}>
+              <Text style={v_d81136.cardName} numberOfLines={1} ellipsizeMode="tail">
                 {v_8c0b26.giftName ?? '선물'} {v_8c0b26.qty ?? ''}
                 {v_8c0b26.qty ? v_80cae9 : ''}
               </Text>
-              <Text style={[v_d81136.cardSub, v_d81136.cardTitleDone]}>{v_e065e5(v_8c0b26.claimedAt)}</Text>
-              <View style={v_d81136.divider} />
-              <View style={v_d81136.cardFooter}>
-                <Text style={[v_d81136.cardFooterLabel, v_d81136.cardTitleDone]}>
+              <View style={v_d81136.cardRow}>
+                <Text style={v_d81136.cardRowLabel}>
                   {v_8d41d7('screens.afterlifeGifts.received', { defaultValue: '입금 완료' })}
                 </Text>
-                <Text style={[v_d81136.cardFooterValue, v_d81136.cardTitleDone]}>{v_8c0b26.xrunAmount} XRUN</Text>
+                <Text style={[v_d81136.cardRowAmount, { color: '#111111' }]}>{v_8c0b26.xrunAmount} XRUN</Text>
               </View>
             </View>
           ))}
@@ -348,68 +413,205 @@ export default function v_5320dd() {
 }
 
 const v_d81136 = v_472849.create({
-  container: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 48 },
-  cardBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#E6F0FF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    marginBottom: 12,
+  container: {
+    ...v_a61db3.container,
   },
-  cardBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#2563EB',
+  scroll: {
+    ...v_a61db3.scrollContent,
+    paddingBottom: 48,
   },
-  errorBox: { padding: 24, alignItems: 'center' },
-  errorText: { color: '#B91C1C', fontSize: 13, textAlign: 'center' },
-  retryBtn: {
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    backgroundColor: v_1bfbd0.buttonPrimary,
+  summaryCard: {
+    borderRadius: v_9b1a04.medium,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 10,
+    height: 140,
+    overflow: 'hidden',
+    marginBottom: v_9b1a04.large,
   },
-  retryBtnText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
-  emptyBox: { padding: 40, alignItems: 'center' },
-  emptyText: { fontSize: 15, fontWeight: '700', color: '#333' },
-  emptySub: { fontSize: 12, color: '#888', marginTop: 8, textAlign: 'center', lineHeight: 17 },
-  card: {
-    backgroundColor: v_1bfbd0.white,
-    borderWidth: 1,
-    borderColor: '#EEF0F6',
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 20,
+  gradient: {
+    flex: 1,
+    borderRadius: v_9b1a04.medium,
+    position: 'relative',
   },
-  cardTitle: { fontSize: 20, fontWeight: '700', color: v_1bfbd0.headerText },
-  cardSub: { fontSize: 12, color: '#888', marginTop: 4 },
-  divider: {
-    height: v_472849.hairlineWidth,
-    backgroundColor: '#E5E7EB',
-    marginVertical: 20,
+  backgroundIcon: {
+    position: 'absolute',
+    right: -20,
+    top: -20,
+    opacity: 0.15,
   },
-  cardFooter: {
+  iconStyle: {
+    transform: [{ rotate: '-15deg' }],
+  },
+  summaryContent: {
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+    flex: 1,
+    justifyContent: 'space-between',
+    zIndex: 1,
+  },
+  summaryTitleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cardFooterLabel: { fontSize: 13, color: '#666', fontWeight: '500' },
-  cardFooterValue: { fontSize: 16, fontWeight: '800', color: v_1bfbd0.headerText },
-  cardDone: { backgroundColor: '#F3F4F6', borderColor: '#E5E7EB' },
-  cardBadgeDone: { backgroundColor: '#E5E7EB' },
-  cardBadgeTextDone: { color: '#6B7280' },
-  cardTitleDone: { color: '#9CA3AF' },
-  moreBtn: {
-    marginTop: 20,
-    paddingVertical: 14,
-    borderRadius: 12,
+  summaryTitleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: v_1bfbd0.white,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  summaryLabel: {
+
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Bold',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+    letterSpacing: 0.3,
+  },
+  summaryValue: {
+    fontSize: v_843035.size.xxxlarge,
+    fontFamily: 'Roboto-Bold',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    letterSpacing: -0.8,
+  },
+  summaryExtra: {
+    fontSize: v_843035.size.medium,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontFamily: 'Roboto-Regular',
+    opacity: 0.9,
+  },
+  errorBox: {
+    paddingVertical: v_9b1a04.xlarge,
     alignItems: 'center',
   },
-  moreBtnText: { fontSize: 14, fontWeight: '600', color: '#4B5563' },
+  errorText: {
+    color: '#B91C1C',
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
+  },
+  retryBtn: {
+    marginTop: v_9b1a04.small,
+    paddingVertical: v_9b1a04.xsmall,
+    paddingHorizontal: 20,
+    borderRadius: v_9b1a04.xsmall,
+    backgroundColor: v_1bfbd0.buttonPrimary,
+  },
+  retryBtnText: {
+    color: v_1bfbd0.white,
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Bold',
+  },
+  emptyBox: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-Bold',
+    color: '#111111',
+  },
+  emptySub: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#666666',
+    marginTop: v_9b1a04.xsmall,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  card: {
+    backgroundColor: v_1bfbd0.background,
+    borderRadius: v_9b1a04.medium,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderWidth: 0.5,
+    borderColor: '#d5dde0',
+    shadowColor: '#00000014',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: v_9b1a04.small,
+    marginTop: 0,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  cardStatus: {
+
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto',
+    color: v_1bfbd0.white,
+    paddingHorizontal: v_9b1a04.small,
+    paddingVertical: 2,
+    borderRadius: 4,
+    backgroundColor: '#6366F1',
+    overflow: 'hidden',
+    letterSpacing: 0,
+  },
+  cardStatusDone: {
+    backgroundColor: '#9CA3AF',
+  },
+  cardDate: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-regular',
+    color: '#666666',
+  },
+
+  cardName: {
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#333333',
+    letterSpacing: -0.5,
+    maxWidth: '70%',
+    marginBottom: 4,
+  },
+  cardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  cardRowLabel: {
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Regular',
+    color: '#333333',
+    letterSpacing: -0.5,
+  },
+  cardRowAmount: {
+    fontSize: v_843035.size.medium,
+    fontFamily: 'Roboto-SemiBold',
+  },
+  moreBtn: {
+    marginTop: v_9b1a04.large,
+    paddingVertical: 14,
+    borderRadius: v_9b1a04.medium,
+    borderWidth: 0.5,
+    borderColor: '#d5dde0',
+    backgroundColor: v_1bfbd0.background,
+    alignItems: 'center',
+  },
+  moreBtnText: {
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-SemiBold',
+    color: '#333333',
+  },
 });
