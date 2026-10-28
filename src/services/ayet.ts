@@ -121,6 +121,50 @@ export const v_e8d7c0 = (v_43e90c): void => {
   void v_5e4f0b(v_43e90c);
 };
 
+const v_617e46 = (v_c99bd2): number | null => {
+  switch (v_c99bd2) {
+    case 2210: return 15;
+    case 2220: return 25;
+    case 2230: return 35;
+    case 2240: return 45;
+    case 2250: return 55;
+    default: return null;
+  }
+};
+
+const v_537f8a = (v_c99bd2): string | null => {
+  switch (v_c99bd2) {
+    case 2110: return 'MALE';
+    case 2111: return 'FEMALE';
+    default: return null;
+  }
+};
+
+export const v_a0b9d7 = (
+  v_2d2cbc,
+  v_d199d8,
+): void => {
+  const v_d47c2d = v_617e46(v_2d2cbc);
+  if (v_d47c2d != null && v_1bebcf?.setAge) {
+    try {
+      v_1bebcf.setAge(v_d47c2d);
+      console.log(`${v_4c1151} setAge: code=${v_2d2cbc} → years=${v_d47c2d}`);
+    } catch (v_9e86fd) {
+      console.warn(`${v_4c1151} setAge 실패:`, v_9e86fd?.message ?? v_9e86fd);
+    }
+  }
+
+  const v_77bf50 = v_537f8a(v_d199d8);
+  if (v_77bf50 != null && v_1bebcf?.setGender) {
+    try {
+      v_1bebcf.setGender(v_77bf50);
+      console.log(`${v_4c1151} setGender: code=${v_d199d8} → ${v_77bf50}`);
+    } catch (v_9e86fd) {
+      console.warn(`${v_4c1151} setGender 실패:`, v_9e86fd?.message ?? v_9e86fd);
+    }
+  }
+};
+
 export const v_961d2c = async (
   v_bb8cc2 = v_ddd026(),
   v_b36f96

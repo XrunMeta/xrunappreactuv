@@ -44,6 +44,39 @@ class AyetOfferwallModule(reactContext: ReactApplicationContext) : ReactContextB
     }
 
     @ReactMethod
+    fun setAge(age: Int) {
+        try {
+            if (age <= 0 || age > 100) {
+                Log.w("AyetOfferwall", "setAge skipped: out of range age=$age")
+                return
+            }
+            AyetSdk.setAge(age)
+            Log.d("AyetOfferwall", "setAge: $age")
+        } catch (e: Exception) {
+            Log.e("AyetOfferwall", "setAge 실패", e)
+        }
+    }
+
+    @ReactMethod
+    fun setGender(gender: String) {
+        try {
+            val enumValue = when (gender.uppercase()) {
+                "MALE", "M" -> AyetSdk.Gender.MALE
+                "FEMALE", "F" -> AyetSdk.Gender.FEMALE
+                "NON_BINARY", "N", "O" -> AyetSdk.Gender.NON_BINARY
+                else -> {
+                    Log.w("AyetOfferwall", "setGender skipped: unknown value=$gender")
+                    return
+                }
+            }
+            AyetSdk.setGender(enumValue)
+            Log.d("AyetOfferwall", "setGender: $gender → $enumValue")
+        } catch (e: Exception) {
+            Log.e("AyetOfferwall", "setGender 실패", e)
+        }
+    }
+
+    @ReactMethod
     fun showOfferwall(adSlotName: String, promise: Promise) {
         try {
             val activity = reactApplicationContext.currentActivity

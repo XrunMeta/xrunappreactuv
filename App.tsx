@@ -92,7 +92,7 @@ import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 import { v_116c93, v_1f4a13 } from './src/locales';
 import { v_0b0acf } from './src/services/taboola';
-import { v_e8d7c0 } from './src/services/ayet';
+import { v_e8d7c0, v_a0b9d7 } from './src/services/ayet';
 import { v_f5ecec } from './src/services';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
 import { v_563153, v_dd87bc, v_8ee299 } from './src/services';
@@ -203,6 +203,8 @@ const v_c0dbdf = () => {
         const v_ef7306 = JSON.parse(v_f24fd5);
         if (v_ef7306?.member != null) {
           v_e8d7c0(String(v_ef7306.member));
+
+          v_a0b9d7(v_ef7306.age, v_ef7306.gender);
 
           v_cec605(v_ef7306.member).catch(() => {});
 
