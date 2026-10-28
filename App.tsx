@@ -121,7 +121,8 @@ import { v_f84ef5, v_cec605 } from './src/services';
 import { v_f16a74, v_deac27, v_763f0d, v_790b4f, v_5ee4ec } from './src/services/versionCheck';
 import { v_772971 } from 'jmpfvteuuztnp';
 import * as v_2b7a17 from 'bpebbcghaffswkrsep';
-import { v_ccfe3c } from './src/screens/AfterlifeGiftsScreen';
+import { v_ccfe3c, v_64d35b } from './src/screens/AfterlifeGiftsScreen';
+import { v_92f5e3 } from './src/utils/walletEvents';
 import { v_ef924b } from './src/utils/afterlifeWhitelist';
 
 v_2b7a17.setNotificationHandler({
@@ -295,8 +296,12 @@ const v_c0dbdf = () => {
             return;
           }
           const v_35f85c = v_8decf8.queryParams?.m as string | undefined;
+          const v_9e86fd = v_8decf8.queryParams?.e as string | undefined; 
           if (v_35f85c) await v_e84827.setItem(v_ccfe3c, String(v_35f85c)).catch(() => {});
+          if (v_9e86fd) await v_e84827.setItem(v_64d35b, String(v_9e86fd)).catch(() => {});
+          else await v_e84827.removeItem(v_64d35b).catch(() => {});
           v_9b57fc(v_ce4741.afterlifeGifts);
+          v_92f5e3(); 
           return;
         }
 
@@ -399,7 +404,7 @@ const v_c0dbdf = () => {
     const v_269481 = v_f2c756.addEventListener('url', (v_d48baf) => {
       console.log('[딥링크] 딥링크 이벤트 감지:', v_d48baf.url);
 
-      if (v_d48baf.url !== v_308260) {
+      if (v_d48baf.url !== v_308260 || v_bd4f82(v_f2c756.parse(v_d48baf.url))) {
         v_308260 = null;
       }
       v_90a7e8(v_d48baf.url);
