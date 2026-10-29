@@ -167,7 +167,8 @@
       "expo-tracking-transparency",
       "expo-secure-store",
       "@react-native-firebase/app",
-      "@react-native-firebase/analytics"
+      "@react-native-firebase/analytics",
+      "expo-audio"
     ],
     "extra": {
       "eas": {
