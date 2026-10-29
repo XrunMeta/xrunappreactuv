@@ -124,6 +124,7 @@ import * as v_2b7a17 from 'bpebbcghaffswkrsep';
 import { v_ccfe3c, v_64d35b } from './src/screens/AfterlifeGiftsScreen';
 import { v_92f5e3 } from './src/utils/walletEvents';
 import { v_ef924b } from './src/utils/afterlifeWhitelist';
+import { v_c9b96f } from './src/hooks/useAccountFaceGate';
 
 v_2b7a17.setNotificationHandler({
   handleNotification: async () => ({
@@ -537,9 +538,16 @@ const v_c0dbdf = () => {
 
   }, [v_0f0c7b]);
 
+  const v_075310 = v_c9b96f(v_0f0c7b === 'map');
+
   v_c4deb2(() => {
     if (v_0f0c7b) v_22de27(v_0f0c7b);
   }, [v_0f0c7b]);
+
+  if (v_0f0c7b === 'map' && v_075310.needs) {
+    const v_5b71e1 = require('./src/screens/face/AccountFaceEnrollScreen').default;
+    return <AccountFaceEnrollScreen onDone={v_075310.refresh} />;
+  }
 
   if (v_0f0c7b === 'login') {
     return <LoginScreen />;
