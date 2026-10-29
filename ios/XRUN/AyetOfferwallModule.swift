@@ -32,8 +32,11 @@ class AyetOfferwallModule: NSObject {
       NSLog("[ayeT] setAge skipped: out of range age=%d", value)
       return
     }
-    AyetSDK.shared.setAge(value)
-    NSLog("[ayeT] setAge: %d", value)
+
+    DispatchQueue.main.async {
+      AyetSDK.shared.setAge(value)
+      NSLog("[ayeT] setAge: %d", value)
+    }
   }
 
   @objc
@@ -52,8 +55,10 @@ class AyetOfferwallModule: NSObject {
       NSLog("[ayeT] setGender skipped: value=%{public}@", normalized)
       return
     }
-    AyetSDK.shared.setGender(value)
-    NSLog("[ayeT] setGender: %{public}@", normalized)
+    DispatchQueue.main.async {
+      AyetSDK.shared.setGender(value)
+      NSLog("[ayeT] setGender: %{public}@", normalized)
+    }
   }
 
   @objc
