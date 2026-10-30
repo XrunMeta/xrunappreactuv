@@ -15,6 +15,7 @@ export { default as v_269e04 } from './polygonWallet';
 export { default as v_0cd34d } from './xrunWallet';
 export { default as v_b12e1b } from './nftWallet';
 export { default as v_8bc52c } from './adWallet';
+export { default as v_8048f5 } from './afterlifeGifts';
 export { default as v_400baf } from './walletSend';
 export { default as v_4c15cf } from './walletReceive';
 export { default as v_76f0d9 } from './walletAddressBook';
