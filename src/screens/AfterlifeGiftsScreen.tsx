@@ -15,7 +15,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 
 import { v_729608, v_f16775, v_556baf } from '../components';
-import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
+import { v_1bfbd0, v_a61db3, v_843035, v_9b1a04 } from '../constants';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import {
@@ -293,7 +293,7 @@ export default function v_5320dd() {
               <View style={v_d81136.cardHeader}>
                 <View style={v_d81136.cardBadge}>
                   <Text style={v_d81136.cardBadgeText}>
-                    {v_8d41d7('screens.afterlifeGifts.exchangeBadge', { defaultValue: '애프터라이프 SWAP' })}
+                    {v_8d41d7('screens.afterlifeGifts.exchangeBadge', { defaultValue: 'SWAP' })}
                   </Text>
                 </View>
                 <Text style={v_d81136.cardDate}>{v_e065e5(v_8c0b26.createdAt)}</Text>
@@ -305,7 +305,7 @@ export default function v_5320dd() {
               <View style={v_d81136.divider} />
               <View style={v_d81136.cardFooter}>
                 <Text style={v_d81136.cardFooterLabel}>
-                  {v_8d41d7('screens.afterlifeGifts.tapToReceive', { defaultValue: '광고 보고 받기' })}
+                  {v_8d41d7('screens.afterlifeGifts.tapToReceive', { defaultValue: '보상금액' })}
                 </Text>
                 {v_56eae3 === v_8c0b26.id ? (
                   <ActivityIndicator color={v_1bfbd0.buttonPrimary} />
@@ -364,7 +364,8 @@ export default function v_5320dd() {
 
 const v_d81136 = v_472849.create({
   container: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 48 },
+
+  scroll: { ...v_a61db3.scrollContent, paddingBottom: 48 },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
