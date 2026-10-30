@@ -15,7 +15,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_772971 } from 'jmpfvteuuztnp';
 
 import { v_729608, v_f16775, v_556baf } from '../components';
-import { v_1bfbd0 } from '../constants';
+import { v_1bfbd0, v_843035, v_9b1a04 } from '../constants';
 import { v_4b1173 } from '../context/AlertDialogContext';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import {
@@ -25,7 +25,13 @@ import {
 } from '../services/afterlifeRewards';
 import { v_18f201 } from '../services/pangle';
 import { v_dd87bc } from '../services';
-import { v_b9db3d, v_d7e45e } from '../utils';
+import { v_b9db3d } from '../utils';
+
+function v_dc25a4(v_f63e09): string {
+  const v_f4e98d = Number(v_f63e09);
+  if (!Number.isFinite(v_f4e98d) || v_f4e98d <= 0) return '0 KRW';
+  return `${Math.round(v_f4e98d).toLocaleString('ko-KR')} KRW`;
+}
 import { v_5f124d } from '../utils/walletEvents';
 import { v_02d115 } from '../services/afterlifeRelogin';
 
@@ -238,9 +244,9 @@ export default function v_5320dd() {
         refreshControl={<RefreshControl refreshing={v_612e9f} onRefresh={v_d5345f} />}
       >
         <ReferralStatsCard
-          title={v_8d41d7('screens.afterlifeGifts.pendingTotal', { defaultValue: '받을 보상' })}
+          title={v_8d41d7('screens.afterlifeGifts.pendingTotal', { defaultValue: 'SWAP' })}
           value={`${v_039fee} XRUN`}
-          helperText={v_d7e45e(v_f02564)}
+          helperText={v_dc25a4(v_f02564)}
           icon="flower"
         />
 
@@ -258,11 +264,11 @@ export default function v_5320dd() {
         {!v_683210 && !v_49263d && v_483de2.length === 0 && (
           <TouchableOpacity style={v_d81136.emptyBox} onPress={v_7f243f} activeOpacity={0.75}>
             <Text style={v_d81136.emptyText}>
-              {v_8d41d7('screens.afterlifeGifts.emptyRewardTitle', { defaultValue: '받을 보상이 없어요' })}
+              {v_8d41d7('screens.afterlifeGifts.emptyRewardTitle', { defaultValue: 'SWAP 보상이 없어요' })}
             </Text>
             <Text style={v_d81136.emptySub}>
               {v_8d41d7('screens.afterlifeGifts.emptyRewardSub', {
-                defaultValue: '애프터라이프 앱 선물함에서 받은 선물을 교환하면 여기서 XRUN으로 받을 수 있어요.',
+                defaultValue: '애프터라이프 앱 선물함에서 받은 선물을 SWAP하면 여기서 XRUN으로 받을 수 있어요.',
               })}
             </Text>
           </TouchableOpacity>
@@ -279,16 +285,18 @@ export default function v_5320dd() {
               disabled={v_56eae3 !== null}
               activeOpacity={0.75}
             >
-              <View style={v_d81136.cardBadge}>
-                <Text style={v_d81136.cardBadgeText}>
-                  {v_8d41d7('screens.afterlifeGifts.exchangeBadge', { defaultValue: '애프터라이프 교환' })}
-                </Text>
+              <View style={v_d81136.cardHeader}>
+                <View style={v_d81136.cardBadge}>
+                  <Text style={v_d81136.cardBadgeText}>
+                    {v_8d41d7('screens.afterlifeGifts.exchangeBadge', { defaultValue: '애프터라이프 SWAP' })}
+                  </Text>
+                </View>
+                <Text style={v_d81136.cardDate}>{v_e065e5(v_8c0b26.createdAt)}</Text>
               </View>
               <Text style={v_d81136.cardTitle}>
                 {v_8c0b26.giftName ?? '선물'} {v_8c0b26.qty ?? ''}
                 {v_8c0b26.qty ? v_80cae9 : ''}
               </Text>
-              <Text style={v_d81136.cardSub}>{v_e065e5(v_8c0b26.createdAt)}</Text>
               <View style={v_d81136.divider} />
               <View style={v_d81136.cardFooter}>
                 <Text style={v_d81136.cardFooterLabel}>
@@ -308,16 +316,18 @@ export default function v_5320dd() {
           !v_49263d &&
           v_aa143b.map((v_8c0b26) => (
             <View key={`c-${v_8c0b26.id}`} style={[v_d81136.card, v_d81136.cardDone]}>
-              <View style={[v_d81136.cardBadge, v_d81136.cardBadgeDone]}>
-                <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>
-                  {v_8d41d7('screens.afterlifeGifts.claimedBadge', { defaultValue: '받기 완료' })}
-                </Text>
+              <View style={v_d81136.cardHeader}>
+                <View style={[v_d81136.cardBadge, v_d81136.cardBadgeDone]}>
+                  <Text style={[v_d81136.cardBadgeText, v_d81136.cardBadgeTextDone]}>
+                    {v_8d41d7('screens.afterlifeGifts.claimedBadge', { defaultValue: 'SWAP' })}
+                  </Text>
+                </View>
+                <Text style={[v_d81136.cardDate, v_d81136.cardTitleDone]}>{v_e065e5(v_8c0b26.claimedAt)}</Text>
               </View>
               <Text style={[v_d81136.cardTitle, v_d81136.cardTitleDone]}>
                 {v_8c0b26.giftName ?? '선물'} {v_8c0b26.qty ?? ''}
                 {v_8c0b26.qty ? v_80cae9 : ''}
               </Text>
-              <Text style={[v_d81136.cardSub, v_d81136.cardTitleDone]}>{v_e065e5(v_8c0b26.claimedAt)}</Text>
               <View style={v_d81136.divider} />
               <View style={v_d81136.cardFooter}>
                 <Text style={[v_d81136.cardFooterLabel, v_d81136.cardTitleDone]}>
@@ -350,18 +360,28 @@ export default function v_5320dd() {
 const v_d81136 = v_472849.create({
   container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 48 },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   cardBadge: {
     alignSelf: 'flex-start',
     backgroundColor: '#E6F0FF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: v_9b1a04.small,
+    paddingVertical: 2,
     borderRadius: 999,
-    marginBottom: 12,
   },
   cardBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: v_843035.size.msmall,
+    fontFamily: 'Roboto-Medium',
     color: '#2563EB',
+  },
+  cardDate: {
+    fontSize: v_843035.size.small,
+    fontFamily: 'Roboto-Regular',
+    color: '#666666',
   },
   errorBox: { padding: 24, alignItems: 'center' },
   errorText: { color: '#B91C1C', fontSize: 13, textAlign: 'center' },
@@ -374,30 +394,30 @@ const v_d81136 = v_472849.create({
   },
   retryBtnText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
   emptyBox: { padding: 40, alignItems: 'center' },
-  emptyText: { fontSize: 15, fontWeight: '700', color: '#333' },
-  emptySub: { fontSize: 12, color: '#888', marginTop: 8, textAlign: 'center', lineHeight: 17 },
+  emptyText: { fontSize: v_843035.size.medium, fontFamily: 'Roboto-Bold', color: '#333' },
+  emptySub: { fontSize: v_843035.size.small, fontFamily: 'Roboto-Regular', color: '#888', marginTop: 8, textAlign: 'center', lineHeight: 20 },
   card: {
     backgroundColor: v_1bfbd0.white,
     borderWidth: 1,
     borderColor: '#EEF0F6',
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 20,
+    borderRadius: v_9b1a04.medium,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    marginTop: v_9b1a04.small,
   },
-  cardTitle: { fontSize: 20, fontWeight: '700', color: v_1bfbd0.headerText },
-  cardSub: { fontSize: 12, color: '#888', marginTop: 4 },
+  cardTitle: { fontSize: v_843035.size.medium, fontFamily: 'Roboto-Bold', color: v_1bfbd0.headerText },
   divider: {
     height: v_472849.hairlineWidth,
     backgroundColor: '#E5E7EB',
-    marginVertical: 20,
+    marginVertical: 12,
   },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cardFooterLabel: { fontSize: 13, color: '#666', fontWeight: '500' },
-  cardFooterValue: { fontSize: 16, fontWeight: '800', color: v_1bfbd0.headerText },
+  cardFooterLabel: { fontSize: v_843035.size.msmall, fontFamily: 'Roboto-Regular', color: '#333333', letterSpacing: -0.5 },
+  cardFooterValue: { fontSize: v_843035.size.medium, fontFamily: 'Roboto-SemiBold', color: v_1bfbd0.headerText },
   cardDone: { backgroundColor: '#F3F4F6', borderColor: '#E5E7EB' },
   cardBadgeDone: { backgroundColor: '#E5E7EB' },
   cardBadgeTextDone: { color: '#6B7280' },
@@ -411,5 +431,5 @@ const v_d81136 = v_472849.create({
     backgroundColor: v_1bfbd0.white,
     alignItems: 'center',
   },
-  moreBtnText: { fontSize: 14, fontWeight: '600', color: '#4B5563' },
+  moreBtnText: { fontSize: v_843035.size.msmall, fontFamily: 'Roboto-Medium', color: '#4B5563' },
 });
