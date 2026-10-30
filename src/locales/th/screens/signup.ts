@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: 'รหัสแนะนำ',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
+  termsAgreeAll: 'ฉันยอมรับข้อกำหนดทั้งหมด',
   terms: {
     service: 'ข้อกำหนดการให้บริการ XRUN',
     location: 'ข้อกำหนดข้อมูลตำแหน่งส่วนบุคคล',

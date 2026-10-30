@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: '推荐码',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '。',
+  termsAgreeAll: '我同意全部条款',
   terms: {
     service: 'XRUN服务条款',
     location: '个人位置信息条款',

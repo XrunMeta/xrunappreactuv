@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: '추천 코드',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '에 동의합니다.',
+  termsAgreeAll: '전체 약관에 동의합니다',
   terms: {
     service: 'XRUN 서비스 약관',
     location: '개인 위치정보 약관',
