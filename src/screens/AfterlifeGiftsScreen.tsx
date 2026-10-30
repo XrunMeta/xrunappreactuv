@@ -189,6 +189,11 @@ export default function v_5320dd() {
               const v_d308b5 = v_59289a?.response?.status;
               console.warn('[AfterlifeRewards] claim failed:', v_d308b5, v_59289a?.message);
               void v_f6f5de();
+
+              if (v_59289a?.response?.data?.message === 'payout_frozen') {
+                await v_889fad(v_8d41d7('screens.adWallet.payoutFrozenTitle'), v_8d41d7('screens.adWallet.payoutFrozenMessage'));
+                return;
+              }
               await v_889fad(
                 v_8d41d7('screens.afterlifeGifts.claimFailTitle', { defaultValue: '받지 못했어요' }),
                 v_d308b5 === 409
