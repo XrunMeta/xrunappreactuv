@@ -23,6 +23,8 @@ export const v_5fdcb2 = () => {
       service: v_8d41d7('screens.myInfoClauses.serviceClause'),
       location: v_8d41d7('screens.myInfoClauses.locationClause'),
       personal: v_8d41d7('screens.myInfoClauses.personalClause'),
+      ai_data: v_8d41d7('screens.myInfoClauses.aiDataClause'),
+      marketing: v_8d41d7('screens.myInfoClauses.marketingClause'),
     }),
     [v_8d41d7],
   );
@@ -41,7 +43,7 @@ export const v_5fdcb2 = () => {
 
         console.log('[약관] 현재 언어 코드:', v_7c5e9b, 'i18n.language:', v_9c213b.language);
 
-        const v_4898e2 = v_6e7459 as 'service' | 'location' | 'personal';
+        const v_4898e2 = v_6e7459;
 
         const v_75fec9 = await v_4dba02(v_4898e2, v_7c5e9b, v_9b57fc);
 
