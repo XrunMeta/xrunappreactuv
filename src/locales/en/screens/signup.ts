@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: 'Referral Code',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
+  termsAgreeAll: 'I agree to all terms',
   terms: {
     service: 'XRUN Service Terms',
     location: 'Personal Location Information Terms',

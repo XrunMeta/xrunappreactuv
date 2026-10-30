@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: 'रेफरल कोड',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
+  termsAgreeAll: 'मैं सभी शर्तों से सहमत हूँ',
   terms: {
     service: 'XRUN सेवा नियम',
     location: 'व्यक्तिगत स्थान सूचना नियम',

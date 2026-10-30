@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: '紹介コード',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: 'に同意します。',
+  termsAgreeAll: 'すべての規約に同意します',
   terms: {
     service: 'XRUNサービス規約',
     location: '個人位置情報規約',
