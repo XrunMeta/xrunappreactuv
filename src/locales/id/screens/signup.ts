@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: 'Kode Referral',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
+  termsAgreeAll: 'Setujui semua ketentuan',
   terms: {
     service: 'Ketentuan Layanan XRUN',
     location: 'Ketentuan Informasi Lokasi Pribadi',

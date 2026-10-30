@@ -112,6 +112,17 @@ export const v_f40fc5 = () => {
   const [v_52cab9, v_a63a51] = v_5ab095(false);
   const [v_75d381, v_55cb03] = v_5ab095(false);
 
+  const v_33f2ba =
+    v_471e49 && v_68a5a9 && v_e55f34 && v_52cab9 && v_75d381;
+  const v_bc2355 = () => {
+    const v_a448ad = !v_33f2ba;
+    v_7f4d53(v_a448ad);
+    v_8e53ad(v_a448ad);
+    v_f932c8(v_a448ad);
+    v_a63a51(v_a448ad);
+    v_55cb03(v_a448ad);
+  };
+
   const v_b1f14f =
     v_471e49 && v_68a5a9 && v_e55f34 && v_52cab9;
 
@@ -1534,6 +1545,20 @@ export const v_f40fc5 = () => {
             </Text>
           </View>
 
+          <View style={v_d81136.termsDivider} />
+
+          {}
+          <View style={[v_d81136.termsRow, v_d81136.termsRowAll]}>
+            <FormCheckbox
+              checked={v_33f2ba}
+              onToggle={v_bc2355}
+              variant="square"
+            />
+            <Text style={[v_d81136.termsText, v_d81136.termsTextAll]}>
+              {v_8d41d7('screens.signup.termsAgreeAll')}
+            </Text>
+          </View>
+
           <View style={v_d81136.buttonWrapper}>
             <PrimaryButton
               title={v_88dca2 ? v_8d41d7('screens.signup.submitting') : v_8d41d7('screens.signup.submitButton')}
@@ -1754,6 +1779,22 @@ const v_d81136 = v_472849.create({
     width: 24,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  termsRowAll: {
+    paddingVertical: 4,
+  },
+  termsTextAll: {
+    fontSize: 14,
+    fontFamily: 'Roboto-SemiBold',
+    color: '#343A5A',
+  },
+  termsDivider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 4,
+    width: '100%',
+    maxWidth: 780,
+    alignSelf: 'center',
   },
   termsRow: {
     flexDirection: 'row',

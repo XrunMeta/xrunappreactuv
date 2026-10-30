@@ -25,6 +25,7 @@ export default {
   referralEmailLabel: 'Mã giới thiệu',
   referralEmailPlaceholder: 'ABC123',
   termsAgree: '.',
+  termsAgreeAll: 'Tôi đồng ý với tất cả điều khoản',
   terms: {
     service: 'Điều khoản dịch vụ XRUN',
     location: 'Điều khoản thông tin vị trí cá nhân',
