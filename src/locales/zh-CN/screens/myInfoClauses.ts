@@ -3,6 +3,8 @@ export default {
   serviceClause: '服务条款',
   locationClause: '个人位置信息条款',
   personalClause: '个人信息收集/使用条款',
+  aiDataClause: 'AI数据使用及生成同意',
+  marketingClause: '营销信息收集及使用同意',
   loading: '正在加载条款内容...',
   loadFailed: '无法加载条款内容。',
   loadError: '加载条款内容时发生错误。',

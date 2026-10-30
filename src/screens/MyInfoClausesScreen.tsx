@@ -23,6 +23,9 @@ export const v_41dfd5 = () => {
     { id: 'service', label: v_8d41d7('screens.myInfoClauses.serviceClause') },
     { id: 'location', label: v_8d41d7('screens.myInfoClauses.locationClause') },
     { id: 'personal', label: v_8d41d7('screens.myInfoClauses.personalClause') },
+
+    { id: 'ai_data', label: v_8d41d7('screens.myInfoClauses.aiDataClause') },
+    { id: 'marketing', label: v_8d41d7('screens.myInfoClauses.marketingClause') },
   ];
 
   return (
@@ -76,5 +79,4 @@ const v_d81136 = v_472849.create({
     fontFamily: 'Roboto-Medium',
   },
 });
-
 
