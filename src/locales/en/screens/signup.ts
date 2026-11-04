@@ -53,6 +53,17 @@ export default {
     loginCheckFailed: 'Registration completed but login verification failed. Please try again on the login screen',
     error: 'An error occurred during registration',
   },
+
+  inline: {
+    emailInvalid: 'Invalid email format',
+    emailCheckingTitle: 'Just a moment',
+    emailChecking: 'Checking your email. Please wait a moment.',
+    pwNeedLower: 'lowercase letter',
+    pwNeedUpper: 'uppercase letter',
+    pwNeedDigit: 'number',
+    pwNeedLen: '7+ characters',
+    pwNeedHint: 'Required: {{items}}',
+  },
   success: {
     title: 'Registration Complete',
     message: 'Registration has been completed',
@@ -73,6 +84,4 @@ export default {
     inputReferral: 'Enter Referral',
   },
 };
-
-
 

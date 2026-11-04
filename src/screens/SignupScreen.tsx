@@ -13,7 +13,7 @@ import {
   v_79c4f2,
   v_0e1f26,
 } from 'rcmrninabrnb';
-import { v_25515d } from 'zvyjokvuouwvifyzks';
+import { v_dec439, v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_ae251a, v_a9f6da } from '../services/analytics';
@@ -54,6 +54,11 @@ import { v_019a30, v_4e5f7b } from './walletKeyTutorialHelpers';
 import { v_5401ae } from '../testIDs';
 
 const v_0c96f7 = ['0', '10', '20', '30', '40', '50+'] as const;
+
+const v_b85249 = '#1A9450';
+const v_8d6ec1 = '#ff6b6b';
+
+const v_0712ab = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
 type GenderValue = 'male' | 'female' | '0';
 type AgeValue = (typeof v_0c96f7)[number];
@@ -125,6 +130,60 @@ export const v_f40fc5 = () => {
 
   const v_b1f14f =
     v_471e49 && v_68a5a9 && v_e55f34 && v_52cab9;
+
+  type EmailStatus = 'idle' | 'checking' | 'invalid' | 'duplicate' | 'ok';
+  const [v_b37c6e, v_11c6c1] = v_5ab095<EmailStatus>('idle');
+  const v_6edb1d = v_47b466 || v_d0472c;
+  v_c4deb2(() => {
+    const v_2f361a = v_e0c7e8.trim();
+    if (v_6edb1d || !v_2f361a) {
+      v_11c6c1('idle');
+      return;
+    }
+    if (!v_0712ab.test(v_2f361a)) {
+      v_11c6c1('invalid');
+      return;
+    }
+    v_11c6c1('checking');
+    let v_2008a4 = false;
+    const v_cb36b1 = setTimeout(async () => {
+      try {
+
+        const v_37a1a7 = await v_60e3a5(v_2f361a);
+        if (!v_2008a4) v_11c6c1(v_37a1a7 ? 'ok' : 'duplicate');
+      } catch {
+
+        if (!v_2008a4) v_11c6c1('idle');
+      }
+    }, 500);
+    return () => {
+      v_2008a4 = true;
+      clearTimeout(v_cb36b1);
+    };
+  }, [v_e0c7e8, v_6edb1d]);
+
+  const v_2d9119 = /[a-z]/.test(v_adc076);
+  const v_a25735 = /[A-Z]/.test(v_adc076);
+  const v_9b89a6 = /\d/.test(v_adc076);
+  const v_8a4e12 = v_adc076.length >= 7;
+  const v_78c4a6 = v_2d9119 && v_a25735 && v_9b89a6 && v_8a4e12;
+  const v_79f04d = v_78c4a6
+    ? undefined
+    : v_8d41d7('screens.signup.inline.pwNeedHint', {
+        items: [
+          !v_2d9119 ? v_8d41d7('screens.signup.inline.pwNeedLower') : null,
+          !v_a25735 ? v_8d41d7('screens.signup.inline.pwNeedUpper') : null,
+          !v_9b89a6 ? v_8d41d7('screens.signup.inline.pwNeedDigit') : null,
+          !v_8a4e12 ? v_8d41d7('screens.signup.inline.pwNeedLen') : null,
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      });
+  const v_a41c7b = !v_1e51a9
+    ? 'idle'
+    : v_adc076 === v_1e51a9
+      ? 'ok'
+      : 'mismatch';
 
   const [v_7dc79d, v_1bdbba] = v_5ab095(false);
   const [v_90b6e5, v_e23b14] = v_5ab095<v_9dd03c>('service');
@@ -748,6 +807,21 @@ export const v_f40fc5 = () => {
       return;
     }
 
+    if (!v_6edb1d) {
+      if (v_b37c6e === 'invalid') {
+        await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.inline.emailInvalid'));
+        return;
+      }
+      if (v_b37c6e === 'checking') {
+        await v_889fad(v_8d41d7('screens.signup.inline.emailCheckingTitle'), v_8d41d7('screens.signup.inline.emailChecking'));
+        return;
+      }
+      if (v_b37c6e === 'duplicate') {
+        await v_889fad(v_8d41d7('screens.signup.alerts.emailDuplicate'), v_8d41d7('screens.signup.errors.emailDuplicate'));
+        return;
+      }
+    }
+
     if (!v_d0472c) {
       if (!v_adc076.trim()) {
         await v_889fad(v_8d41d7('screens.signup.alerts.inputError'), v_8d41d7('screens.signup.errors.passwordRequired'));
@@ -1304,6 +1378,22 @@ export const v_f40fc5 = () => {
             autoCapitalize="none"
             containerStyle={v_d81136.fieldContainer}
             editable={!v_47b466 && !v_d0472c}
+            rightAccessory={
+              v_b37c6e === 'checking' ? (
+                <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
+              ) : v_b37c6e === 'invalid' || v_b37c6e === 'duplicate' ? (
+                <Feather name="x-circle" size={18} color={v_8d6ec1} />
+              ) : v_b37c6e === 'ok' ? (
+                <Feather name="check-circle" size={18} color={v_b85249} />
+              ) : undefined
+            }
+            errorText={
+              v_b37c6e === 'invalid'
+                ? v_8d41d7('screens.signup.inline.emailInvalid')
+                : v_b37c6e === 'duplicate'
+                  ? v_8d41d7('screens.signup.errors.emailDuplicate')
+                  : undefined
+            }
           />
 
           {}
@@ -1318,19 +1408,29 @@ export const v_f40fc5 = () => {
                 autoCapitalize="none"
                 containerStyle={v_d81136.fieldContainer}
                 rightAccessory={
-                  <TouchableOpacity
-                    style={v_d81136.eyeButton}
-                    onPress={() => v_c6fe9e((v_ba2215) => !v_ba2215)}
-                    activeOpacity={0.7}
-                    disabled={v_88dca2}
-                  >
-                    <Ionicons
-                      name={v_f872c3 ? 'eye-outline' : 'eye-off-outline'}
-                      size={20}
-                      color="#666666"
-                    />
-                  </TouchableOpacity>
+                  <View style={v_d81136.statusAccessory}>
+                    {v_adc076 ? (
+                      <Feather
+                        name={v_78c4a6 ? 'check-circle' : 'x-circle'}
+                        size={18}
+                        color={v_78c4a6 ? v_b85249 : v_8d6ec1}
+                      />
+                    ) : null}
+                    <TouchableOpacity
+                      style={v_d81136.eyeButton}
+                      onPress={() => v_c6fe9e((v_ba2215) => !v_ba2215)}
+                      activeOpacity={0.7}
+                      disabled={v_88dca2}
+                    >
+                      <Ionicons
+                        name={v_f872c3 ? 'eye-outline' : 'eye-off-outline'}
+                        size={20}
+                        color="#666666"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 }
+                errorText={v_79f04d}
               />
 
               <FormField
@@ -1342,19 +1442,29 @@ export const v_f40fc5 = () => {
                 autoCapitalize="none"
                 containerStyle={v_d81136.fieldContainer}
                 rightAccessory={
-                  <TouchableOpacity
-                    style={v_d81136.eyeButton}
-                    onPress={() => v_ed3503((v_ba2215) => !v_ba2215)}
-                    activeOpacity={0.7}
-                    disabled={v_88dca2}
-                  >
-                    <Ionicons
-                      name={v_99a8a8 ? 'eye-outline' : 'eye-off-outline'}
-                      size={20}
-                      color="#666666"
-                    />
-                  </TouchableOpacity>
+                  <View style={v_d81136.statusAccessory}>
+                    {v_a41c7b !== 'idle' ? (
+                      <Feather
+                        name={v_a41c7b === 'ok' ? 'check-circle' : 'x-circle'}
+                        size={18}
+                        color={v_a41c7b === 'ok' ? v_b85249 : v_8d6ec1}
+                      />
+                    ) : null}
+                    <TouchableOpacity
+                      style={v_d81136.eyeButton}
+                      onPress={() => v_ed3503((v_ba2215) => !v_ba2215)}
+                      activeOpacity={0.7}
+                      disabled={v_88dca2}
+                    >
+                      <Ionicons
+                        name={v_99a8a8 ? 'eye-outline' : 'eye-off-outline'}
+                        size={20}
+                        color="#666666"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 }
+                errorText={v_a41c7b === 'mismatch' ? v_8d41d7('screens.signup.errors.passwordMismatch') : undefined}
               />
             </>
           )}
@@ -1779,6 +1889,11 @@ const v_d81136 = v_472849.create({
     width: 24,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  statusAccessory: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   termsRowAll: {
     paddingVertical: 4,

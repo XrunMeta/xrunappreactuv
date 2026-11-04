@@ -53,6 +53,17 @@ export default {
     loginCheckFailed: '회원가입은 완료되었지만 로그인 확인에 실패했습니다. 로그인 화면에서 다시 시도해주세요.',
     error: '회원가입 중 오류가 발생했습니다.',
   },
+
+  inline: {
+    emailInvalid: '이메일 형식이 올바르지 않아요',
+    emailCheckingTitle: '잠시만요',
+    emailChecking: '이메일 확인 중입니다. 잠시만 기다려 주세요.',
+    pwNeedLower: '영문 소문자',
+    pwNeedUpper: '영문 대문자',
+    pwNeedDigit: '숫자',
+    pwNeedLen: '7자 이상',
+    pwNeedHint: '{{items}} 입력해주세요',
+  },
   success: {
     title: '회원가입 완료',
     message: '회원가입이 완료되었습니다.',
@@ -73,6 +84,4 @@ export default {
     inputReferral: '입력하기',
   },
 };
-
-
 

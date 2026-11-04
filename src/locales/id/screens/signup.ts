@@ -51,6 +51,17 @@ export default {
     loginCheckFailed: 'Pendaftaran selesai tetapi verifikasi login gagal. Silakan coba lagi di halaman login',
     error: 'Terjadi kesalahan selama pendaftaran',
   },
+
+  inline: {
+    emailInvalid: 'Format email tidak valid',
+    emailCheckingTitle: 'Mohon tunggu',
+    emailChecking: 'Sedang memeriksa email. Mohon tunggu sebentar.',
+    pwNeedLower: 'huruf kecil',
+    pwNeedUpper: 'huruf besar',
+    pwNeedDigit: 'angka',
+    pwNeedLen: 'minimal 7 karakter',
+    pwNeedHint: 'Wajib: {{items}}',
+  },
   success: {
     title: 'Pendaftaran Selesai',
     message: 'Pendaftaran telah selesai',
@@ -71,6 +82,4 @@ export default {
     inputReferral: 'Masukkan Referral',
   },
 };
-
-
 
