@@ -51,6 +51,17 @@ export default {
     loginCheckFailed: '注册已完成，但登录验证失败。请在登录页面重试',
     error: '注册过程中发生错误',
   },
+
+  inline: {
+    emailInvalid: '邮箱格式不正确',
+    emailCheckingTitle: '请稍候',
+    emailChecking: '正在检查邮箱，请稍候。',
+    pwNeedLower: '小写字母',
+    pwNeedUpper: '大写字母',
+    pwNeedDigit: '数字',
+    pwNeedLen: '至少7位',
+    pwNeedHint: '还需包含：{{items}}',
+  },
   success: {
     title: '注册完成',
     message: '注册已完成',
@@ -71,6 +82,4 @@ export default {
     inputReferral: '输入推荐人',
   },
 };
-
-
 

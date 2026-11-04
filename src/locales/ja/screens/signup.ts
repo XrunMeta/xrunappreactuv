@@ -51,6 +51,17 @@ export default {
     loginCheckFailed: '会員登録は完了しましたが、ログイン確認に失敗しました。ログイン画面で再度お試しください',
     error: '会員登録中にエラーが発生しました',
   },
+
+  inline: {
+    emailInvalid: 'メールアドレスの形式が正しくありません',
+    emailCheckingTitle: 'お待ちください',
+    emailChecking: 'メールアドレスを確認中です。しばらくお待ちください。',
+    pwNeedLower: '英小文字',
+    pwNeedUpper: '英大文字',
+    pwNeedDigit: '数字',
+    pwNeedLen: '7文字以上',
+    pwNeedHint: '{{items}}を含めてください',
+  },
   success: {
     title: '会員登録完了',
     message: '会員登録が完了しました',
@@ -71,6 +82,4 @@ export default {
     inputReferral: '紹介人を入力',
   },
 };
-
-
 

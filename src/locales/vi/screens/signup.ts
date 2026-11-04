@@ -51,6 +51,17 @@ export default {
     loginCheckFailed: 'Đăng ký hoàn tất nhưng xác minh đăng nhập thất bại. Vui lòng thử lại trên màn hình đăng nhập',
     error: 'Đã xảy ra lỗi trong quá trình đăng ký',
   },
+
+  inline: {
+    emailInvalid: 'Định dạng email không hợp lệ',
+    emailCheckingTitle: 'Vui lòng đợi',
+    emailChecking: 'Đang kiểm tra email. Vui lòng đợi trong giây lát.',
+    pwNeedLower: 'chữ thường',
+    pwNeedUpper: 'chữ hoa',
+    pwNeedDigit: 'số',
+    pwNeedLen: 'từ 7 ký tự',
+    pwNeedHint: 'Cần có: {{items}}',
+  },
   success: {
     title: 'Đăng ký hoàn tất',
     message: 'Đăng ký đã hoàn tất',
@@ -71,7 +82,4 @@ export default {
     inputReferral: 'Nhập người giới thiệu',
   },
 };
-
-
-
 

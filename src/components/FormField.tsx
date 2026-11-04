@@ -20,6 +20,7 @@ interface FormFieldProps extends v_b60ea2 {
   leftAccessory?: v_a3453e.ReactNode;
   showDisabledStyle?: boolean; 
   onPress?: () => void; 
+  errorText?: string; 
 }
 
 export const FormField: v_a3453e.FC<FormFieldProps> = ({
@@ -34,6 +35,7 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
   onPress: v_719eed,
   editable: v_87d063 = true,
   showDisabledStyle: v_e3745c = true, 
+  errorText: v_74dc8b,
   ...v_3a2a5d
 }) => {
   const v_73e70b = v_f3168c();
@@ -91,6 +93,7 @@ export const FormField: v_a3453e.FC<FormFieldProps> = ({
           <View style={v_d81136.rightAccessory}>{v_de8f73}</View>
         ) : null}
       </InputWrapper>
+      {v_74dc8b ? <Text style={v_d81136.errorText}>{v_74dc8b}</Text> : null}
     </View>
   );
 };
@@ -151,6 +154,11 @@ const v_d81136 = v_472849.create({
   },
   inputDisabled: {
     color: '#9e9e9e',
+  },
+  errorText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#ff6b6b',
   },
 });
 
