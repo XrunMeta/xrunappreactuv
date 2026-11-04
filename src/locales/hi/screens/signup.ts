@@ -51,6 +51,17 @@ export default {
     loginCheckFailed: 'पंजीकरण पूर्ण हो गया लेकिन लॉगिन सत्यापन विफल। कृपया लॉगिन स्क्रीन पर पुनः प्रयास करें',
     error: 'पंजीकरण के दौरान एक त्रुटि हुई',
   },
+
+  inline: {
+    emailInvalid: 'ईमेल का प्रारूप सही नहीं है',
+    emailCheckingTitle: 'कृपया प्रतीक्षा करें',
+    emailChecking: 'ईमेल की जाँच हो रही है। कृपया थोड़ा प्रतीक्षा करें।',
+    pwNeedLower: 'छोटा अक्षर',
+    pwNeedUpper: 'बड़ा अक्षर',
+    pwNeedDigit: 'संख्या',
+    pwNeedLen: 'कम से कम 7 अक्षर',
+    pwNeedHint: 'आवश्यक: {{items}}',
+  },
   success: {
     title: 'पंजीकरण पूर्ण',
     message: 'पंजीकरण पूर्ण हो गया है',
@@ -71,7 +82,4 @@ export default {
     inputReferral: 'रेफरल दर्ज करें',
   },
 };
-
-
-
 

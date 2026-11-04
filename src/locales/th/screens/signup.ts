@@ -51,6 +51,17 @@ export default {
     loginCheckFailed: 'การลงทะเบียนเสร็จสมบูรณ์ แต่การยืนยันการเข้าสู่ระบบล้มเหลว กรุณาลองอีกครั้งในหน้าจอเข้าสู่ระบบ',
     error: 'เกิดข้อผิดพลาดระหว่างการลงทะเบียน',
   },
+
+  inline: {
+    emailInvalid: 'รูปแบบอีเมลไม่ถูกต้อง',
+    emailCheckingTitle: 'กรุณารอสักครู่',
+    emailChecking: 'กำลังตรวจสอบอีเมล กรุณารอสักครู่',
+    pwNeedLower: 'ตัวพิมพ์เล็ก',
+    pwNeedUpper: 'ตัวพิมพ์ใหญ่',
+    pwNeedDigit: 'ตัวเลข',
+    pwNeedLen: '7 ตัวอักษรขึ้นไป',
+    pwNeedHint: 'ต้องมี: {{items}}',
+  },
   success: {
     title: 'ลงทะเบียนเสร็จสมบูรณ์',
     message: 'การลงทะเบียนเสร็จสมบูรณ์แล้ว',
@@ -71,7 +82,4 @@ export default {
     inputReferral: 'กรอกข้อมูลแนะนำ',
   },
 };
-
-
-
 
