@@ -103,6 +103,17 @@ $AppsFlyerPurchaseConnector=true
           end
         end
       end
+      # 🔥 [2026-11-12] Xcode 27.1 SDK 는 IPHONEOS_DEPLOYMENT_TARGET 15.0 미만 거부.
+      #   GTMAppAuth·GoogleToolboxForMac·PromisesObjC·SDWebImage 등 수많은 Pod 가 옛 target 들고 와 archive 실패.
+      #   모든 Pod target 을 앱 deployment target (15.1) 으로 강제.
+      installer.pods_project.targets.each do |target|
+        target.build_configurations.each do |config|
+          deployment = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+          if deployment.nil? || Gem::Version.new(deployment.to_s) < Gem::Version.new('15.1')
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+          end
+        end
+      end
       installer.pods_project.save
     end
   end
