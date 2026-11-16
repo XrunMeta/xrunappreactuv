@@ -1,5 +1,5 @@
 {
-  "_comment": "XR-1101 6단계 · npm 패키지로 잡히지 않는 구성요소. native=앱 바이너리에 포함되는 SDK·폰트, data=지역 데이터·폰트 데이터. 상용 SDK(Tapjoy·Pangle·AppsFlyer·Adison·Ayet)는 오픈소스가 아니므로 포함하지 않는다(처리방침에 별도 기재).",
+  "_comment": "XR-1101 6단계 · npm 패키지로 잡히지 않는 구성요소. native=앱 바이너리에 포함되는 SDK·라이브러리·폰트, data=지역 데이터·폰트 데이터. 상용 SDK(Tapjoy·Pangle·AppsFlyer·Adison·Ayet·Admixer·play-services-ads)는 오픈소스가 아니므로 포함하지 않는다(처리방침에 별도 기재). iOS Pods 전체 자동 수집은 macOS·pod install 환경 필요 — 현재는 Podfile.lock top-level OSS 수작업 보강.",
   "entries": [
     { "section": "native", "name": "Firebase Android SDK", "license": "Apache-2.0", "url": "https://github.com/firebase/firebase-android-sdk" },
     { "section": "native", "name": "Firebase iOS SDK", "license": "Apache-2.0", "url": "https://github.com/firebase/firebase-ios-sdk" },
@@ -7,6 +7,27 @@
     { "section": "native", "name": "Google Play Billing Library", "license": "Google Play Billing License", "url": "https://developer.android.com/google/play/billing" },
     { "section": "native", "name": "Feather Icons", "license": "MIT", "url": "https://github.com/feathericons/feather", "notice": "Copyright (c) 2013-2017 Cole Bemis" },
     { "section": "native", "name": "Ionicons", "license": "MIT", "url": "https://github.com/ionic-team/ionicons", "notice": "Copyright (c) 2015-present Ionic (http://ionic.io/)" },
+
+    { "section": "native", "name": "AppAuth for iOS/Android", "license": "Apache-2.0", "url": "https://github.com/openid/AppAuth-iOS", "notice": "Copyright (c) 2015 The AppAuth Authors." },
+    { "section": "native", "name": "AppCheckCore (Firebase App Check)", "license": "Apache-2.0", "url": "https://github.com/google/app-check" },
+    { "section": "native", "name": "GoogleUtilities", "license": "Apache-2.0", "url": "https://github.com/google/GoogleUtilities" },
+    { "section": "native", "name": "GTMAppAuth", "license": "Apache-2.0", "url": "https://github.com/google/GTMAppAuth" },
+    { "section": "native", "name": "GTMSessionFetcher", "license": "Apache-2.0", "url": "https://github.com/google/gtm-session-fetcher" },
+    { "section": "native", "name": "PromisesObjC (Google Promises)", "license": "Apache-2.0", "url": "https://github.com/google/promises" },
+    { "section": "native", "name": "Google Maps iOS SDK", "license": "Google Maps Platform Terms of Service", "url": "https://developers.google.com/maps/terms-20180207", "notice": "Google Maps iOS/Android SDK. 지도 표시에 사용. Google Maps Platform 약관 적용." },
+    { "section": "native", "name": "Google Maps iOS Utils", "license": "Apache-2.0", "url": "https://github.com/googlemaps/google-maps-ios-utils" },
+    { "section": "native", "name": "Hermes (React Native JS engine)", "license": "MIT", "url": "https://github.com/facebook/hermes", "notice": "Copyright (c) Meta Platforms, Inc. and affiliates." },
+    { "section": "native", "name": "Facebook Fresco (Android image pipeline)", "license": "MIT", "url": "https://github.com/facebook/fresco", "notice": "Copyright (c) Meta Platforms, Inc. and affiliates." },
+    { "section": "native", "name": "Facebook Yoga (RN layout engine)", "license": "MIT", "url": "https://github.com/facebook/yoga", "notice": "Copyright (c) Meta Platforms, Inc. and affiliates." },
+    { "section": "native", "name": "RCT-Folly (RN Folly port)", "license": "Apache-2.0", "url": "https://github.com/facebook/folly", "notice": "Copyright (c) Meta Platforms, Inc. and affiliates." },
+    { "section": "native", "name": "Boost C++ Libraries", "license": "BSL-1.0", "url": "https://www.boost.org/" },
+    { "section": "native", "name": "DoubleConversion", "license": "BSD-3-Clause", "url": "https://github.com/google/double-conversion", "notice": "Copyright 2006-2011, the V8 project authors." },
+    { "section": "native", "name": "fmt (formatting library)", "license": "MIT", "url": "https://github.com/fmtlib/fmt", "notice": "Copyright (c) 2012 - present, Victor Zverovich." },
+    { "section": "native", "name": "glog (Google logging library)", "license": "BSD-3-Clause", "url": "https://github.com/google/glog" },
+    { "section": "native", "name": "SocketRocket", "license": "BSD-3-Clause", "url": "https://github.com/facebookincubator/SocketRocket" },
+    { "section": "native", "name": "SDWebImage", "license": "MIT", "url": "https://github.com/SDWebImage/SDWebImage" },
+    { "section": "native", "name": "lottie-ios / lottie-android", "license": "Apache-2.0", "url": "https://github.com/airbnb/lottie-ios", "notice": "Copyright 2024 Airbnb, Inc." },
+    { "section": "native", "name": "CocoaAsyncSocket", "license": "MIT", "url": "https://github.com/robbiehanson/CocoaAsyncSocket" },
 
     { "section": "data", "name": "Countries States Cities Database", "version": "snapshot 8ad1a90c (2022-03-13)", "license": "ODbL-1.0", "url": "https://github.com/dr5hn/countries-states-cities-database", "notice": "Region data: Countries States Cities Database (https://github.com/dr5hn/countries-states-cities-database), made available under the Open Database License v1.0 (ODbL). Individual contents under the Database Contents License (DbCL) v1.0." },
     { "section": "data", "name": "Roboto Font Family", "license": "Apache-2.0 (and OFL-1.1 for font files)", "url": "https://github.com/googlefonts/roboto-3-classic", "notice": "Roboto typeface (@expo-google-fonts/roboto). Font files licensed under the SIL Open Font License 1.1." }
