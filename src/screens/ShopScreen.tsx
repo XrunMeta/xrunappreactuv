@@ -1,29 +1,29 @@
-import v_a3453e, { v_5ab095, v_df9f57, v_c4deb2, v_de06a3 } from 'bapkr';
-import { v_3094a2, v_472849, v_19b633, v_4623af, v_cf9c33, v_122070, v_07a341, v_700696, v_39a996, v_6c4f62, v_79c4f2, v_f2c756 } from 'rcmrninabrnb';
-import * as v_8a44cb from 'zryrlwvgokjhz';
-import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_5ade23 } from 'xbfwaaanosqvazmrqoah';
-import { v_570c34, v_556baf } from '../components';
-import { v_dec439 } from 'zvyjokvuouwvifyzks';
-import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_b34ce5, v_4c7b5d } from '../components';
-import { v_4b1173 } from '../context/AlertDialogContext';
-import { v_a0daa8, v_ce4741 } from '../navigation';
-import { v_700ef9 } from '../context';
-import { v_1bfbd0, v_a61db3, v_9b1a04, v_843035 } from '../constants';
-import type { v_d62ea7 } from '../services/giftishowBiz';
-import { v_877de8, v_885e03, v_54d016, v_81c40d, v_4d25ff, v_dd87bc } from '../services';
-import type { v_20035e } from '../types';
-import { v_5401ae } from '../testIDs';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView, ImageSourcePropType, Dimensions, ActivityIndicator, RefreshControl, TextInput, Linking } from 'react-native';
+import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeScrollView, SafeView } from '../components';
+import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { Header, SegmentedControl } from '../components';
+import { useAlertDialog } from '../context/AlertDialogContext';
+import { useAppNavigation, ROUTES } from '../navigation';
+import { useAppContext } from '../context';
+import { COLORS, COMMON_STYLES, SIZES, FONTS } from '../constants';
+import type { GiftishowProductItem } from '../services/giftishowBiz';
+import { getAyetPointsBalance, getXrunWalletBalance, getUserBalance, getXrunBuyableItems, fetchWalletData, getXRUNGopaxPrice } from '../services';
+import type { ShopItemData } from '../types';
+import { TID } from '../testIDs';
 
-const v_10664a = require('../../assets/xplay_symbol.png');
-const v_33c40c = require('../../assets/xrun-round-logo.png');
-const v_e98c55 = require('../../assets/sample_starbugs.png');
-const v_b236ed = require('../../assets/sample_cu.png');
-const v_da3188 = require('../../assets/sample_naverpay.png');
-const v_10a702 = require('../../assets/images/blur_yellow.png');
-const v_74bda9 = require('../../assets/images/ethereum_thumb.png');
-const v_47af4d = require('../../assets/xrun-horizontal-logo.png');
+const xplaySymbol = require('../../assets/xplay_symbol.png');
+const xrunRoundLogo = require('../../assets/xrun-round-logo.png');
+const sampleStarbucks = require('../../assets/sample_starbugs.png');
+const sampleCU = require('../../assets/sample_cu.png');
+const sampleNaverPay = require('../../assets/sample_naverpay.png');
+const blurYellow = require('../../assets/images/blur_yellow.png');
+const ethereumThumb = require('../../assets/images/ethereum_thumb.png');
+const xrunHorizontalLogo = require('../../assets/xrun-horizontal-logo.png');
 
 interface ProductData {
     id: string;
@@ -31,7 +31,7 @@ interface ProductData {
     title: string;
     description?: string;
     price: number;
-    image?: v_07a341 | null;
+    image?: ImageSourcePropType | null;
 
     isXplayShop?: boolean;
 
@@ -40,13 +40,13 @@ interface ProductData {
     iakCategory?: string;
 }
 
-const v_426e67 = [
+const sampleProducts: ProductData[] = [
     {
         id: '1',
         brand: '스타벅스',
         title: '아이스 카페 아메리카노T 2잔+부드러운 생크림 카스텔라 모바일쿠폰',
         price: 2000,
-        image: v_e98c55,
+        image: sampleStarbucks,
     },
     {
         id: '2',
@@ -54,480 +54,480 @@ const v_426e67 = [
         title: 'Ethereum 교환권',
         description: '최소 30,000 XRUN 이상 교환가능',
         price: 30000,
-        image: v_74bda9,
+        image: ethereumThumb,
     },
     {
         id: '3',
         brand: 'CU',
         title: 'CU 편의점 기프티콘',
         price: 2000,
-        image: v_b236ed,
+        image: sampleCU,
     },
     {
         id: '4',
         brand: 'Ethereum',
         title: '네이버페이 포인트 1만원',
         price: 30000,
-        image: v_da3188,
+        image: sampleNaverPay,
     },
 ];
 
-function v_02c692(item: v_20035e): ProductData {
+function shopItemToProductData(item: ShopItemData): ProductData {
 
-    const v_0622fe = v_8c0b26.thumbnail || v_8c0b26.image;
-    const v_74f4a3 = typeof v_0622fe === 'string' && v_0622fe.startsWith('http') ? v_0622fe : null;
+    const imgSrc = item.thumbnail || item.image;
+    const imgUri = typeof imgSrc === 'string' && imgSrc.startsWith('http') ? imgSrc : null;
     return {
-        id: String(v_8c0b26.item),
+        id: String(item.item),
         brand: 'XRUN',
-        title: v_8c0b26.title || '-',
-        description: v_8c0b26.description || undefined,
-        price: Number(v_8c0b26.priceXrun) || 0,
-        image: v_74f4a3 ? { uri: v_74f4a3 } : v_47af4d,
+        title: item.title || '-',
+        description: item.description || undefined,
+        price: Number(item.priceXrun) || 0,
+        image: imgUri ? { uri: imgUri } : xrunHorizontalLogo,
     };
 }
 
-const v_4994d5 = 70;
+const FALLBACK_KRW_PER_XRUN = 70;
 
-function v_e233cd(v_cd1446): string | null {
-    if (!v_cd1446) return null;
-    const v_fd5f43 = String(v_cd1446).trim();
-    if (!v_fd5f43) return null;
-    if (/^https?:\/\//i.test(v_fd5f43)) return v_fd5f43;
-    if (v_fd5f43.startsWith('/files/')) {
+function resolveAssetUri(uri: string | null | undefined): string | null {
+    if (!uri) return null;
+    const s = String(uri).trim();
+    if (!s) return null;
+    if (/^https?:\/\//i.test(s)) return s;
+    if (s.startsWith('/files/')) {
 
-        const v_389afb = v_fd5f43.slice('/files/'.length);
-        return `https://oth-path-f0013c.example.invalid/oth-path${v_389afb}`;
+        const id = s.slice('/files/'.length);
+        return `https://oth-path-f0013c.example.invalid/oth-path${id}`;
     }
-    return v_fd5f43;
+    return s;
 }
 
-function v_9bd735(item: v_d62ea7, v_e9cbfb, v_b0e133): ProductData {
-    const v_56d99d = typeof v_8c0b26.price === 'number' ? v_8c0b26.price : 0;
+function giftishowToProductData(item: GiftishowProductItem, krwPerXrun: number, defaultImageUri?: string | null): ProductData {
+    const rawPrice = typeof item.price === 'number' ? item.price : 0;
 
-    const v_20ff2e = typeof (v_8c0b26 as any).priceKRW === 'number';
-    let v_7be02f;
-    if (v_20ff2e) {
-        v_7be02f = v_56d99d; 
+    const hasBackendXrun = typeof (item as any).priceKRW === 'number';
+    let xrunPrice: number;
+    if (hasBackendXrun) {
+        xrunPrice = rawPrice; 
     } else {
-        const v_b7ffba = typeof v_e9cbfb === 'number' && v_e9cbfb > 0 ? v_e9cbfb : v_4994d5;
+        const divisor = typeof krwPerXrun === 'number' && krwPerXrun > 0 ? krwPerXrun : FALLBACK_KRW_PER_XRUN;
 
-        v_7be02f = Math.round((v_56d99d / v_b7ffba) * 100) / 100;
+        xrunPrice = Math.round((rawPrice / divisor) * 100) / 100;
     }
 
-    const v_364071 = v_e233cd(v_b0e133);
-    const v_0158ad = v_364071 ? { uri: v_364071 } : null;
+    const resolvedDefault = resolveAssetUri(defaultImageUri);
+    const fallbackImage = resolvedDefault ? { uri: resolvedDefault } : null;
     return {
-        id: v_8c0b26.id ?? `g-${v_8c0b26.name ?? ''}`,
+        id: item.id ?? `g-${item.name ?? ''}`,
 
-        brand: (v_8c0b26 as any).brandName ?? (v_8c0b26 as any).brand ?? '',
-        title: v_8c0b26.name ?? '-',
+        brand: (item as any).brandName ?? (item as any).brand ?? '',
+        title: item.name ?? '-',
 
-        description: (v_8c0b26 as any).description ?? undefined,
-        price: v_7be02f,
-        image: v_8c0b26.imageUrl ? { uri: v_e233cd(v_8c0b26.imageUrl) ?? v_8c0b26.imageUrl } : (v_0158ad as any),
+        description: (item as any).description ?? undefined,
+        price: xrunPrice,
+        image: item.imageUrl ? { uri: resolveAssetUri(item.imageUrl) ?? item.imageUrl } : (fallbackImage as any),
         isXplayShop: true,
-        isIak: (v_8c0b26 as any).source === 'iak',
-        iakCategory: (v_8c0b26 as any).iakCategory ?? (v_8c0b26 as any).category ?? undefined,
+        isIak: (item as any).source === 'iak',
+        iakCategory: (item as any).iakCategory ?? (item as any).category ?? undefined,
     };
 }
 
-const v_eaaecf = {
+const FORCE_COUNTRY_BY_EMAIL: Record<string, 'KR' | 'ID'> = {
     'oth-user@example.invalid': 'ID',
     'oth-test@example.invalid': 'ID',
 };
 
-export const v_10886b = () => {
+export const ShopScreen = () => {
     console.log('[ShopScreen] ShopScreen 컴포넌트 렌더링됨');
-    const { t: v_8d41d7 } = v_772971();
-    const { showAlert: v_889fad } = v_4b1173();
-    const { setSelectedShopItem: v_d0fbad, selectedShopItem: v_dfe883 } = v_700ef9();
-    const [v_11083e, v_94ee83] = v_5ab095<'xrunStore' | 'myItems'>('xrunStore');
+    const { t } = useTranslation();
+    const { showAlert } = useAlertDialog();
+    const { setSelectedShopItem, selectedShopItem } = useAppContext();
+    const [tab, setTab] = useState<'xrunStore' | 'myItems'>('xrunStore');
 
-    const [v_50b846, v_4ff2fa] = v_5ab095<v_d62ea7[]>([]);
+    const [xplayProductList, setXplayProductList] = useState<GiftishowProductItem[]>([]);
 
-    const [v_2bb9f6, v_180395] = v_5ab095<string | null>(null);
-    const [v_32c9b7, v_0e5971] = v_5ab095(false);
-    const [v_5605ec, v_ad5fd0] = v_5ab095(false);
-    const [v_02e6ad, v_33ec67] = v_5ab095<string | null>(null);
-    const [v_cd398d, v_d20f1f] = v_5ab095<number | null>(null);
-    const [v_837630, v_2f87ed] = v_5ab095(false);
-    const [v_1d54f1, v_67ba02] = v_5ab095<number | null>(null);
-    const [v_19340b, v_14129c] = v_5ab095(false);
-    const [v_7fb877, v_d816a6] = v_5ab095<ProductData[]>([]);
-    const [v_a502c3, v_77037a] = v_5ab095(false);
+    const [serverDefaultImage, setServerDefaultImage] = useState<string | null>(null);
+    const [xplayLoading, setXplayLoading] = useState(false);
+    const [xplayRefreshing, setXplayRefreshing] = useState(false);
+    const [xplayError, setXplayError] = useState<string | null>(null);
+    const [xplayBalance, setXplayBalance] = useState<number | null>(null);
+    const [xplayBalanceLoading, setXplayBalanceLoading] = useState(false);
+    const [xrunBalance, setXrunBalance] = useState<number | null>(null);
+    const [xrunBalanceLoading, setXrunBalanceLoading] = useState(false);
+    const [xrunStoreProducts, setXrunStoreProducts] = useState<ProductData[]>([]);
+    const [xrunStoreLoading, setXrunStoreLoading] = useState(false);
 
-    const [v_ca7424, v_c235bc] = v_5ab095<number>(v_4994d5);
+    const [gopaxKrwPerXrun, setGopaxKrwPerXrun] = useState<number>(FALLBACK_KRW_PER_XRUN);
 
-    const [v_b70da2, v_068f20] = v_5ab095<'KR' | 'ID' | null>(null);  
-    const [v_ae728d, v_9982dc] = v_5ab095<boolean>(false);
+    const [shopCountry, setShopCountry] = useState<'KR' | 'ID' | null>(null);  
+    const [gpsDenied, setGpsDenied] = useState<boolean>(false);
 
-    const [v_d51f37, v_bba8d0] = v_5ab095<boolean>(false);
-    const [v_01305e, v_e94174] = v_5ab095<'AUTO' | 'KR' | 'ID'>('AUTO');
-    const { navigate: v_9b57fc } = v_a0daa8();
+    const [isDevAccount, setIsDevAccount] = useState<boolean>(false);
+    const [forceCountry, setForceCountry] = useState<'AUTO' | 'KR' | 'ID'>('AUTO');
+    const { navigate } = useAppNavigation();
 
-    const v_5536d4 = 'shop:xrunBalance';
-    const v_fc87c6 = 'shop:xplayBalance';
+    const XRUN_BALANCE_CACHE_KEY = 'shop:xrunBalance';
+    const XPLAY_BALANCE_CACHE_KEY = 'shop:xplayBalance';
 
-    const v_abb08d = v_de06a3(async () => {
+    const loadXrunBalance = useCallback(async () => {
         try {
-            const v_f24fd5 = await v_e84827.getItem('userData');
-            if (!v_f24fd5) return;
-            const v_ef7306 = JSON.parse(v_f24fd5);
-            const v_660822 = v_ef7306?.member;
-            if (v_660822 == null) return;
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) return;
 
-            v_67ba02((v_ba2215) => {
-                if (v_ba2215 == null) v_14129c(true);
-                return v_ba2215;
+            setXrunBalance((prev) => {
+                if (prev == null) setXrunBalanceLoading(true);
+                return prev;
             });
-            console.log('[ShopScreen] fetchWalletData(currency=18) 호출 member=', v_660822);
-            const v_8f00b9 = await v_4d25ff(Number(v_660822), 7, v_9b57fc);
-            const v_ef8ab1 = Array.isArray(v_8f00b9?.data) ? v_8f00b9.data : [];
-            const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
-            const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
-            console.log('[ShopScreen] XRUN Polygon 잔액:', v_8decf8);
-            const v_3b402b = Number.isFinite(v_8decf8) ? v_8decf8 : null;
-            v_67ba02(v_3b402b);
-            if (v_3b402b != null) v_e84827.setItem(v_5536d4, String(v_3b402b)).catch(() => {});
-        } catch (v_9e86fd) {
-            console.warn('[ShopScreen] XRUN 잔액 조회 실패:', v_9e86fd);
+            console.log('[ShopScreen] fetchWalletData(currency=18) 호출 member=', member);
+            const res: any = await fetchWalletData(Number(member), 7, navigate);
+            const list: any[] = Array.isArray(res?.data) ? res.data : [];
+            const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+            const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+            console.log('[ShopScreen] XRUN Polygon 잔액:', parsed);
+            const value = Number.isFinite(parsed) ? parsed : null;
+            setXrunBalance(value);
+            if (value != null) AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(value)).catch(() => {});
+        } catch (e) {
+            console.warn('[ShopScreen] XRUN 잔액 조회 실패:', e);
 
         } finally {
-            v_14129c(false);
+            setXrunBalanceLoading(false);
         }
-    }, [v_9b57fc]);
+    }, [navigate]);
 
-    const v_c1e7a4 = v_de06a3(async () => {
+    const loadXplayBalance = useCallback(async () => {
         try {
-            const v_f24fd5 = await v_e84827.getItem('userData');
-            if (!v_f24fd5) {
-                v_d20f1f(null);
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) {
+                setXplayBalance(null);
                 return;
             }
-            const v_ef7306 = JSON.parse(v_f24fd5);
-            const v_660822 = v_ef7306?.member;
-            if (v_660822 == null) {
-                v_d20f1f(null);
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) {
+                setXplayBalance(null);
                 return;
             }
-            v_d20f1f((v_ba2215) => {
-                if (v_ba2215 == null) v_2f87ed(true);
-                return v_ba2215;
+            setXplayBalance((prev) => {
+                if (prev == null) setXplayBalanceLoading(true);
+                return prev;
             });
-            console.log('[ShopScreen] getAyetPointsBalance 호출 member=', v_660822);
-            const v_43c42e = await v_877de8(v_660822, v_9b57fc);
-            console.log('[ShopScreen] getAyetPointsBalance 결과:', v_43c42e);
-            const v_3b402b = v_43c42e.total_ayet_points ?? null;
-            v_d20f1f(v_3b402b);
-            if (v_3b402b != null) v_e84827.setItem(v_fc87c6, String(v_3b402b)).catch(() => {});
-        } catch (v_9e86fd) {
-            console.warn('[ShopScreen] Xplay 잔액 조회 실패:', v_9e86fd);
+            console.log('[ShopScreen] getAyetPointsBalance 호출 member=', member);
+            const result = await getAyetPointsBalance(member, navigate);
+            console.log('[ShopScreen] getAyetPointsBalance 결과:', result);
+            const value = result.total_ayet_points ?? null;
+            setXplayBalance(value);
+            if (value != null) AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(value)).catch(() => {});
+        } catch (e) {
+            console.warn('[ShopScreen] Xplay 잔액 조회 실패:', e);
 
         } finally {
-            v_2f87ed(false);
+            setXplayBalanceLoading(false);
         }
-    }, [v_9b57fc]);
+    }, [navigate]);
 
-    v_c4deb2(() => {
-        let v_2008a4 = false;
+    useEffect(() => {
+        let cancelled = false;
         (async () => {
             console.log('[ShopScreen] 잔액 마운트 fetch 시작');
             try {
-                const v_f24fd5 = await v_e84827.getItem('userData');
-                if (!v_f24fd5) return;
-                const v_ef7306 = JSON.parse(v_f24fd5);
-                const v_660822 = v_ef7306?.member;
-                if (v_660822 == null) return;
+                const userDataStr = await AsyncStorage.getItem('userData');
+                if (!userDataStr) return;
+                const userData = JSON.parse(userDataStr);
+                const member = userData?.member;
+                if (member == null) return;
 
                 try {
-                    const [v_be8dbe, v_ebcf3f] = await Promise.all([
-                        v_e84827.getItem(v_5536d4),
-                        v_e84827.getItem(v_fc87c6),
+                    const [cachedXrun, cachedXplay] = await Promise.all([
+                        AsyncStorage.getItem(XRUN_BALANCE_CACHE_KEY),
+                        AsyncStorage.getItem(XPLAY_BALANCE_CACHE_KEY),
                     ]);
-                    if (!v_2008a4) {
-                        if (v_be8dbe != null) {
-                            const v_f4e98d = parseFloat(v_be8dbe);
-                            if (Number.isFinite(v_f4e98d)) v_67ba02(v_f4e98d);
+                    if (!cancelled) {
+                        if (cachedXrun != null) {
+                            const n = parseFloat(cachedXrun);
+                            if (Number.isFinite(n)) setXrunBalance(n);
                         }
-                        if (v_ebcf3f != null) {
-                            const v_f4e98d = parseFloat(v_ebcf3f);
-                            if (Number.isFinite(v_f4e98d)) v_d20f1f(v_f4e98d);
+                        if (cachedXplay != null) {
+                            const n = parseFloat(cachedXplay);
+                            if (Number.isFinite(n)) setXplayBalance(n);
                         }
                     }
                 } catch {}
 
-                const v_38fb16 = await Promise.allSettled([
-                    v_4d25ff(Number(v_660822), 7, undefined),
+                const xrunRes = await Promise.allSettled([
+                    fetchWalletData(Number(member), 7, undefined),
                 ]);
-                if (v_2008a4) return;
-                if (v_38fb16[0].status === 'fulfilled') {
-                    const v_ef8ab1 = Array.isArray((v_38fb16[0].value as any)?.data) ? (v_38fb16[0].value as any).data : [];
-                    const v_b25f51 = v_ef8ab1.find((v_32f7b8) => Number(v_32f7b8?.currency) === 18);
-                    const v_8decf8 = parseFloat(v_b25f51?.Wamount || v_b25f51?.amount || '0');
-                    const v_81e2ef = Number.isFinite(v_8decf8) ? v_8decf8 : 0;
-                    console.log('[ShopScreen] XRUN Polygon 잔액:', v_81e2ef);
-                    v_67ba02(v_81e2ef);
-                    v_d20f1f(v_81e2ef);
-                    v_e84827.setItem(v_5536d4, String(v_81e2ef)).catch(() => {});
-                    v_e84827.setItem(v_fc87c6, String(v_81e2ef)).catch(() => {});
+                if (cancelled) return;
+                if (xrunRes[0].status === 'fulfilled') {
+                    const list: any[] = Array.isArray((xrunRes[0].value as any)?.data) ? (xrunRes[0].value as any).data : [];
+                    const xrunPolygon = list.find((w) => Number(w?.currency) === 18);
+                    const parsed = parseFloat(xrunPolygon?.Wamount || xrunPolygon?.amount || '0');
+                    const v = Number.isFinite(parsed) ? parsed : 0;
+                    console.log('[ShopScreen] XRUN Polygon 잔액:', v);
+                    setXrunBalance(v);
+                    setXplayBalance(v);
+                    AsyncStorage.setItem(XRUN_BALANCE_CACHE_KEY, String(v)).catch(() => {});
+                    AsyncStorage.setItem(XPLAY_BALANCE_CACHE_KEY, String(v)).catch(() => {});
                 } else {
-                    console.warn('[ShopScreen] Polygon 잔액 실패:', v_38fb16[0].reason);
+                    console.warn('[ShopScreen] Polygon 잔액 실패:', xrunRes[0].reason);
                 }
-            } catch (v_9e86fd) {
-                console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', v_9e86fd);
+            } catch (e) {
+                console.warn('[ShopScreen] 잔액 마운트 fetch 에러:', e);
             } finally {
-                if (!v_2008a4) {
-                    v_2f87ed(false);
-                    v_14129c(false);
+                if (!cancelled) {
+                    setXplayBalanceLoading(false);
+                    setXrunBalanceLoading(false);
                 }
             }
         })();
-        return () => { v_2008a4 = true; };
+        return () => { cancelled = true; };
     }, []);
 
-    v_c4deb2(() => {
+    useEffect(() => {
 
     }, []);
 
-    const v_4bfa33 = 'shopGpsCountry';
-    const v_447733 = 30 * 60 * 1000; 
-    const v_add9f8 = v_de06a3(async () => {
+    const GPS_CACHE_KEY = 'shopGpsCountry';
+    const GPS_CACHE_TTL = 30 * 60 * 1000; 
+    const detectCountry = useCallback(async () => {
 
         try {
-            const v_f24fd5 = await v_e84827.getItem('userData');
-            if (v_f24fd5) {
-                const v_e0c7e8 = String(JSON.parse(v_f24fd5)?.email ?? '').trim().toLowerCase();
-                const v_9bfd73 = v_eaaecf[v_e0c7e8];
-                if (v_9bfd73) {
-                    v_068f20(v_9bfd73);
-                    v_9982dc(false);
-                    console.log('[ShopScreen] 이메일 강제 국가:', v_e0c7e8, '→', v_9bfd73);
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (userDataStr) {
+                const email = String(JSON.parse(userDataStr)?.email ?? '').trim().toLowerCase();
+                const forced = FORCE_COUNTRY_BY_EMAIL[email];
+                if (forced) {
+                    setShopCountry(forced);
+                    setGpsDenied(false);
+                    console.log('[ShopScreen] 이메일 강제 국가:', email, '→', forced);
                     return;
                 }
             }
         } catch {}
-        if (v_01305e !== 'AUTO') {
-            v_068f20(v_01305e);
-            v_9982dc(false);
+        if (forceCountry !== 'AUTO') {
+            setShopCountry(forceCountry);
+            setGpsDenied(false);
             return;
         }
 
         try {
-            const v_e2a6a6 = await v_e84827.getItem(v_4bfa33);
-            if (v_e2a6a6) {
-                const v_8decf8 = JSON.parse(v_e2a6a6);
-                if (v_8decf8?.country && v_8decf8?.ts && (Date.now() - v_8decf8.ts) < v_447733) {
-                    v_068f20(v_8decf8.country === 'ID' ? 'ID' : 'KR');
-                    v_9982dc(false);
-                    console.log('[ShopScreen] GPS country cache hit:', v_8decf8.country, '(age', Math.round((Date.now() - v_8decf8.ts)/1000), 's)');
+            const cached = await AsyncStorage.getItem(GPS_CACHE_KEY);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed?.country && parsed?.ts && (Date.now() - parsed.ts) < GPS_CACHE_TTL) {
+                    setShopCountry(parsed.country === 'ID' ? 'ID' : 'KR');
+                    setGpsDenied(false);
+                    console.log('[ShopScreen] GPS country cache hit:', parsed.country, '(age', Math.round((Date.now() - parsed.ts)/1000), 's)');
                     return;
                 }
             }
         } catch {  }
         try {
-            const v_d60769 = await v_8a44cb.getForegroundPermissionsAsync();
-            let v_b6d66b = v_d60769.granted;
-            if (!v_b6d66b) {
-                const v_309144 = await v_8a44cb.requestForegroundPermissionsAsync();
-                v_b6d66b = v_309144.granted;
+            const perm = await Location.getForegroundPermissionsAsync();
+            let granted = perm.granted;
+            if (!granted) {
+                const req = await Location.requestForegroundPermissionsAsync();
+                granted = req.granted;
             }
-            if (!v_b6d66b) {
-                v_9982dc(true);
-                v_068f20('KR');
+            if (!granted) {
+                setGpsDenied(true);
+                setShopCountry('KR');
                 return;
             }
-            v_9982dc(false);
-            const v_9e7a9d = await v_8a44cb.getLastKnownPositionAsync({ maxAge: 60_000, requiredAccuracy: 1000 })
-                ?? await v_8a44cb.getCurrentPositionAsync({ accuracy: v_8a44cb.Accuracy.Balanced });
-            if (!v_9e7a9d?.coords) { v_068f20('KR'); return; }
-            const v_c53393 = await v_8a44cb.reverseGeocodeAsync({ latitude: v_9e7a9d.coords.latitude, longitude: v_9e7a9d.coords.longitude }).catch(() => []);
-            const v_fb024c = (v_c53393?.[0]?.isoCountryCode ?? '').toUpperCase();
-            const v_36caa3 = v_fb024c === 'ID' ? 'ID' : 'KR';
-            v_068f20(v_36caa3);
-            console.log('[ShopScreen] GPS country detected:', v_fb024c, '→', v_36caa3);
+            setGpsDenied(false);
+            const pos = await Location.getLastKnownPositionAsync({ maxAge: 60_000, requiredAccuracy: 1000 })
+                ?? await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+            if (!pos?.coords) { setShopCountry('KR'); return; }
+            const geo = await Location.reverseGeocodeAsync({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }).catch(() => []);
+            const isoCountry = (geo?.[0]?.isoCountryCode ?? '').toUpperCase();
+            const finalCountry = isoCountry === 'ID' ? 'ID' : 'KR';
+            setShopCountry(finalCountry);
+            console.log('[ShopScreen] GPS country detected:', isoCountry, '→', finalCountry);
 
             try {
-                await v_e84827.setItem(v_4bfa33, JSON.stringify({ country: v_36caa3, ts: Date.now() }));
+                await AsyncStorage.setItem(GPS_CACHE_KEY, JSON.stringify({ country: finalCountry, ts: Date.now() }));
             } catch {  }
-        } catch (v_9e86fd) {
-            console.warn('[ShopScreen] GPS detect failed, fallback KR:', v_9e86fd);
-            v_9982dc(true);
-            v_068f20('KR');
+        } catch (e) {
+            console.warn('[ShopScreen] GPS detect failed, fallback KR:', e);
+            setGpsDenied(true);
+            setShopCountry('KR');
         }
-    }, [v_01305e]);
+    }, [forceCountry]);
 
-    const v_f61b49 = v_de06a3(async () => {
-        v_33ec67(null);
+    const loadXplayProducts = useCallback(async () => {
+        setXplayError(null);
 
-        const v_09dafd = v_b70da2 === 'ID' ? '/getIakActiveGoods' : '/getGiftishowActiveGoods';
+        const endpoint = shopCountry === 'ID' ? '/getIakActiveGoods' : '/getGiftishowActiveGoods';
         try {
-            const v_9f42a4 = (await import('../services')).createAxiosInstance();
+            const axiosInstance = (await import('../services')).createAxiosInstance();
 
-            const v_c6f7a9 = (() => {
+            const memberForServer = (() => {
                 try {
-                    const v_ceb55a = (globalThis as any)?.__userData;
-                    return (v_ceb55a?.member != null) ? Number(v_ceb55a.member) : undefined;
+                    const u = (globalThis as any)?.__userData;
+                    return (u?.member != null) ? Number(u.member) : undefined;
                 } catch { return undefined; }
             })();
 
-            let v_1644fa = {};
-            if (typeof v_c6f7a9 === 'number' && Number.isFinite(v_c6f7a9)) {
-                v_1644fa = { member: v_c6f7a9 };
+            let memberBody: Record<string, number> = {};
+            if (typeof memberForServer === 'number' && Number.isFinite(memberForServer)) {
+                memberBody = { member: memberForServer };
             } else {
                 try {
-                    const v_e84827 = (await import('bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv')).default;
-                    const v_5dd688 = await v_e84827.getItem('userData');
-                    if (v_5dd688) {
-                        const v_f21c33 = JSON.parse(v_5dd688);
-                        if (v_f21c33?.member != null) v_1644fa = { member: Number(v_f21c33.member) };
+                    const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+                    const udStr = await AsyncStorage.getItem('userData');
+                    if (udStr) {
+                        const ud = JSON.parse(udStr);
+                        if (ud?.member != null) memberBody = { member: Number(ud.member) };
                     }
                 } catch {  }
             }
-            const v_8f00b9 = await v_9f42a4.post(v_09dafd, v_1644fa);
-            const v_479f05 = Array.isArray(v_8f00b9.data?.data?.list) ? v_8f00b9.data.data.list as any[] : [];
+            const res = await axiosInstance.post(endpoint, memberBody);
+            const raw = Array.isArray(res.data?.data?.list) ? res.data.data.list as any[] : [];
 
-            v_180395(typeof v_8f00b9.data?.data?.default_image === 'string' ? v_8f00b9.data.data.default_image : null);
+            setServerDefaultImage(typeof res.data?.data?.default_image === 'string' ? res.data.data.default_image : null);
 
-            const v_ef8ab1 = v_479f05.map((v_206b88) => ({
-                id: v_206b88.goods_code,
-                name: v_206b88.goods_name,
-                brand: v_206b88.brand_name,
-                price: Number(v_206b88.xplay_points ?? 0),    
-                priceKRW: Number(v_206b88.real_price ?? 0),
-                imageUrl: v_206b88.goods_image,
+            const list = raw.map((g: any) => ({
+                id: g.goods_code,
+                name: g.goods_name,
+                brand: g.brand_name,
+                price: Number(g.xplay_points ?? 0),    
+                priceKRW: Number(g.real_price ?? 0),
+                imageUrl: g.goods_image,
 
-                source: v_b70da2 === 'ID' ? 'iak' : 'kr_giftishow',
+                source: shopCountry === 'ID' ? 'iak' : 'kr_giftishow',
 
-                iakCategory: v_b70da2 === 'ID' ? (v_206b88.category ?? null) : null,
+                iakCategory: shopCountry === 'ID' ? (g.category ?? null) : null,
 
-                description: typeof v_206b88.description === 'string' ? v_206b88.description : undefined,
+                description: typeof g.description === 'string' ? g.description : undefined,
             }));
-            v_4ff2fa(v_ef8ab1 as any);
-            console.log('[Xplay Shop] DB 활성 상품:', v_ef8ab1.length, '건');
-            if (v_ef8ab1.length === 0) v_33ec67('등록된 기프티콘 상품이 없습니다.');
-        } catch (v_9e86fd) {
+            setXplayProductList(list as any);
+            console.log('[Xplay Shop] DB 활성 상품:', list.length, '건');
+            if (list.length === 0) setXplayError('등록된 기프티콘 상품이 없습니다.');
+        } catch (e) {
 
-            console.warn('[Xplay Shop] 백엔드 호출 실패:', v_9e86fd);
-            v_33ec67('기프티콘 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-            v_4ff2fa([]);
+            console.warn('[Xplay Shop] 백엔드 호출 실패:', e);
+            setXplayError('기프티콘 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+            setXplayProductList([]);
         }
-    }, [v_b70da2]);
+    }, [shopCountry]);
 
-    const v_d0991f = v_de06a3(async () => {
+    const loadGopaxKrwPerXrun = useCallback(async () => {
         try {
-            const v_e2a6a6 = await v_e84827.getItem('xrungopaxprice');
-            if (v_e2a6a6) {
-                const v_8decf8 = JSON.parse(v_e2a6a6) as { data?: { gopaxPrice?: number } };
-                const v_e2a85c = v_8decf8?.data?.gopaxPrice;
-                if (typeof v_e2a85c === 'number' && v_e2a85c > 0) v_c235bc(v_e2a85c);
+            const cached = await AsyncStorage.getItem('xrungopaxprice');
+            if (cached) {
+                const parsed = JSON.parse(cached) as { data?: { gopaxPrice?: number } };
+                const p = parsed?.data?.gopaxPrice;
+                if (typeof p === 'number' && p > 0) setGopaxKrwPerXrun(p);
             }
         } catch {
 
         }
         try {
-            const v_43c42e = await v_dd87bc(v_9b57fc);
-            const v_e2a85c = v_43c42e?.data?.gopaxPrice;
-            if (typeof v_e2a85c === 'number' && v_e2a85c > 0) {
-                v_c235bc(v_e2a85c);
-                await v_e84827.setItem('xrungopaxprice', JSON.stringify(v_43c42e));
+            const result = await getXRUNGopaxPrice(navigate);
+            const p = result?.data?.gopaxPrice;
+            if (typeof p === 'number' && p > 0) {
+                setGopaxKrwPerXrun(p);
+                await AsyncStorage.setItem('xrungopaxprice', JSON.stringify(result));
                 return;
             }
-        } catch (v_9e86fd) {
-            console.warn('[ShopScreen] 고팍스 XRUN 가격 API 실패:', v_9e86fd);
+        } catch (e) {
+            console.warn('[ShopScreen] 고팍스 XRUN 가격 API 실패:', e);
         }
         try {
-            const v_fd5f43 = await v_e84827.getItem('xrungopaxprice');
-            if (v_fd5f43) {
-                const v_8decf8 = JSON.parse(v_fd5f43) as { data?: { gopaxPrice?: number } };
-                const v_e2a85c = v_8decf8?.data?.gopaxPrice;
-                if (typeof v_e2a85c === 'number' && v_e2a85c > 0) {
-                    v_c235bc(v_e2a85c);
+            const s = await AsyncStorage.getItem('xrungopaxprice');
+            if (s) {
+                const parsed = JSON.parse(s) as { data?: { gopaxPrice?: number } };
+                const p = parsed?.data?.gopaxPrice;
+                if (typeof p === 'number' && p > 0) {
+                    setGopaxKrwPerXrun(p);
                     return;
                 }
             }
         } catch {
 
         }
-    }, [v_9b57fc]);
+    }, [navigate]);
 
-    v_c4deb2(() => {
-        if (v_11083e === 'xrunStore') {
-            void v_add9f8();
+    useEffect(() => {
+        if (tab === 'xrunStore') {
+            void detectCountry();
         }
-    }, [v_11083e, v_add9f8]);
+    }, [tab, detectCountry]);
 
-    v_c4deb2(() => {
-        if (v_11083e === 'xrunStore' && v_b70da2 !== null) {
-            v_0e5971(true);
-            void v_d0991f();
-            v_f61b49().finally(() => v_0e5971(false));
+    useEffect(() => {
+        if (tab === 'xrunStore' && shopCountry !== null) {
+            setXplayLoading(true);
+            void loadGopaxKrwPerXrun();
+            loadXplayProducts().finally(() => setXplayLoading(false));
         }
-    }, [v_11083e, v_b70da2, v_f61b49, v_d0991f]);
+    }, [tab, shopCountry, loadXplayProducts, loadGopaxKrwPerXrun]);
 
-    const v_f80453 = v_de06a3(() => {
-        v_ad5fd0(true);
-        Promise.all([v_f61b49(), v_c1e7a4(), v_d0991f()]).finally(() => v_ad5fd0(false));
-    }, [v_f61b49, v_c1e7a4, v_d0991f]);
+    const onXplayRefresh = useCallback(() => {
+        setXplayRefreshing(true);
+        Promise.all([loadXplayProducts(), loadXplayBalance(), loadGopaxKrwPerXrun()]).finally(() => setXplayRefreshing(false));
+    }, [loadXplayProducts, loadXplayBalance, loadGopaxKrwPerXrun]);
 
-    v_c4deb2(() => {
-        if (v_dfe883 && (v_dfe883 as any).shopTab) {
-            v_94ee83('xrunStore');
-            v_d0fbad(undefined);
+    useEffect(() => {
+        if (selectedShopItem && (selectedShopItem as any).shopTab) {
+            setTab('xrunStore');
+            setSelectedShopItem(undefined);
         }
-    }, [v_dfe883, v_d0fbad]);
-    const [v_61d92f, v_f10880] = v_5ab095<boolean>(false);
-    const [v_5d756f, v_a563de] = v_5ab095<string>('');
+    }, [selectedShopItem, setSelectedShopItem]);
+    const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
-    const v_734b9d = v_de06a3(async () => {
+    const loadXrunStoreProducts = useCallback(async () => {
         try {
-            const v_f24fd5 = await v_e84827.getItem('userData');
-            if (!v_f24fd5) return;
-            const v_ef7306 = JSON.parse(v_f24fd5);
-            const v_660822 = v_ef7306?.member;
-            if (v_660822 == null) return;
-            const v_8f00b9 = await v_81c40d(String(v_660822));
-            if (v_8f00b9.status === 'success' && v_8f00b9.data) {
-                v_d816a6(v_8f00b9.data.map(v_02c692));
+            const userDataStr = await AsyncStorage.getItem('userData');
+            if (!userDataStr) return;
+            const userData = JSON.parse(userDataStr);
+            const member = userData?.member;
+            if (member == null) return;
+            const res = await getXrunBuyableItems(String(member));
+            if (res.status === 'success' && res.data) {
+                setXrunStoreProducts(res.data.map(shopItemToProductData));
             }
-        } catch (v_49263d) {
-            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', v_49263d);
+        } catch (err) {
+            console.error('[ShopScreen] XRUN Store 상품 로드 실패:', err);
         }
     }, []);
 
-    v_c4deb2(() => {
-        if (v_11083e === 'xrunStore') {
-            v_abb08d();
-            v_734b9d();
+    useEffect(() => {
+        if (tab === 'xrunStore') {
+            loadXrunBalance();
+            loadXrunStoreProducts();
         }
-    }, [v_11083e, v_abb08d, v_734b9d]);
+    }, [tab, loadXrunBalance, loadXrunStoreProducts]);
 
-    const v_bcfa24 = v_700696.get('window').width;
-    const v_3af450 = v_df9f57(() => {
-        const v_d409bb = 16;
-        const v_3c3231 = 8;
-        const v_2f5c5c = v_bcfa24 - v_d409bb * 2;
-        return (v_2f5c5c - v_3c3231) / 2;
-    }, [v_bcfa24]);
+    const screenWidth = Dimensions.get('window').width;
+    const productCardWidth = useMemo(() => {
+        const paddingHorizontal = 16;
+        const gap = 8;
+        const availableWidth = screenWidth - paddingHorizontal * 2;
+        return (availableWidth - gap) / 2;
+    }, [screenWidth]);
 
-    const v_f523cd = v_df9f57(
-        () => v_50b846.map((v_8c0b26) => v_9bd735(v_8c0b26, v_ca7424, v_2bb9f6)),
-        [v_50b846, v_ca7424, v_2bb9f6],
+    const xplayProductsAsCards = useMemo(
+        () => xplayProductList.map((item) => giftishowToProductData(item, gopaxKrwPerXrun, serverDefaultImage)),
+        [xplayProductList, gopaxKrwPerXrun, serverDefaultImage],
     );
 
-    const v_cb1f8e = v_de06a3((v_ef8ab1): ProductData[] => {
-        const v_ab6401 = v_5d756f.trim().toLowerCase();
-        if (!v_ab6401) return v_ef8ab1;
-        return v_ef8ab1.filter((v_e2a85c) => {
-            const v_a2e3a2 = `${v_e2a85c.brand || ''} ${v_e2a85c.title || ''} ${v_e2a85c.description || ''}`.toLowerCase();
-            return v_a2e3a2.includes(v_ab6401);
+    const filterByQuery = useCallback((list: ProductData[]): ProductData[] => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return list;
+        return list.filter((p) => {
+            const hay = `${p.brand || ''} ${p.title || ''} ${p.description || ''}`.toLowerCase();
+            return hay.includes(q);
         });
-    }, [v_5d756f]);
+    }, [searchQuery]);
 
-    const v_41d7ed = v_df9f57(() => v_cb1f8e(v_7fb877), [v_cb1f8e, v_7fb877]);
-    const v_eb6490 = v_df9f57(() => v_cb1f8e(v_f523cd), [v_cb1f8e, v_f523cd]);
-    const v_259393 = v_41d7ed.length + v_eb6490.length > 0;
+    const filteredXrunStoreProducts = useMemo(() => filterByQuery(xrunStoreProducts), [filterByQuery, xrunStoreProducts]);
+    const filteredXplayProducts = useMemo(() => filterByQuery(xplayProductsAsCards), [filterByQuery, xplayProductsAsCards]);
+    const hasAnyResult = filteredXrunStoreProducts.length + filteredXplayProducts.length > 0;
 
-    const v_1c4d31 = v_df9f57(
+    const segmentedOptions = useMemo(
         () => [
             { label: 'XRUN Store', value: 'xrunStore' },
             { label: 'My Items', value: 'myItems' },
@@ -535,98 +535,98 @@ export const v_10886b = () => {
         [],
     );
 
-    const v_42b5ed = (value: typeof v_1c4d31[number]['value']) => {
-        if (v_3b402b === 'myItems') {
-            v_9b57fc(v_ce4741.shopMyItems);
+    const handleTabChange = (value: typeof segmentedOptions[number]['value']) => {
+        if (value === 'myItems') {
+            navigate(ROUTES.shopMyItems);
             return;
         }
-        v_94ee83(v_3b402b);
+        setTab(value);
     };
 
-    const v_8d97ed = (v_01bee9) => {
+    const handleProductClick = (product: ProductData) => {
 
-        const v_983c87 = {
-            id: v_01bee9.id,
-            title: v_01bee9.title,
-            priceLabel: `${v_01bee9.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`,
-            image: v_01bee9.image,
+        const shopItem = {
+            id: product.id,
+            title: product.title,
+            priceLabel: `${product.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`,
+            image: product.image,
             detailTotal: '',
-            brand: v_01bee9.brand,
-            description: v_01bee9.description,
-            isXrun: v_01bee9.brand === 'XRUN',
-            shopTab: v_01bee9.isXplayShop ? ('xplayShop' as const) : undefined,
+            brand: product.brand,
+            description: product.description,
+            isXrun: product.brand === 'XRUN',
+            shopTab: product.isXplayShop ? ('xplayShop' as const) : undefined,
 
-            isIak: v_01bee9.isIak ?? false,
-            iakCategory: v_01bee9.iakCategory ?? null,
+            isIak: product.isIak ?? false,
+            iakCategory: product.iakCategory ?? null,
         };
-        v_d0fbad(v_983c87 as any);
-        v_9b57fc(v_ce4741.shopProductDetail);
+        setSelectedShopItem(shopItem as any);
+        navigate(ROUTES.shopProductDetail);
     };
 
-    const v_dfaad1 = (v_01bee9) => {
-        v_889fad(v_8d41d7('screens.shop.purchaseConfirmTitle'), v_8d41d7('screens.shop.purchaseConfirmMessage', { title: v_01bee9.title }), [
-            { text: v_8d41d7('screens.shop.cancel') },
-            { text: v_8d41d7('screens.shop.purchase'), onPress: () => console.log('구매:', v_01bee9.id) },
+    const handlePurchase = (product: ProductData) => {
+        showAlert(t('screens.shop.purchaseConfirmTitle'), t('screens.shop.purchaseConfirmMessage', { title: product.title }), [
+            { text: t('screens.shop.cancel') },
+            { text: t('screens.shop.purchase'), onPress: () => console.log('구매:', product.id) },
         ]);
     };
 
-    const [v_23faa2, v_689f28] = v_5ab095<Set<string>>(new Set());
+    const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
-    const v_80b207 = (v_01bee9, v_80e8c0 = false) => {
-        const v_2141e0 = v_01bee9.brand === 'Ethereum' && v_01bee9.description;
+    const renderProductCard = (product: ProductData, showPurchaseButton: boolean = false) => {
+        const isEthereum = product.brand === 'Ethereum' && product.description;
 
-        const v_fa78fb = v_01bee9.brand === 'XRUN' || v_01bee9.isXplayShop === true;
+        const isXrun = product.brand === 'XRUN' || product.isXplayShop === true;
 
-        const v_419eb6 = v_01bee9.image && typeof v_01bee9.image === 'object' && 'uri' in v_01bee9.image;
-        const v_f3e29a = v_419eb6 && v_23faa2.has(v_01bee9.id);
-        const v_fafc7f = v_f3e29a ? null : v_01bee9.image;
-        const v_01a739 = !!v_fafc7f;
+        const isRemote = product.image && typeof product.image === 'object' && 'uri' in product.image;
+        const imgFailed = isRemote && failedImages.has(product.id);
+        const displayImage = imgFailed ? null : product.image;
+        const hasImage = !!displayImage;
 
         return (
-            <TouchableOpacity testID={v_5401ae.shop.productClick}
-                key={v_01bee9.id}
-                style={[v_d81136.productCard, { width: v_3af450 }]}
-                onPress={() => v_8d97ed(v_01bee9)}
+            <TouchableOpacity testID={TID.shop.productClick}
+                key={product.id}
+                style={[styles.productCard, { width: productCardWidth }]}
+                onPress={() => handleProductClick(product)}
                 activeOpacity={0.8}
             >
                 <View style={[
-                    v_d81136.productImageContainer,
-                    v_2141e0 && v_d81136.productImageContainerEthereum
+                    styles.productImageContainer,
+                    isEthereum && styles.productImageContainerEthereum
                 ]}>
-                    {v_01a739 ? (
+                    {hasImage ? (
                         <Image
-                            source={v_fafc7f as v_07a341}
+                            source={displayImage as ImageSourcePropType}
 
                             style={{ width: '80%', height: '80%', borderRadius: 8, alignSelf: 'center', marginTop: '10%' }}
                             resizeMode="cover"
                             onError={() => {
-                                if (v_419eb6) {
-                                    v_689f28(v_ba2215 => new Set(v_ba2215).add(v_01bee9.id));
+                                if (isRemote) {
+                                    setFailedImages(prev => new Set(prev).add(product.id));
                                 }
                             }}
                         />
                     ) : null}
-                    {v_2141e0 && v_01bee9.description && (
-                        <View style={v_d81136.imageDescriptionOverlay}>
-                            <Text testID={v_5401ae.shop.descriptionLabel} style={v_d81136.imageDescriptionText}>{v_01bee9.description}</Text>
+                    {isEthereum && product.description && (
+                        <View style={styles.imageDescriptionOverlay}>
+                            <Text testID={TID.shop.descriptionLabel} style={styles.imageDescriptionText}>{product.description}</Text>
                         </View>
                     )}
                 </View>
-                <View style={v_d81136.productInfo}>
-                    <Text style={v_d81136.productBrand}>{v_01bee9.brand || (v_01bee9.isIak ? v_8d41d7('screens.shop.iakBrand') : v_8d41d7('screens.shop.giftBrand'))}</Text>
-                    <Text testID={v_5401ae.shop.titleLabel} style={v_d81136.productTitle} numberOfLines={2}>
-                        {v_01bee9.title}
+                <View style={styles.productInfo}>
+                    <Text style={styles.productBrand}>{product.brand || (product.isIak ? t('screens.shop.iakBrand') : t('screens.shop.giftBrand'))}</Text>
+                    <Text testID={TID.shop.titleLabel} style={styles.productTitle} numberOfLines={2}>
+                        {product.title}
                     </Text>
                     {}
-                    <View style={v_d81136.productFooter}>
-                        <Text style={v_d81136.priceText}>{v_01bee9.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} XRUN</Text>
-                        {v_80e8c0 && (
+                    <View style={styles.productFooter}>
+                        <Text style={styles.priceText}>{product.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} XRUN</Text>
+                        {showPurchaseButton && (
                             <TouchableOpacity
-                                style={v_d81136.purchaseButton}
-                                onPress={() => v_dfaad1(v_01bee9)}
+                                style={styles.purchaseButton}
+                                onPress={() => handlePurchase(product)}
                                 activeOpacity={0.8}
                             >
-                                <Text style={v_d81136.purchaseButtonText}>{v_8d41d7('screens.shop.purchase')}</Text>
+                                <Text style={styles.purchaseButtonText}>{t('screens.shop.purchase')}</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -636,51 +636,51 @@ export const v_10886b = () => {
     };
 
     return (
-        <SafeView style={v_d81136.container} backgroundColor="#F8FAFC">
+        <SafeView style={styles.container} backgroundColor="#F8FAFC">
             <Header
-                title={v_8d41d7('screens.shop.title')}
+                title={t('screens.shop.title')}
                 rightComponent={
                     <TouchableOpacity
                         onPress={() => {
-                            const v_a448ad = !v_61d92f;
-                            v_f10880(v_a448ad);
-                            if (!v_a448ad) v_a563de('');
+                            const next = !showSearchBar;
+                            setShowSearchBar(next);
+                            if (!next) setSearchQuery('');
                         }}
                         activeOpacity={0.7}
-                        style={v_d81136.searchButton}
+                        style={styles.searchButton}
                     >
-                        <Feather name={v_61d92f ? 'x' : 'search'} size={20} color="#007aff" />
+                        <Feather name={showSearchBar ? 'x' : 'search'} size={20} color="#007aff" />
                     </TouchableOpacity>
                 }
             />
-            <View style={v_d81136.contentContainer}>
+            <View style={styles.contentContainer}>
                 {}
-                {v_11083e === 'xrunStore' && (
-                    <View style={v_d81136.balanceCardWrapper}>
+                {tab === 'xrunStore' && (
+                    <View style={styles.balanceCardWrapper}>
                         <LinearGradient
                             colors={['#FFFFFF', '#F9FAFB', '#FFFFFF']}
                             locations={[0, 0.5, 1]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
-                            style={v_d81136.balanceCard}
+                            style={styles.balanceCard}
                         >
-                            <Image source={v_10a702} style={v_d81136.balanceBlurRight} resizeMode="cover" />
-                            <View style={v_d81136.balanceContent}>
-                                <View style={v_d81136.balanceLeft}>
-                                    <Text style={v_d81136.balanceLabel}>{v_8d41d7('screens.shop.myBalance')}</Text>
-                                    <View style={v_d81136.balanceAmountRow}>
-                                        <View style={[v_d81136.balanceXplayIconContainer, v_d81136.balanceXrunIconContainer]}>
+                            <Image source={blurYellow} style={styles.balanceBlurRight} resizeMode="cover" />
+                            <View style={styles.balanceContent}>
+                                <View style={styles.balanceLeft}>
+                                    <Text style={styles.balanceLabel}>{t('screens.shop.myBalance')}</Text>
+                                    <View style={styles.balanceAmountRow}>
+                                        <View style={[styles.balanceXplayIconContainer, styles.balanceXrunIconContainer]}>
                                             <Image
-                                                source={v_33c40c}
-                                                style={v_d81136.balanceXplayIcon}
+                                                source={xrunRoundLogo}
+                                                style={styles.balanceXplayIcon}
                                                 resizeMode="contain"
                                             />
                                         </View>
-                                        <Text style={v_d81136.balanceAmount}>{v_19340b ? '...' : v_1d54f1 == null ? '-' : v_1d54f1.toLocaleString()}</Text>
+                                        <Text style={styles.balanceAmount}>{xrunBalanceLoading ? '...' : xrunBalance == null ? '-' : xrunBalance.toLocaleString()}</Text>
                                     </View>
                                 </View>
-                                <View style={v_d81136.xrunTag}>
-                                    <Text style={v_d81136.xrunTagText}>XRUN</Text>
+                                <View style={styles.xrunTag}>
+                                    <Text style={styles.xrunTagText}>XRUN</Text>
                                 </View>
                             </View>
                         </LinearGradient>
@@ -689,23 +689,23 @@ export const v_10886b = () => {
 
                 {}
                 <SegmentedControl
-                    options={v_1c4d31}
-                    value={v_11083e}
-                    onChange={v_42b5ed}
-                    containerStyle={v_d81136.segmented}
+                    options={segmentedOptions}
+                    value={tab}
+                    onChange={handleTabChange}
+                    containerStyle={styles.segmented}
                     hideIndicator={true}
                 />
 
                 {}
-                {v_61d92f && (
-                    <View style={v_d81136.searchBar}>
+                {showSearchBar && (
+                    <View style={styles.searchBar}>
                         <Feather name="search" size={18} color="#0296f2" />
-                        <TextInput testID={v_5401ae.shop.searchQueryInput}
+                        <TextInput testID={TID.shop.searchQueryInput}
                             placeholder="Search"
                             placeholderTextColor="#bcbec4"
-                            style={v_d81136.searchInput}
-                            value={v_5d756f}
-                            onChangeText={v_a563de}
+                            style={styles.searchInput}
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
                             autoCapitalize="none"
                             autoCorrect={false}
                             returnKeyType="search"
@@ -720,82 +720,78 @@ export const v_10886b = () => {
                     backgroundColor="transparent"
                     disableBottomPadding={true}
                     refreshControl={
-                        v_11083e === 'xrunStore' ? (
-                            <RefreshControl refreshing={v_5605ec} onRefresh={v_f80453} colors={[v_1bfbd0.buttonPrimary]} />
+                        tab === 'xrunStore' ? (
+                            <RefreshControl refreshing={xplayRefreshing} onRefresh={onXplayRefresh} colors={[COLORS.buttonPrimary]} />
                         ) : undefined
                     }
                 >
-                    {v_11083e === 'xrunStore' ? (
+                    {tab === 'xrunStore' ? (
                         <>
                             {
 
 }
 
                             {}
-                            {v_ae728d && (
+                            {gpsDenied && (
                                 <TouchableOpacity
                                     onPress={async () => {
-                                        const v_309144 = await v_8a44cb.requestForegroundPermissionsAsync();
-                                        if (v_309144.granted) {
-                                            v_068f20(null); 
+                                        const req = await Location.requestForegroundPermissionsAsync();
+                                        if (req.granted) {
+                                            setShopCountry(null); 
                                         } else {
 
-                                            v_f2c756.openSettings();
+                                            Linking.openSettings();
                                         }
                                     }}
                                     activeOpacity={0.8}
-                                    style={v_d81136.gpsBanner}
+                                    style={styles.gpsBanner}
                                 >
                                     <Feather name="map-pin" size={16} color="#92400e" />
-                                    <Text style={v_d81136.gpsBannerText}>
-                                        {v_8d41d7('screens.shop.iak.gpsBanner')}
+                                    <Text style={styles.gpsBannerText}>
+                                        {t('screens.shop.iak.gpsBanner')}
                                     </Text>
                                 </TouchableOpacity>
                             )}
-                            {v_32c9b7 && !v_5605ec ? (
-                                <View style={v_d81136.loadingContainer}>
-                                    <ActivityIndicator size="small" color={v_1bfbd0.buttonPrimary} />
-                                    <Text style={v_d81136.loadingText}>{v_8d41d7('screens.shop.loadingGiftList')}</Text>
+                            {xplayLoading && !xplayRefreshing ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="small" color={COLORS.buttonPrimary} />
+                                    <Text style={styles.loadingText}>{t('screens.shop.loadingGiftList')}</Text>
                                 </View>
-                            ) : v_02e6ad ? (
-                                <View style={v_d81136.errorContainer}>
-                                    <Text testID={v_5401ae.shop.errorLabel} style={v_d81136.errorText}>{v_02e6ad}</Text>
+                            ) : xplayError ? (
+                                <View style={styles.errorContainer}>
+                                    <Text testID={TID.shop.errorLabel} style={styles.errorText}>{xplayError}</Text>
                                 </View>
-                            ) : v_5d756f.trim() && !v_259393 ? (
-                                <View style={v_d81136.errorContainer}>
-                                    <Text style={v_d81136.noResultText}>"{v_5d756f.trim()}"에 대한 검색 결과가 없습니다.</Text>
+                            ) : searchQuery.trim() && !hasAnyResult ? (
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.noResultText}>"{searchQuery.trim()}"에 대한 검색 결과가 없습니다.</Text>
                                 </View>
                             ) : (
-                                <View style={v_d81136.productGrid}>
-                                    {v_41d7ed.map((v_01bee9) => v_80b207(v_01bee9, false))}
-                                    {v_eb6490.map((v_01bee9) => v_80b207(v_01bee9, false))}
+                                <View style={styles.productGrid}>
+                                    {filteredXrunStoreProducts.map((product) => renderProductCard(product, false))}
+                                    {filteredXplayProducts.map((product) => renderProductCard(product, false))}
                                 </View>
                             )}
                         </>
                     ) : (
-                        <View style={v_d81136.emptyContainer}>
-                            <Text style={v_d81136.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.emptyText}>My Items는 별도 화면에서 확인하실 수 있습니다.</Text>
                         </View>
                     )}
                 </SafeScrollView>
             </View>
             {}
-            {v_11083e !== 'xplayShop' ? (
-                <View style={v_d81136.taboolaContainer}>
-                    <TaboolaBanner placementType="shop" />
-                </View>
-            ) : null}
-        </SafeView>
+            {tab !== 'xplayShop' ? (
+            </SafeView>
     );
 };
 
-const v_d81136 = v_472849.create({
+const styles = StyleSheet.create({
     container: {
-        ...v_a61db3.container,
+        ...COMMON_STYLES.container,
     },
     contentContainer: {
         flex: 1,
-        ...v_a61db3.contentContainer,
+        ...COMMON_STYLES.contentContainer,
         paddingHorizontal: 0,
         paddingBottom: 0,
     },
@@ -807,7 +803,7 @@ const v_d81136 = v_472849.create({
         justifyContent: 'center',
     },
     searchButtonText: {
-        fontSize: v_843035.size.small,
+        fontSize: FONTS.size.small,
         fontFamily: 'Roboto-Regular',
         color: '#007aff',
     },
@@ -831,7 +827,7 @@ const v_d81136 = v_472849.create({
     searchInput: {
         flex: 1,
         marginLeft: 8,
-        fontSize: v_843035.size.msmall,
+        fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#1a2e35',
     },
@@ -865,7 +861,7 @@ const v_d81136 = v_472849.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: v_9b1a04.large,
+        paddingHorizontal: SIZES.large,
         height: '100%',
     },
     balanceLeft: {
@@ -953,7 +949,7 @@ const v_d81136 = v_472849.create({
         color: '#1e3a5f',
     },
     segmented: {
-        marginBottom: v_9b1a04.large,
+        marginBottom: SIZES.large,
         marginHorizontal: 16,
     },
     productGrid: {
@@ -1138,7 +1134,7 @@ const v_d81136 = v_472849.create({
     },
     gpsBannerText: {
         flex: 1,
-        fontSize: v_843035.size.msmall,
+        fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#92400e',
     },
@@ -1148,7 +1144,7 @@ const v_d81136 = v_472849.create({
         gap: 12,
     },
     loadingText: {
-        fontSize: v_843035.size.msmall,
+        fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#6a7282',
     },
@@ -1158,13 +1154,13 @@ const v_d81136 = v_472849.create({
         alignItems: 'center',
     },
     errorText: {
-        fontSize: v_843035.size.msmall,
+        fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#b91c1c',
         textAlign: 'center',
     },
     noResultText: {
-        fontSize: v_843035.size.msmall,
+        fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#8e9bae',
         textAlign: 'center',
@@ -1175,7 +1171,7 @@ const v_d81136 = v_472849.create({
         paddingHorizontal: 16,
     },
     emptyText: {
-        fontSize: v_843035.size.msmall,
+        fontSize: FONTS.size.msmall,
         fontFamily: 'Roboto-Regular',
         color: '#7d7e83',
     },

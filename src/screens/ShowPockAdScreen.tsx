@@ -31,7 +31,7 @@ import {
 import { v_fda57c } from '../services/appsflyer';
 import { v_cba33f } from '../utils';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_4c7b5d, v_570c34 } from '../components';
+import { v_570c34 } from '../components';
 import { v_843035 } from '../constants';
 import { v_6b63f9 } from '../types';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
@@ -115,7 +115,8 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
   const [v_b42caf, v_3e5456] = v_5ab095(false);
   const [v_7a79cf, v_1a68d1] = v_5ab095(false);
   const [v_660822, v_06fdbc] = v_5ab095<string>('');
-  const [v_452edc, v_5a7a1a] = v_5ab095(false);
+
+  const [v_452edc] = v_5ab095(true);
   const [v_cd0b08, v_1094fa] = v_5ab095(false);
   const [v_b2dceb, v_e60eaf] = v_5ab095('');
   const v_35f830 = v_e662ae<v_2694e4>(null);
@@ -771,19 +772,6 @@ export const ShowPockAdScreen: v_a3453e.FC<ShowPockAdScreenProps> = ({ onClose: 
             </View>
           )}
 
-        </View>
-      )}
-
-      {}
-      {v_7a79cf && (
-        <View style={v_d81136.bannerContainer}>
-          <TaboolaBanner
-            placementType="reward_OS_395x80"
-            onLoadComplete={() => {
-              console.log('[ShowPockAdScreen] Taboola 배너 로딩 완료');
-              v_5a7a1a(true);
-            }}
-          />
         </View>
       )}
 
