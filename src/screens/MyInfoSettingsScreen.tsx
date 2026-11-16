@@ -248,6 +248,17 @@ export const v_4a40b2 = () => {
             <Text style={v_d81136.cardText}>{v_8d41d7('screens.myInfoSettings.languageSelect')}</Text>
           </TouchableOpacity>
           {}
+          <TouchableOpacity
+            style={v_d81136.card}
+            activeOpacity={0.85}
+            onPress={() => v_9b57fc(v_ce4741.openSourceLicenses)}
+          >
+            <Text style={v_d81136.cardText}>
+              {v_8d41d7('screens.myInfoSettings.openSourceLicenses', { defaultValue: '오픈소스 라이선스' })}
+            </Text>
+          </TouchableOpacity>
+
+          {}
           <TouchableOpacity testID={v_5401ae.myInfoSettings.navigate}
             style={v_d81136.card}
             activeOpacity={0.85}

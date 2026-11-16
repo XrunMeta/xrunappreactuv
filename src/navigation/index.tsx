@@ -53,6 +53,7 @@ export const v_ce4741 = {
   myInfoNotify: 'myInfoNotify',
   myInfoReferral: 'myInfoReferral',
   myInfoFaq: 'myInfoFaq',
+  openSourceLicenses: 'openSourceLicenses',
   referralMyGroup: 'referralMyGroup',
   referralSettlement: 'referralSettlement',
   referralRank: 'referralRank',
