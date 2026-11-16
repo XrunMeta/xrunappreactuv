@@ -82,7 +82,6 @@ export const v_ce4741 = {
   ayetOffers: 'ayetOffers',
   ayetOffersXplay: 'ayetOffersXplay',
   webViewTest: 'webViewTest',
-  tapjoyList: 'tapjoyList',
   walletPrivateKeyDisplay: 'walletPrivateKeyDisplay',
   walletPrivateKeyGoogleAuth: 'walletPrivateKeyGoogleAuth',
   walletRestore: 'walletRestore',

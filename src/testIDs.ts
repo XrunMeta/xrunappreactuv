@@ -266,9 +266,6 @@ export const v_5401ae = {
     countrySearchQueryInput: 'signup-country-search-query-input',
     regionSearchQueryInput: 'signup-region-search-query-input',
   },
-  tapjoyList: {
-    showAd: 'tapjoy-list-show-ad',
-  },
   terms: {
     titleLabel: 'terms-title-label',
   },

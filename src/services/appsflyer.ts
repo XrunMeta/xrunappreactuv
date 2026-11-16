@@ -5,11 +5,10 @@ import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 
 export const v_0a693a = 'af_reward_complete';
 
-export type AppsFlyerAdNetwork = 'pangle' | 'nasmedia' | 'point_click' | 'tapjoy';
+export type AppsFlyerAdNetwork = 'pangle' | 'nasmedia' | 'point_click';
 
 export function v_7abfce(v_5a9c46): AppsFlyerAdNetwork {
   const v_3f4e2e = (v_5a9c46 || '').toLowerCase();
-  if (v_3f4e2e === 'tapjoy') return 'tapjoy';
   if (v_3f4e2e === 'pock' || v_3f4e2e === 'pointclick') return 'point_click';
   if (v_3f4e2e === 'pangle') return 'pangle';
   return 'nasmedia';
@@ -24,7 +23,6 @@ function v_ebf12e(v_fe6150): Record<string, number> {
   return {
     nasmedia: v_fe6150 === 'nasmedia' ? 1 : 0,
     point_click: v_fe6150 === 'point_click' ? 1 : 0,
-    tapjoy: v_fe6150 === 'tapjoy' ? 1 : 0,
     pangle: v_fe6150 === 'pangle' ? 1 : 0,
   };
 }
