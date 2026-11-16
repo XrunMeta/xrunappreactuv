@@ -30,6 +30,7 @@ export { WalletReceiveScreen } from './WalletReceiveScreen';
 export { AddWalletAddressScreen } from './AddWalletAddressScreen';
 export { MyInfoScreen } from './MyInfoScreen';
 export { MyInfoFaqScreen } from './MyInfoFaqScreen';
+export { OpenSourceLicensesScreen } from './OpenSourceLicensesScreen';
 export { MyInfoEditScreen } from './MyInfoEditScreen';
 export { PhoneEditScreen } from './PhoneEditScreen';
 export { ChangePasswordScreen } from './ChangePasswordScreen';

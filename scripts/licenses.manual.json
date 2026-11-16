@@ -1,0 +1,14 @@
+{
+  "_comment": "XR-1101 6단계 · npm 패키지로 잡히지 않는 구성요소. native=앱 바이너리에 포함되는 SDK·폰트, data=지역 데이터·폰트 데이터. 상용 SDK(Tapjoy·Pangle·AppsFlyer·Adison·Ayet)는 오픈소스가 아니므로 포함하지 않는다(처리방침에 별도 기재).",
+  "entries": [
+    { "section": "native", "name": "Firebase Android SDK", "license": "Apache-2.0", "url": "https://github.com/firebase/firebase-android-sdk" },
+    { "section": "native", "name": "Firebase iOS SDK", "license": "Apache-2.0", "url": "https://github.com/firebase/firebase-ios-sdk" },
+    { "section": "native", "name": "Google Sign-In for iOS/Android", "license": "Apache-2.0", "url": "https://github.com/google/GoogleSignIn-iOS" },
+    { "section": "native", "name": "Google Play Billing Library", "license": "Google Play Billing License", "url": "https://developer.android.com/google/play/billing" },
+    { "section": "native", "name": "Feather Icons", "license": "MIT", "url": "https://github.com/feathericons/feather", "notice": "Copyright (c) 2013-2017 Cole Bemis" },
+    { "section": "native", "name": "Ionicons", "license": "MIT", "url": "https://github.com/ionic-team/ionicons", "notice": "Copyright (c) 2015-present Ionic (http://ionic.io/)" },
+
+    { "section": "data", "name": "Countries States Cities Database", "version": "snapshot 8ad1a90c (2022-03-13)", "license": "ODbL-1.0", "url": "https://github.com/dr5hn/countries-states-cities-database", "notice": "Region data: Countries States Cities Database (https://github.com/dr5hn/countries-states-cities-database), made available under the Open Database License v1.0 (ODbL). Individual contents under the Database Contents License (DbCL) v1.0." },
+    { "section": "data", "name": "Roboto Font Family", "license": "Apache-2.0 (and OFL-1.1 for font files)", "url": "https://github.com/googlefonts/roboto-3-classic", "notice": "Roboto typeface (@expo-google-fonts/roboto). Font files licensed under the SIL Open Font License 1.1." }
+  ]
+}

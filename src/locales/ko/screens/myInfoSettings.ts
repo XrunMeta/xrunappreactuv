@@ -1,6 +1,7 @@
 export default {
   title: '설정',
   closeMembership: '회원 탈퇴',
+  openSourceLicenses: '오픈소스 라이선스',
   pushNotifications: '푸시 알림',
   pushNotificationsOn: '허용',
   pushNotificationsOff: '미허용',
