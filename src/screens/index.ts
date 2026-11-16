@@ -68,7 +68,6 @@ export { MyinfoShopSalesScreen } from './MyinfoShopSalesScreen';
 export { ReferralInputScreen } from './ReferralInputScreen';
 export { PangleListScreen } from './PangleListScreen';
 export { AyetOffersScreen } from './AyetOffersScreen';
-export { TapjoyListScreen } from './TapjoyListScreen';
 export { WalletPrivateKeyDisplayScreen } from './WalletPrivateKeyDisplayScreen';
 export { WalletPrivateKeyGoogleAuthScreen } from './WalletPrivateKeyGoogleAuthScreen';
 export { WalletRestoreScreen } from './WalletRestoreScreen';
