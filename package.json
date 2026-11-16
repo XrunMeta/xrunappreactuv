@@ -25,6 +25,7 @@
     "@react-native-firebase/analytics": "^25.1.0",
     "@react-native-firebase/app": "^25.1.0",
     "@react-native-google-signin/google-signin": "^16.0.0",
+    "@taboola/react-native-plugin-4x": "^4.0.10",
     "@types/crypto-js": "^4.2.2",
     "axios": "^1.13.2",
     "babel-preset-expo": "~54.0.10",
