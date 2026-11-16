@@ -6,6 +6,7 @@ import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
 import { v_cb41de, v_8714fe, v_556baf } from '../components';
 import { v_1bfbd0, v_9b1a04, v_a61db3, v_843035 } from '../constants';
 import { v_ce4741, v_a0daa8 } from '../navigation';
+import { v_4c7b5d } from '../components/TaboolaBanner';
 
 const { height: v_28d8d8, width: v_0d9f50 } = v_700696.get('window');
 
@@ -108,6 +109,10 @@ export const v_54d331 = () => {
 
       </View>
 
+      {}
+      <View style={v_d81136.taboolaContainer}>
+        <TaboolaBanner placementType="shop" />
+      </View>
     </SafeView>
   );
 };

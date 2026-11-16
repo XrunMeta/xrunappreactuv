@@ -51,6 +51,7 @@ import { v_f71847 } from '../types';
 import { v_f84ef5, v_c07360, v_91d5e4, v_965f93, v_563153, v_5d7ca4, v_e3e9a7, v_1c4683, v_aa7dc1, v_8cba1e, v_318c45, v_755eb9, v_23dd22 } from '../services';
 import { v_9bbbdc, v_9d7f6b } from '../services/walletKeyStore';
 import { v_ecc3ca, v_5ed938, v_6acfff, v_e3b9c1 } from '../services';
+import { v_295e39 } from '../services/taboola';
 
 import { v_858bfa } from '../utils/imageCache';
 import { v_e4a763 } from '../utils/env';
@@ -1732,6 +1733,31 @@ export const MapMainScreen: v_a3453e.FC = () => {
     }
 
   }, [v_524200, v_668889]);
+
+  v_c4deb2(() => {
+
+    const v_f2c805 = async () => {
+
+      try {
+
+        console.log('[MapMainScreen] Taboola HTML 프리로드 시작');
+
+        await v_295e39();
+
+        console.log('[MapMainScreen] Taboola HTML 프리로드 완료');
+
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+
+      } catch (v_5e9bfe) {
+
+        console.error('[MapMainScreen] Taboola HTML 프리로드 실패:', v_5e9bfe);
+
+      }
+
+    };
+
+    v_f2c805();
+  }, []); 
 
   const v_6dea10 = v_de06a3(async (v_9d6a91 = false) => {
 

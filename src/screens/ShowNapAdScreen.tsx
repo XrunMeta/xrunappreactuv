@@ -30,7 +30,7 @@ import {
 import { v_fda57c } from '../services/appsflyer';
 import { v_ebc3c8 } from '../config/napConfig';
 import v_e84827 from 'bkjbgtcoyuizqwgwtnaxmfkyvlqwevapsqmanbsnv';
-import { v_570c34 } from '../components';
+import { v_4c7b5d, v_570c34 } from '../components';
 import { v_843035 } from '../constants';
 import { v_25515d } from 'zvyjokvuouwvifyzks';
 import { v_5401ae } from '../testIDs';
@@ -123,8 +123,7 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
   const [v_b42caf, v_3e5456] = v_5ab095(false);
   const [v_7a79cf, v_1a68d1] = v_5ab095(false);
   const [v_660822, v_06fdbc] = v_5ab095<string>('');
-
-  const [v_452edc] = v_5ab095(true);
+  const [v_452edc, v_5a7a1a] = v_5ab095(false);
   const [v_cd0b08, v_1094fa] = v_5ab095(false);
   const [v_b2dceb, v_e60eaf] = v_5ab095('');
   const v_35f830 = v_e662ae<v_2694e4>(null);
@@ -862,6 +861,10 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
 
         </View>
       )}
+
+      {
+
+}
 
       {}
       <Modal
