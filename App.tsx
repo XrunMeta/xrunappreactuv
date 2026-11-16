@@ -91,7 +91,6 @@ import { v_8ecf08, v_e4a763 } from './src/utils/env';
 import { v_cba33f } from './src/utils';
 import v_1edcd1 from 'bqzlyqiwkhspjgyeabeemc';
 import { v_116c93, v_1f4a13 } from './src/locales';
-import { v_0b0acf } from './src/services/taboola';
 import { v_e8d7c0, v_a0b9d7 } from './src/services/ayet';
 import { v_f5ecec } from './src/services';
 import { v_f095b0, v_e55270 } from './src/services/pangle';
@@ -1315,7 +1314,6 @@ export default function v_6540c3() {
         } catch (v_5e9bfe) {
           console.error('[App] AppsFlyer 초기화 실패:', v_5e9bfe);
         }
-        v_0b0acf().then(() => console.log('[App] Taboola 초기화 완료')).catch((v_9e86fd) => console.error('[App] Taboola 초기화 실패:', v_9e86fd));
         v_dd87bc()
           .then((v_d9a946) => v_e84827.setItem('xrungopaxprice', JSON.stringify(v_d9a946)))
           .then(() => console.log('[App] 고팍스 XRUN 가격 조회 및 저장 완료'))

@@ -6,7 +6,7 @@ import { v_570c34, v_556baf } from '../components';
 import { v_b5df25 } from 'ernurodqvmtspux';
 import { v_dec439 } from 'zvyjokvuouwvifyzks';
 import { v_772971 } from 'jmpfvteuuztnp';
-import { v_729608, v_b34ce5, v_4c7b5d } from '../components';
+import { v_729608, v_b34ce5 } from '../components';
 import { v_c2fdd1 } from '../components/Dialog';
 import { v_a0daa8, v_ce4741 } from '../navigation';
 import { v_700ef9 } from '../context';
@@ -583,11 +583,6 @@ export const v_8c1d95 = () => {
                     )}
                 </SafeScrollView>
             </View>
-            {}
-            <View style={v_d81136.taboolaContainer}>
-                <TaboolaBanner placementType="shop" />
-            </View>
-
             {}
             <Dialog
                 visible={v_0b061c !== null}
