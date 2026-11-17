@@ -862,9 +862,18 @@ export const ShowNapAdScreen: v_a3453e.FC<ShowNapAdScreenProps> = ({ onClose: v_
         </View>
       )}
 
-      {
-
-}
+      {}
+      {v_7a79cf && (
+        <View style={v_d81136.bannerContainer}>
+          <TaboolaBanner
+            placementType="reward_OS_395x80"
+            onLoadComplete={() => {
+              console.log('[ShowNapAdScreen] Taboola 배너 로딩 완료');
+              v_5a7a1a(true);
+            }}
+          />
+        </View>
+      )}
 
       {}
       <Modal

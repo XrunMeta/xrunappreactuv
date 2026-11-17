@@ -36,6 +36,7 @@ export { default as v_cd1792 } from './myInfoCloseMembership';
 export { default as v_0a33ad } from './myInfoCloseMembershipSuccess';
 export { default as v_570520 } from './myInfoReferral';
 export { default as v_029ef9 } from './myInfoFaq';
+export { default as v_dbef46 } from './openSourceLicenses';
 export { default as v_df1cb0 } from './phoneEdit';
 export { default as v_fc7051 } from './referral';
 export { default as v_ca4d8d } from './referralSettlement';
