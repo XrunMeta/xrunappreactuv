@@ -83,6 +83,7 @@
     "react-native-zip-archive": "^7.0.2"
   },
   "overrides": {
+    "expo": "~54.0.31",
     "expo-linking": {
       "expo-constants": "~18.0.13"
     }
