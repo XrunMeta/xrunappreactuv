@@ -89,6 +89,7 @@
     }
   },
   "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@playwright/test": "^1.62.1",
     "@react-native-community/cli": "^20.0.2",
     "@react-native/metro-config": "^0.83.1",
