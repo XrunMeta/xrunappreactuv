@@ -28,6 +28,8 @@
     { "section": "native", "name": "SDWebImage", "license": "MIT", "url": "https://github.com/SDWebImage/SDWebImage" },
     { "section": "native", "name": "lottie-ios / lottie-android", "license": "Apache-2.0", "url": "https://github.com/airbnb/lottie-ios", "notice": "Copyright 2024 Airbnb, Inc." },
     { "section": "native", "name": "CocoaAsyncSocket", "license": "MIT", "url": "https://github.com/robbiehanson/CocoaAsyncSocket" },
+    { "section": "native", "name": "TensorFlow Lite (LiteRT)", "license": "Apache-2.0", "url": "https://github.com/tensorflow/tensorflow", "notice": "Copyright The TensorFlow Authors. 앱 온디바이스 얼굴 임베딩 생성에 사용." },
+    { "section": "native", "name": "OpenCV Zoo SFace (face recognition model)", "license": "Apache-2.0", "url": "https://github.com/opencv/opencv_zoo/tree/main/models/face_recognition_sface", "notice": "SFace model from OpenCV Zoo, licensed under Apache-2.0. Converted from ONNX to TensorFlow Lite (float16) for on-device use." },
 
     { "section": "data", "name": "Countries States Cities Database", "version": "snapshot 8ad1a90c (2022-03-13)", "license": "ODbL-1.0", "url": "https://github.com/dr5hn/countries-states-cities-database", "notice": "Region data: Countries States Cities Database (https://github.com/dr5hn/countries-states-cities-database), made available under the Open Database License v1.0 (ODbL). Individual contents under the Database Contents License (DbCL) v1.0." },
     { "section": "data", "name": "Roboto Font Family", "license": "Apache-2.0 (and OFL-1.1 for font files)", "url": "https://github.com/googlefonts/roboto-3-classic", "notice": "Roboto typeface (@expo-google-fonts/roboto). Font files licensed under the SIL Open Font License 1.1." }
